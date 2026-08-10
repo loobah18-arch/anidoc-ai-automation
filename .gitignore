@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.env
+output/*/images/*.png
+output/*/clips/*.mp4
+output/*/audio/*.mp3
+output/*/final_documentary.mp4
+output/*/temp_*
+.cache/
+.DS_Store

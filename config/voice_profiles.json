@@ -1,0 +1,39 @@
+{
+  "edge_tts": {
+    "hindi_male_documentary": {
+      "voice": "hi-IN-MadhurNeural",
+      "rate": "-4%",
+      "pitch": "-2Hz",
+      "description": "Deep, authoritative, serious male documentary narrator"
+    },
+    "hindi_female_documentary": {
+      "voice": "hi-IN-SwaraNeural",
+      "rate": "-3%",
+      "pitch": "0Hz",
+      "description": "Clear, expressive, investigative female narrator"
+    },
+    "english_male_documentary": {
+      "voice": "en-US-ChristopherNeural",
+      "rate": "-5%",
+      "pitch": "-3Hz",
+      "description": "Prestigious, calm, serious BBC/Netflix documentary voice"
+    },
+    "english_male_gravel": {
+      "voice": "en-US-GuyNeural",
+      "rate": "-4%",
+      "pitch": "-4Hz",
+      "description": "Gritty, tense true crime narrator"
+    }
+  },
+  "elevenlabs": {
+    "default_voice_id": "pNInz6obpgDQGcFmaJgB",
+    "voice_name": "Adam",
+    "model_id": "eleven_multilingual_v2",
+    "voice_settings": {
+      "stability": 0.55,
+      "similarity_boost": 0.80,
+      "style": 0.25,
+      "use_speaker_boost": true
+    }
+  }
+}

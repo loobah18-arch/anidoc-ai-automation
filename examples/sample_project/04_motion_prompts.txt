@@ -1,0 +1,20 @@
+Image 1 — Video Motion Prompt:
+- Starting Frame: Three Indian pilots digging escape tunnel under dim bulb.
+- Camera Motion: Slow push-in towards the lead pilot's focused eyes.
+- Environmental Dynamics: Subtle falling dust particles in the yellow light cone.
+- Duration: 4 seconds
+- Audio Cue: Muffled scraping metal and distant thunder.
+
+Image 2 — Video Motion Prompt:
+- Starting Frame: Wide prison courtyard with searchlight under heavy rain.
+- Camera Motion: Slow horizontal pan from left wall to the right guard tower.
+- Environmental Dynamics: Heavy vertical rain streaks and searchlight sweep across wet ground.
+- Duration: 5 seconds
+- Audio Cue: Heavy pouring rain and gusting wind.
+
+Image 3 — Video Motion Prompt:
+- Starting Frame: Close-up portrait of pilot in vintage coat in shadow.
+- Camera Motion: Gentle slow zoom with subtle breathing parallax.
+- Environmental Dynamics: Soft vapor breath in cold air.
+- Duration: 4 seconds
+- Audio Cue: Low ambient bass rumble and distant military siren.

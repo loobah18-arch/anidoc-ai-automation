@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AniDoc AI Studio — 2D Documentary Automation Engine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="studio-header">
+      <div class="logo-area">
+        <div class="logo-badge">2D ANIMATION</div>
+        <h1>AniDoc <span class="accent-text">AI Studio</span></h1>
+      </div>
+      <div class="header-tagline">
+        Viral 2D Documentary Video Generation Engine • Based on Chad Grow's Blueprint
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="studio-grid">
+      <!-- Left Panel: Controls & Topic Generator -->
+      <section class="panel control-panel">
+        <div class="panel-header">
+          <h2>1. Pipeline Setup</h2>
+          <span class="status-indicator ready">READY</span>
+        </div>
+
+        <div class="control-group">
+          <label for="language-select">Target Language</label>
+          <select id="language-select" class="custom-select">
+            <option value="Hindi" selected>Hindi (Formal Documentary with Urdu flavor)</option>
+            <option value="English">English (Cinematic BBC/Netflix Tone)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Topic Selection</label>
+          <button id="btn-generate-topics" class="btn btn-secondary">
+            ⚡ Generate 10 Viral Topics (State 1)
+          </button>
+        </div>
+
+        <div class="control-group">
+          <label for="topic-input">Or Enter Custom Topic</label>
+          <input type="text" id="topic-input" class="custom-input" placeholder="e.g. 1971 PAF Jailbreak by 3 Indian Pilots" value="1971 PAF Prison Escape: Untold Story of 3 Indian Fighter Pilots">
+        </div>
+
+        <div class="button-stack">
+          <button id="btn-run-pipeline" class="btn btn-primary btn-glow">
+            🚀 Run Full 6-State Pipeline
+          </button>
+          <button id="btn-render-media" class="btn btn-accent">
+            🎬 Render 1080p Video & Subtitles
+          </button>
+        </div>
+
+        <!-- System Stats / Architecture -->
+        <div class="feature-card">
+          <h3>AniDoc Engine DNA</h3>
+          <ul class="dna-list">
+            <li>🎯 <strong>Target Word Count:</strong> 3,000–4,500 words</li>
+            <li>⏱️ <strong>Retention Hook:</strong> Every 90–120s</li>
+            <li>🎨 <strong>Visual Style:</strong> 2D Vector Illustration, 16:9</li>
+            <li>🎙️ <strong>Voiceover:</strong> Deep Authoritative Neural TTS</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Right Panel: Output Tabs & Live Preview -->
+      <section class="panel output-panel">
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-tab="tab-topics">Topics</button>
+          <button class="tab-btn" data-tab="tab-script">Script (State 2)</button>
+          <button class="tab-btn" data-tab="tab-images">2D Prompts (State 3)</button>
+          <button class="tab-btn" data-tab="tab-motion">Motion (State 4)</button>
+          <button class="tab-btn" data-tab="tab-thumbnails">Thumbnails (State 5)</button>
+          <button class="tab-btn" data-tab="tab-seo">YouTube SEO (State 6)</button>
+          <button class="tab-btn highlight" data-tab="tab-media">Final Media</button>
+        </div>
+
+        <div class="tab-content-container">
+          <!-- Topics Tab -->
+          <div id="tab-topics" class="tab-content active">
+            <div class="tab-header">
+              <h3>Viral Topic Recommendations</h3>
+              <button class="btn btn-copy" onclick="copyText('topics-output')">Copy</button>
+            </div>
+            <pre id="topics-output" class="code-block">Click 'Generate 10 Viral Topics' to load high-potential video ideas...</pre>
+          </div>
+
+          <!-- Script Tab -->
+          <div id="tab-script" class="tab-content">
+            <div class="tab-header">
+              <h3>Cinematic Voiceover Script</h3>
+              <button class="btn btn-copy" onclick="copyText('script-output')">Copy Script</button>
+            </div>
+            <div id="script-output" class="text-content">No script generated yet. Click 'Run Full 6-State Pipeline' to generate.</div>
+          </div>
+
+          <!-- 2D Image Prompts Tab -->
+          <div id="tab-images" class="tab-content">
+            <div class="tab-header">
+              <h3>2D Illustration Image Prompts (16:9 AniDoc Style)</h3>
+              <button class="btn btn-copy" onclick="copyText('images-output')">Copy Prompts</button>
+            </div>
+            <pre id="images-output" class="code-block">Prompts will appear here in batches of 20...</pre>
+          </div>
+
+          <!-- Motion Prompts Tab -->
+          <div id="tab-motion" class="tab-content">
+            <div class="tab-header">
+              <h3>Camera Motion & Atmospheric Dynamics Prompts</h3>
+              <button class="btn btn-copy" onclick="copyText('motion-output')">Copy Motion</button>
+            </div>
+            <pre id="motion-output" class="code-block">Motion prompts for Veo 3 / Kling AI will appear here...</pre>
+          </div>
+
+          <!-- Thumbnails Tab -->
+          <div id="tab-thumbnails" class="tab-content">
+            <div class="tab-header">
+              <h3>5 High-CTR Thumbnail Concepts</h3>
+              <button class="btn btn-copy" onclick="copyText('thumbs-output')">Copy Concepts</button>
+            </div>
+            <pre id="thumbs-output" class="code-block">Thumbnail formulas and AI prompts will appear here...</pre>
+          </div>
+
+          <!-- SEO Tab -->
+          <div id="tab-seo" class="tab-content">
+            <div class="tab-header">
+              <h3>YouTube SEO & Metadata Package</h3>
+              <button class="btn btn-copy" onclick="copyText('seo-output')">Copy Package</button>
+            </div>
+            <pre id="seo-output" class="code-block">Titles, Description, 15 Hashtags, and 30 Tags will appear here...</pre>
+          </div>
+
+          <!-- Media Tab -->
+          <div id="tab-media" class="tab-content">
+            <div class="tab-header">
+              <h3>Rendered Documentary Assets</h3>
+            </div>
+            <div id="media-preview-area" class="media-grid">
+              <div class="placeholder-box">
+                <p>Rendered 1080p Video, Voiceover Audio, and High-CTR Thumbnail will appear here.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="studio-footer">
+      <p>AniDoc AI Automation System • Open Source Production Studio</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

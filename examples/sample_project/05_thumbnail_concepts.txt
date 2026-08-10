@@ -1,0 +1,13 @@
+Thumbnail 1:
+- Hindi Headline: RAW JAILBREAK: 3 पायलटों का खौफनाक सच (खौफनाक in RED)
+- Main Characters: Flight Lieutenant Dilip Parulkar, mud on face, intense determined gaze, center-right.
+- Background: Split screen — Left side dark rainy prison wall with glaring white searchlight + Right side vintage map of Peshawar and barbed wire.
+- Badge: '2D ANIMATION' in yellow rounded rectangle at bottom center.
+- Image Prompt: Semi-realistic 2D illustration of an intense Indian Air Force pilot escaping a dark Pakistani prison under a glaring searchlight and torrential rain, split composition with tactical map background, high contrast, warm amber and deep navy palette, 16:9 aspect ratio.
+
+Thumbnail 2:
+- Hindi Headline: पाकिस्तान जेल से भागने का गुप्त प्लान (गुप्त in YELLOW)
+- Main Characters: Silhouette of 3 pilots emerging from a tunnel into misty night.
+- Background: Giant shadowy military guard tower with red emergency beacon.
+- Badge: '2D ANIMATION' in yellow rounded rectangle at bottom center.
+- Image Prompt: Semi-realistic 2D illustration of three Indian pilots breaking out of a barbed wire military compound at night, dramatic shadows, single red spotlight accent, high tension, 16:9 aspect ratio.
