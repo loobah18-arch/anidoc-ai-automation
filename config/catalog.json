@@ -1,0 +1,53 @@
+{
+  "catalog": [
+    {
+      "id": "raw_1971_escape",
+      "category": "Espionage & Secret Missions",
+      "topic": "1971 PAF Prison Escape: Rawalpindi Jail se 3 Indian Fighter Pilots ka Daring Jailbreak",
+      "keywords": ["1971 War", "RAW", "Dilip Parulkar", "Jailbreak", "Air Force"],
+      "default_language": "Hindi"
+    },
+    {
+      "id": "operation_sindoor",
+      "category": "Espionage & Secret Missions",
+      "topic": "Operation Sindoor: RAW ka Sabse Secret Cross-Border Intelligence Extraction",
+      "keywords": ["RAW Operation", "Intelligence", "Spy Mission", "Special Ops"],
+      "default_language": "Hindi"
+    },
+    {
+      "id": "mumbai_underworld_treaty",
+      "category": "Historical Crime & Underworld",
+      "topic": "1970s Mumbai Underworld: Haji Mastan aur Karim Lala ki Secret Treaty aur Port Division",
+      "keywords": ["Mumbai Mafia", "Haji Mastan", "Underworld", "D-Company"],
+      "default_language": "Hindi"
+    },
+    {
+      "id": "ic814_kandahar_standoff",
+      "category": "Untold Real Events & Mysteries",
+      "topic": "Flight IC-814 Kandahar Hijack: 7 Dino Ka High-Stakes Cockpit & Cabinet Standoff",
+      "keywords": ["IC814", "Kandahar", "Hijack", "National Security"],
+      "default_language": "Hindi"
+    },
+    {
+      "id": "telgi_scam_untold",
+      "category": "Historical Crime & Underworld",
+      "topic": "The Telgi Stamp Paper Scam: 30,000 Crore Fake Empire ki Asli Kahani",
+      "keywords": ["Abdul Karim Telgi", "Financial Scam", "CBI Investigation"],
+      "default_language": "Hindi"
+    },
+    {
+      "id": "emergency_midnight_1975",
+      "category": "Political History & Power",
+      "topic": "1975 Emergency: 25 June ki Aadhi Raat ko Rashtrapati Bhavan ke Band Kamro ka Sach",
+      "keywords": ["Emergency 1975", "Indira Gandhi", "Political History"],
+      "default_language": "Hindi"
+    },
+    {
+      "id": "purulia_arms_drop_1995",
+      "category": "Untold Real Events & Mysteries",
+      "topic": "Purulia Arms Drop 1995: Aasman Se Barse AK-47 Hathiyar aur International Spy Conspiracy",
+      "keywords": ["Purulia", "Arms Drop", "Interpol", "RAW Investigation"],
+      "default_language": "Hindi"
+    }
+  ]
+}

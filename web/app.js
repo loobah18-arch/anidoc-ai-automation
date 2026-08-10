@@ -116,22 +116,24 @@ async function handleRenderMedia() {
     });
     const data = await res.json();
     if (data.status === 'success') {
-      const m = data.media;
       mediaArea.innerHTML = `
         <div class="media-card">
           <h4>Final 1080p Documentary Video</h4>
           <video controls src="/output/${currentProject}/final_documentary.mp4"></video>
-          <a class="btn btn-secondary" href="/output/${currentProject}/final_documentary.mp4" download>Download Video (.mp4)</a>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <a class="btn btn-secondary" href="/output/${currentProject}/final_documentary.mp4" download>Download Video</a>
+            <button class="btn btn-primary" onclick="handleUploadYouTube()">🚀 Upload to YouTube</button>
+          </div>
         </div>
         <div class="media-card">
           <h4>Viral High-CTR Thumbnail</h4>
           <img src="/output/${currentProject}/thumbnail.jpg" alt="Thumbnail">
-          <a class="btn btn-secondary" href="/output/${currentProject}/thumbnail.jpg" download>Download Thumbnail</a>
+          <a class="btn btn-secondary" href="/output/${currentProject}/thumbnail.jpg" download style="margin-top:8px;">Download Thumbnail</a>
         </div>
         <div class="media-card">
           <h4>Voiceover Narration Track</h4>
           <audio controls src="/output/${currentProject}/audio/voiceover.mp3" style="width:100%;margin-top:10px;"></audio>
-          <a class="btn btn-secondary" href="/output/${currentProject}/audio/voiceover.mp3" download style="margin-top:10px;">Download Audio (.mp3)</a>
+          <a class="btn btn-secondary" href="/output/${currentProject}/audio/voiceover.mp3" download style="margin-top:10px;">Download Audio</a>
         </div>
       `;
     } else {
@@ -139,6 +141,40 @@ async function handleRenderMedia() {
     }
   } catch (e) {
     alert('Rendering error: ' + e.message);
+  } finally {
+    statusInd.className = 'status-indicator ready';
+    statusInd.textContent = 'READY';
+  }
+}
+
+async function handleUploadYouTube() {
+  if (!currentProject) {
+    alert('Please run pipeline and render media first.');
+    return;
+  }
+  const statusInd = document.querySelector('.status-indicator');
+  statusInd.className = 'status-indicator busy';
+  statusInd.textContent = 'UPLOADING TO YOUTUBE...';
+
+  try {
+    const res = await fetch('/api/upload-youtube', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ project_name: currentProject, privacy: 'public' })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      const u = data.upload;
+      if (u.url) {
+        alert('🎉 Upload Success! Video URL: ' + u.url);
+      } else {
+        alert('Upload package prepared: ' + u.metadata_file + '\n' + u.status);
+      }
+    } else {
+      alert('Upload failed: ' + JSON.stringify(data));
+    }
+  } catch (e) {
+    alert('Upload error: ' + e.message);
   } finally {
     statusInd.className = 'status-indicator ready';
     statusInd.textContent = 'READY';

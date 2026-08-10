@@ -1,7 +1,7 @@
 """
 Lightweight Backend Web Server for AniDoc AI Automation Studio
-Serves the responsive web UI and exposes REST endpoints to trigger pipeline states.
-Runs on standard Python without requiring heavy framework installs.
+Serves the responsive web UI and exposes REST endpoints to trigger pipeline states
+and automatic YouTube uploading.
 """
 
 import sys
@@ -16,6 +16,8 @@ sys.path.insert(0, str(BASE_DIR))
 
 from config import settings
 from core.pipeline import AniDocPipeline
+from publishers.youtube_publisher import YouTubePublisher
+from main import extract_titles_and_desc
 
 PORT = 8080
 
@@ -24,11 +26,9 @@ class AniDocWebHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(BASE_DIR / "web"), **kwargs)
 
     def do_GET(self):
-        # Serve static assets or api endpoints
         if self.path.startswith("/api/projects"):
             self._handle_list_projects()
         elif self.path.startswith("/output/"):
-            # Serve generated media from output folder
             file_rel = self.path[len("/output/"):]
             target_path = BASE_DIR / "output" / file_rel
             if target_path.exists() and target_path.is_file():
@@ -62,6 +62,8 @@ class AniDocWebHandler(SimpleHTTPRequestHandler):
             self._handle_run_pipeline(data)
         elif self.path == "/api/render-media":
             self._handle_render_media(data)
+        elif self.path == "/api/upload-youtube":
+            self._handle_upload_youtube(data)
         else:
             self.send_error(404, "Endpoint not found")
 
@@ -97,6 +99,33 @@ class AniDocWebHandler(SimpleHTTPRequestHandler):
         pipeline = AniDocPipeline(project_name=project_name)
         res = pipeline.render_complete_media(max_images=data.get("max_images", 4))
         self._send_json({"status": "success", "media": res})
+
+    def _handle_upload_youtube(self, data):
+        project_name = data.get("project_name")
+        privacy = data.get("privacy", "public")
+        proj_dir = settings.OUTPUT_DIR / project_name
+        
+        video_path = proj_dir / "final_documentary.mp4"
+        thumb_path = proj_dir / "thumbnail.jpg"
+        seo_file = proj_dir / "06_seo_package.txt"
+        
+        seo_text = ""
+        if seo_file.exists():
+            with open(seo_file, "r", encoding="utf-8") as f:
+                seo_text = f.read()
+
+        title, desc, tags = extract_titles_and_desc(seo_text, project_name)
+        publisher = YouTubePublisher()
+        res = publisher.upload_video(
+            video_path=str(video_path),
+            title=title,
+            description=desc,
+            tags=tags,
+            thumbnail_path=str(thumb_path),
+            privacy_status=privacy,
+            topic_name=project_name
+        )
+        self._send_json({"status": "success", "upload": res})
 
     def _handle_list_projects(self):
         projects = []

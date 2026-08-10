@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Interactive CLI for AniDoc AI Automation Engine
-Run states 1-6 interactively or trigger full autonomous video creation.
+Run states 1-6 interactively or trigger full autonomous video creation and automatic YouTube upload.
 """
 
 import sys
@@ -13,6 +13,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from config import settings
 from core.pipeline import AniDocPipeline
+from publishers.youtube_publisher import YouTubePublisher
+from main import extract_titles_and_desc
 
 def print_banner():
     print("""
@@ -32,15 +34,15 @@ def print_banner():
 def main_menu():
     print_banner()
     print("Select an operation mode:")
-    print("  [1] Complete 1-Click Autonomous Production (Topic -> Script -> Media -> Video)")
+    print("  [1] 🚀 Complete 1-Click Autonomous Production & Auto YouTube Upload")
     print("  [2] State 1: Generate 10 Viral Topics")
     print("  [3] State 2: Generate Script from Custom Topic")
     print("  [4] State 3: Generate 2D Illustration Image Prompts")
     print("  [5] State 4: Generate Video Motion Prompts")
     print("  [6] State 5: Generate 5 High-CTR Thumbnail Concepts")
     print("  [7] State 6: Generate YouTube SEO Package")
-    print("  [8] Render Final 1080p Video & Subtitles from Existing Project")
-    print("  [9] Launch Web Studio Dashboard (http://localhost:8080)")
+    print("  [8] 🎬 Render 1080p Video & Subtitles locally")
+    print("  [9] 🌐 Launch Web Studio Dashboard (http://localhost:8080)")
     print("  [0] Exit")
     print("------------------------------------------------------------------------")
 
@@ -54,30 +56,43 @@ def run():
             break
             
         elif choice == "1":
-            print("\n--- 1-Click Autonomous Video Production ---")
+            print("\n--- Autonomous Video Creation & Automatic YouTube Upload ---")
             lang = input("Language (Hindi / English) [Default: Hindi]: ").strip() or "Hindi"
-            topic_input = input("Enter topic (or press Enter to auto-generate 10 topics): ").strip()
+            topic_input = input("Enter topic (or press Enter to auto-generate from catalog): ").strip()
             
             pipeline = AniDocPipeline(language=lang)
             if not topic_input:
-                topics_raw = pipeline.run_state1_topics()
-                print("\n" + topics_raw)
-                topic_input = input("\nEnter chosen topic name or number: ").strip()
-                if not topic_input:
-                    topic_input = "RAW Operation Sindoor 1971 Untold Story"
+                from core.topic_manager import TopicManager
+                mgr = TopicManager()
+                t_info = mgr.get_next_topic(language=lang)
+                topic_input = t_info["topic"]
                     
-            print(f"\nProceeding with Topic: '{topic_input}'\n")
+            print(f"\n[+] Producing Documentary on: '{topic_input}' [{lang}]\n")
             pipeline.run_state2_script(topic_input)
             pipeline.run_state3_image_prompts()
             pipeline.run_state4_motion_prompts()
             pipeline.run_state5_thumbnails()
-            pipeline.run_state6_seo()
+            seo_output = pipeline.run_state6_seo()
             
-            render_q = input("\nGenerate images, voiceover & render 1080p video now? (y/n) [Default: y]: ").strip().lower()
-            if render_q != "n":
-                pipeline.render_complete_media(max_images=4)
+            print("\nRendering 1080p Video, Voiceover & 2D Animated Thumbnail...")
+            media_res = pipeline.render_complete_media(max_images=5)
+
+            upload_q = input("\nUpload automatically to YouTube now? (y/n) [Default: y]: ").strip().lower()
+            if upload_q != "n":
+                privacy = input("Privacy status (public / unlisted / private) [Default: public]: ").strip() or "public"
+                best_title, description, tags = extract_titles_and_desc(seo_output, topic_input)
+                publisher = YouTubePublisher()
+                publisher.upload_video(
+                    video_path=media_res["video"],
+                    title=best_title,
+                    description=description,
+                    tags=tags,
+                    thumbnail_path=media_res["thumbnail"],
+                    privacy_status=privacy,
+                    topic_name=topic_input
+                )
                 
-            input("\n[SUCCESS] Project completed! Press Enter to return to main menu...")
+            input("\n[SUCCESS] Pipeline finished! Press Enter to return to main menu...")
 
         elif choice == "2":
             lang = input("Language (Hindi / English) [Default: Hindi]: ").strip() or "Hindi"
