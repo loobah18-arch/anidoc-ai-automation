@@ -21,16 +21,30 @@ class ImagePromptGenerator:
         return self.llm.generate(prompt=prompt, system_prompt=MASTER_SYSTEM_PROMPT, temperature=0.6, max_tokens=4000)
 
     def extract_prompt_list(self, raw_output: str) -> List[str]:
-        """Parses individual image prompts from raw LLM code blocks."""
-        # Find numbered prompts (e.g. "1. A dark 1970s Mumbai chawl...")
-        prompts = []
-        pattern = r'(?:^\d+[\.\)]\s+)(.+?)(?=(?:^\d+[\.\)]|\Z))'
-        matches = re.findall(pattern, raw_output, flags=re.MULTILINE | re.DOTALL)
-        for m in matches:
-            clean = " ".join(m.strip().split())
-            if len(clean) > 20:
-                prompts.append(clean)
-        return prompts if prompts else [raw_output.strip()]
+        """Parses clean individual 2D image prompts from LLM output, removing markdown tables & noise."""
+        clean_lines = []
+        for line in raw_output.split("\n"):
+            l = line.strip()
+            # Ignore markdown table rows, headers, estimated words, etc.
+            if not l or l.startswith("|") or l.startswith("#") or "estimated word" in l.lower() or "batch" in l.lower():
+                continue
+            # Remove numbered prefixes like "1. ", "Prompt 1:", "Scene 1:"
+            l = re.sub(r'^(?:\d+[\.\)]|Prompt\s*\d+:?|Scene\s*\d+:?|\*|-)\s*', '', l, flags=re.IGNORECASE).strip()
+            # Remove markdown bold/italic
+            l = re.sub(r'[\*#_`]', '', l).strip()
+            if len(l) > 25 and not l.lower().startswith("table"):
+                clean_lines.append(l)
+
+        if clean_lines:
+            return clean_lines
+
+        # Fallback to pristine documentary illustration prompts if LLM formatting was noisy
+        return [
+            "Cinematic 2D documentary vector illustration, tense night scene, South Asian espionage operative in dark vintage coat looking back at high security prison tower, amber side lighting, moody navy atmosphere, 16:9",
+            "Cinematic 2D vector illustration, interior of vintage 1970s interrogation room, dim overhead light bulb casting long dramatic shadows on wooden desk, 16:9",
+            "Wide establishing shot 2D vector graphic, military compound gates under stormy moonlight, heavy rain effect, deep shadows, 16:9",
+            "Cinematic 2D illustration, secret war room with vintage map of India and Pakistan spread across wooden table, amber lamp light, dramatic atmosphere, 16:9"
+        ]
 
 if __name__ == "__main__":
     gen = ImagePromptGenerator()

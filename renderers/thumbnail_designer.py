@@ -5,6 +5,7 @@ red/yellow keyword highlight, and the signature '2D ANIMATION' bottom badge.
 """
 
 import subprocess
+import re
 from pathlib import Path
 from generators.image_generator import ImageGenerator
 
@@ -22,12 +23,18 @@ class ThumbnailDesigner:
         output_path.parent.mkdir(exist_ok=True, parents=True)
         
         base_image = output_path.parent / "temp_thumb_base.png"
-        print(f"Generating thumbnail base image from prompt: {image_prompt[:60]}...")
-        self.image_gen.generate_single(image_prompt, str(base_image), width=1280, height=720)
+        
+        # Clean prompt: strip any markdown tables or headers
+        clean_prompt = re.sub(r'[\*#_`\|]', '', image_prompt)
+        if len(clean_prompt) < 20 or "estimated" in clean_prompt.lower() or "table" in clean_prompt.lower():
+            clean_prompt = "Dramatic 2D vector documentary illustration, high contrast split composition, South Asian operative escaping prison tower at night under amber lamp light, moody atmospheric lighting, 16:9"
+            
+        print(f"Generating thumbnail base image from clean prompt: {clean_prompt[:60]}...")
+        self.image_gen.generate_single(clean_prompt, str(base_image), width=1280, height=720)
 
-        # Overlay text using FFmpeg drawtext and drawbox filter
-        # Draw top vignette/shadow for text readability + text + bottom yellow badge
-        headline_escaped = hindi_headline.replace("'", "").replace(":", "\\:").replace("%", "\\%")
+        # Clean headline
+        headline_escaped = re.sub(r'[\*#_`]', '', hindi_headline).strip()
+        headline_escaped = headline_escaped.replace("'", "").replace(":", "\\:").replace("%", "\\%")
         
         # Badge filter: Yellow rounded box at bottom center with black bold text '2D ANIMATION'
         # Top title: Bold white text

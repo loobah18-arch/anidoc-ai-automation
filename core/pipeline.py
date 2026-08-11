@@ -147,7 +147,7 @@ class AniDocPipeline:
         self._save_text("06_seo_package.txt", seo_output)
         return seo_output
 
-    def render_complete_media(self, max_images: int = 6) -> Dict[str, str]:
+    def render_complete_media(self, max_images: int = 10, max_script_chars: int = 4000) -> Dict[str, str]:
         """
         Synthesizes Voiceover, Generates Images, Animates Motion, Burns Subtitles,
         and Renders Final 1080p Video and Viral Thumbnail.
@@ -159,19 +159,24 @@ class AniDocPipeline:
         # 1. Voiceover
         audio_file = self.audio_dir / "voiceover.mp3"
         script_text = self.data.get("script_prose") or self.data.get("chosen_topic", "Documentary voiceover")
+        full_prose_script = script_text[:max_script_chars].strip()
+        
         print(f"Step 1: Synthesizing voiceover audio ({self.language})...")
-        self.voice_gen.generate(script_text[:1200], str(audio_file), self.language)
+        self.voice_gen.generate(full_prose_script, str(audio_file), self.language)
         audio_duration = self.video_assembler.get_media_duration(str(audio_file))
         print(f"  Voiceover generated: {audio_file} (Duration: {audio_duration:.1f}s)")
 
         # 2. Image Generation
         prompts = self.data.get("image_prompts_list", [])[:max_images]
-        if not prompts:
+        if not prompts or len(prompts) < 3:
             prompts = [
                 f"Cinematic 2D illustration of {self.data.get('chosen_topic', 'investigative documentary')}, warm muted tones, dramatic side lighting, 16:9",
                 "A tense secret meeting room at night, South Asian officials in vintage attire, amber lamp light, 16:9",
-                "Wide establishing shot of historic parliament building under moody stormy sky, 16:9"
-            ]
+                "Wide establishing shot of historic compound under moody stormy sky, 16:9",
+                "Dark interrogation cell with solitary light bulb casting long shadows, 16:9",
+                "Cinematic 2D vector graphic of military aircraft hangar at dawn, 16:9"
+            ][:max_images]
+            
         print(f"Step 2: Generating {len(prompts)} 2D illustrated frames via Flux...")
         img_paths = self.image_gen.generate_batch(prompts, str(self.images_dir))
 
@@ -184,7 +189,7 @@ class AniDocPipeline:
         print("Step 4: Generating synchronized Devanagari / English subtitles...")
         srt_file = self.subs_dir / "captions.srt"
         ass_file = self.subs_dir / "captions.ass"
-        self.sub_gen.create_subtitles(script_text[:1200], audio_duration, str(srt_file), str(ass_file))
+        self.sub_gen.create_subtitles(full_prose_script, audio_duration, str(srt_file), str(ass_file))
 
         # 5. Final Video Assembly
         print("Step 5: Assembling final 1080p documentary video...")
@@ -200,8 +205,11 @@ class AniDocPipeline:
         print("Step 6: Designing viral thumbnail with 2D ANIMATION badge...")
         thumb_file = self.project_dir / "thumbnail.jpg"
         thumb_headline = "सीक्रेट मिशन का सच" if self.language.lower() == "hindi" else "THE UNTOLD REALITY"
+        
+        # Use first clean illustration prompt
+        thumb_prompt = prompts[0] if prompts else f"Cinematic 2D vector documentary illustration of {self.data.get('chosen_topic', 'untold story')}, dramatic lighting, 16:9"
         self.thumb_designer.create_thumbnail(
-            image_prompt=prompts[0],
+            image_prompt=thumb_prompt,
             hindi_headline=thumb_headline,
             output_path=str(thumb_file)
         )

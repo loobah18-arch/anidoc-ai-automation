@@ -10,3 +10,6 @@ output/*/final_documentary.mp4
 output/*/temp_*
 .cache/
 .DS_Store
+config/youtube_token.json
+exchange_token.py
+scratch/

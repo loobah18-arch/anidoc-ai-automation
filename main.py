@@ -169,7 +169,7 @@ def main():
     parser.add_argument("--auto-upload", action="store_true", help="Hands-free mode: auto-selects fresh topic from catalog and uploads to YouTube")
     parser.add_argument("--privacy", type=str, default="public", choices=["public", "unlisted", "private"], help="YouTube privacy status")
     parser.add_argument("--render", action="store_true", help="Render video without uploading")
-    parser.add_argument("--max-images", type=int, default=5, help="Number of 2D images to render for video")
+    parser.add_argument("--max-images", type=int, default=10, help="Number of 2D images to render for video")
 
     args = parser.parse_args()
 
