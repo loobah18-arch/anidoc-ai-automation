@@ -87,15 +87,10 @@ class AniDocPipeline:
         self.data["script_full_output"] = script_output
         self._save_text("02_script_full.txt", script_output)
         
-        # Extract pure voiceover prose (strip style table headers if present)
-        clean_prose = script_output
-        if "Final Word Count" in script_output:
-            clean_prose = script_output.split("Final Word Count")[0]
-        if "Script generate kar raha hoon..." in clean_prose:
-            clean_prose = clean_prose.split("Script generate kar raha hoon...")[-1]
-            
-        self.data["script_prose"] = clean_prose.strip()
-        self._save_text("02_voiceover_script.txt", self.data["script_prose"])
+        # Extract 100% pure voiceover prose (stripping Style DNA table, bracketed tags, and metadata)
+        clean_prose = self.script_writer.extract_pure_voiceover(script_output)
+        self.data["script_prose"] = clean_prose
+        self._save_text("02_voiceover_script.txt", clean_prose)
         return script_output
 
     def run_state3_image_prompts(self, batch_count: int = 1) -> str:

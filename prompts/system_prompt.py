@@ -46,23 +46,23 @@ Output the topics cleanly and conclude by asking the user to select a number or 
 STATE2_SCRIPT_PROMPT = """You are generating the complete cinematic documentary script for the chosen topic:
 Topic: "{topic}"
 Language: {language}
-Target Length: {target_length} (Aim for 2,500 to 4,000 words for a deep 12-15 minute documentary, or proportionally detailed).
+Target Length: {target_length} (Aim for 2,500 to 4,000 words for a deep documentary).
 
 First output the Style DNA analysis table:
 - NICHE: Documentary True Crime / Espionage / Political History
 - TARGET AUDIENCE: 18-45 curious about power, crime, espionage & national security
 - HOOK TYPE: Date + City/Location + Sensory Detail -> Immediate Stakes
-- SCRIPT FLOW: Hook (30s) -> Background (2 min) -> Inciting Incident -> Escalation (8-10 min) -> Climax -> Resolution -> Macro Significance -> Documentary CTA
+- SCRIPT FLOW: Hook (30s) -> Background -> Inciting Incident -> Escalation -> Climax -> Resolution -> Macro Significance
 - TONE: Authoritative, serious, grave, investigative cinematic narrator
 - ESTIMATED WORDS: [Calculated word count]
 
-Then immediately output the FULL SCRIPT adhering to these strict rules:
-1. CLEAN PROSE ONLY: Do NOT use markdown headers (#, ##), do NOT use scene markers (SCENE 1), and do NOT use audio tags ([MUSIC], [SFX]). Pure narrative text ready for voiceover.
-2. HOOK: Open mid-action in the very first 3 sentences with a specific date, city, and sensory detail.
-3. RETENTION & TENSION: Insert a twist, escalation, or new revelation every 90-120 seconds. Mark major tension peaks with [TENSION PEAK].
-4. ENDING: Conclude with historical/macro significance and an authoritative documentary-style subscribe call-to-action.
+Then output the FULL SCRIPT strictly enclosed between the markers below:
 
-After the script, provide the word count and estimated video duration at 50 WPM (slow/dramatic), 100 WPM (documentary standard), and 160 WPM (fast).
+=== START VOICEOVER SCRIPT ===
+[Write the pure narrative script here. Open mid-action in the first 3 sentences with a specific date, city, and sensory detail. No section headers, no audio tags, no speaker names. Pure narration prose.]
+=== END VOICEOVER SCRIPT ===
+
+After the script, provide the word count and estimated video duration.
 """
 
 STATE3_IMAGE_PROMPTS_PROMPT = """Analyze the following documentary script and generate standalone 2D Illustration Image Prompts in batches of 20.
