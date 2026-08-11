@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 """
 Main Autonomous Runner for AniDoc AI 2D Documentary Creation & YouTube Upload
-Supports:
-  1. Full Hands-Free Daily Automation:
-     python main.py --auto-upload
-  2. Custom Topic Creation & Upload:
-     python main.py --topic "The 1971 PAF Prison Escape" --language Hindi --upload
-  3. Dry-Run / Local Media Generation:
-     python main.py --topic "Operation Sindoor" --render
 """
 
 import sys
@@ -24,42 +17,85 @@ from core.pipeline import AniDocPipeline
 from core.topic_manager import TopicManager
 from publishers.youtube_publisher import YouTubePublisher
 
-def extract_titles_and_desc(seo_text: str, default_topic: str):
-    """Parses titles, description, hashtags, and tags from State 6 output."""
-    titles = []
-    description = ""
-    tags = []
+def clean_title(title_raw: str, default_topic: str) -> str:
+    """Cleans title of any LLM formatting or option prefixes."""
+    t = title_raw.strip()
+    # Remove markdown formatting like ** or #
+    t = re.sub(r'[\*#_`]', '', t)
+    # Remove Option prefixes like "Option 1 (Curiosity Gap):" or "1. Curiosity Gap:"
+    t = re.sub(r'^(?:Option\s*\d+\s*\(.*?\)|Option\s*\d+|\d+\.|\(Option\s*\d+\))\s*:?\s*', '', t, flags=re.IGNORECASE)
+    # Remove any leading parenthetical label like "(Curiosity Gap):"
+    t = re.sub(r'^\(.*?\)\s*:?\s*', '', t)
+    t = t.strip(' :-\t\n"\'')
+    if len(t) < 10:
+        t = f"{default_topic} | 2D Documentary"
+    return t[:95]
 
-    # Title extraction
-    title_matches = re.findall(r'Option \d+.*?:?\s*(.+)', seo_text)
-    if title_matches:
-        for t in title_matches:
-            clean_t = t.strip().strip('"\'')
-            if len(clean_t) > 5:
-                titles.append(clean_t)
+def clean_tags(tag_list: list, max_total_chars: int = 400) -> list:
+    """Sanitizes tags for YouTube Data API v3 requirements."""
+    sanitized = []
+    total_len = 0
     
-    if not titles:
-        titles = [f"{default_topic} | 2D Documentary #anidoc #shorts"]
+    for raw_tag in tag_list:
+        tag = str(raw_tag).strip()
+        # Remove invalid YouTube tag characters: < > # * [ ] " '
+        tag = re.sub(r'[<>#\*\[\]"\'`]', '', tag).strip()
+        # Disallow overly long single tags (> 40 chars)
+        if len(tag) < 2 or len(tag) > 40:
+            continue
+        if total_len + len(tag) + 1 > max_total_chars:
+            break
+        if tag.lower() not in [s.lower() for s in sanitized]:
+            sanitized.append(tag)
+            total_len += len(tag) + 1
+            
+    if not sanitized:
+        sanitized = ["2D Documentary", "True Crime Hindi", "Animation Storytelling", "Chad Grow", "AniDoc", "Real Events"]
+    return sanitized[:25]
+
+def extract_titles_and_desc(seo_text: str, default_topic: str):
+    """Parses clean titles, description, hashtags, and tags from State 6 output."""
+    raw_titles = []
+    
+    # Extract titles from Option lines or numbered lines
+    lines = seo_text.split("\n")
+    for line in lines:
+        line_s = line.strip()
+        if re.search(r'Option \d+|Title \d+|\bOption\b', line_s, flags=re.IGNORECASE):
+            parts = re.split(r'[:\-—]\s*', line_s, maxsplit=1)
+            if len(parts) > 1:
+                raw_titles.append(parts[1])
+            else:
+                raw_titles.append(line_s)
+        elif line_s.startswith(("1.", "2.", "3.", "4.", "5.")) and "TITLE" not in line_s and len(line_s) > 15:
+            raw_titles.append(line_s)
+
+    best_title_raw = raw_titles[0] if raw_titles else default_topic
+    best_title = clean_title(best_title_raw, default_topic)
 
     # Description extraction
-    if "YOUTUBE DESCRIPTION:" in seo_text:
-        desc_part = seo_text.split("YOUTUBE DESCRIPTION:")[1]
-        if "VIRAL HASHTAGS" in desc_part:
-            description = desc_part.split("VIRAL HASHTAGS")[0].strip()
+    description = ""
+    if "YOUTUBE DESCRIPTION:" in seo_text or "DESCRIPTION:" in seo_text:
+        desc_part = re.split(r'(?:YOUTUBE\s*)?DESCRIPTION:', seo_text, flags=re.IGNORECASE)[-1]
+        if "VIRAL HASHTAGS" in desc_part or "HASHTAGS" in desc_part:
+            description = re.split(r'(?:VIRAL\s*)?HASHTAGS', desc_part, flags=re.IGNORECASE)[0].strip()
         else:
             description = desc_part[:800].strip()
     else:
-        description = f"An investigative 2D documentary on {default_topic}. Like and subscribe for more untold historical realities."
+        description = f"An investigative 2D documentary on {default_topic}. Like, share and subscribe for more untold historical realities."
+
+    # Remove markdown header markers from description
+    description = re.sub(r'[\*#_`]', '', description).strip()
 
     # Tags extraction
-    if "YOUTUBE SEARCH TAGS" in seo_text or "TAGS" in seo_text:
+    raw_tags = []
+    if "TAGS" in seo_text:
         tag_part = seo_text.split("TAGS")[-1].replace(":", "").strip()
-        tags = [t.strip() for t in tag_part.split(",") if len(t.strip()) > 1][:30]
+        # Handle comma or newline separated
+        raw_tags = [t.strip() for t in re.split(r'[,;\n]+', tag_part) if t.strip()]
 
-    if not tags:
-        tags = ["2d documentary", "true crime hindi", "animation documentary", "chad grow", "anidoc", "history", "raw espionage"]
-
-    return titles[0], description, tags
+    tags = clean_tags(raw_tags)
+    return best_title, description, tags
 
 def run_pipeline(topic: str, language: str = "Hindi", upload: bool = False, privacy_status: str = "public", max_images: int = 6):
     print("=" * 70)
@@ -99,7 +135,7 @@ def run_pipeline(topic: str, language: str = "Hindi", upload: bool = False, priv
     video_path = media_res["video"]
     thumbnail_path = media_res["thumbnail"]
 
-    # Parse metadata for YouTube
+    # Parse clean metadata for YouTube
     best_title, description, tags = extract_titles_and_desc(seo_output, topic)
 
     # 7. Upload to YouTube (if requested or in auto-upload mode)
@@ -140,7 +176,6 @@ def main():
     topic_mgr = TopicManager()
 
     if args.auto_upload:
-        # Automated hands-free daily mode
         topic_info = topic_mgr.get_next_topic(custom_topic=args.topic, language=args.language)
         run_pipeline(
             topic=topic_info["topic"],
@@ -158,7 +193,6 @@ def main():
             max_images=args.max_images
         )
     else:
-        # Default topic selection
         topic_info = topic_mgr.get_next_topic(language=args.language)
         run_pipeline(
             topic=topic_info["topic"],
