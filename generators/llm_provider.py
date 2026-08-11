@@ -125,6 +125,7 @@ class LLMProvider:
         messages.append({"role": "user", "content": prompt})
 
         models = [
+            "nvidia/nemotron-3-ultra-550b-a55b",
             "nvidia/llama-3.1-nemotron-70b-instruct",
             "meta/llama-3.3-70b-instruct",
             "mistralai/mixtral-8x22b-instruct-v0.1"
