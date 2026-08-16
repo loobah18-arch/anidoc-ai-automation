@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       universe:
-        description: 'Universe (marvel or jjk)'
+        description: 'Universe (marvel, jjk, or random)'
         required: false
         default: 'random'
         type: choice
@@ -15,12 +15,12 @@ on:
           - 'marvel'
           - 'jjk'
       character:
-        description: 'Specific character (spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki)'
+        description: 'Specific character (spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi, yuji)'
         required: false
         default: ''
         type: string
       phonk:
-        description: 'Phonk BGM Track'
+        description: 'Phonk BGM Track (or random for auto-rotation)'
         required: false
         default: 'random'
         type: choice
@@ -41,6 +41,11 @@ on:
           - 'cyber_glow'
           - 'anime_shrine'
           - 'cinematic_minimal'
+      refresh_clips:
+        description: 'Download & slice fresh scenepack cuts'
+        required: false
+        default: false
+        type: boolean
       upload:
         description: 'Upload rendered Short to YouTube'
         required: true
@@ -104,6 +109,10 @@ jobs:
           
           if [ -n "${{ github.event.inputs.subtitle_style }}" ]; then
             CMD="$CMD --subtitle-style ${{ github.event.inputs.subtitle_style }}"
+          fi
+          
+          if [ "${{ github.event.inputs.refresh_clips }}" = "true" ]; then
+            CMD="$CMD --refresh-clips"
           fi
           
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ]; then

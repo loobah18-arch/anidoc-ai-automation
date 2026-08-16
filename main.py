@@ -44,6 +44,7 @@ def main():
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
     parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts")
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
+    parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
     parser.add_argument("--studio", action="store_true", help="Launch the AniDoc Studio Web Video Editing Software")
     parser.add_argument("--port", type=int, default=7860, help="Port for AniDoc Studio server (default: 7860)")
     
@@ -76,8 +77,8 @@ def main():
         custom_quote=args.quote,
         custom_title=args.title,
         cc_preset=args.cc,
-        github_repo=args.github_repo,
-        auto_fetch_clips=True
+        auto_fetch_clips=True,
+        force_refresh=args.refresh_clips
     )
     
     output_path = result["output_path"]

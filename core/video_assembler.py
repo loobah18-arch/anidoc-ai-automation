@@ -55,7 +55,8 @@ def render_cinematic_edit(
     custom_title: Optional[str] = None,
     cc_preset: Optional[str] = None,
     github_repo: Optional[str] = None,
-    auto_fetch_clips: bool = True
+    auto_fetch_clips: bool = True,
+    force_refresh: bool = False
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
@@ -107,7 +108,8 @@ def render_cinematic_edit(
         segment_durations=durations,
         is_drop_flags=drop_flags,
         auto_fetch_online=auto_fetch_clips,
-        github_repo=github_repo
+        github_repo=github_repo,
+        force_refresh=force_refresh
     )
     
     # 5. Generate Kinetic Karaoke Subtitles (Safe-Zone Alignment)

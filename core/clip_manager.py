@@ -1,65 +1,65 @@
 """
-Clip Asset & Procedural Scene Generator for Marvel & Jujutsu Kaisen.
-Manages raw 1080p/4K clips, public API/GitHub fetching, and procedural motion scene generation.
+Character Clip Library & Action Scene Ingestion Manager for Marvel & Jujutsu Kaisen.
+Features dynamic non-repeating clip shuffling, multi-source scenepack rotation, and procedural fallback.
 """
-import subprocess
+import os
 import random
+import subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-from config.settings import MARVEL_DIR, JJK_DIR, SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT
-from core.public_api_fetcher import fetch_character_scenepack, fetch_from_github_repo
+from config.settings import MARVEL_DIR, JJK_DIR, SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
+from core.public_api_fetcher import fetch_character_scenepack
 
-# Curated Character Universe Themes
 CHARACTER_THEMES = {
-    # Marvel
+    # Marvel Universe
     "spiderman": {
         "universe": "marvel",
         "name": "Spider-Man (Peter Parker)",
-        "colors": ["#e23636", "#0055b3", "#1a1a24"],
+        "colors": ["#e11d48", "#1e3a8a", "#0f172a"],
         "cc_preset": "marvel_hdr",
-        "quote": "I'm a machine. You think I'm afraid of you?"
+        "quote": "Mr. Stark, it smells like a new car in here!"
     },
     "ironman": {
         "universe": "marvel",
         "name": "Iron Man (Tony Stark)",
-        "colors": ["#d4af37", "#990000", "#111118"],
+        "colors": ["#eab308", "#991b1b", "#1c1917"],
         "cc_preset": "marvel_hdr",
         "quote": "And I... am... Iron Man."
     },
     "thor": {
         "universe": "marvel",
-        "name": "Thor Odinson",
-        "colors": ["#00d2ff", "#1e3a8a", "#0f172a"],
+        "name": "Thor (God of Thunder)",
+        "colors": ["#0284c7", "#38bdf8", "#030712"],
         "cc_preset": "marvel_hdr",
         "quote": "Bring me Thanos!"
     },
     "thanos": {
         "universe": "marvel",
-        "name": "Thanos",
-        "colors": ["#581c87", "#7e22ce", "#18181b"],
-        "cc_preset": "sukuna_shrine",
-        "quote": "You should have gone for the head."
+        "name": "Thanos (The Mad Titan)",
+        "colors": ["#7e22ce", "#3b0764", "#09090b"],
+        "cc_preset": "marvel_hdr",
+        "quote": "I am inevitable."
     },
     "wolverine": {
         "universe": "marvel",
         "name": "Wolverine (Logan)",
-        "colors": ["#fbbf24", "#1e3a8a", "#0f172a"],
+        "colors": ["#ca8a04", "#1e293b", "#0f172a"],
         "cc_preset": "marvel_hdr",
-        "quote": "I'm the best there is at what I do, but what I do isn't very nice."
+        "quote": "I'm the best there is at what I do."
     },
     "loki": {
         "universe": "marvel",
         "name": "Loki (God of Stories)",
-        "colors": ["#10b981", "#047857", "#064e3b"],
+        "colors": ["#15803d", "#22c55e", "#052e16"],
         "cc_preset": "cyber_phonk",
-        "quote": "I know what kind of god I need to be. For you. For all of us."
+        "quote": "I know what kind of god I need to be."
     },
-    # Jujutsu Kaisen
+    # Jujutsu Kaisen Universe
     "gojo": {
         "universe": "jjk",
         "name": "Gojo Satoru",
-        "colors": ["#7c3aed", "#00d2ff", "#0f0c29"],
+        "colors": ["#3b82f6", "#8b5cf6", "#090514"],
         "cc_preset": "jjk_void",
         "quote": "Throughout heaven and earth, I alone am the honored one."
     },
@@ -82,14 +82,14 @@ CHARACTER_THEMES = {
         "name": "Yuji Itadori",
         "colors": ["#b91c1c", "#fbbf24", "#1a0b0b"],
         "cc_preset": "sukuna_shrine",
-        "quote": "I don't know how I'll feel when I'm dead, but I don't want to regret the way I lived."
+        "quote": "I'm going to save everyone I can."
     },
     "megumi": {
         "universe": "jjk",
         "name": "Megumi Fushiguro",
         "colors": ["#1e293b", "#38bdf8", "#0f172a"],
         "cc_preset": "jjk_void",
-        "quote": "With this treasure, I summon... Eight-Handled Sword Divergent Sila Divine General Mahoraga."
+        "quote": "With this treasure, I summon... Mahoraga."
     }
 }
 
@@ -111,21 +111,22 @@ def generate_procedural_cinematic_scene(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     dur_str = f"{duration:.2f}"
     
-    # Animated generative background pattern using FFmpeg testsrc & gradients
     pulse_freq = 4.0 if is_drop else 1.5
-    v_expr = (
-        f"color=c={c3}:s={VIDEO_WIDTH}x{VIDEO_HEIGHT}:d={dur_str},"
-        f"drawbox=x=80:y=120:w={VIDEO_WIDTH-160}:h={VIDEO_HEIGHT-240}:color={c2}@0.15:t=fill,"
-        f"drawbox=x=120:y=160:w={VIDEO_WIDTH-240}:h={VIDEO_HEIGHT-320}:color={c1}@0.35:t=2,"
-        f"drawbox=x=0:y=ih-16:w='iw*(t/{dur_str})':h=16:color={c2}@0.9:t=fill"
+    vf_chain = (
+        f"testsrc=duration={dur_str}:size={VIDEO_WIDTH}x{VIDEO_HEIGHT}:rate={FPS},"
+        f"drawbox=x=0:y=0:w=iw:h=ih:color={c3}@1:t=fill,"
+        f"drawbox=x='(w-400)/2':y='(h-700)/2':w=400:h=700:color={c1}@0.7:t=fill,"
+        f"drawbox=x='(w-480)/2':y='(h-780)/2':w=480:h=780:color={c2}@0.9:t=8,"
+        f"curves=all='0/0 0.5/0.7 1/1',"
+        f"vignette=PI/3.5,"
+        f"format=yuv420p"
     )
     
     cmd = [
         "ffmpeg", "-y",
-        "-f", "lavfi", "-i", v_expr,
+        "-f", "lavfi", "-i", vf_chain,
         "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-pix_fmt", "yuv420p",
+        "-preset", "ultrafast",
         "-t", dur_str,
         str(output_path)
     ]
@@ -138,14 +139,11 @@ def get_character_scene_clips(
     segment_durations: List[float],
     is_drop_flags: List[bool],
     auto_fetch_online: bool = True,
-    github_repo: Optional[str] = None
+    github_repo: Optional[str] = None,
+    force_refresh: bool = False
 ) -> List[Path]:
     """
-    Returns a list of video clip paths for each segment.
-    1. Checks local universe video directory for character-specific clips.
-    2. If missing and github_repo is provided, fetches from GitHub repo.
-    3. If missing and auto_fetch_online is True, downloads raw scenepack.
-    4. Falls back to generating high-octane procedural scenes.
+    Retrieves or downloads real footage clips for a character with dynamic non-repeating rotation.
     """
     theme = CHARACTER_THEMES.get(character_key, CHARACTER_THEMES["gojo"])
     universe_dir = MARVEL_DIR if theme["universe"] == "marvel" else JJK_DIR
@@ -154,33 +152,46 @@ def get_character_scene_clips(
     # Search for real clip files matching the character
     raw_clips = list(universe_dir.glob(f"*{character_key}*.mp4"))
     
-    # If no character-specific clips exist and github_repo specified, fetch from GitHub
-    if not raw_clips and github_repo:
-        print(f"🐙 Sourcing clips from GitHub repo: {github_repo}")
-        raw_clips = fetch_from_github_repo(github_repo, universe_dir, character_filter=character_key)
-        
-    # If still no clips and auto_fetch enabled, download & slice scenepack
-    if not raw_clips and auto_fetch_online:
-        print(f"🌐 No local clips for '{character_key}'. Fetching from public streamer...")
-        raw_clips = fetch_character_scenepack(character_key, max_clips=len(segment_durations) + 2)
-        
-    # Fallback to any general universe clips if present
+    # If forced refresh or missing, download fresh multi-query scenepack
+    if (not raw_clips or force_refresh) and auto_fetch_online:
+        print(f"🌐 Fetching fresh scenepack cuts for '{character_key}'...")
+        fetched = fetch_character_scenepack(character_key, max_clips=len(segment_durations) + 4)
+        if fetched:
+            raw_clips = fetched
+            
+    # Fallback to general universe clips if present
     if not raw_clips:
         raw_clips = list(universe_dir.glob("*.mp4"))
         
     raw_clips = sorted(raw_clips, key=lambda p: p.name)
     intro_pool = raw_clips[:min(3, len(raw_clips))] if raw_clips else []
     action_pool = raw_clips[min(2, len(raw_clips)):] if len(raw_clips) > 2 else raw_clips
+    
+    # Randomly shuffle action pool for non-repeating variety on every render
+    shuffled_action = list(action_pool)
+    random.shuffle(shuffled_action)
+    if not shuffled_action:
+        shuffled_action = raw_clips
+        
+    shuffled_intro = list(intro_pool)
+    random.shuffle(shuffled_intro)
+    if not shuffled_intro:
+        shuffled_intro = raw_clips
         
     clip_paths = []
+    action_idx = 0
+    intro_idx = 0
+    
     for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):
         if raw_clips:
-            if not is_drop and intro_pool:
+            if not is_drop and shuffled_intro:
                 # Slower character/dialogue intro shots
-                clip_paths.append(intro_pool[idx % len(intro_pool)])
+                clip_paths.append(shuffled_intro[intro_idx % len(shuffled_intro)])
+                intro_idx += 1
             else:
-                # High-velocity action shots
-                clip_paths.append(action_pool[idx % len(action_pool)])
+                # Dynamic randomized action shots
+                clip_paths.append(shuffled_action[action_idx % len(shuffled_action)])
+                action_idx += 1
         else:
             # Generate tailored procedural scene
             out_p = SCRATCH_DIR / f"proc_{character_key}_seg_{idx}_{int(dur*100)}.mp4"
@@ -193,7 +204,6 @@ def get_character_scene_clips(
 def list_available_character_clips(universe: Optional[str] = None) -> Dict[str, List[Dict[str, Any]]]:
     """Lists all available downloaded clips categorized by character and universe."""
     result = {}
-    
     dirs = []
     if universe == "marvel" or not universe:
         dirs.append(("marvel", MARVEL_DIR))
