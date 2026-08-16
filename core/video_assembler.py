@@ -13,8 +13,9 @@ from config.settings import (
 )
 from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
+from core.phonk_manager import get_random_or_specified_phonk
 from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
-from core.subtitle_stylizer import generate_kinetic_subtitles
+from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata
 
 
@@ -43,8 +44,15 @@ def generate_fallback_phonk_audio(duration: float, output_path: Path) -> Path:
 def render_cinematic_edit(
     character_key: Optional[str] = None,
     audio_path: Optional[Path] = None,
+    phonk_track: Optional[str] = None,
     output_path: Optional[Path] = None,
-    target_duration: float = 22.0
+    target_duration: float = 22.0,
+    subtitle_style: str = "viral_karaoke",
+    custom_quote: Optional[str] = None,
+    custom_title: Optional[str] = None,
+    cc_preset: Optional[str] = None,
+    github_repo: Optional[str] = None,
+    auto_fetch_clips: bool = True
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
@@ -62,15 +70,19 @@ def render_cinematic_edit(
     
     # 1. Generate Metadata & Quotes
     metadata = generate_edit_metadata(character_key)
-    quote_text = metadata["quote"]
+    quote_text = custom_quote or metadata["quote"]
+    title_text = custom_title or metadata["title"]
+    metadata["quote"] = quote_text
+    metadata["title"] = title_text
     print(f"💬 Quote: \"{quote_text}\"")
-    print(f"📌 Title: {metadata['title']}")
+    print(f"📌 Title: {title_text}")
     
     # 2. Audio Sourcing & Beat Analysis
     if not audio_path or not Path(audio_path).exists():
-        raw_phonk = list(PHONK_DIR.glob("*.mp3")) + list(PHONK_DIR.glob("*.wav"))
-        if raw_phonk:
-            audio_path = random.choice(raw_phonk)
+        chosen_audio = get_random_or_specified_phonk(phonk_track)
+        if chosen_audio and chosen_audio.exists():
+            audio_path = chosen_audio
+            print(f"🎧 Using Phonk Track: {audio_path.name}")
         else:
             audio_path = SCRATCH_DIR / f"phonk_synth_{character_key}.aac"
             generate_fallback_phonk_audio(target_duration, audio_path)
@@ -82,18 +94,28 @@ def render_cinematic_edit(
     # 3. Retrieve or Render Character Scene Clips
     durations = [seg["duration"] for seg in segments]
     drop_flags = [seg["is_drop"] for seg in segments]
-    clip_paths = get_character_scene_clips(character_key, durations, drop_flags)
+    clip_paths = get_character_scene_clips(
+        character_key=character_key,
+        segment_durations=durations,
+        is_drop_flags=drop_flags,
+        auto_fetch_online=auto_fetch_clips,
+        github_repo=github_repo
+    )
     
-    # 4. Generate Glowing Kinetic Subtitles
+    # 4. Generate Kinetic Karaoke Subtitles
     ass_path = SCRATCH_DIR / f"subs_{character_key}.ass"
-    cc_cfg = CC_PRESETS.get(theme["cc_preset"], CC_PRESETS["marvel_hdr"])
+    active_cc = cc_preset or theme["cc_preset"]
+    cc_cfg = CC_PRESETS.get(active_cc, CC_PRESETS["marvel_hdr"])
+    
     generate_kinetic_subtitles(
         quote_text=quote_text,
         start_time=0.2,
-        end_time=min(beat_grid.duration, beat_grid.drop_time),
+        end_time=min(beat_grid.duration, max(4.0, beat_grid.drop_time)),
         output_ass_path=ass_path,
-        primary_color=cc_cfg["primary_color"],
-        glow_color="&H00000000",
+        style_preset=subtitle_style,
+        primary_color="&H00FFFFFF",
+        active_color=cc_cfg.get("primary_color", "&H002BF5FF"),
+        glow_color=None,
         character_name=theme["name"].split()[0]
     )
     
@@ -127,7 +149,7 @@ def render_cinematic_edit(
     flash_str = ",".join(flash_filters) if flash_filters else "null"
     
     # 4K HDR Color Grade (CC Preset)
-    cc_filter = build_cc_filter(theme["cc_preset"])
+    cc_filter = build_cc_filter(active_cc)
     
     # Subtitle Burn-in
     ass_escaped = str(ass_path).replace(":", "\\:").replace("\\", "/")
@@ -167,5 +189,8 @@ def render_cinematic_edit(
         "character_key": character_key,
         "duration": beat_grid.duration,
         "cuts_count": len(segments),
-        "file_size_kb": output_path.stat().st_size // 1024
+        "file_size_kb": output_path.stat().st_size // 1024,
+        "audio_used": Path(audio_path).name,
+        "subtitle_style": subtitle_style,
+        "cc_preset": active_cc
     }
