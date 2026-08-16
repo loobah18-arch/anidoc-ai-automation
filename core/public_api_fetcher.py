@@ -161,6 +161,11 @@ def fetch_character_scenepack(
     
     target = query if (query.startswith("http://") or query.startswith("https://")) else f"ytsearch1:{query}"
     
+    import shutil
+    if not shutil.which("yt-dlp"):
+        print(f"⚠️ yt-dlp binary not found in PATH. Skipping online scenepack download.")
+        return []
+
     print(f"📥 Downloading Scenepack for '{character_key}' via public streamer...")
     cmd = [
         "yt-dlp",
@@ -170,18 +175,22 @@ def fetch_character_scenepack(
         target,
         "--max-downloads", "1"
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    
-    if temp_raw.exists() and temp_raw.stat().st_size > 50000:
-        clips = slice_scenepack_into_clips(
-            raw_video_path=temp_raw,
-            output_dir=universe_dir,
-            clip_prefix=character_key,
-            seg_duration=2.5,
-            max_clips=max_clips
-        )
-        temp_raw.unlink(missing_ok=True)
-        return clips
-    else:
-        print(f"⚠️ Scenepack download returned status: {res.returncode}")
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        if temp_raw.exists() and temp_raw.stat().st_size > 50000:
+            clips = slice_scenepack_into_clips(
+                raw_video_path=temp_raw,
+                output_dir=universe_dir,
+                clip_prefix=character_key,
+                seg_duration=2.5,
+                max_clips=max_clips
+            )
+            temp_raw.unlink(missing_ok=True)
+            return clips
+        else:
+            print(f"⚠️ Scenepack download returned status: {res.returncode}")
+            return []
+    except Exception as e:
+        print(f"⚠️ Scenepack download exception: {e}")
         return []
+

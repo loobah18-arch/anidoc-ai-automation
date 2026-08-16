@@ -107,6 +107,11 @@ def download_phonk_track(track_id: str, query_override: Optional[str] = None) ->
         else:
             query = f"{track_id} phonk no copyright 30 seconds"
             
+    import shutil
+    if not shutil.which("yt-dlp"):
+        print(f"⚠️ yt-dlp binary not found in PATH. Skipping online phonk download.")
+        return None
+
     print(f"🎵 Downloading Phonk BGM '{track_id}' from internet...")
     cmd = [
         "yt-dlp",
@@ -116,13 +121,18 @@ def download_phonk_track(track_id: str, query_override: Optional[str] = None) ->
         f"ytsearch1:{query}",
         "--max-downloads", "1"
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    if target_mp3.exists() and target_mp3.stat().st_size > 10000:
-        print(f"✅ Downloaded: {target_mp3.name} ({target_mp3.stat().st_size // 1024} KB)")
-        return target_mp3
-    else:
-        print(f"⚠️ Failed to download '{track_id}': {res.stderr[:200] if res.stderr else 'Unknown error'}")
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        if target_mp3.exists() and target_mp3.stat().st_size > 10000:
+            print(f"✅ Downloaded: {target_mp3.name} ({target_mp3.stat().st_size // 1024} KB)")
+            return target_mp3
+        else:
+            print(f"⚠️ Failed to download '{track_id}': {res.stderr[:200] if res.stderr else 'Unknown error'}")
+            return None
+    except Exception as e:
+        print(f"⚠️ Phonk download exception: {e}")
         return None
+
 
 
 def ensure_popular_phonk_library(min_tracks: int = 3) -> List[Path]:
