@@ -1,4 +1,4 @@
-name: Daily 4K Phonk / Scene Edit Generator & YouTube + TikTok Auto-Upload
+name: Daily 4K Phonk / Scene Edit Generator & YouTube Auto-Upload
 
 on:
   schedule:
@@ -51,11 +51,6 @@ on:
         required: true
         default: true
         type: boolean
-      upload_tiktok:
-        description: 'Also upload to TikTok (requires TIKTOK_COOKIES_JSON secret)'
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   render_and_publish:
@@ -97,9 +92,6 @@ jobs:
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
           YOUTUBE_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
-          # TikTok dual-upload: base64 encode your TikTok cookies JSON and store as TIKTOK_COOKIES_JSON secret
-          # Generate locally with: base64 < CookiesDir/your_username.json | pbcopy
-          TIKTOK_COOKIES_JSON: ${{ secrets.TIKTOK_COOKIES_JSON }}
           # Optional stock video APIs (free at pixabay.com & pexels.com)
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -127,10 +119,6 @@ jobs:
           
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ]; then
             CMD="$CMD --upload"
-          fi
-          
-          if [ "${{ github.event.inputs.upload_tiktok }}" = "true" ] || [ "${{ github.event_name }}" = "schedule" ]; then
-            CMD="$CMD --upload-tiktok"
           fi
           
           echo "Executing: $CMD"
