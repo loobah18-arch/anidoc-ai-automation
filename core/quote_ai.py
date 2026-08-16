@@ -17,9 +17,9 @@ from core.clip_manager import CHARACTER_THEMES
 
 FALLBACK_CONCEPTS = {
     "spiderman": {
-        "quote": "I'm a machine. You think I'm afraid of you?",
-        "title": "Spiderman In Infinity War ⚡ #marvel #spiderman #4kedit #shorts",
-        "tags": ["spiderman", "infinitywar", "marvel", "peterparker", "avengers", "4kedit", "phonk", "shorts"]
+        "quote": "Mr. Stark, it smells like a new car in here!",
+        "title": "Spiderman in infinity war #marvel #spiderman #peterlovers #avengers #4kedit #ironman #shorts #thor",
+        "tags": ["spiderman", "infinitywar", "marvel", "peterlovers", "avengers", "4kedit", "ironman", "shorts", "thor"]
     },
     "ironman": {
         "quote": "And I... am... Iron Man.",

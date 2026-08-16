@@ -168,11 +168,19 @@ def get_character_scene_clips(
     if not raw_clips:
         raw_clips = list(universe_dir.glob("*.mp4"))
         
+    raw_clips = sorted(raw_clips, key=lambda p: p.name)
+    intro_pool = raw_clips[:min(3, len(raw_clips))] if raw_clips else []
+    action_pool = raw_clips[min(2, len(raw_clips)):] if len(raw_clips) > 2 else raw_clips
+        
     clip_paths = []
     for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):
         if raw_clips:
-            # Pick from available raw clips
-            clip_paths.append(random.choice(raw_clips))
+            if not is_drop and intro_pool:
+                # Slower character/dialogue intro shots
+                clip_paths.append(intro_pool[idx % len(intro_pool)])
+            else:
+                # High-velocity action shots
+                clip_paths.append(action_pool[idx % len(action_pool)])
         else:
             # Generate tailored procedural scene
             out_p = SCRATCH_DIR / f"proc_{character_key}_seg_{idx}_{int(dur*100)}.mp4"

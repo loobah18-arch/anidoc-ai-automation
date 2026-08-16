@@ -1,7 +1,7 @@
 """
 Production 4K Phonk / Scene Edit Video Assembler for Marvel & Jujutsu Kaisen.
 Assembles beat-synced cuts, velocity ramping, 4K HDR CC, impact flashes, and glowing ASS subtitles.
-Mixes original clip dialogue & SFX audio with dynamic low-pass intro into explosive Phonk drop.
+Features true character dialogue voiceover, low-pass Phonk intro into explosive drop, and commercial audio mastering.
 """
 import subprocess
 import random
@@ -15,6 +15,7 @@ from config.settings import (
 from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
+from core.voice_engine import get_character_dialogue_audio
 from core.public_api_fetcher import check_clip_has_audio
 from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
@@ -58,7 +59,7 @@ def render_cinematic_edit(
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
-    Mixes original scene audio (dialogue/punches) with dynamic Phonk BGM and strips watermarks.
+    Features genuine character dialogue, low-pass intro, explosive Phonk drop, and commercial mastering.
     """
     if not character_key or character_key not in CHARACTER_THEMES:
         character_key = random.choice(list(CHARACTER_THEMES.keys()))
@@ -92,9 +93,13 @@ def render_cinematic_edit(
             
     beat_grid = analyze_audio_beats(audio_path, target_duration=target_duration)
     segments = beat_grid.get_cut_segments()
-    print(f"🎵 Beat Grid: {len(segments)} scene cuts detected across {beat_grid.duration:.1f}s (Drop at {beat_grid.drop_time:.1f}s)")
+    drop_t = max(0.5, beat_grid.drop_time)
+    print(f"🎵 Beat Grid: {len(segments)} scene cuts detected across {beat_grid.duration:.1f}s (Drop at {drop_t:.1f}s)")
     
-    # 3. Retrieve or Render Character Scene Clips
+    # 3. Retrieve Character Dialogue Audio
+    dialogue_path = get_character_dialogue_audio(character_key, quote_text)
+    
+    # 4. Retrieve or Render Character Scene Clips
     durations = [seg["duration"] for seg in segments]
     drop_flags = [seg["is_drop"] for seg in segments]
     clip_paths = get_character_scene_clips(
@@ -105,7 +110,7 @@ def render_cinematic_edit(
         github_repo=github_repo
     )
     
-    # 4. Generate Kinetic Karaoke Subtitles
+    # 5. Generate Kinetic Karaoke Subtitles (Safe-Zone Alignment)
     ass_path = SCRATCH_DIR / f"subs_{character_key}.ass"
     active_cc = cc_preset or theme["cc_preset"]
     cc_cfg = CC_PRESETS.get(active_cc, CC_PRESETS["marvel_hdr"])
@@ -113,7 +118,7 @@ def render_cinematic_edit(
     generate_kinetic_subtitles(
         quote_text=quote_text,
         start_time=0.2,
-        end_time=min(beat_grid.duration, max(4.0, beat_grid.drop_time)),
+        end_time=min(beat_grid.duration, max(4.0, drop_t)),
         output_ass_path=ass_path,
         style_preset=subtitle_style,
         primary_color="&H00FFFFFF",
@@ -122,7 +127,7 @@ def render_cinematic_edit(
         character_name=theme["name"].split()[0]
     )
     
-    # 5. Build FFmpeg Filtergraph (Video + Watermark Crop + Clip Audio Mixing)
+    # 6. Build Multi-Layer FFmpeg Filtergraph
     cmd_inputs = []
     has_clip_audio_list = []
     
@@ -130,8 +135,11 @@ def render_cinematic_edit(
         cmd_inputs.extend(["-i", str(cp)])
         has_clip_audio_list.append(check_clip_has_audio(cp))
         
+    phonk_inp_idx = len(clip_paths)
     cmd_inputs.extend(["-i", str(audio_path)])
-    audio_inp_idx = len(clip_paths)
+    
+    dialogue_inp_idx = len(clip_paths) + 1
+    cmd_inputs.extend(["-i", str(dialogue_path)])
     
     filter_chains = []
     concat_v_inputs = []
@@ -154,7 +162,7 @@ def render_cinematic_edit(
         
         # Clip Audio extraction & normalization
         if has_aud:
-            a_chain = f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,volume=0.90,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+            a_chain = f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,volume=0.85,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
         else:
             a_chain = f"aevalsrc=0:d={seg['duration']:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
         filter_chains.append(a_chain)
@@ -164,7 +172,7 @@ def render_cinematic_edit(
     concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
     filter_chains.append(concat_v_str)
     
-    # Concat all audio segments
+    # Concat all clip audio segments
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
     
@@ -172,7 +180,7 @@ def render_cinematic_edit(
     flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.09, opacity=0.60)
     flash_str = ",".join(flash_filters) if flash_filters else "null"
     
-    # 4K HDR Color Grade (CC Preset)
+    # 4K HDR Color Grade (CC Preset with S-curve colorlevels)
     cc_filter = build_cc_filter(active_cc)
     
     # Subtitle Burn-in
@@ -181,15 +189,20 @@ def render_cinematic_edit(
     # Video Post-processing (Concatenated + Flash + CC + ASS)
     filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter},ass={ass_escaped}[vout]")
     
-    # Audio Dynamic Structure: Muffled low-pass intro into explosive Phonk drop
-    drop_t = max(0.5, beat_grid.drop_time)
+    # Audio Dynamic Structure:
+    # 1. Dialogue track (isolated, prominent, volume boosted during intro)
+    # 2. Phonk track (low-pass filtered muffled during intro, explosive at drop)
+    # 3. Clip SFX (combat punches/impacts)
+    # 4. Master volume normalization & compression
     filter_chains.append(
-        f"[{audio_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
-        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=750,volume=0.45[p_intro];"
-        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.90[p_drop];"
+        f"[{dialogue_inp_idx}:a]volume=1.5,dynaudnorm,atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS[dialogue_clean];"
+        f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
+        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=650,volume=0.35[p_intro];"
+        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.95[p_drop];"
         f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
-        f"[clip_sfx_raw]volume=0.90,dynaudnorm[clip_sfx];"
-        f"[clip_sfx][phonk_dynamic]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+        f"[clip_sfx_raw]volume=0.85,dynaudnorm[clip_sfx];"
+        f"[phonk_dynamic][dialogue_clean][clip_sfx]amix=inputs=3:duration=first:dropout_transition=2,"
+        f"volume=1.70,loudnorm=I=-11:TP=-0.5:LRA=7[aout]"
     )
     
     full_filter_complex = ";".join(filter_chains)

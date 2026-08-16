@@ -1,6 +1,6 @@
 """
 Dynamic High-Retention ASS Subtitle Stylizer for Anime & Marvel Shorts.
-Features Word-by-Word Karaoke Highlighting, Kinetic Pops, and Universe Themed Neon Glows.
+Features Word-by-Word Karaoke Highlighting, Kinetic Pops, and Safe-Zone Framing.
 """
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -19,41 +19,41 @@ def format_ass_timestamp(seconds: float) -> str:
 SUBTITLE_STYLE_PRESETS = {
     "viral_karaoke": {
         "font": "Arial",
-        "fontsize": 76,
+        "fontsize": 74,
         "primary": "&H00FFFFFF",      # Crisp White inactive
         "active_word": "&H002BF5FF",  # Bright Gold Active (BGR)
         "outline": "&H00000000",      # Deep Black Outline
         "shadow": "&H90000000",
-        "outline_width": 5.0,
+        "outline_width": 5.5,
         "shadow_depth": 3.5,
-        "alignment": 5,               # Centered Screen
-        "margin_v": 960,
+        "alignment": 2,               # Mid-Lower Third (Safe Zone)
+        "margin_v": 380,
         "badge_color": "&H002BF5FF"
     },
     "cyber_glow": {
         "font": "Arial",
-        "fontsize": 78,
+        "fontsize": 74,
         "primary": "&H00FFFFFF",
         "active_word": "&H00FFFF00",  # Neon Cyan Active
         "outline": "&H00FF55D2",      # Neon Purple Glow Outline
         "shadow": "&H99000000",
         "outline_width": 6.0,
         "shadow_depth": 4.0,
-        "alignment": 5,
-        "margin_v": 960,
+        "alignment": 2,
+        "margin_v": 380,
         "badge_color": "&H00FFFF00"
     },
     "anime_shrine": {
         "font": "Arial",
-        "fontsize": 80,
+        "fontsize": 76,
         "primary": "&H00FFFFFF",
         "active_word": "&H003333FF",  # Blood Crimson Active
         "outline": "&H00000000",      # Pure Black
         "shadow": "&H99000088",       # Crimson Drop Shadow
         "outline_width": 5.5,
         "shadow_depth": 4.0,
-        "alignment": 5,
-        "margin_v": 960,
+        "alignment": 2,
+        "margin_v": 380,
         "badge_color": "&H003333FF"
     },
     "cinematic_minimal": {
@@ -61,12 +61,12 @@ SUBTITLE_STYLE_PRESETS = {
         "fontsize": 68,
         "primary": "&H00FFFFFF",
         "active_word": "&H00E0E0E0",
-        "outline": "&H00111111",
+        "outline": "&H00000000",
         "shadow": "&H60000000",
-        "outline_width": 3.0,
-        "shadow_depth": 2.0,
-        "alignment": 2,               # Bottom Centered
-        "margin_v": 240,
+        "outline_width": 4.5,
+        "shadow_depth": 2.5,
+        "alignment": 2,
+        "margin_v": 380,
         "badge_color": "&H00FFFFFF"
     }
 }
@@ -74,9 +74,9 @@ SUBTITLE_STYLE_PRESETS = {
 
 def generate_kinetic_subtitles(
     quote_text: str,
-    start_time: float,
-    end_time: float,
-    output_ass_path: Path,
+    start_time: float = 0.2,
+    end_time: float = 6.8,
+    output_ass_path: Optional[Path] = None,
     style_preset: str = "viral_karaoke",
     primary_color: Optional[str] = None,
     active_color: Optional[str] = None,
@@ -116,7 +116,7 @@ PlayResY: 1920
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: BaseText,{cfg['font']},{cfg['fontsize']},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{cfg['outline_width']},{cfg['shadow_depth']},{cfg['alignment']},40,40,{cfg['margin_v']},1
-Style: Badge,{cfg['font']},36,&H00FFFFFF,&H00FFFFFF,&H00000000,&H90000000,-1,0,0,0,100,100,3,0,1,3.5,2.0,8,40,40,180,1
+Style: Badge,{cfg['font']},40,&H00FFFFFF,&H00FFFFFF,&H00000000,&H90000000,-1,0,0,0,100,100,3,0,1,4.0,2.5,8,40,40,180,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -150,7 +150,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             for j, w in enumerate(chunk_words):
                 w_upper = w.upper()
                 if j == word_in_chunk_idx:
-                    # Active word: Highlighted color + 115% dynamic bounce
+                    # Active word: Highlighted color + 118% dynamic bounce
                     line_parts.append(
                         f"{{\\c{cfg['active_word']}\\t(0,100,\\fscx118\\fscy118)\\t(100,200,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
                     )
