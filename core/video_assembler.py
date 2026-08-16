@@ -1,7 +1,7 @@
 """
 Production 4K Phonk / Scene Edit Video Assembler for Marvel & Jujutsu Kaisen.
 Assembles beat-synced cuts, velocity ramping, 4K HDR CC, impact flashes, and glowing ASS subtitles.
-Mixes original clip dialogue & SFX audio seamlessly with hard-hitting Phonk BGM.
+Mixes original clip dialogue & SFX audio with dynamic low-pass intro into explosive Phonk drop.
 """
 import subprocess
 import random
@@ -58,7 +58,7 @@ def render_cinematic_edit(
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
-    Mixes original scene audio (dialogue/punches) with viral Phonk BGM and strips watermarks.
+    Mixes original scene audio (dialogue/punches) with dynamic Phonk BGM and strips watermarks.
     """
     if not character_key or character_key not in CHARACTER_THEMES:
         character_key = random.choice(list(CHARACTER_THEMES.keys()))
@@ -154,7 +154,7 @@ def render_cinematic_edit(
         
         # Clip Audio extraction & normalization
         if has_aud:
-            a_chain = f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,volume=0.85,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+            a_chain = f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,volume=0.90,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
         else:
             a_chain = f"aevalsrc=0:d={seg['duration']:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
         filter_chains.append(a_chain)
@@ -169,7 +169,7 @@ def render_cinematic_edit(
     filter_chains.append(concat_a_str)
     
     # Impact White Flashes on Beat Drops
-    flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.10, opacity=0.45)
+    flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.09, opacity=0.60)
     flash_str = ",".join(flash_filters) if flash_filters else "null"
     
     # 4K HDR Color Grade (CC Preset)
@@ -181,11 +181,15 @@ def render_cinematic_edit(
     # Video Post-processing (Concatenated + Flash + CC + ASS)
     filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter},ass={ass_escaped}[vout]")
     
-    # Audio Mixing: Clip Dialogue/SFX + Phonk BGM
+    # Audio Dynamic Structure: Muffled low-pass intro into explosive Phonk drop
+    drop_t = max(0.5, beat_grid.drop_time)
     filter_chains.append(
+        f"[{audio_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
+        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=750,volume=0.45[p_intro];"
+        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.90[p_drop];"
+        f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
         f"[clip_sfx_raw]volume=0.90,dynaudnorm[clip_sfx];"
-        f"[{audio_inp_idx}:a]volume=0.80[phonk_bgm];"
-        f"[clip_sfx][phonk_bgm]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+        f"[clip_sfx][phonk_dynamic]amix=inputs=2:duration=first:dropout_transition=2[aout]"
     )
     
     full_filter_complex = ";".join(filter_chains)
@@ -198,7 +202,7 @@ def render_cinematic_edit(
         "-map", "[aout]",
         "-c:v", "libx264",
         "-preset", "veryfast",
-        "-crf", "19",
+        "-crf", "18",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "192k",
