@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Main Entrypoint for AniDoc 4K Phonk / Scene Edit Automated Video Engine.
-Supports Marvel & Jujutsu Kaisen 9:16 Shorts Generation, Web Studio Editor & YouTube Auto-Upload.
+Supports Marvel & Jujutsu Kaisen 9:16 Shorts Generation, Web Studio Editor,
+YouTube Auto-Upload, and TikTok Dual-Upload.
 """
 import sys
 import argparse
@@ -27,6 +28,7 @@ except ImportError:
 from core.clip_manager import CHARACTER_THEMES
 from core.video_assembler import render_cinematic_edit
 from publishers.youtube_publisher import upload_video_to_youtube
+from publishers.tiktok_publisher import upload_video_to_tiktok
 from studio.server import start_studio_server
 
 def main():
@@ -43,6 +45,7 @@ def main():
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
     parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts")
+    parser.add_argument("--upload-tiktok", action="store_true", help="Also upload to TikTok (requires TIKTOK_COOKIES_JSON env var)")
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
     parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
     parser.add_argument("--studio", action="store_true", help="Launch the AniDoc Studio Web Video Editing Software")
@@ -108,6 +111,20 @@ def main():
             print(f"🌟 Published to YouTube: {upload_res.get('url')}")
         else:
             print(f"⚠️ YouTube upload status: {upload_res.get('status')} ({upload_res.get('reason') or upload_res.get('error')})")
+
+    # Upload to TikTok if requested (dual-publishing)
+    if args.upload_tiktok or args.upload:
+        print("\n📱 [TikTok] Attempting dual-upload to TikTok...")
+        tiktok_url = upload_video_to_tiktok(
+            video_path=output_path,
+            title=metadata["title"],
+            tags=metadata["tags"],
+            privacy="public"
+        )
+        if tiktok_url:
+            print(f"🎵 Published to TikTok: {tiktok_url}")
+        else:
+            print("⚠️  TikTok upload skipped (no cookies or uploader unavailable)")
 
 if __name__ == "__main__":
     main()

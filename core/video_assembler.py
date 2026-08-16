@@ -2,6 +2,11 @@
 Production 4K Phonk / Scene Edit Video Assembler for Marvel & Jujutsu Kaisen.
 Assembles beat-synced cuts, velocity ramping, 4K HDR CC, impact flashes, and glowing ASS subtitles.
 Features true character dialogue voiceover, low-pass Phonk intro into explosive drop, and commercial audio mastering.
+
+OpenCut-Inspired Engine: Uses xfade transitions, per-clip speed ramps, cinematic bars, and
+Audio fade handles — all ported from OpenCut's browser editor to FFmpeg filtergraph.
+
+Smart Downloader: Multi-source clip fetching via yt-dlp → Archive.org → Pixabay/Pexels fallback.
 """
 import subprocess
 import random
@@ -20,6 +25,11 @@ from core.public_api_fetcher import check_clip_has_audio
 from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata
+from core.opencut_engine import (
+    build_opencut_clip_filter,
+    build_clip_audio_fade,
+)
+from core.smart_downloader import smart_fetch_clips
 
 
 def generate_fallback_phonk_audio(duration: float, output_path: Path) -> Path:
@@ -61,6 +71,9 @@ def render_cinematic_edit(
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
     Features genuine character dialogue, low-pass intro, explosive Phonk drop, and commercial mastering.
+    
+    OpenCut-inspired edits: xfade transitions, speed ramps, cinematic bars, audio clip fades.
+    Smart downloader: yt-dlp → Archive.org → Pixabay/Pexels fallback chain.
     """
     if not character_key or character_key not in CHARACTER_THEMES:
         character_key = random.choice(list(CHARACTER_THEMES.keys()))
@@ -100,9 +113,29 @@ def render_cinematic_edit(
     # 3. Retrieve Character Dialogue Audio
     dialogue_path = get_character_dialogue_audio(character_key, quote_text)
     
-    # 4. Retrieve or Render Character Scene Clips
+    # 4a. Smart Multi-Source Clip Download (yt-dlp → Archive.org → Pixabay/Pexels)
     durations = [seg["duration"] for seg in segments]
     drop_flags = [seg["is_drop"] for seg in segments]
+
+    universe_dir = SCRATCH_DIR / theme.get("universe", "marvel")
+    universe_dir.mkdir(parents=True, exist_ok=True)
+
+    local_clips_count = len(list(universe_dir.glob(f"{character_key}*.mp4")))
+    if force_refresh or local_clips_count < 4:
+        print(f"🌐 [SmartDownloader] Fetching fresh clips for {character_key}...")
+        try:
+            smart_fetch_clips(
+                character_key=character_key,
+                universe_dir=universe_dir,
+                max_clips=12,
+                use_archive=True,
+                use_pixabay=True,
+                use_pexels=True
+            )
+        except Exception as e:
+            print(f"⚠️  [SmartDownloader] Failed: {e} — using cached clips.")
+
+    # 4b. Get assembled clip paths from clip manager
     clip_paths = get_character_scene_clips(
         character_key=character_key,
         segment_durations=durations,
@@ -129,7 +162,7 @@ def render_cinematic_edit(
         character_name=theme["name"].split()[0]
     )
     
-    # 6. Build Multi-Layer FFmpeg Filtergraph
+    # 6. Build Multi-Layer FFmpeg Filtergraph (OpenCut-Inspired)
     cmd_inputs = []
     has_clip_audio_list = []
     
@@ -147,33 +180,61 @@ def render_cinematic_edit(
     concat_v_inputs = []
     concat_a_inputs = []
     
-    # Build per-clip video filters with watermark crop and audio extraction
+    # Build per-clip video filters (OpenCut: speed ramps, watermark crop, cinematic bars)
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         zoom_filter = build_velocity_zoom_filter(seg["is_drop"], idx)
         
-        # Watermark-free center crop & scale
-        v_chain = (
-            f"[{idx}:v]crop=in_w-24:in_h-24:12:12,"
-            f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=increase,"
-            f"crop={VIDEO_WIDTH}:{VIDEO_HEIGHT},{zoom_filter},"
-            f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1,fps={FPS},"
-            f"trim=duration={seg['duration']:.2f},setpts=PTS-STARTPTS[v{idx}]"
+        # OpenCut-style per-clip filter: crop + scale + speed ramp + SAR + FPS
+        opencut_vf = build_opencut_clip_filter(
+            seg_idx=idx,
+            duration=seg["duration"],
+            is_drop=seg["is_drop"],
+            video_width=VIDEO_WIDTH,
+            video_height=VIDEO_HEIGHT,
+            fps=FPS,
+            add_bars=(idx == 0)  # Cinematic bars only on first clip (dramatic intro)
         )
+        
+        v_chain = f"[{idx}:v]{opencut_vf},{zoom_filter},scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1[v{idx}]"
         filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
         
-        # Clip Audio extraction & normalization
+        # OpenCut-style per-clip audio fades + extraction
+        audio_fade = build_clip_audio_fade(seg["duration"])
         if has_aud:
-            a_chain = f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,volume=0.85,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+            a_chain = (
+                f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,"
+                f"{audio_fade},volume=0.85,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+            )
         else:
             a_chain = f"aevalsrc=0:d={seg['duration']:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
+
+    # OpenCut xfade-based video concat (replaces plain concat)
+    # Use xfade if we have multiple clips and a supported ffmpeg version
+    if len(clip_paths) > 1:
+        # Build sequential xfade chain with contextual transitions
+        XFADE_DUR = 0.10
+        from core.opencut_engine import pick_transition
         
-    # Concat all video segments
-    concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
-    filter_chains.append(concat_v_str)
-    
+        current_label = "[v0]"
+        seg_offset = 0.0
+        for i in range(1, len(clip_paths)):
+            transition = pick_transition(is_drop=drop_flags[i] if i < len(drop_flags) else True)
+            seg_offset += durations[i - 1] - XFADE_DUR
+            out_label = f"[xf{i}]" if i < len(clip_paths) - 1 else "[concatenated_v]"
+            
+            chain = (
+                f"{current_label}[v{i}]xfade=transition={transition}:"
+                f"duration={XFADE_DUR:.3f}:offset={seg_offset:.3f}{out_label}"
+            )
+            filter_chains.append(chain)
+            current_label = out_label
+    else:
+        concat_v_str = f"{concat_v_inputs[0]}null[concatenated_v]"
+        filter_chains.append(concat_v_str)
+
     # Concat all clip audio segments
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
