@@ -1,6 +1,7 @@
 """
 Production 4K Phonk / Scene Edit Video Assembler for Marvel & Jujutsu Kaisen.
 Assembles beat-synced cuts, velocity ramping, 4K HDR CC, impact flashes, and glowing ASS subtitles.
+Mixes original clip dialogue & SFX audio seamlessly with hard-hitting Phonk BGM.
 """
 import subprocess
 import random
@@ -14,6 +15,7 @@ from config.settings import (
 from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
+from core.public_api_fetcher import check_clip_has_audio
 from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata
@@ -56,6 +58,7 @@ def render_cinematic_edit(
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
+    Mixes original scene audio (dialogue/punches) with viral Phonk BGM and strips watermarks.
     """
     if not character_key or character_key not in CHARACTER_THEMES:
         character_key = random.choice(list(CHARACTER_THEMES.keys()))
@@ -119,30 +122,51 @@ def render_cinematic_edit(
         character_name=theme["name"].split()[0]
     )
     
-    # 5. Build FFmpeg Filtergraph
+    # 5. Build FFmpeg Filtergraph (Video + Watermark Crop + Clip Audio Mixing)
     cmd_inputs = []
+    has_clip_audio_list = []
+    
     for cp in clip_paths:
         cmd_inputs.extend(["-i", str(cp)])
+        has_clip_audio_list.append(check_clip_has_audio(cp))
+        
     cmd_inputs.extend(["-i", str(audio_path)])
     audio_inp_idx = len(clip_paths)
     
-    # Per-clip scale, crop, velocity zoom & normalize SAR/FPS
     filter_chains = []
-    concat_inputs = []
-    for idx, (cp, seg) in enumerate(zip(clip_paths, segments)):
+    concat_v_inputs = []
+    concat_a_inputs = []
+    
+    # Build per-clip video filters with watermark crop and audio extraction
+    for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         zoom_filter = build_velocity_zoom_filter(seg["is_drop"], idx)
-        chain = (
-            f"[{idx}:v]scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=increase,"
+        
+        # Watermark-free center crop & scale
+        v_chain = (
+            f"[{idx}:v]crop=in_w-24:in_h-24:12:12,"
+            f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=increase,"
             f"crop={VIDEO_WIDTH}:{VIDEO_HEIGHT},{zoom_filter},"
             f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1,fps={FPS},"
             f"trim=duration={seg['duration']:.2f},setpts=PTS-STARTPTS[v{idx}]"
         )
-        filter_chains.append(chain)
-        concat_inputs.append(f"[v{idx}]")
+        filter_chains.append(v_chain)
+        concat_v_inputs.append(f"[v{idx}]")
         
-    # Concat all segments
-    concat_str = "".join(concat_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated]"
-    filter_chains.append(concat_str)
+        # Clip Audio extraction & normalization
+        if has_aud:
+            a_chain = f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,volume=0.85,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+        else:
+            a_chain = f"aevalsrc=0:d={seg['duration']:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+        filter_chains.append(a_chain)
+        concat_a_inputs.append(f"[a{idx}]")
+        
+    # Concat all video segments
+    concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
+    filter_chains.append(concat_v_str)
+    
+    # Concat all audio segments
+    concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
+    filter_chains.append(concat_a_str)
     
     # Impact White Flashes on Beat Drops
     flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.10, opacity=0.45)
@@ -154,17 +178,24 @@ def render_cinematic_edit(
     # Subtitle Burn-in
     ass_escaped = str(ass_path).replace(":", "\\:").replace("\\", "/")
     
-    full_v_filter = (
-        ";".join(filter_chains) + ";"
-        f"[concatenated]{flash_str},{cc_filter},ass={ass_escaped}[vout]"
+    # Video Post-processing (Concatenated + Flash + CC + ASS)
+    filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter},ass={ass_escaped}[vout]")
+    
+    # Audio Mixing: Clip Dialogue/SFX + Phonk BGM
+    filter_chains.append(
+        f"[clip_sfx_raw]volume=0.90,dynaudnorm[clip_sfx];"
+        f"[{audio_inp_idx}:a]volume=0.80[phonk_bgm];"
+        f"[clip_sfx][phonk_bgm]amix=inputs=2:duration=first:dropout_transition=2[aout]"
     )
+    
+    full_filter_complex = ";".join(filter_chains)
     
     cmd = [
         "ffmpeg", "-y",
         *cmd_inputs,
-        "-filter_complex", full_v_filter,
+        "-filter_complex", full_filter_complex,
         "-map", "[vout]",
-        "-map", f"{audio_inp_idx}:a",
+        "-map", "[aout]",
         "-c:v", "libx264",
         "-preset", "veryfast",
         "-crf", "19",
@@ -175,7 +206,6 @@ def render_cinematic_edit(
         "-t", f"{beat_grid.duration:.2f}",
         str(output_path)
     ]
-
     
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:

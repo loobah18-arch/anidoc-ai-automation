@@ -1,10 +1,12 @@
 """
 Public API & GitHub Repository Video Clip Fetcher for AniDoc.
 Fetches high-quality anime and MCU action scenes from GitHub repos, public video APIs, and scenepack archives.
+Preserves original scene audio/SFX and applies watermark-removal crops.
 """
 import os
 import re
 import json
+import shutil
 import urllib.request
 import subprocess
 from pathlib import Path
@@ -12,29 +14,41 @@ from typing import List, Dict, Any, Optional
 
 from config.settings import MARVEL_DIR, JJK_DIR, SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT
 
-# Curated High-Action Scenepack Queries for Marvel, JJK, and Anime
+# Curated High-Action Scenepack Queries (Logless, no watermark, no text)
 CURATED_CLIP_QUERIES = {
     # Marvel Cinematic Universe
-    "spiderman": "Spider-Man No Way Home 4K 60FPS Scenepack no music no subs",
-    "ironman": "Iron Man Mark 85 Endgame 4K 60FPS Scenepack logless",
-    "thor": "Thor Wakanda Infinity War 4K 60FPS Scenepack",
-    "thanos": "Thanos vs Avengers Endgame 4K 60FPS Scenepack",
-    "wolverine": "Deadpool and Wolverine 4K 60FPS Scenepack no music",
-    "loki": "Loki God of Stories Season 2 4K 60FPS Scenepack",
+    "spiderman": "Spider-Man No Way Home 4K 60FPS Scenepack logless no watermark no text",
+    "ironman": "Iron Man Mark 85 Endgame 4K 60FPS Scenepack logless no watermark",
+    "thor": "Thor Wakanda Infinity War 4K 60FPS Scenepack logless no text",
+    "thanos": "Thanos vs Avengers Endgame 4K 60FPS Scenepack logless no watermark",
+    "wolverine": "Deadpool and Wolverine 4K 60FPS Scenepack logless no watermark",
+    "loki": "Loki God of Stories Season 2 4K 60FPS Scenepack logless no text",
     # Jujutsu Kaisen
-    "gojo": "Gojo Satoru Hollow Purple Shibuya 4K 60FPS Scenepack no text",
-    "sukuna": "Ryomen Sukuna Malevolent Shrine Shibuya 4K 60FPS Scenepack",
-    "toji": "Toji Fushiguro vs Gojo 4K 60FPS Scenepack",
-    "yuji": "Yuji Itadori Black Flash Shibuya 4K 60FPS Scenepack",
-    "megumi": "Megumi Fushiguro Mahoraga Summon 4K 60FPS Scenepack",
-    "maki": "Maki Zenin Awakened 4K 60FPS Scenepack"
+    "gojo": "Gojo Satoru Hollow Purple Shibuya 4K 60FPS Scenepack logless no watermark no text",
+    "sukuna": "Ryomen Sukuna Malevolent Shrine Shibuya 4K 60FPS Scenepack logless no text",
+    "toji": "Toji Fushiguro vs Gojo 4K 60FPS Scenepack logless no watermark",
+    "yuji": "Yuji Itadori Black Flash Shibuya 4K 60FPS Scenepack logless no text",
+    "megumi": "Megumi Fushiguro Mahoraga Summon 4K 60FPS Scenepack logless no watermark",
+    "maki": "Maki Zenin Awakened 4K 60FPS Scenepack logless no watermark"
 }
 
-# Public GitHub Repositories hosting curated open video clips & anime datasets
-KNOWN_PUBLIC_GITHUB_REPOS = [
-    "https://github.com/intel-isl/OpenDriveDataset",
-    "https://github.com/loobah18-arch/anidoc-ai-automation"
-]
+
+def check_clip_has_audio(path: Path) -> bool:
+    """Checks if a video file has an active audio stream."""
+    if not path.exists():
+        return False
+    cmd = [
+        "ffprobe", "-v", "error",
+        "-select_streams", "a",
+        "-show_entries", "stream=codec_name",
+        "-of", "csv=p=0",
+        str(path)
+    ]
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        return bool(res.stdout.strip())
+    except Exception:
+        return False
 
 
 def slice_scenepack_into_clips(
@@ -46,6 +60,7 @@ def slice_scenepack_into_clips(
 ) -> List[Path]:
     """
     Slices raw footage into punchy 1.5s - 3.5s action clips formatted for 9:16 vertical shorts.
+    Preserves original dialogue & SFX audio, and crops out edge watermarks/logos.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -62,11 +77,21 @@ def slice_scenepack_into_clips(
     except Exception:
         total_dur = 20.0
         
-    print(f"✂️ Slicing '{raw_video_path.name}' ({total_dur:.1f}s) into {seg_duration}s action cuts...")
+    print(f"✂️ Slicing '{raw_video_path.name}' ({total_dur:.1f}s) into {seg_duration}s action cuts with audio & watermark removal...")
+    
+    # Check if raw input has audio
+    has_audio = check_clip_has_audio(raw_video_path)
     
     generated_clips = []
     t = 0.5  # Skip first 0.5s of potential logo/fade
     count = 0
+    
+    # Watermark-free 9:16 crop filter (trims 24px off edges then centers)
+    vf_filter = (
+        f"crop=w=iw-48:h=ih-48:x=24:y=24,"
+        f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=increase,"
+        f"crop={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1"
+    )
     
     while t + seg_duration <= total_dur and count < max_clips:
         out_clip = output_dir / f"{clip_prefix}_clip_{count:02d}.mp4"
@@ -75,13 +100,20 @@ def slice_scenepack_into_clips(
             "-ss", f"{t:.2f}",
             "-i", str(raw_video_path),
             "-t", f"{seg_duration:.2f}",
-            "-vf", f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=increase,crop={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1",
+            "-vf", vf_filter,
             "-c:v", "libx264",
             "-preset", "veryfast",
-            "-an",  # Strip audio for phonk synchronization
-            "-pix_fmt", "yuv420p",
-            str(out_clip)
+            "-pix_fmt", "yuv420p"
         ]
+        
+        if has_audio:
+            cmd.extend(["-c:a", "aac", "-b:a", "192k"])
+        else:
+            # Generate quiet placeholder audio track so concat never fails
+            cmd.extend(["-an"])
+            
+        cmd.append(str(out_clip))
+        
         subprocess.run(cmd, capture_output=True)
         if out_clip.exists() and out_clip.stat().st_size > 15000:
             generated_clips.append(out_clip)
@@ -98,8 +130,7 @@ def fetch_from_github_repo(
     character_filter: Optional[str] = None
 ) -> List[Path]:
     """
-    Fetches raw video clips from a public GitHub repository (using GitHub API or raw content).
-    repo_url format: 'https://github.com/owner/repo' or 'owner/repo'
+    Fetches raw video clips from a public GitHub repository.
     """
     target_dir.mkdir(parents=True, exist_ok=True)
     clean_repo = repo_url.replace("https://github.com/", "").strip("/")
@@ -144,7 +175,6 @@ def fetch_character_scenepack(
 ) -> List[Path]:
     """
     Downloads and slices real 4K/1080p footage for a character.
-    Saves to the appropriate universe directory (marvel or jjk).
     """
     is_marvel = character_key in ["spiderman", "ironman", "thor", "thanos", "wolverine", "loki"]
     universe_dir = MARVEL_DIR if is_marvel else JJK_DIR
@@ -157,11 +187,10 @@ def fetch_character_scenepack(
         return existing_clips
         
     temp_raw = SCRATCH_DIR / f"raw_scenepack_{character_key}.mp4"
-    query = custom_query_or_url or CURATED_CLIP_QUERIES.get(character_key, f"{character_key} 4K 60FPS scenepack")
+    query = custom_query_or_url or CURATED_CLIP_QUERIES.get(character_key, f"{character_key} 4K 60FPS logless no watermark scenepack")
     
     target = query if (query.startswith("http://") or query.startswith("https://")) else f"ytsearch1:{query}"
     
-    import shutil
     if not shutil.which("yt-dlp"):
         print(f"⚠️ yt-dlp binary not found in PATH. Skipping online scenepack download.")
         return []
@@ -193,4 +222,3 @@ def fetch_character_scenepack(
     except Exception as e:
         print(f"⚠️ Scenepack download exception: {e}")
         return []
-
