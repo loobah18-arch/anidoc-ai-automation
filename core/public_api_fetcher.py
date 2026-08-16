@@ -216,3 +216,41 @@ def fetch_character_scenepack(
         print(f"⚠️ Scenepack download exception: {e}")
         
     return list(universe_dir.glob(f"*{character_key}*.mp4"))
+
+
+def fetch_from_github_repo(
+    repo_url_or_slug: str,
+    target_dir: Path,
+    character_filter: Optional[str] = None
+) -> List[Path]:
+    """
+    Clones or downloads video assets from a GitHub repository.
+    """
+    target_dir.mkdir(parents=True, exist_ok=True)
+    slug = repo_url_or_slug.replace("https://github.com/", "").strip("/")
+    
+    # Try GitHub API to find video files
+    api_url = f"https://api.github.com/repos/{slug}/contents"
+    downloaded = []
+    
+    try:
+        req = urllib.request.Request(api_url, headers={"User-Agent": "AniDoc-Automation"})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            items = json.loads(response.read().decode())
+            
+        for item in items:
+            name = item.get("name", "").lower()
+            if any(name.endswith(ext) for ext in [".mp4", ".mov", ".mkv"]):
+                if character_filter and character_filter.lower() not in name:
+                    continue
+                download_url = item.get("download_url")
+                if download_url:
+                    out_path = target_dir / item["name"]
+                    print(f"📥 Downloading clip from GitHub repo: {item['name']}...")
+                    urllib.request.urlretrieve(download_url, str(out_path))
+                    if out_path.exists() and out_path.stat().st_size > 10000:
+                        downloaded.append(out_path)
+    except Exception as e:
+        print(f"⚠️ GitHub API fetch exception: {e}")
+        
+    return downloaded or list(target_dir.glob("*.mp4"))
