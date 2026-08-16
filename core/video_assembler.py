@@ -171,9 +171,11 @@ def render_cinematic_edit(
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "192k",
+        "-movflags", "+faststart",
         "-t", f"{beat_grid.duration:.2f}",
         str(output_path)
     ]
+
     
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
