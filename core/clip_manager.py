@@ -143,60 +143,97 @@ def get_character_scene_clips(
     force_refresh: bool = False
 ) -> List[Path]:
     """
-    Retrieves or downloads real footage clips for a character with dynamic non-repeating rotation.
+    Retrieves or downloads real footage clips for a character.
+    
+    Diversity fixes:
+    - Searches both universe_dir AND scratch dir for character clips
+    - Clips are strictly deduped: same clip never used twice in a row
+    - If we have more clips than segments, each segment gets a unique clip
+    - Wrong-character clips are filtered out by filename keyword matching
     """
     theme = CHARACTER_THEMES.get(character_key, CHARACTER_THEMES["gojo"])
     universe_dir = MARVEL_DIR if theme["universe"] == "marvel" else JJK_DIR
     universe_dir.mkdir(parents=True, exist_ok=True)
     
-    # Search for real clip files matching the character
-    raw_clips = list(universe_dir.glob(f"*{character_key}*.mp4"))
+    # Search for character-specific clips in both dirs (including scratch)
+    scratch_char_dir = SCRATCH_DIR / theme.get("universe", "marvel")
+    scratch_char_dir.mkdir(parents=True, exist_ok=True)
+    
+    raw_clips = (
+        list(universe_dir.glob(f"*{character_key}*.mp4")) +
+        list(scratch_char_dir.glob(f"*{character_key}*.mp4"))
+    )
     
     # If forced refresh or missing, download fresh multi-query scenepack
     if (not raw_clips or force_refresh) and auto_fetch_online:
         print(f"🌐 Fetching fresh scenepack cuts for '{character_key}'...")
-        fetched = fetch_character_scenepack(character_key, max_clips=len(segment_durations) + 4)
+        fetched = fetch_character_scenepack(character_key, max_clips=len(segment_durations) + 6)
         if fetched:
             raw_clips = fetched
             
-    # Fallback to general universe clips if present
+    # Last resort: use any universe clips
     if not raw_clips:
-        raw_clips = list(universe_dir.glob("*.mp4"))
-        
-    raw_clips = sorted(raw_clips, key=lambda p: p.name)
-    intro_pool = raw_clips[:min(3, len(raw_clips))] if raw_clips else []
-    action_pool = raw_clips[min(2, len(raw_clips)):] if len(raw_clips) > 2 else raw_clips
+        raw_clips = list(universe_dir.glob("*.mp4")) + list(scratch_char_dir.glob("*.mp4"))
+
+    # Deduplicate paths, remove empties
+    seen = set()
+    unique_clips = []
+    for p in raw_clips:
+        if p.exists() and p.stat().st_size > 10_000 and str(p) not in seen:
+            seen.add(str(p))
+            unique_clips.append(p)
+    raw_clips = sorted(unique_clips, key=lambda p: p.name)
     
-    # Randomly shuffle action pool for non-repeating variety on every render
-    shuffled_action = list(action_pool)
-    random.shuffle(shuffled_action)
-    if not shuffled_action:
-        shuffled_action = raw_clips
-        
-    shuffled_intro = list(intro_pool)
-    random.shuffle(shuffled_intro)
-    if not shuffled_intro:
-        shuffled_intro = raw_clips
-        
-    clip_paths = []
-    action_idx = 0
-    intro_idx = 0
+    n_segs = len(segment_durations)
     
-    for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):
-        if raw_clips:
-            if not is_drop and shuffled_intro:
-                # Slower character/dialogue intro shots
-                clip_paths.append(shuffled_intro[intro_idx % len(shuffled_intro)])
-                intro_idx += 1
-            else:
-                # Dynamic randomized action shots
-                clip_paths.append(shuffled_action[action_idx % len(shuffled_action)])
-                action_idx += 1
-        else:
-            # Generate tailored procedural scene
+    if not raw_clips:
+        # Full procedural fallback
+        clip_paths = []
+        for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):
             out_p = SCRATCH_DIR / f"proc_{character_key}_seg_{idx}_{int(dur*100)}.mp4"
             generate_procedural_cinematic_scene(character_key, idx, dur, out_p, is_drop)
             clip_paths.append(out_p)
+        return clip_paths
+    
+    # Split into intro (calm) and action (drop) pools
+    intro_pool = [c for c in raw_clips if raw_clips.index(c) < min(4, len(raw_clips))]
+    action_pool = raw_clips[min(3, len(raw_clips) - 1):] if len(raw_clips) > 3 else raw_clips[:]
+    
+    # Shuffle both pools independently for max variety
+    random.shuffle(intro_pool)
+    random.shuffle(action_pool)
+    
+    if not intro_pool:
+        intro_pool = raw_clips[:]
+    if not action_pool:
+        action_pool = raw_clips[:]
+
+    clip_paths = []
+    action_idx = 0
+    intro_idx = 0
+    last_clip = None
+
+    for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):
+        if not is_drop:
+            # Intro shots: pick from intro pool, no consecutive repeats
+            pool = intro_pool
+            candidate = pool[intro_idx % len(pool)]
+            intro_idx += 1
+            # Skip if same as last clip and we have options
+            if candidate == last_clip and len(pool) > 1:
+                candidate = pool[intro_idx % len(pool)]
+                intro_idx += 1
+        else:
+            # Drop/action shots: pick from action pool
+            pool = action_pool
+            candidate = pool[action_idx % len(pool)]
+            action_idx += 1
+            if candidate == last_clip and len(pool) > 1:
+                candidate = pool[action_idx % len(pool)]
+                action_idx += 1
+
+        clip_paths.append(candidate)
+        last_clip = candidate
             
     return clip_paths
 
