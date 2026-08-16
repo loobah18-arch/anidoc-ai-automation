@@ -4,10 +4,16 @@ __pycache__/
 output/
 scratch/
 temp/
-*.mp4
-*.mkv
-*.mov
-*.webm
-*.jpg
-*.png
 .DS_Store
+
+# Ignore temporary root video outputs
+/*.mp4
+/*.mkv
+/*.mov
+/*.webm
+/*.jpg
+/*.png
+
+# Ensure assets are tracked
+!assets/
+!assets/**
