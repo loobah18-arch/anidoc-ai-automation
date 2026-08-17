@@ -309,7 +309,7 @@ def _extract_audio_energy_clips(
             "-ss", str(start), "-t", str(clip_duration),
             "-i", str(video_path),
             "-vf", (
-                f"crop=in_h*9/16:in_h:(in_w-in_h*9/16)/2:0,"
+                f"crop=in_h:in_h:(in_w-in_h)/2:0,"
                 f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1,fps={FPS}"
             ),
             "-c:v", "libx264", "-preset", "veryfast", "-crf", "20",

@@ -243,7 +243,7 @@ def extract_best_clips(
             "-t", str(dur),
             "-i", str(video_path),
             "-vf", (
-                f"crop=in_h*9/16:in_h:(in_w-in_h*9/16)/2:0,"
+                f"crop=in_h:in_h:(in_w-in_h)/2:0,"
                 f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},"
                 f"setsar=1,fps={FPS}"
             ),

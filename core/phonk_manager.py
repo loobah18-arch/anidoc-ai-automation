@@ -9,6 +9,7 @@ Priority order:
 2. Static catalog fallback (if live search fails)
 3. Existing local files
 """
+import json
 import subprocess
 import random
 import shutil
@@ -228,31 +229,63 @@ def download_phonk_track(track_id: str, query_override: Optional[str] = None) ->
     return result
 
 
+PHONK_HISTORY_FILE = SCRATCH_DIR / "phonk_rotation_history.json"
+
+
+def _load_phonk_history() -> List[str]:
+    """Loads previously played phonk track IDs."""
+    if PHONK_HISTORY_FILE.exists():
+        try:
+            with open(PHONK_HISTORY_FILE, "r") as f:
+                return json.load(f).get("used_tracks", [])
+        except Exception:
+            pass
+    return []
+
+
+def _save_phonk_history(used: List[str]):
+    """Saves played phonk track IDs."""
+    try:
+        PHONK_HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(PHONK_HISTORY_FILE, "w") as f:
+            json.dump({"used_tracks": used}, f, indent=2)
+    except Exception as e:
+        print(f"⚠️ [Phonk] Failed to save rotation history: {e}")
+
+
 def get_random_or_specified_phonk(track_id: Optional[str] = None) -> Optional[Path]:
     """
     Returns a phonk audio Path. Priority:
     1. If specific track_id given → return that exact curated track
-    2. If 'random' or None → randomly select from curated Top 10 AURA Phonk library
+    2. If 'random' or None → intelligently rotates through the 10 Top Viral AURA Phonk songs
     3. Fallback: live trending fetch or procedural audio
     """
     PHONK_DIR.mkdir(parents=True, exist_ok=True)
 
     # 1. Specific track requested
     if track_id and track_id not in ("random", ""):
-        # Check direct filename match
         direct = PHONK_DIR / f"{track_id}.mp3"
         if direct.exists() and direct.stat().st_size > 50_000:
             return direct
-        # Check if partial ID match
         for f in PHONK_DIR.glob("*.mp3"):
             if track_id in f.stem:
                 return f
 
-    # 2. Random selection from curated local Top 10 AURA Phonk library
+    # 2. Intelligent Non-Repeating Rotation from curated 10 AURA Phonk library
     curated_tracks = [f for f in PHONK_DIR.glob("*.mp3") if f.stat().st_size > 50_000]
     if curated_tracks:
-        chosen = random.choice(curated_tracks)
-        print(f"🎧 [Phonk] Selected curated Aura track: {chosen.stem}")
+        used_history = _load_phonk_history()
+        unused_tracks = [f for f in curated_tracks if f.stem not in used_history]
+        
+        if not unused_tracks:
+            print("🔄 [Phonk] All 10 Aura tracks have been rotated through. Resetting rotation cycle.")
+            used_history = []
+            unused_tracks = curated_tracks
+
+        chosen = random.choice(unused_tracks)
+        used_history.append(chosen.stem)
+        _save_phonk_history(used_history)
+        print(f"🎧 [Phonk] Selected fresh rotated Aura track ({len(used_history)}/{len(curated_tracks)}): {chosen.stem}")
         return chosen
 
     # 3. Live trending fallback

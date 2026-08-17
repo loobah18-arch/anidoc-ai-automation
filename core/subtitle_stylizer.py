@@ -13,6 +13,8 @@ Fixes applied:
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
+from config.settings import VIDEO_WIDTH, VIDEO_HEIGHT
+
 def format_ass_timestamp(seconds: float) -> str:
     """Formats float seconds into ASS timestamp format: H:MM:SS.cc"""
     h = int(seconds // 3600)
@@ -27,55 +29,55 @@ def format_ass_timestamp(seconds: float) -> str:
 SUBTITLE_STYLE_PRESETS = {
     "viral_karaoke": {
         "font": "Arial",
-        "fontsize": 82,                  # ↑ larger, punchier
+        "fontsize": 64,                  # Proportional for 1:1 square canvas
         "primary": "&H00FFFFFF",
         "active_word": "&H002BF5FF",     # Bright Cyan Active
         "outline": "&H00000000",
         "shadow": "&H90000000",
-        "outline_width": 7.0,            # ↑ thicker for contrast on any clip
-        "shadow_depth": 4.0,
+        "outline_width": 6.0,
+        "shadow_depth": 3.5,
         "alignment": 2,                  # Bottom-center
-        "margin_v": 180,                 # ↑ was 380 — now sits above phone UI
-        "margin_lr": 80,                 # safe side margins to prevent clipping
+        "margin_v": 85,                  # Sits in lower third of square
+        "margin_lr": 60,
     },
     "cyber_glow": {
         "font": "Arial",
-        "fontsize": 82,
+        "fontsize": 64,
         "primary": "&H00FFFFFF",
         "active_word": "&H00FFFF00",     # Neon Cyan Active
         "outline": "&H00FF55D2",
         "shadow": "&H99000000",
-        "outline_width": 7.0,
-        "shadow_depth": 4.5,
+        "outline_width": 6.0,
+        "shadow_depth": 3.5,
         "alignment": 2,
-        "margin_v": 180,
-        "margin_lr": 80,
+        "margin_v": 85,
+        "margin_lr": 60,
     },
     "anime_shrine": {
         "font": "Arial",
-        "fontsize": 84,
+        "fontsize": 66,
         "primary": "&H00FFFFFF",
         "active_word": "&H003333FF",     # Blood Crimson Active
         "outline": "&H00000000",
         "shadow": "&H99000088",
-        "outline_width": 7.0,
-        "shadow_depth": 4.5,
+        "outline_width": 6.0,
+        "shadow_depth": 3.5,
         "alignment": 2,
-        "margin_v": 180,
-        "margin_lr": 80,
+        "margin_v": 85,
+        "margin_lr": 60,
     },
     "cinematic_minimal": {
         "font": "Arial",
-        "fontsize": 76,
+        "fontsize": 58,
         "primary": "&H00FFFFFF",
         "active_word": "&H00E0E0E0",
         "outline": "&H00000000",
         "shadow": "&H60000000",
-        "outline_width": 5.5,
-        "shadow_depth": 3.0,
+        "outline_width": 5.0,
+        "shadow_depth": 2.5,
         "alignment": 2,
-        "margin_v": 180,
-        "margin_lr": 80,
+        "margin_v": 85,
+        "margin_lr": 60,
     }
 }
 
@@ -127,8 +129,8 @@ ScriptType: v4.00+
 WrapStyle: 1
 ScaledBorderAndShadow: yes
 YCbCr Matrix: TV.601
-PlayResX: 1080
-PlayResY: 1920
+PlayResX: {VIDEO_WIDTH}
+PlayResY: {VIDEO_HEIGHT}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
