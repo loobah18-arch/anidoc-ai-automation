@@ -16,6 +16,7 @@ Editing Engine:
 
 Phonk: Live trending August 2026 fetch via yt-dlp YouTube search.
 """
+import os
 import subprocess
 import random
 from pathlib import Path
