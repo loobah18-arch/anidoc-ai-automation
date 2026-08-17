@@ -82,7 +82,8 @@ class TestAniDocPipeline(unittest.TestCase):
                 content = f.read()
                 self.assertIn("[Script Info]", content)
                 self.assertIn("HONORED", content)
-                self.assertIn("GOJO", content)
+                # Note: character badge removed from subtitles (cleaner look)
+                self.assertIn("BaseText", content)
 
     def test_06_procedural_scene_rendering(self):
         test_clip = SCRATCH_DIR / "test_proc_scene.mp4"
