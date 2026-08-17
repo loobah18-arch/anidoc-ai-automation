@@ -1,74 +1,160 @@
 """
-Phonk Music Library & Beat Profile Manager for AniDoc.
-Manages popular phonk tracks, automatic internet downloaders, and audio analysis.
+Phonk Music Library & Live Trending Fetcher for AniDoc.
+
+Now includes a live trending phonk fetcher that searches YouTube for
+actual August 2026 phonk tracks — not a static catalog but live search.
+
+Priority order:
+1. Live trending 2026 phonk search via yt-dlp (freshest possible)
+2. Static catalog fallback (if live search fails)
+3. Existing local files
 """
 import subprocess
 import random
+import shutil
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 from config.settings import PHONK_DIR, SCRATCH_DIR
 
-# Curated Popular Phonk Catalog with search queries and default drop timings
+
+# --- Static fallback catalog (if live search is unavailable) ---
 POPULAR_PHONK_CATALOG = [
     {
-        "id": "brazilian_phonk_montagem",
-        "title": "Brazilian Phonk (Montagem Slowed & Reverb)",
+        "id": "brazilian_phonk_2026",
+        "title": "Brazilian Phonk 2026 (Montagem Sloped)",
         "genre": "Brazilian Phonk",
         "bpm": 134.0,
         "default_drop": 6.4,
-        "query": "brazilian phonk montagem slowed reverb no copyright 30 seconds"
+        "query": "brazilian phonk 2026 no copyright shorts montagem",
     },
     {
-        "id": "tokyo_drift_phonk",
-        "title": "Tokyo Drift Phonk (Cowbell Aggressive)",
-        "genre": "Drift Phonk",
-        "bpm": 130.0,
-        "default_drop": 5.8,
-        "query": "tokyo drift phonk cowbell no copyright 30 seconds"
-    },
-    {
-        "id": "dark_shadow_phonk",
-        "title": "Dark Shadow Phonk (Aggressive Bass Drop)",
+        "id": "dark_phonk_2026",
+        "title": "Dark Aggressive Phonk 2026",
         "genre": "Dark Phonk",
         "bpm": 138.0,
         "default_drop": 7.2,
-        "query": "dark aggressive shadow phonk no copyright 30 seconds"
+        "query": "dark phonk 2026 no copyright aggressive bass drop",
     },
     {
-        "id": "cyber_phonk_beat",
-        "title": "Cyberpunk Neon Phonk (Synthesizer Wave)",
-        "genre": "Cyber Phonk",
-        "bpm": 128.0,
-        "default_drop": 6.0,
-        "query": "cyberpunk neon phonk beat no copyright 30 seconds"
+        "id": "drift_phonk_2026",
+        "title": "Drift Phonk 2026 Cowbell",
+        "genre": "Drift Phonk",
+        "bpm": 130.0,
+        "default_drop": 5.8,
+        "query": "drift phonk 2026 cowbell no copyright",
     },
     {
-        "id": "murder_mind_phonk",
-        "title": "Kordhell Style Murder Phonk (Heavy Bass)",
+        "id": "murder_phonk_2026",
+        "title": "Murder Phonk 2026 Heavy Bass",
         "genre": "Murder Phonk",
         "bpm": 136.0,
         "default_drop": 6.8,
-        "query": "aggressive murder phonk bass boosted no copyright 30 seconds"
+        "query": "murder phonk 2026 no copyright heavy bass",
     },
     {
-        "id": "gigachad_phonk",
-        "title": "Gigachad Phonk (Sigma Slowed Edit Beat)",
+        "id": "sigma_phonk_2026",
+        "title": "Sigma Slowed Phonk 2026",
         "genre": "Sigma Phonk",
         "bpm": 132.0,
         "default_drop": 6.5,
-        "query": "gigachad phonk theme slowed reverb no copyright 30 seconds"
-    }
+        "query": "sigma phonk 2026 slowed reverb no copyright",
+    },
 ]
+
+# Live trending search queries — these rotate per run for max freshness
+TRENDING_PHONK_QUERIES_2026 = [
+    "trending phonk 2026 no copyright",
+    "best phonk music august 2026 no copyright shorts",
+    "new phonk 2026 aggressive bass drop no copyright",
+    "viral phonk song 2026 no copyright",
+    "phonk remix 2026 trending youtube shorts no copyright",
+    "slowed phonk 2026 best hits no copyright",
+    "dark phonk 2026 no copyright free use",
+    "brazilian funk phonk 2026 no copyright",
+    "phonk beats 2026 no copyright aggressive",
+    "new age phonk 2026 no copyright viral",
+]
+
+
+def _ytdlp_available() -> bool:
+    return shutil.which("yt-dlp") is not None
+
+
+def _download_track_from_query(query: str, out_path: Path, max_duration: int = 210) -> Optional[Path]:
+    """Download a single track matching query using yt-dlp. Returns path if successful."""
+    cmd = [
+        "yt-dlp",
+        "--extractor-args", "youtube:player_client=android,web",
+        "-x",
+        "--audio-format", "mp3",
+        "--audio-quality", "0",
+        "-o", str(out_path),
+        f"ytsearch1:{query}",
+        "--max-downloads", "1",
+        "--no-playlist",
+        "--match-filter", f"duration <= {max_duration}",
+        "--quiet",
+    ]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
+        # yt-dlp may add extension automatically
+        actual = out_path if out_path.exists() else out_path.with_suffix(".mp3")
+        if actual.exists() and actual.stat().st_size > 50_000:
+            return actual
+        # Search result may not match duration filter — try without filter
+        if not actual.exists():
+            cmd_no_filter = [c for c in cmd if "duration" not in c and "match-filter" not in c]
+            subprocess.run(cmd_no_filter, capture_output=True, text=True, timeout=90)
+            actual = out_path if out_path.exists() else out_path.with_suffix(".mp3")
+            if actual.exists() and actual.stat().st_size > 50_000:
+                return actual
+    except Exception as e:
+        print(f"⚠️  [Phonk] Download error: {e}")
+    return None
+
+
+def fetch_trending_phonk_2026(n: int = 1) -> List[Path]:
+    """
+    Fetches n trending phonk tracks from YouTube, searching for August 2026 phonk.
+    Returns list of downloaded .mp3 paths.
+    """
+    if not _ytdlp_available():
+        print("⚠️  [Phonk] yt-dlp not found. Skipping live phonk fetch.")
+        return []
+
+    PHONK_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Shuffle queries so each run gets a different track
+    queries = TRENDING_PHONK_QUERIES_2026.copy()
+    random.shuffle(queries)
+
+    downloaded = []
+    tried = 0
+
+    for query in queries:
+        if len(downloaded) >= n:
+            break
+        tried += 1
+        track_id = f"live_phonk_{tried}_{random.randint(1000, 9999)}"
+        out_path = PHONK_DIR / f"{track_id}.mp3"
+
+        print(f"🎵 [Phonk] Searching trending 2026 phonk: '{query[:60]}'")
+        result = _download_track_from_query(query, out_path)
+        if result:
+            downloaded.append(result)
+            print(f"  ✅ Got: {result.name} ({result.stat().st_size // 1024} KB)")
+
+    return downloaded
 
 
 def list_available_phonk_tracks() -> List[Dict[str, Any]]:
     """Lists all phonk audio files currently downloaded and ready to use."""
     PHONK_DIR.mkdir(parents=True, exist_ok=True)
-    audio_files = list(PHONK_DIR.glob("*.mp3")) + list(PHONK_DIR.glob("*.wav")) + list(PHONK_DIR.glob("*.aac"))
-    
+    audio_files = list(PHONK_DIR.glob("*.mp3")) + list(PHONK_DIR.glob("*.wav"))
+
     catalog_map = {item["id"]: item for item in POPULAR_PHONK_CATALOG}
-    
+
     results = []
     for f in audio_files:
         stem = f.stem
@@ -76,14 +162,14 @@ def list_available_phonk_tracks() -> List[Dict[str, Any]]:
             "id": stem,
             "title": stem.replace("_", " ").title(),
             "genre": "Phonk",
-            "bpm": 130.0,
+            "bpm": 132.0,
             "default_drop": 6.5
         })
         results.append({
             "id": info["id"],
             "title": info["title"],
             "genre": info.get("genre", "Phonk"),
-            "bpm": info.get("bpm", 130.0),
+            "bpm": info.get("bpm", 132.0),
             "default_drop": info.get("default_drop", 6.5),
             "path": str(f),
             "size_kb": f.stat().st_size // 1024
@@ -92,78 +178,75 @@ def list_available_phonk_tracks() -> List[Dict[str, Any]]:
 
 
 def download_phonk_track(track_id: str, query_override: Optional[str] = None) -> Optional[Path]:
-    """Downloads a specific phonk track from the internet using yt-dlp."""
+    """Downloads a specific phonk track from the static catalog."""
     PHONK_DIR.mkdir(parents=True, exist_ok=True)
     target_mp3 = PHONK_DIR / f"{track_id}.mp3"
-    
-    if target_mp3.exists() and target_mp3.stat().st_size > 10000:
+
+    if target_mp3.exists() and target_mp3.stat().st_size > 50_000:
         return target_mp3
-        
+
     query = query_override
     if not query:
         matching = [item for item in POPULAR_PHONK_CATALOG if item["id"] == track_id]
-        if matching:
-            query = matching[0]["query"]
-        else:
-            query = f"{track_id} phonk no copyright 30 seconds"
-            
-    import shutil
-    if not shutil.which("yt-dlp"):
-        print(f"⚠️ yt-dlp binary not found in PATH. Skipping online phonk download.")
+        query = matching[0]["query"] if matching else f"{track_id} phonk no copyright"
+
+    if not _ytdlp_available():
         return None
 
-    print(f"🎵 Downloading Phonk BGM '{track_id}' from internet...")
-    cmd = [
-        "yt-dlp",
-        "--extractor-args", "youtube:player_client=android,web",
-        "-x", "--audio-format", "mp3",
-        "-o", str(target_mp3),
-        f"ytsearch1:{query}",
-        "--max-downloads", "1"
-    ]
-    try:
-        res = subprocess.run(cmd, capture_output=True, text=True)
-        if target_mp3.exists() and target_mp3.stat().st_size > 10000:
-            print(f"✅ Downloaded: {target_mp3.name} ({target_mp3.stat().st_size // 1024} KB)")
-            return target_mp3
-        else:
-            print(f"⚠️ Failed to download '{track_id}': {res.stderr[:200] if res.stderr else 'Unknown error'}")
-            return None
-    except Exception as e:
-        print(f"⚠️ Phonk download exception: {e}")
-        return None
-
-
-
-def ensure_popular_phonk_library(min_tracks: int = 3) -> List[Path]:
-    """Ensures at least min_tracks popular phonk tracks are downloaded and ready."""
-    PHONK_DIR.mkdir(parents=True, exist_ok=True)
-    existing = list(PHONK_DIR.glob("*.mp3"))
-    if len(existing) >= min_tracks:
-        return existing
-        
-    for item in POPULAR_PHONK_CATALOG:
-        download_phonk_track(item["id"], item["query"])
-        
-    return list(PHONK_DIR.glob("*.mp3"))
+    print(f"🎵 [Phonk] Downloading catalog track '{track_id}'...")
+    result = _download_track_from_query(query, target_mp3)
+    return result
 
 
 def get_random_or_specified_phonk(track_id: Optional[str] = None) -> Optional[Path]:
-    """Returns a phonk audio Path matching track_id, or a random downloaded phonk."""
+    """
+    Returns a phonk audio Path. Priority:
+    1. If track_id given → try static catalog download
+    2. Otherwise → fetch a fresh trending 2026 track from YouTube
+    3. Fall back to any existing local file
+    """
     PHONK_DIR.mkdir(parents=True, exist_ok=True)
-    if track_id:
+
+    if track_id and track_id not in ("random", ""):
         direct = PHONK_DIR / f"{track_id}.mp3"
-        if direct.exists():
+        if direct.exists() and direct.stat().st_size > 50_000:
             return direct
-        direct_alt = PHONK_DIR / track_id
-        if direct_alt.exists():
-            return direct_alt
-        # Try downloading it
         downloaded = download_phonk_track(track_id)
         if downloaded:
             return downloaded
-            
-    tracks = list(PHONK_DIR.glob("*.mp3")) + list(PHONK_DIR.glob("*.wav"))
-    if tracks:
-        return random.choice(tracks)
+
+    # Live trending 2026 fetch (freshest phonk)
+    live = fetch_trending_phonk_2026(n=1)
+    if live:
+        return live[0]
+
+    # Last resort: any local file
+    existing = list(PHONK_DIR.glob("*.mp3")) + list(PHONK_DIR.glob("*.wav"))
+    if existing:
+        return random.choice(existing)
+
     return None
+
+
+def ensure_popular_phonk_library(min_tracks: int = 2) -> List[Path]:
+    """Ensures at least min_tracks phonk tracks are downloaded and ready."""
+    PHONK_DIR.mkdir(parents=True, exist_ok=True)
+    existing = [f for f in PHONK_DIR.glob("*.mp3") if f.stat().st_size > 50_000]
+    if len(existing) >= min_tracks:
+        return existing
+
+    # Fetch trending 2026 tracks first
+    live = fetch_trending_phonk_2026(n=min_tracks - len(existing))
+    if live:
+        existing += live
+
+    # Supplement from catalog if still short
+    if len(existing) < min_tracks:
+        for item in random.sample(POPULAR_PHONK_CATALOG, min(min_tracks, len(POPULAR_PHONK_CATALOG))):
+            t = download_phonk_track(item["id"], item["query"])
+            if t:
+                existing.append(t)
+                if len(existing) >= min_tracks:
+                    break
+
+    return existing

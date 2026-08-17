@@ -1,12 +1,16 @@
 """
 Production 4K Phonk / Scene Edit Video Assembler for Marvel & Jujutsu Kaisen.
 Assembles beat-synced cuts, velocity ramping, 4K HDR CC, impact flashes, and glowing ASS subtitles.
-Features true character dialogue voiceover, low-pass Phonk intro into explosive drop, and commercial audio mastering.
+
+NO AI VOICE — real clip audio (original anime/movie sound) is featured throughout.
+Best moments are automatically extracted from downloaded episodes by audio energy analysis.
 
 OpenCut-Inspired Engine: Uses xfade transitions, per-clip speed ramps, cinematic bars, and
 Audio fade handles — all ported from OpenCut's browser editor to FFmpeg filtergraph.
 
 Smart Downloader: Multi-source clip fetching via yt-dlp → Archive.org → Pixabay/Pexels fallback.
+Best Moments: FFmpeg audio energy analysis finds loudest scene moments automatically.
+Phonk: Live trending August 2026 fetch via yt-dlp YouTube search.
 """
 import subprocess
 import random
@@ -14,13 +18,13 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 from config.settings import (
-    OUTPUT_DIR, SCRATCH_DIR, PHONK_DIR, DIALOGUE_DIR,
+    OUTPUT_DIR, SCRATCH_DIR, PHONK_DIR,
     VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS
 )
 from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
-from core.voice_engine import get_character_dialogue_audio
+from core.best_moments import fetch_best_episode_clips
 from core.public_api_fetcher import check_clip_has_audio
 from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
@@ -110,40 +114,69 @@ def render_cinematic_edit(
     drop_t = max(0.5, beat_grid.drop_time)
     print(f"🎵 Beat Grid: {len(segments)} scene cuts detected across {beat_grid.duration:.1f}s (Drop at {drop_t:.1f}s)")
     
-    # 3. Retrieve Character Dialogue Audio
-    dialogue_path = get_character_dialogue_audio(character_key, quote_text)
-    
-    # 4a. Smart Multi-Source Clip Download (yt-dlp → Archive.org → Pixabay/Pexels)
+    # 3. Clip Sourcing: try best_moments (real episode audio) first, then smart_downloader fallback
     durations = [seg["duration"] for seg in segments]
     drop_flags = [seg["is_drop"] for seg in segments]
+    n_clips = len(segments)
 
     universe_dir = SCRATCH_DIR / theme.get("universe", "marvel")
     universe_dir.mkdir(parents=True, exist_ok=True)
 
-    local_clips_count = len(list(universe_dir.glob(f"{character_key}*.mp4")))
-    if force_refresh or local_clips_count < 4:
-        print(f"🌐 [SmartDownloader] Fetching fresh clips for {character_key}...")
-        try:
-            smart_fetch_clips(
-                character_key=character_key,
-                universe_dir=universe_dir,
-                max_clips=12,
-                use_archive=True,
-                use_pixabay=True,
-                use_pexels=True
-            )
-        except Exception as e:
-            print(f"⚠️  [SmartDownloader] Failed: {e} — using cached clips.")
+    clip_paths = []
 
-    # 4b. Get assembled clip paths from clip manager
-    clip_paths = get_character_scene_clips(
-        character_key=character_key,
-        segment_durations=durations,
-        is_drop_flags=drop_flags,
-        auto_fetch_online=auto_fetch_clips,
-        github_repo=github_repo,
-        force_refresh=force_refresh
-    )
+    # Primary: fetch best energetic moments from real episodes (with original audio)
+    if force_refresh:
+        print(f"📺 [BestMoments] Fetching best real episode moments for '{character_key}'...")
+        try:
+            best_clips = fetch_best_episode_clips(
+                character_key=character_key,
+                output_dir=universe_dir,
+                n_clips=n_clips + 4
+            )
+            if best_clips:
+                clip_paths = best_clips
+                print(f"✅ [BestMoments] Using {len(best_clips)} real episode clips with original audio.")
+        except Exception as e:
+            print(f"⚠️  [BestMoments] Failed: {e}")
+
+    # Secondary: smart multi-source downloader if best_moments didn't get enough
+    if len(clip_paths) < n_clips:
+        existing_clips = len(list(universe_dir.glob(f"{character_key}*.mp4")))
+        if force_refresh or existing_clips < 4:
+            print(f"🌐 [SmartDownloader] Supplementing clips for {character_key}...")
+            try:
+                smart_fetch_clips(
+                    character_key=character_key,
+                    universe_dir=universe_dir,
+                    max_clips=n_clips + 4,
+                    use_archive=True,
+                    use_pixabay=True,
+                    use_pexels=True
+                )
+            except Exception as e:
+                print(f"⚠️  [SmartDownloader] Failed: {e} — using cached clips.")
+
+        # Fill remaining slots from clip manager
+        remaining = n_clips - len(clip_paths)
+        extra = get_character_scene_clips(
+            character_key=character_key,
+            segment_durations=durations[:remaining],
+            is_drop_flags=drop_flags[:remaining],
+            auto_fetch_online=auto_fetch_clips,
+            github_repo=github_repo,
+            force_refresh=False  # already fetched above
+        )
+        clip_paths.extend(extra)
+
+    # Ensure we have exactly n_clips (pad with rotation if needed)
+    if len(clip_paths) > n_clips:
+        clip_paths = clip_paths[:n_clips]
+    elif clip_paths and len(clip_paths) < n_clips:
+        while len(clip_paths) < n_clips:
+            clip_paths.append(clip_paths[len(clip_paths) % len(clip_paths)])
+
+    if not clip_paths:
+        raise RuntimeError("No clips available after all download attempts.")
     
     # 5. Generate Kinetic Karaoke Subtitles (Safe-Zone Alignment)
     ass_path = SCRATCH_DIR / f"subs_{character_key}.ass"
@@ -172,10 +205,7 @@ def render_cinematic_edit(
         
     phonk_inp_idx = len(clip_paths)
     cmd_inputs.extend(["-i", str(audio_path)])
-    
-    dialogue_inp_idx = len(clip_paths) + 1
-    cmd_inputs.extend(["-i", str(dialogue_path)])
-    
+
     filter_chains = []
     concat_v_inputs = []
     concat_a_inputs = []
@@ -200,11 +230,12 @@ def render_cinematic_edit(
         concat_v_inputs.append(f"[v{idx}]")
         
         # OpenCut-style per-clip audio fades + extraction
+        # Real clip audio: bring it up loud so character voice is featured
         audio_fade = build_clip_audio_fade(seg["duration"])
         if has_aud:
             a_chain = (
                 f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,"
-                f"{audio_fade},volume=0.85,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+                f"{audio_fade},volume=1.60,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
             )
         else:
             a_chain = f"aevalsrc=0:d={seg['duration']:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
@@ -252,20 +283,25 @@ def render_cinematic_edit(
     # Video Post-processing (Concatenated + Flash + CC + ASS)
     filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter},ass={ass_escaped}[vout]")
     
-    # Audio Dynamic Structure:
-    # 1. Dialogue track (isolated, prominent, volume boosted during intro)
-    # 2. Phonk track (low-pass filtered muffled during intro, explosive at drop)
-    # 3. Clip SFX (combat punches/impacts)
-    # 4. Master volume normalization & compression
+    # Audio Dynamic Structure (NO AI VOICE — real clip audio is featured):
+    # Track 1: Real clip audio (original anime voice/SFX) — prominent volume
+    #   - Intro section: slightly lower so phonk intro is audible
+    #   - Drop section: full volume (character voice + fight SFX in foreground)
+    # Track 2: Phonk BGM (trending 2026)
+    #   - Intro: low-pass muffled + quiet for dramatic tension
+    #   - Drop: full explosive volume
+    # Master: loudnorm to -11 dB (commercial streaming loudness)
     filter_chains.append(
-        f"[{dialogue_inp_idx}:a]volume=1.5,dynaudnorm,atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS[dialogue_clean];"
+        f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in];"
+        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=1.20[csfx_intro];"
+        f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.80[csfx_drop];"
+        f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full];"
         f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
-        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=650,volume=0.35[p_intro];"
-        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.95[p_drop];"
+        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=700,volume=0.28[p_intro];"
+        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.88[p_drop];"
         f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
-        f"[clip_sfx_raw]volume=0.85,dynaudnorm[clip_sfx];"
-        f"[phonk_dynamic][dialogue_clean][clip_sfx]amix=inputs=3:duration=first:dropout_transition=2,"
-        f"volume=1.70,loudnorm=I=-11:TP=-0.5:LRA=7[aout]"
+        f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:dropout_transition=2,"
+        f"volume=1.65,loudnorm=I=-11:TP=-0.5:LRA=7[aout]"
     )
     
     full_filter_complex = ";".join(filter_chains)
