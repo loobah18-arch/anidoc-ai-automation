@@ -73,8 +73,8 @@ def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
         results = []
         seen = set()
         for name, raw_fid in matches:
-            # Clean file id
-            clean_fid = raw_fid.split("-")[0]
+            # Clean file id by removing only the trailing session suffix (-0-16)
+            clean_fid = re.sub(r"-\d+-\d+$", "", raw_fid)
             if clean_fid not in seen:
                 seen.add(clean_fid)
                 results.append({
