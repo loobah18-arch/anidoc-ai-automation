@@ -99,13 +99,13 @@ class TestAniDocPipeline(unittest.TestCase):
             str(test_clip)
         ]
         res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
-        self.assertIn("1080,1920", res.stdout)
+        self.assertIn(f"{VIDEO_WIDTH},{VIDEO_HEIGHT}", res.stdout)
 
     def test_07_end_to_end_video_assembly_with_phonk(self):
         out_video = SCRATCH_DIR / "test_assembled_edit.mp4"
         res = render_cinematic_edit(
             character_key="spiderman",
-            phonk_track="tokyo_drift_phonk",
+            phonk_track="lonown_avangard_phonk",
             subtitle_style="viral_karaoke",
             output_path=out_video,
             target_duration=4.5
@@ -114,7 +114,7 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(out_video.exists())
         self.assertTrue(out_video.stat().st_size > 50000)
 
-        # Verify 9:16 aspect ratio & duration
+        # Verify aspect ratio & duration
         probe_cmd = [
             "ffprobe", "-v", "error",
             "-show_entries", "stream=width,height,codec_name",
@@ -122,7 +122,7 @@ class TestAniDocPipeline(unittest.TestCase):
             str(out_video)
         ]
         probe_res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
-        self.assertIn("1080,1920", probe_res.stdout)
+        self.assertIn(f"{VIDEO_WIDTH},{VIDEO_HEIGHT}", probe_res.stdout)
 
 if __name__ == "__main__":
     unittest.main()
