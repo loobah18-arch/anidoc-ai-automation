@@ -18,47 +18,77 @@ from typing import List, Dict, Any, Optional
 from config.settings import PHONK_DIR, SCRATCH_DIR
 
 
-# --- Static fallback catalog (if live search is unavailable) ---
+# --- Curated Top 10 Viral AURA Phonk Catalog ---
 POPULAR_PHONK_CATALOG = [
     {
-        "id": "brazilian_phonk_2026",
-        "title": "Brazilian Phonk 2026 (Montagem Sloped)",
-        "genre": "Brazilian Phonk",
-        "bpm": 134.0,
+        "id": "lonown_avangard_phonk",
+        "title": "LONOWN - AVANGARD (SLOWED)",
+        "genre": "Aura Phonk",
+        "bpm": 132.0,
         "default_drop": 6.4,
-        "query": "brazilian phonk 2026 no copyright shorts montagem",
     },
     {
-        "id": "dark_phonk_2026",
-        "title": "Dark Aggressive Phonk 2026",
-        "genre": "Dark Phonk",
+        "id": "mvsterious_slava_funk",
+        "title": "MVSTERIOUS - SLAVA FUNK!",
+        "genre": "Slava Phonk",
+        "bpm": 136.0,
+        "default_drop": 5.2,
+    },
+    {
+        "id": "dygo_funk_infernal",
+        "title": "DYGO - FUNK INFERNAL",
+        "genre": "Infernal Phonk",
         "bpm": 138.0,
-        "default_drop": 7.2,
-        "query": "dark phonk 2026 no copyright aggressive bass drop",
+        "default_drop": 6.8,
     },
     {
-        "id": "drift_phonk_2026",
-        "title": "Drift Phonk 2026 Cowbell",
-        "genre": "Drift Phonk",
+        "id": "ashreveal_manasha_phonk",
+        "title": "ASHREVEAL - MANASHA",
+        "genre": "Aggressive Phonk",
+        "bpm": 134.0,
+        "default_drop": 7.0,
+    },
+    {
+        "id": "andromeda_no_fear_phonk",
+        "title": "ANDROMEDA - NO FEAR!",
+        "genre": "Aura Phonk",
+        "bpm": 135.0,
+        "default_drop": 6.0,
+    },
+    {
+        "id": "ogryzek_aura_phonk",
+        "title": "OGRYZEK - AURA",
+        "genre": "Aura Phonk",
         "bpm": 130.0,
         "default_drop": 5.8,
-        "query": "drift phonk 2026 cowbell no copyright",
     },
     {
-        "id": "murder_phonk_2026",
-        "title": "Murder Phonk 2026 Heavy Bass",
-        "genre": "Murder Phonk",
-        "bpm": 136.0,
-        "default_drop": 6.8,
-        "query": "murder phonk 2026 no copyright heavy bass",
-    },
-    {
-        "id": "sigma_phonk_2026",
-        "title": "Sigma Slowed Phonk 2026",
-        "genre": "Sigma Phonk",
+        "id": "ncts_next_phonk",
+        "title": "NCTS - NEXT",
+        "genre": "Next Phonk",
         "bpm": 132.0,
-        "default_drop": 6.5,
-        "query": "sigma phonk 2026 slowed reverb no copyright",
+        "default_drop": 6.2,
+    },
+    {
+        "id": "nxght_blue_horizon_funk",
+        "title": "NXGHT - BLUE HORIZON FUNK",
+        "genre": "Horizon Phonk",
+        "bpm": 136.0,
+        "default_drop": 5.5,
+    },
+    {
+        "id": "trashxrl_deus_do_olimpo",
+        "title": "TRASHXRL - DEUS DO OLIMPO",
+        "genre": "Brazilian Phonk",
+        "bpm": 140.0,
+        "default_drop": 4.8,
+    },
+    {
+        "id": "irokz_funk_universo_slowed",
+        "title": "IROKZ - FUNK UNIVERSO (SLOWED)",
+        "genre": "Slowed Phonk",
+        "bpm": 128.0,
+        "default_drop": 7.5,
     },
 ]
 
@@ -201,29 +231,34 @@ def download_phonk_track(track_id: str, query_override: Optional[str] = None) ->
 def get_random_or_specified_phonk(track_id: Optional[str] = None) -> Optional[Path]:
     """
     Returns a phonk audio Path. Priority:
-    1. If track_id given → try static catalog download
-    2. Otherwise → fetch a fresh trending 2026 track from YouTube
-    3. Fall back to any existing local file
+    1. If specific track_id given → return that exact curated track
+    2. If 'random' or None → randomly select from curated Top 10 AURA Phonk library
+    3. Fallback: live trending fetch or procedural audio
     """
     PHONK_DIR.mkdir(parents=True, exist_ok=True)
 
+    # 1. Specific track requested
     if track_id and track_id not in ("random", ""):
+        # Check direct filename match
         direct = PHONK_DIR / f"{track_id}.mp3"
         if direct.exists() and direct.stat().st_size > 50_000:
             return direct
-        downloaded = download_phonk_track(track_id)
-        if downloaded:
-            return downloaded
+        # Check if partial ID match
+        for f in PHONK_DIR.glob("*.mp3"):
+            if track_id in f.stem:
+                return f
 
-    # Live trending 2026 fetch (freshest phonk)
+    # 2. Random selection from curated local Top 10 AURA Phonk library
+    curated_tracks = [f for f in PHONK_DIR.glob("*.mp3") if f.stat().st_size > 50_000]
+    if curated_tracks:
+        chosen = random.choice(curated_tracks)
+        print(f"🎧 [Phonk] Selected curated Aura track: {chosen.stem}")
+        return chosen
+
+    # 3. Live trending fallback
     live = fetch_trending_phonk_2026(n=1)
     if live:
         return live[0]
-
-    # Last resort: any local file
-    existing = list(PHONK_DIR.glob("*.mp3")) + list(PHONK_DIR.glob("*.wav"))
-    if existing:
-        return random.choice(existing)
 
     return None
 

@@ -26,11 +26,16 @@ on:
         type: choice
         options:
           - 'random'
-          - 'brazilian_phonk_montagem'
-          - 'tokyo_drift_phonk'
-          - 'dark_shadow_phonk'
-          - 'cyber_phonk_beat'
-          - 'gigachad_phonk'
+          - 'lonown_avangard_phonk'
+          - 'mvsterious_slava_funk'
+          - 'dygo_funk_infernal'
+          - 'ashreveal_manasha_phonk'
+          - 'andromeda_no_fear_phonk'
+          - 'ogryzek_aura_phonk'
+          - 'ncts_next_phonk'
+          - 'nxght_blue_horizon_funk'
+          - 'trashxrl_deus_do_olimpo'
+          - 'irokz_funk_universo_slowed'
       subtitle_style:
         description: 'Kinetic Subtitle Style Preset'
         required: false
