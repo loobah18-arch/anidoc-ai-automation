@@ -36,6 +36,7 @@ def main():
     parser.add_argument("--duration", type=float, default=22.0, help="Target video duration in seconds (default: 22.0)")
     parser.add_argument("--phonk", type=str, default=None, help="Phonk track name or ID from library (e.g. tokyo_drift_phonk, brazilian_phonk_montagem, dark_shadow_phonk, cyber_phonk_beat, gigachad_phonk)")
     parser.add_argument("--subtitle-style", type=str, choices=["viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"], default="viral_karaoke", help="Dynamic kinetic subtitle preset")
+    parser.add_argument("--burn-subtitles", action="store_true", default=False, help="Burn kinetic subtitles onto the video (default: False for clean pure video)")
     parser.add_argument("--quote", type=str, default=None, help="Custom dialogue monologue quote")
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
     parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (marvel_hdr, jjk_void, sukuna_shrine, cyber_phonk)")
@@ -75,6 +76,7 @@ def main():
         output_path=Path(args.output) if args.output else None,
         target_duration=args.duration,
         subtitle_style=args.subtitle_style,
+        burn_subtitles=args.burn_subtitles,
         custom_quote=args.quote,
         custom_title=args.title,
         cc_preset=args.cc,

@@ -72,6 +72,7 @@ def render_cinematic_edit(
     output_path: Optional[Path] = None,
     target_duration: float = 22.0,
     subtitle_style: str = "viral_karaoke",
+    burn_subtitles: bool = False,
     custom_quote: Optional[str] = None,
     custom_title: Optional[str] = None,
     cc_preset: Optional[str] = None,
@@ -218,22 +219,24 @@ def render_cinematic_edit(
     if not clip_paths:
         raise RuntimeError("No clips available after all download attempts.")
     
-    # 5. Generate Kinetic Karaoke Subtitles (Safe-Zone Alignment)
-    ass_path = SCRATCH_DIR / f"subs_{character_key}.ass"
+    # 5. Optional Kinetic Karaoke Subtitles (Safe-Zone Alignment)
+    ass_path = None
     active_cc = cc_preset or theme["cc_preset"]
     cc_cfg = CC_PRESETS.get(active_cc, CC_PRESETS["marvel_hdr"])
     
-    generate_kinetic_subtitles(
-        quote_text=quote_text,
-        start_time=0.2,
-        end_time=min(beat_grid.duration, max(4.0, drop_t)),
-        output_ass_path=ass_path,
-        style_preset=subtitle_style,
-        primary_color="&H00FFFFFF",
-        active_color=cc_cfg.get("primary_color", "&H002BF5FF"),
-        glow_color=None,
-        character_name=theme["name"].split()[0]
-    )
+    if burn_subtitles:
+        ass_path = SCRATCH_DIR / f"subs_{character_key}.ass"
+        generate_kinetic_subtitles(
+            quote_text=quote_text,
+            start_time=0.2,
+            end_time=min(beat_grid.duration, max(4.0, drop_t)),
+            output_ass_path=ass_path,
+            style_preset=subtitle_style,
+            primary_color="&H00FFFFFF",
+            active_color=cc_cfg.get("primary_color", "&H002BF5FF"),
+            glow_color=None,
+            character_name=theme["name"].split()[0]
+        )
     
     # 6. Build Multi-Layer FFmpeg Filtergraph (OpenCut-Inspired)
     cmd_inputs = []
@@ -317,11 +320,15 @@ def render_cinematic_edit(
     # 4K HDR Color Grade (CC Preset with S-curve colorlevels)
     cc_filter = build_cc_filter(active_cc)
     
-    # Subtitle Burn-in
-    ass_escaped = str(ass_path).replace(":", "\\:").replace("\\", "/")
+    # Subtitle Burn-in (Disabled by default to keep edit 100% pure video)
+    if burn_subtitles and ass_path and ass_path.exists():
+        ass_escaped = str(ass_path).replace(":", "\\:").replace("\\", "/")
+        sub_filter = f",ass={ass_escaped}"
+    else:
+        sub_filter = ""
     
-    # Video Post-processing (Concatenated + Flash + CC + ASS)
-    filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter},ass={ass_escaped}[vout]")
+    # Video Post-processing (Concatenated + Flash + CC)
+    filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter}{sub_filter}[vout]")
     
     # Audio Dynamic Structure:
     # 70% Phonk BGM / 30% Original Anime/Movie Voice & SFX
