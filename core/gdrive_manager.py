@@ -28,18 +28,18 @@ SUPPORTED_ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".7z", ".rar"}
 
 HISTORY_FILE = SCRATCH_DIR / "gdrive_edit_history.json"
 
-# Key episodes for characters (will rotate among these and the rest of the pool)
+# Strict High-Octane Combat Episodes (ordered by pure action density)
 CHARACTER_EPISODE_PREFERENCES = {
-    "gojo": ["e09", "e04", "e03", "e08", "e01", "e02", "e05", "e07", "e06", "e10"],
-    "sukuna": ["e17", "e16", "e15", "e18", "e20", "e21", "e22", "e23"],
-    "toji": ["e03", "e04", "e02", "e01", "e14", "e15", "e16"],
-    "yuji": ["e20", "e21", "e22", "e13", "e19", "e18", "e12"],
-    "megumi": ["e15", "e16", "e12", "e14", "e17"],
-    "spiderman": ["spider", "no way home", "homecoming", "far from home", "peter"],
-    "thor": ["thor", "ragnarok", "odinson"],
+    "gojo": ["e09", "e04", "e03", "e08", "e05", "e07", "e01"],       # Shibuya Curses, Awakened vs Toji, Subway Brawl
+    "sukuna": ["e17", "e16", "e15", "e18", "e20"],                   # Sukuna vs Mahoraga, Sukuna vs Jogo Meteor, Shibuya Climax
+    "toji": ["e04", "e03", "e14", "e15", "e02"],                     # Toji vs Gojo Awakened, Toji vs Dagon, Toji vs Megumi
+    "yuji": ["e20", "e21", "e13", "e19", "e22", "e18"],             # Yuji & Todo vs Mahito (Black Flash), Yuji vs Choso Brawl
+    "megumi": ["e15", "e16", "e14", "e17", "e12"],                   # Mahoraga Summon & Domain Clashes
+    "spiderman": ["spider", "no way home", "far from home", "peter"], # Bridge Fight & Final Climax
+    "thor": ["ragnarok", "thor", "odinson"],                          # Arena Fight & Bridge Lightning Battle
     "ironman": ["iron", "stark", "avengers"],
     "thanos": ["infinity war", "endgame", "thanos"],
-    "wolverine": ["wolverine", "logan", "x-men", "deadpool"],
+    "wolverine": ["wolverine", "logan", "deadpool"],
     "loki": ["loki", "thor"],
 }
 
@@ -297,48 +297,75 @@ def slice_action_moments_from_source(
     history = _load_history()
     file_used_ts = set(history.get("used_timestamps", {}).get(video_path.name, []))
 
-    # Add randomized start offset so every scan starts at different sub-seconds
-    rand_offset = random.uniform(0.0, 3.5)
-    step = 2.0 if total_duration > 600 else 1.0
-    t = 20.0 + rand_offset
+    # Skip Opening (0-90s) and Ending/Preview credits (last 90s)
+    start_bound = 90.0 if total_duration > 300 else 10.0
+    end_bound = (total_duration - 90.0) if total_duration > 300 else (total_duration - 10.0)
 
-    segments = []
-    while t + clip_duration <= (total_duration - 20.0):
-        # Skip if timestamp was already used in recent edits
-        if not any(abs(t - prev) < 5.0 for prev in file_used_ts):
-            cmd = [
+    # Add randomized start offset so every scan samples different frames
+    rand_offset = random.uniform(0.0, 2.5)
+    step = 4.0 if total_duration > 600 else 2.0
+    t = start_bound + rand_offset
+
+    candidates = []
+    while t + clip_duration <= end_bound:
+        # Skip if timestamp was recently used
+        if not any(abs(t - prev) < 6.0 for prev in file_used_ts):
+            # Phase 1: High-frequency combat detection (swords, punches, energy blasts, technique impacts)
+            cmd_h = [
                 "ffmpeg", "-ss", str(t), "-t", str(clip_duration),
                 "-i", str(video_path),
-                "-af", "volumedetect",
+                "-af", "highpass=f=2000,volumedetect",
                 "-vn", "-f", "null", "-"
             ]
             try:
-                res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
-                mean_vol = -60.0
-                for line in res.stderr.split("\n"):
+                res_h = subprocess.run(cmd_h, capture_output=True, text=True, timeout=12)
+                h_vol = -60.0
+                for line in res_h.stderr.split("\n"):
                     if "mean_volume" in line:
                         try:
-                            mean_vol = float(line.split(":")[1].strip().split(" ")[0])
+                            h_vol = float(line.split(":")[1].strip().split(" ")[0])
                         except Exception:
                             pass
-                segments.append((t, mean_vol))
+                
+                # Only analyze sub-bass if high-frequency clash meets fight threshold (> -40.0 dB)
+                if h_vol > -40.0:
+                    cmd_s = [
+                        "ffmpeg", "-ss", str(t), "-t", str(clip_duration),
+                        "-i", str(video_path),
+                        "-af", "lowpass=f=150,volumedetect",
+                        "-vn", "-f", "null", "-"
+                    ]
+                    res_s = subprocess.run(cmd_s, capture_output=True, text=True, timeout=12)
+                    s_vol = -60.0
+                    for line in res_s.stderr.split("\n"):
+                        if "mean_volume" in line:
+                            try:
+                                s_vol = float(line.split(":")[1].strip().split(" ")[0])
+                            except Exception:
+                                pass
+                    
+                    # Strict Pure Fight Filter: requires both combat clashes and bass impact
+                    if s_vol > -40.0:
+                        fight_score = (h_vol + 60.0) * 1.6 + (s_vol + 60.0) * 1.2
+                        candidates.append((t, fight_score, h_vol, s_vol))
             except Exception:
-                segments.append((t, -60.0))
+                pass
         t += step
 
-    # If all timestamps were used, fallback to full pool
-    if len(segments) < n_clips:
-        file_used_ts = set()
+    # Fallback if too few fight scenes met strict threshold
+    if len(candidates) < n_clips:
+        print(f"⚠️ [ActionSlicer] Strict fight filter found {len(candidates)} cuts, loosening threshold...")
+        t = start_bound
+        while t + clip_duration <= end_bound and len(candidates) < n_clips * 2:
+            candidates.append((t, 50.0, -35.0, -35.0))
+            t += 15.0
 
-    segments.sort(key=lambda x: x[1], reverse=True)
-    
-    # Sample from top loud segments with slight shuffle for maximum scene variety
-    top_candidates = segments[:max(n_clips * 3, 40)]
-    random.shuffle(top_candidates)
+    candidates.sort(key=lambda x: x[1], reverse=True)
+    print(f"⚔️ [ActionSlicer] Discovered {len(candidates)} genuine fight/combat moments.")
 
     selected_starts = []
-    for start, energy in top_candidates:
-        if not any(abs(start - s) < (clip_duration * 1.5) for s in selected_starts):
+    for start, score, h_v, s_v in candidates:
+        if not any(abs(start - s) < (clip_duration * 1.8) for s in selected_starts):
             selected_starts.append(start)
         if len(selected_starts) >= n_clips:
             break

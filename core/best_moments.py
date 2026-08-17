@@ -156,32 +156,56 @@ def get_audio_energy_segments(
     if total_duration < 3.0:
         return [(0.0, window_secs, -20.0)]
 
+    start_bound = 90.0 if total_duration > 300 else 5.0
+    end_bound = (total_duration - 90.0) if total_duration > 300 else (total_duration - 5.0)
+
     segments = []
-    t = 0.0
-    while t + window_secs <= total_duration:
-        # Sample audio energy in this window
-        cmd = [
+    t = start_bound
+    while t + window_secs <= end_bound:
+        # Phase 1: High frequency combat clashes
+        cmd_h = [
             "ffmpeg", "-ss", str(t), "-t", str(window_secs),
             "-i", str(video_path),
-            "-af", "astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-",
+            "-af", "highpass=f=2000,volumedetect",
             "-vn", "-f", "null", "-"
         ]
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
-            rms_values = []
-            for line in res.stderr.split("\n"):
-                if "RMS_level" in line and "=" in line:
+            res_h = subprocess.run(cmd_h, capture_output=True, text=True, timeout=12)
+            h_vol = -60.0
+            for line in res_h.stderr.split("\n"):
+                if "mean_volume" in line:
                     try:
-                        val = float(line.split("=")[-1].strip())
-                        if val > -100:
-                            rms_values.append(val)
-                    except ValueError:
+                        h_vol = float(line.split(":")[1].strip().split(" ")[0])
+                    except Exception:
                         pass
-            energy = max(rms_values) if rms_values else -60.0
-            segments.append((t, t + window_secs, energy))
+            
+            if h_vol > -40.0:
+                cmd_s = [
+                    "ffmpeg", "-ss", str(t), "-t", str(window_secs),
+                    "-i", str(video_path),
+                    "-af", "lowpass=f=150,volumedetect",
+                    "-vn", "-f", "null", "-"
+                ]
+                res_s = subprocess.run(cmd_s, capture_output=True, text=True, timeout=12)
+                s_vol = -60.0
+                for line in res_s.stderr.split("\n"):
+                    if "mean_volume" in line:
+                        try:
+                            s_vol = float(line.split(":")[1].strip().split(" ")[0])
+                        except Exception:
+                            pass
+                if s_vol > -40.0:
+                    fight_score = (h_vol + 60.0) * 1.6 + (s_vol + 60.0) * 1.2
+                    segments.append((t, t + window_secs, fight_score))
         except Exception:
-            segments.append((t, t + window_secs, -60.0))
+            pass
         t += step_secs
+
+    if len(segments) < top_n:
+        t = start_bound
+        while t + window_secs <= end_bound and len(segments) < top_n * 2:
+            segments.append((t, t + window_secs, 50.0))
+            t += 15.0
 
     # Sort by energy descending, return top N non-overlapping
     segments.sort(key=lambda x: x[2], reverse=True)
