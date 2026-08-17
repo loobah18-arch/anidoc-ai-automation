@@ -39,6 +39,7 @@ def main():
     parser.add_argument("--quote", type=str, default=None, help="Custom dialogue monologue quote")
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
     parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (marvel_hdr, jjk_void, sukuna_shrine, cyber_phonk)")
+    parser.add_argument("--gdrive-folder", type=str, default=None, help="Google Drive folder URL or ID to pull movie/episode footage from")
     parser.add_argument("--github-repo", type=str, default=None, help="GitHub repository URL or slug to fetch video clips from")
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
@@ -77,6 +78,8 @@ def main():
         custom_quote=args.quote,
         custom_title=args.title,
         cc_preset=args.cc,
+        github_repo=args.github_repo,
+        gdrive_folder=args.gdrive_folder,
         auto_fetch_clips=True,
         force_refresh=args.refresh_clips
     )

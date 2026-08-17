@@ -30,6 +30,7 @@ from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
 from core.best_moments import fetch_best_episode_clips
 from core.free_stream_fetcher import fetch_free_stream_clips
+from core.gdrive_manager import fetch_and_prepare_gdrive_footage
 from core.public_api_fetcher import check_clip_has_audio
 from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
@@ -74,6 +75,7 @@ def render_cinematic_edit(
     custom_title: Optional[str] = None,
     cc_preset: Optional[str] = None,
     github_repo: Optional[str] = None,
+    gdrive_folder: Optional[str] = None,
     auto_fetch_clips: bool = True,
     force_refresh: bool = False
 ) -> Dict[str, Any]:
@@ -119,7 +121,7 @@ def render_cinematic_edit(
     drop_t = max(0.5, beat_grid.drop_time)
     print(f"🎵 Beat Grid: {len(segments)} scene cuts detected across {beat_grid.duration:.1f}s (Drop at {drop_t:.1f}s)")
     
-    # 3. Clip Sourcing — 3-tier waterfall (all FREE, no subscriptions)
+    # 3. Clip Sourcing — 4-tier waterfall (Google Drive -> FreeStream -> BestMoments -> SmartDownloader)
     durations = [seg["duration"] for seg in segments]
     drop_flags = [seg["is_drop"] for seg in segments]
     n_clips = len(segments)
@@ -128,20 +130,38 @@ def render_cinematic_edit(
     universe_dir.mkdir(parents=True, exist_ok=True)
     clip_paths = []
 
+    # ── TIER 0: Google Drive Personal Uploads (Raw 1080p/4K Movies & Series) ──
+    gdrive_target = gdrive_folder or os.environ.get("GDRIVE_FOLDER_URL") or os.environ.get("GDRIVE_URL")
+    if gdrive_target:
+        print(f"📥 [GoogleDrive] Fetching uncompressed footage from Google Drive for '{character_key}'...")
+        try:
+            gdrive_clips = fetch_and_prepare_gdrive_footage(
+                gdrive_url_or_id=gdrive_target,
+                target_character=character_key,
+                output_dir=universe_dir,
+                n_clips=n_clips + 4
+            )
+            if gdrive_clips:
+                clip_paths = gdrive_clips
+                print(f"✅ [GoogleDrive] Using {len(clip_paths)} high-definition action clips with original audio.")
+        except Exception as e:
+            print(f"⚠️  [GoogleDrive] Extraction failed: {e}")
+
     # ── TIER 1: Free stream fetcher (anime sites + VidSrc movies) ──────────
-    # These streaming sites are NOT blocked on GitHub Actions (only YouTube is)
-    print(f"🌐 [FreeStream] Fetching real footage for '{character_key}'...")
-    try:
-        stream_clips = fetch_free_stream_clips(
-            character_key=character_key,
-            output_dir=universe_dir,
-            n_clips=n_clips + 4
-        )
-        if stream_clips:
-            clip_paths = stream_clips
-            print(f"✅ [FreeStream] {len(clip_paths)} real clips with original audio.")
-    except Exception as e:
-        print(f"⚠️  [FreeStream] Failed: {e}")
+    # Used if Google Drive is not provided or didn't yield enough clips
+    if len(clip_paths) < n_clips:
+        print(f"🌐 [FreeStream] Fetching real footage for '{character_key}'...")
+        try:
+            stream_clips = fetch_free_stream_clips(
+                character_key=character_key,
+                output_dir=universe_dir,
+                n_clips=n_clips + 4
+            )
+            if stream_clips:
+                clip_paths.extend(stream_clips)
+                print(f"✅ [FreeStream] +{len(stream_clips)} real stream clips.")
+        except Exception as e:
+            print(f"⚠️  [FreeStream] Failed: {e}")
 
     # ── TIER 2: BestMoments (YouTube scenepack download) ───────────────────
     if len(clip_paths) < n_clips and force_refresh:

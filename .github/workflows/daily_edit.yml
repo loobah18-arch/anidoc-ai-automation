@@ -41,6 +41,11 @@ on:
           - 'cyber_glow'
           - 'anime_shrine'
           - 'cinematic_minimal'
+      gdrive_folder:
+        description: 'Google Drive folder link or ID containing raw movies/episodes (optional)'
+        required: false
+        default: ''
+        type: string
       refresh_clips:
         description: 'Download & slice fresh scenepack cuts (multi-source: yt-dlp → Archive.org → Pixabay)'
         required: false
@@ -67,10 +72,10 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install System Dependencies (FFmpeg, Fonts, yt-dlp)
+      - name: Install System Dependencies (FFmpeg, Fonts, yt-dlp, Unpackers)
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-dejavu-core fontconfig
+          sudo apt-get install -y ffmpeg fonts-dejavu-core fontconfig p7zip-full unrar-free
           sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
@@ -88,6 +93,7 @@ jobs:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
           YOUTUBE_CLIENT_ID: ${{ secrets.CLIENT_ID }}
@@ -112,6 +118,10 @@ jobs:
           
           if [ -n "${{ github.event.inputs.subtitle_style }}" ]; then
             CMD="$CMD --subtitle-style ${{ github.event.inputs.subtitle_style }}"
+          fi
+
+          if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
+            CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
           fi
           
           # Always refresh clips to get diverse sources each run
