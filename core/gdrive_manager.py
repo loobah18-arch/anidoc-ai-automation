@@ -133,7 +133,8 @@ def pick_best_file_for_character(
 
 def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -> Optional[Path]:
     """
-    Downloads a single targeted movie or episode from Google Drive in seconds.
+    Downloads a single targeted movie or episode from Google Drive in seconds
+    using high-speed direct chunked streaming with automatic confirmation token parsing.
     """
     download_dir.mkdir(parents=True, exist_ok=True)
     file_id = file_info["id"]
@@ -146,29 +147,57 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
 
     print(f"🚀 [GoogleDrive] Downloading '{file_info['name']}' ({file_id})...")
 
-    # Try gdown CLI first
+    # 1. Direct high-speed streaming with confirmation token handling
+    try:
+        session = requests.Session()
+        session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
+        init_url = "https://drive.google.com/uc?export=download"
+        r = session.get(init_url, params={"id": file_id, "confirm": "t"}, stream=True, timeout=30)
+        
+        download_url = init_url
+        download_params = {"id": file_id, "confirm": "t"}
+        
+        # Check if Google returned a virus warning / large file confirmation page
+        if "text/html" in r.headers.get("content-type", ""):
+            form_match = re.search(r'<form [^>]*action=\"([^\"]+)\"', r.text)
+            if form_match:
+                download_url = form_match.group(1)
+                inputs = re.findall(r'<input type=\"hidden\" name=\"([^\"]+)\" value=\"([^\"]+)\"', r.text)
+                download_params = dict(inputs)
+            
+            # Start actual file stream
+            r = session.get(download_url, params=download_params, stream=True, timeout=120)
+
+        if r.status_code == 200 and ("application" in r.headers.get("content-type", "") or "video" in r.headers.get("content-type", "") or int(r.headers.get("content-length", 0)) > 100_000):
+            total_size = int(r.headers.get("content-length", 0))
+            downloaded = 0
+            with open(out_path, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):  # 1MB chunks
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+            
+            if out_path.exists() and out_path.stat().st_size > 1_000_000:
+                print(f"✅ [GoogleDrive] Successfully downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
+                return out_path
+    except Exception as e:
+        print(f"⚠️ [GoogleDrive] Direct stream download failed: {e}")
+
+    # 2. Fallback to gdown CLI
     try:
         cmd = [
             "gdown", f"https://drive.google.com/uc?id={file_id}",
             "-O", str(out_path),
-            "--fuzzy",
             "--quiet"
         ]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        subprocess.run(cmd, capture_output=True, text=True, timeout=300)
         if out_path.exists() and out_path.stat().st_size > 1_000_000:
-            print(f"✅ [GoogleDrive] Downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
+            print(f"✅ [GoogleDrive] Downloaded via gdown: {out_path.name}")
             return out_path
     except Exception as e:
         print(f"⚠️ [GoogleDrive] gdown CLI failed: {e}")
-
-    # Fallback to python gdown module
-    try:
-        import gdown
-        downloaded = gdown.download(id=file_id, output=str(out_path), quiet=False, fuzzy=True)
-        if downloaded and Path(downloaded).exists() and Path(downloaded).stat().st_size > 1_000_000:
-            return Path(downloaded)
-    except Exception as e:
-        print(f"⚠️ [GoogleDrive] gdown module failed: {e}")
 
     return None
 
