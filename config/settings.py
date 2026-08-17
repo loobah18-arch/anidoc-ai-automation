@@ -19,9 +19,9 @@ SCRATCH_DIR = BASE_DIR / "scratch"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
-# Video Rendering Config (1:1 Square Format matching viral YouTube Shorts aesthetic)
+# Video Rendering Config (9:16 Portrait Fullscreen Format for YouTube Shorts & TikTok)
 VIDEO_WIDTH = 1080
-VIDEO_HEIGHT = 1080
+VIDEO_HEIGHT = 1920
 FPS = 30
 DEFAULT_DURATION = 35.0  # 30-40s optimal high-retention Short length
 

@@ -86,46 +86,49 @@ def build_velocity_clip_filter(
     add_bars: bool = False
 ) -> str:
     """
-    Builds the frame-accurate per-clip video filter:
-    1. Edge crop to remove potential watermarks / broadcast bars.
-    2. Aspect ratio scale & center crop to 9:16 portrait.
-    3. Dynamic speed ramp (slow-motion or velocity boost).
-    4. Velocity zoom punch scaling.
+    Builds the agency-grade per-clip video filter:
+    1. Edge crop to remove potential broadcast watermarks.
+    2. Aspect ratio fit & center crop for true 9:16 portrait (1080x1920).
+    3. Twixtor-style speed ramp with frame-blending motion blur on slow-mo (speed < 0.8x).
+    4. Continuous animated dynamic zoom punch (zooms in to 1.25x and eases down on impact).
     5. FPS & SAR normalization.
-    6. Exact duration trimming to lock frame-accurate zero-drift beat sync.
+    6. Exact duration trimming to lock zero-drift beat sync.
     """
-    scaled_w = int(video_width * scale_factor)
-    scaled_h = int(video_height * scale_factor)
-    # Ensure even dimensions
-    if scaled_w % 2 != 0:
-        scaled_w += 1
-    if scaled_h % 2 != 0:
-        scaled_h += 1
-
     pts_mult = 1.0 / max(0.2, speed)
-
     filters = [
         # Watermark-free edge crop
         "crop=in_w-24:in_h-24:12:12",
         # Fit to 9:16 portrait
         f"scale={video_width}:{video_height}:force_original_aspect_ratio=increase",
         f"crop={video_width}:{video_height}",
-        # Velocity speed ramp (Twixtor-style slow-mo or snap boost)
+        # Velocity speed ramp
         f"setpts={pts_mult:.4f}*PTS",
-        # Dynamic zoom punch
-        f"scale={scaled_w}:{scaled_h}",
-        f"crop={video_width}:{video_height}",
-        # FPS & SAR normalize
-        f"fps={fps}",
-        "setsar=1",
-        # Exact target duration trim
-        f"trim=duration={duration:.3f}",
-        "setpts=PTS-STARTPTS"
     ]
 
+    # Apply frame blending motion blur on slow-motion clips (Twixtor-style)
+    if speed < 0.80:
+        filters.append("tblend=all_mode=average")
+
+    # Animated Dynamic Zoom Punch (Continuous ease-down from punch scale to 1.0x over first 8 frames)
+    if scale_factor > 1.05:
+        punch_delta = scale_factor - 1.0
+        # Zoompan dynamic punch expression
+        zoom_expr = f"if(lte(in,8),{scale_factor:.2f}-{punch_delta:.2f}*(in/8),1.0)"
+        filters.append(
+            f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
+        )
+    else:
+        filters.append(f"fps={fps}")
+
+    filters.extend([
+        "setsar=1",
+        f"trim=duration={duration:.3f}",
+        "setpts=PTS-STARTPTS"
+    ])
+
     if add_bars:
-        # Cinematic 2.39:1 letterbox bars on intro
-        bar_h = 100
+        # Cinematic 2.39:1 letterbox bars on intro (240px top and bottom on 1080x1920)
+        bar_h = 240
         filters.append(f"drawbox=x=0:y=0:w=iw:h={bar_h}:color=black:t=fill")
         filters.append(f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black:t=fill")
 
@@ -146,9 +149,9 @@ def build_cc_filter(preset_name: str = "marvel_hdr") -> str:
     return f"{eq_part},{levels_part},{unsharp_part},{vignette_part}"
 
 
-def build_beat_flash_filters(beat_timestamps: List[float], flash_duration: float = 0.07, opacity: float = 0.50) -> List[str]:
+def build_beat_flash_filters(beat_timestamps: List[float], flash_duration: float = 0.07, opacity: float = 0.85) -> List[str]:
     """
-    Builds fast momentary white screen burst flash overlays timed to heavy bass drops.
+    Builds energetic white screen burst flash overlays timed to heavy bass drops.
     """
     flash_filters = []
     # Add flashes on downbeats (spaced by at least 0.60s to prevent strobe overload)
