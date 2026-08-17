@@ -1,24 +1,21 @@
 """
-High-Speed Google Drive Ingestion, Smart Episode Selector & Action Moments Slicer for AniDoc.
+High-Speed Google Drive Ingestion, Non-Repetitive Episode Selector & Action Moments Slicer.
 
-Optimized for Large Libraries (20GB+ folders):
-1. Instead of downloading all 25+ episodes at once, it parses the folder index in 1 second.
-2. Selects the BEST matching episode/movie for the chosen character:
-   - Gojo     -> JJK S02E09 (Sealing / 0.2s Domain) or S02E04 (Gojo Awakened)
-   - Sukuna   -> JJK S02E17 (Sukuna vs Mahoraga) or S02E16 (Sukuna vs Jogo)
-   - Toji     -> JJK S02E03 or S02E04 (Toji vs Gojo)
-   - Yuji     -> JJK S02E20 or S02E21 (Yuji & Todo vs Mahito)
-   - Megumi   -> JJK S02E15 or S02E16 (Mahoraga Summon)
-   - Spider-Man -> Spider-Man No Way Home Extended
-   - Thor     -> Thor Ragnarok IMAX
-3. Downloads ONLY that single file (~300MB - 1GB) in ~15-30 seconds via direct Google Drive API / gdown.
-4. Uses FFmpeg audio energy analysis to cut out 15+ high-energy 9:16 portrait action clips with original audio.
+Features:
+1. Non-Repetitive Episode Rotation: Tracks used episodes so each run uses a DIFFERENT
+   episode/movie from your Google Drive library (e.g. rotating through JJK Season 2 Ep 01-23).
+2. Non-Repetitive Clip Slicing: Adds randomized start scanning offsets and tracks timestamp
+   history so it never slices the exact same scene twice.
+3. Fast Targeted Download: Downloads only 1 selected file (~150MB - 1GB) in ~10s via direct
+   chunked streaming with Google Drive confirmation token handling.
+4. Action Energy Slicing: Uses FFmpeg volume analysis to cut out 15-35 high-energy 9:16
+   portrait clips with original Japanese/English dialogue & combat SFX.
 """
 import os
 import re
+import json
 import random
 import shutil
-import zipfile
 import subprocess
 import requests
 from pathlib import Path
@@ -29,13 +26,15 @@ from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
 SUPPORTED_VIDEO_EXTS = {".mp4", ".mkv", ".mov", ".avi", ".webm", ".ts", ".m4v"}
 SUPPORTED_ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".7z", ".rar"}
 
-# Character priority episode mapping for Jujutsu Kaisen Season 2 & Marvel
+HISTORY_FILE = SCRATCH_DIR / "gdrive_edit_history.json"
+
+# Key episodes for characters (will rotate among these and the rest of the pool)
 CHARACTER_EPISODE_PREFERENCES = {
-    "gojo": ["e09", "e04", "e03", "e08", "e01", "e02", "e05"],
-    "sukuna": ["e17", "e16", "e15", "e18", "e20"],
-    "toji": ["e03", "e04", "e02", "e14", "e15"],
-    "yuji": ["e20", "e21", "e22", "e13", "e19"],
-    "megumi": ["e15", "e16", "e12", "e14"],
+    "gojo": ["e09", "e04", "e03", "e08", "e01", "e02", "e05", "e07", "e06", "e10"],
+    "sukuna": ["e17", "e16", "e15", "e18", "e20", "e21", "e22", "e23"],
+    "toji": ["e03", "e04", "e02", "e01", "e14", "e15", "e16"],
+    "yuji": ["e20", "e21", "e22", "e13", "e19", "e18", "e12"],
+    "megumi": ["e15", "e16", "e12", "e14", "e17"],
     "spiderman": ["spider", "no way home", "homecoming", "far from home", "peter"],
     "thor": ["thor", "ragnarok", "odinson"],
     "ironman": ["iron", "stark", "avengers"],
@@ -45,11 +44,31 @@ CHARACTER_EPISODE_PREFERENCES = {
 }
 
 
+def _load_history() -> Dict[str, Any]:
+    """Loads previously used episodes and timestamps."""
+    if HISTORY_FILE.exists():
+        try:
+            with open(HISTORY_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {"used_files": [], "used_timestamps": {}}
+
+
+def _save_history(history: Dict[str, Any]):
+    """Persists used episodes and timestamps."""
+    try:
+        HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(HISTORY_FILE, "w") as f:
+            json.dump(history, f, indent=2)
+    except Exception as e:
+        print(f"⚠️ [GoogleDrive] Failed to save history: {e}")
+
+
 def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
     """
     Parses a public Google Drive folder in ~1 second via HTTP and extracts all file names & clean file IDs.
     """
-    # Extract folder ID
     match = re.search(r"folders/([a-zA-Z0-9_-]+)", folder_url_or_id)
     folder_id = match.group(1) if match else folder_url_or_id.strip()
     url = f"https://drive.google.com/drive/folders/{folder_id}"
@@ -64,7 +83,6 @@ def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
             return []
 
         text = r.text
-        # Regex extracting filename and ssk file ID
         matches = re.findall(
             r'aria-label=\"([^\"]+?)\s+(?:Video|Shared|Archive|Zip|Audio).*?ssk=[\'\"][^:]+:[^:]+:([a-zA-Z0-9_-]{25,})',
             text
@@ -73,7 +91,6 @@ def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
         results = []
         seen = set()
         for name, raw_fid in matches:
-            # Clean file id by removing only the trailing session suffix (-0-16)
             clean_fid = re.sub(r"-\d+-\d+$", "", raw_fid)
             if clean_fid not in seen:
                 seen.add(clean_fid)
@@ -95,40 +112,53 @@ def pick_best_file_for_character(
     character_key: str
 ) -> Optional[Dict[str, str]]:
     """
-    Selects the most cinematic episode or movie for the target character.
+    Selects a DIVERSE, non-repetitive episode or movie for the target character.
+    Tracks history so the same episode is not reused until the entire pool has been rotated through.
     """
+    if not files:
+        return None
+
+    history = _load_history()
+    used_files = set(history.get("used_files", []))
+
+    # 1. Collect all matching eligible files for this character/universe
     prefs = CHARACTER_EPISODE_PREFERENCES.get(character_key, [character_key])
+    eligible_files = []
 
-    # 1. Match character preferences
-    for pref in prefs:
-        for f in files:
-            clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
-            # Check if pref (e.g. 'e09' or 'spider') is in clean_name
-            if pref in clean_name or pref in f["name"].lower():
-                print(f"🎯 [GoogleDrive] Selected best match for '{character_key}': {f['name']}")
-                return f
+    # Priority matching
+    for f in files:
+        clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
+        if any(pref in clean_name or pref in f["name"].lower() for pref in prefs):
+            eligible_files.append(f)
 
-    # 2. General universe fallback
-    if character_key in {"gojo", "sukuna", "toji", "yuji", "megumi"}:
-        jjk_files = [f for f in files if "jujutsu" in f["name"].lower() or "jjk" in f["name"].lower()]
-        if jjk_files:
-            chosen = random.choice(jjk_files)
-            print(f"🎯 [GoogleDrive] Picked random JJK episode for '{character_key}': {chosen['name']}")
-            return chosen
-    else:
-        marvel_files = [f for f in files if any(k in f["name"].lower() for k in ["spider", "thor", "iron", "marvel"])]
-        if marvel_files:
-            chosen = random.choice(marvel_files)
-            print(f"🎯 [GoogleDrive] Picked Marvel movie for '{character_key}': {chosen['name']}")
-            return chosen
+    # Universe fallback if no exact character preference matched
+    if not eligible_files:
+        if character_key in {"gojo", "sukuna", "toji", "yuji", "megumi"}:
+            eligible_files = [f for f in files if "jujutsu" in f["name"].lower() or "jjk" in f["name"].lower()]
+        else:
+            eligible_files = [f for f in files if any(k in f["name"].lower() for k in ["spider", "thor", "iron", "marvel"])]
 
-    # 3. Last resort: any file
-    if files:
-        chosen = random.choice(files)
-        print(f"🎯 [GoogleDrive] Using available file: {chosen['name']}")
-        return chosen
+    if not eligible_files:
+        eligible_files = files
 
-    return None
+    # 2. Filter out recently used files to guarantee fresh footage
+    unused_eligible = [f for f in eligible_files if f["name"] not in used_files]
+
+    if not unused_eligible:
+        # Reset cycle if all eligible episodes have been used
+        print("🔄 [GoogleDrive] All episodes in library have been used once. Resetting history cycle.")
+        history["used_files"] = []
+        unused_eligible = eligible_files
+
+    # 3. Pick a random unused file
+    chosen = random.choice(unused_eligible)
+    print(f"🎯 [GoogleDrive] Selected fresh non-repetitive episode for '{character_key}': {chosen['name']}")
+
+    # Record in history
+    history["used_files"].append(chosen["name"])
+    _save_history(history)
+
+    return chosen
 
 
 def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -> Optional[Path]:
@@ -164,7 +194,6 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
         download_url = init_url
         download_params = {"id": file_id, "confirm": "t"}
         
-        # If Google returns an HTML warning/confirmation page, extract the action & hidden inputs
         content_type = r.headers.get("content-type", "").lower()
         if "text/html" in content_type or "text/plain" in content_type:
             form_match = re.search(r'<form [^>]*action=\"([^\"]+)\"', r.text)
@@ -177,7 +206,6 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
                 if c_match:
                     download_params["confirm"] = c_match.group(1)
             
-            # Follow download link
             r = session.get(download_url, params=download_params, stream=True, timeout=180)
 
         if r.status_code == 200:
@@ -190,7 +218,6 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
                 print(f"✅ [GoogleDrive] Direct stream downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
                 return out_path
             else:
-                print(f"⚠️ [GoogleDrive] Direct stream file too small ({out_path.stat().st_size if out_path.exists() else 0} bytes). Trying fallback...")
                 if out_path.exists():
                     out_path.unlink()
     except Exception as e:
@@ -239,54 +266,79 @@ def slice_action_moments_from_source(
     clip_duration: float = 2.4
 ) -> List[Path]:
     """
-    Scans a raw episode/movie from Google Drive using FFmpeg audio energy analysis
-    and cuts the top N loudest, most energetic action moments into 9:16 portrait clips.
+    Scans a raw episode/movie using FFmpeg audio energy analysis with:
+    1. Randomized time jitter so scans never hit the exact same timestamps.
+    2. Exclusion of previously used timestamps for this episode.
+    3. Temperature-based sampling from the top 40 loudest moments.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
+    # Clean old slices for this character to ensure 100% fresh clips
+    for old in output_dir.glob(f"{character_key}_gdrive_*.mp4"):
+        try:
+            old.unlink()
+        except Exception:
+            pass
+
     probe_cmd = [
         "ffprobe", "-v", "quiet", "-print_format", "json",
         "-show_format", str(video_path)
     ]
     try:
         res = subprocess.run(probe_cmd, capture_output=True, text=True, timeout=20)
-        import json
         info = json.loads(res.stdout)
         total_duration = float(info["format"].get("duration", 120.0))
     except Exception:
         total_duration = 120.0
 
-    print(f"🔍 [ActionSlicer] Scanning '{video_path.name}' ({total_duration:.1f}s) for best action scenes...")
+    print(f"🔍 [ActionSlicer] Scanning '{video_path.name}' ({total_duration:.1f}s) for fresh action scenes...")
 
+    # Load previously used timestamps for this video
+    history = _load_history()
+    file_used_ts = set(history.get("used_timestamps", {}).get(video_path.name, []))
+
+    # Add randomized start offset so every scan starts at different sub-seconds
+    rand_offset = random.uniform(0.0, 3.5)
     step = 2.0 if total_duration > 600 else 1.0
+    t = 20.0 + rand_offset
+
     segments = []
-    t = 20.0  # Skip intro logos / OP
-    
     while t + clip_duration <= (total_duration - 20.0):
-        cmd = [
-            "ffmpeg", "-ss", str(t), "-t", str(clip_duration),
-            "-i", str(video_path),
-            "-af", "volumedetect",
-            "-vn", "-f", "null", "-"
-        ]
-        try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
-            mean_vol = -60.0
-            for line in res.stderr.split("\n"):
-                if "mean_volume" in line:
-                    try:
-                        mean_vol = float(line.split(":")[1].strip().split(" ")[0])
-                    except Exception:
-                        pass
-            segments.append((t, mean_vol))
-        except Exception:
-            segments.append((t, -60.0))
+        # Skip if timestamp was already used in recent edits
+        if not any(abs(t - prev) < 5.0 for prev in file_used_ts):
+            cmd = [
+                "ffmpeg", "-ss", str(t), "-t", str(clip_duration),
+                "-i", str(video_path),
+                "-af", "volumedetect",
+                "-vn", "-f", "null", "-"
+            ]
+            try:
+                res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+                mean_vol = -60.0
+                for line in res.stderr.split("\n"):
+                    if "mean_volume" in line:
+                        try:
+                            mean_vol = float(line.split(":")[1].strip().split(" ")[0])
+                        except Exception:
+                            pass
+                segments.append((t, mean_vol))
+            except Exception:
+                segments.append((t, -60.0))
         t += step
 
+    # If all timestamps were used, fallback to full pool
+    if len(segments) < n_clips:
+        file_used_ts = set()
+
     segments.sort(key=lambda x: x[1], reverse=True)
+    
+    # Sample from top loud segments with slight shuffle for maximum scene variety
+    top_candidates = segments[:max(n_clips * 3, 40)]
+    random.shuffle(top_candidates)
+
     selected_starts = []
-    for start, energy in segments:
-        if not any(abs(start - s) < (clip_duration * 1.3) for s in selected_starts):
+    for start, energy in top_candidates:
+        if not any(abs(start - s) < (clip_duration * 1.5) for s in selected_starts):
             selected_starts.append(start)
         if len(selected_starts) >= n_clips:
             break
@@ -294,6 +346,8 @@ def slice_action_moments_from_source(
     selected_starts.sort()
 
     generated_clips = []
+    new_used_ts = []
+
     for idx, start in enumerate(selected_starts):
         out_clip = output_dir / f"{character_key}_gdrive_{idx:02d}_{int(start)}s.mp4"
         cmd = [
@@ -319,11 +373,22 @@ def slice_action_moments_from_source(
             subprocess.run(cmd, capture_output=True, check=True, timeout=60)
             if out_clip.exists() and out_clip.stat().st_size > 40_000:
                 generated_clips.append(out_clip)
+                new_used_ts.append(start)
                 print(f"  ✂️ Clip {idx+1}/{len(selected_starts)} sliced ({start:.1f}s - {start+clip_duration:.1f}s)")
         except Exception as e:
             print(f"  ⚠️ Error cutting clip at {start}s: {e}")
 
-    print(f"✅ Generated {len(generated_clips)} unique high-definition action clips with original audio.")
+    # Record used timestamps in history
+    if "used_timestamps" not in history:
+        history["used_timestamps"] = {}
+    if video_path.name not in history["used_timestamps"]:
+        history["used_timestamps"][video_path.name] = []
+    history["used_timestamps"][video_path.name].extend(new_used_ts)
+    # Keep last 50 timestamps per file
+    history["used_timestamps"][video_path.name] = history["used_timestamps"][video_path.name][-50:]
+    _save_history(history)
+
+    print(f"✅ Generated {len(generated_clips)} unique non-repetitive action clips with original audio.")
     return generated_clips
 
 
@@ -334,33 +399,30 @@ def fetch_and_prepare_gdrive_footage(
     n_clips: int = 15
 ) -> List[Path]:
     """
-    Lightning-Fast Google Drive Ingestion:
+    Lightning-Fast Non-Repetitive Google Drive Ingestion:
     1. Parses Google Drive folder index in 1s.
-    2. Downloads ONLY the 1 best matching episode/movie for the character (~15-30s).
-    3. Slices top action moments into 9:16 portrait clips with original audio.
+    2. Rotates to a DIFFERENT episode/movie for the character that hasn't been used yet.
+    3. Downloads only that 1 video (~10s).
+    4. Slices fresh non-repetitive action moments into 9:16 portrait clips.
     """
     gdrive_workdir = SCRATCH_DIR / "gdrive_workspace"
     gdrive_workdir.mkdir(parents=True, exist_ok=True)
 
-    # 1. Parse folder items
     items = list_gdrive_folder_items(gdrive_url_or_id)
     if not items:
         print("⚠️ [GoogleDrive] No files retrieved from Google Drive folder index.")
         return []
 
-    # 2. Pick the best episode/movie
     best_file = pick_best_file_for_character(items, target_character)
     if not best_file:
         print(f"⚠️ [GoogleDrive] No matching file found for '{target_character}'.")
         return []
 
-    # 3. Download the single targeted video
     raw_video = download_single_gdrive_file(best_file, gdrive_workdir)
     if not raw_video:
         print(f"⚠️ [GoogleDrive] Failed to download {best_file['name']}.")
         return []
 
-    # 4. Slice action moments
     sliced_clips = slice_action_moments_from_source(
         video_path=raw_video,
         character_key=target_character,

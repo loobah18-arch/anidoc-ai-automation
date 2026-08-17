@@ -323,25 +323,22 @@ def render_cinematic_edit(
     # Video Post-processing (Concatenated + Flash + CC + ASS)
     filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter},ass={ass_escaped}[vout]")
     
-    # Audio Dynamic Structure (NO AI VOICE — real clip audio is featured):
-    # Track 1: Real clip audio (original anime voice/SFX) — prominent volume
-    #   - Intro section: slightly lower so phonk intro is audible
-    #   - Drop section: full volume (character voice + fight SFX in foreground)
-    # Track 2: Phonk BGM (trending 2026)
-    #   - Intro: low-pass muffled + quiet for dramatic tension
-    #   - Drop: full explosive volume
-    # Master: loudnorm to -11 dB (commercial streaming loudness)
+    # Audio Dynamic Structure:
+    # 70% Phonk BGM / 30% Original Anime/Movie Voice & SFX
+    # Track 1: Real clip audio (Voice/SFX) — 30% weight
+    # Track 2: Phonk BGM (Aura Phonk) — 70% weight
+    # Master: loudnorm to -12 dB (commercial streaming loudness)
     filter_chains.append(
         f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in];"
-        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=1.20[csfx_intro];"
-        f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.80[csfx_drop];"
+        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=0.30[csfx_intro];"
+        f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.50[csfx_drop];"
         f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full];"
         f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
-        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=700,volume=0.28[p_intro];"
-        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.88[p_drop];"
+        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=1000,volume=0.45[p_intro];"
+        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.35[p_drop];"
         f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
-        f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:dropout_transition=2,"
-        f"volume=1.65,loudnorm=I=-11:TP=-0.5:LRA=7[aout]"
+        f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:weights=7 3:dropout_transition=2,"
+        f"volume=1.30,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"
     )
     
     full_filter_complex = ";".join(filter_chains)
