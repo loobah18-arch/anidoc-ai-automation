@@ -3,13 +3,17 @@ Production 4K Phonk / Scene Edit Video Assembler for Marvel & Jujutsu Kaisen.
 Assembles beat-synced cuts, velocity ramping, 4K HDR CC, impact flashes, and glowing ASS subtitles.
 
 NO AI VOICE — real clip audio (original anime/movie sound) is featured throughout.
-Best moments are automatically extracted from downloaded episodes by audio energy analysis.
 
-OpenCut-Inspired Engine: Uses xfade transitions, per-clip speed ramps, cinematic bars, and
-Audio fade handles — all ported from OpenCut's browser editor to FFmpeg filtergraph.
+Clip Sourcing Priority (all FREE, no subscriptions):
+  1. FreeStream: Anime sites (gogoanime/aniwatchtv) + VidSrc movie embeds via yt-dlp
+     (These sites are NOT blocked on GitHub Actions — only YouTube is)
+  2. BestMoments: YouTube scenepack download + FFmpeg energy analysis fallback
+  3. SmartDownloader: Archive.org + Pixabay/Pexels last-resort fallback
 
-Smart Downloader: Multi-source clip fetching via yt-dlp → Archive.org → Pixabay/Pexels fallback.
-Best Moments: FFmpeg audio energy analysis finds loudest scene moments automatically.
+Editing Engine:
+  OpenCut-inspired: xfade transitions, speed ramps, cinematic bars, audio fades.
+  All implemented in FFmpeg filtergraph.
+
 Phonk: Live trending August 2026 fetch via yt-dlp YouTube search.
 """
 import subprocess
@@ -25,6 +29,7 @@ from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
 from core.best_moments import fetch_best_episode_clips
+from core.free_stream_fetcher import fetch_free_stream_clips
 from core.public_api_fetcher import check_clip_has_audio
 from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
@@ -114,19 +119,33 @@ def render_cinematic_edit(
     drop_t = max(0.5, beat_grid.drop_time)
     print(f"🎵 Beat Grid: {len(segments)} scene cuts detected across {beat_grid.duration:.1f}s (Drop at {drop_t:.1f}s)")
     
-    # 3. Clip Sourcing: try best_moments (real episode audio) first, then smart_downloader fallback
+    # 3. Clip Sourcing — 3-tier waterfall (all FREE, no subscriptions)
     durations = [seg["duration"] for seg in segments]
     drop_flags = [seg["is_drop"] for seg in segments]
     n_clips = len(segments)
 
     universe_dir = SCRATCH_DIR / theme.get("universe", "marvel")
     universe_dir.mkdir(parents=True, exist_ok=True)
-
     clip_paths = []
 
-    # Primary: fetch best energetic moments from real episodes (with original audio)
-    if force_refresh:
-        print(f"📺 [BestMoments] Fetching best real episode moments for '{character_key}'...")
+    # ── TIER 1: Free stream fetcher (anime sites + VidSrc movies) ──────────
+    # These streaming sites are NOT blocked on GitHub Actions (only YouTube is)
+    print(f"🌐 [FreeStream] Fetching real footage for '{character_key}'...")
+    try:
+        stream_clips = fetch_free_stream_clips(
+            character_key=character_key,
+            output_dir=universe_dir,
+            n_clips=n_clips + 4
+        )
+        if stream_clips:
+            clip_paths = stream_clips
+            print(f"✅ [FreeStream] {len(clip_paths)} real clips with original audio.")
+    except Exception as e:
+        print(f"⚠️  [FreeStream] Failed: {e}")
+
+    # ── TIER 2: BestMoments (YouTube scenepack download) ───────────────────
+    if len(clip_paths) < n_clips and force_refresh:
+        print(f"📺 [BestMoments] Trying YouTube scenepack for '{character_key}'...")
         try:
             best_clips = fetch_best_episode_clips(
                 character_key=character_key,
@@ -134,16 +153,16 @@ def render_cinematic_edit(
                 n_clips=n_clips + 4
             )
             if best_clips:
-                clip_paths = best_clips
-                print(f"✅ [BestMoments] Using {len(best_clips)} real episode clips with original audio.")
+                clip_paths.extend(best_clips)
+                print(f"✅ [BestMoments] +{len(best_clips)} scenepack clips.")
         except Exception as e:
             print(f"⚠️  [BestMoments] Failed: {e}")
 
-    # Secondary: smart multi-source downloader if best_moments didn't get enough
+    # ── TIER 3: SmartDownloader + ClipManager (archive / procedural) ───────
     if len(clip_paths) < n_clips:
-        existing_clips = len(list(universe_dir.glob(f"{character_key}*.mp4")))
-        if force_refresh or existing_clips < 4:
-            print(f"🌐 [SmartDownloader] Supplementing clips for {character_key}...")
+        existing_count = len(list(universe_dir.glob(f"{character_key}*.mp4")))
+        if force_refresh or existing_count < 4:
+            print(f"🗂️  [SmartDownloader] Last-resort fallback for '{character_key}'...")
             try:
                 smart_fetch_clips(
                     character_key=character_key,
@@ -154,21 +173,21 @@ def render_cinematic_edit(
                     use_pexels=True
                 )
             except Exception as e:
-                print(f"⚠️  [SmartDownloader] Failed: {e} — using cached clips.")
+                print(f"⚠️  [SmartDownloader] Failed: {e}")
 
-        # Fill remaining slots from clip manager
         remaining = n_clips - len(clip_paths)
-        extra = get_character_scene_clips(
-            character_key=character_key,
-            segment_durations=durations[:remaining],
-            is_drop_flags=drop_flags[:remaining],
-            auto_fetch_online=auto_fetch_clips,
-            github_repo=github_repo,
-            force_refresh=False  # already fetched above
-        )
-        clip_paths.extend(extra)
+        if remaining > 0:
+            extra = get_character_scene_clips(
+                character_key=character_key,
+                segment_durations=durations[:remaining],
+                is_drop_flags=drop_flags[:remaining],
+                auto_fetch_online=auto_fetch_clips,
+                github_repo=github_repo,
+                force_refresh=False
+            )
+            clip_paths.extend(extra)
 
-    # Ensure we have exactly n_clips (pad with rotation if needed)
+    # ── Normalise clip list to exactly n_clips ──────────────────────────────
     if len(clip_paths) > n_clips:
         clip_paths = clip_paths[:n_clips]
     elif clip_paths and len(clip_paths) < n_clips:
