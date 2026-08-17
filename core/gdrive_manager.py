@@ -263,7 +263,7 @@ def slice_action_moments_from_source(
     character_key: str,
     output_dir: Path,
     n_clips: int = 15,
-    clip_duration: float = 2.4
+    clip_duration: float = 3.2
 ) -> List[Path]:
     """
     Scans a raw episode/movie using FFmpeg audio energy analysis with:

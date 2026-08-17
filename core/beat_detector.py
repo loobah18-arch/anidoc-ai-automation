@@ -21,8 +21,8 @@ class BeatGrid:
         self.beat_times = sorted(list(set([round(t, 2) for t in beat_times if 0.0 <= t <= duration])))
         self.bpm = bpm
 
-    def get_cut_segments(self) -> List[Dict[str, float]]:
-        """Returns list of segments with start, end, duration and is_drop_phase flag."""
+    def get_cut_segments(self) -> List[Dict[str, Any]]:
+        """Returns list of segments with start, end, duration, is_drop, and prev_is_drop flags."""
         segments = []
         all_points = [0.0] + self.beat_times
         if self.duration not in all_points:
@@ -34,11 +34,14 @@ class BeatGrid:
             e = all_points[i+1]
             if e - s < 0.22:
                 continue
+            is_d = s >= self.drop_time
+            prev_d = segments[-1]["is_drop"] if segments else False
             segments.append({
                 "start": s,
                 "end": e,
                 "duration": round(e - s, 2),
-                "is_drop": s >= self.drop_time,
+                "is_drop": is_d,
+                "prev_is_drop": prev_d,
                 "index": len(segments)
             })
         return segments

@@ -33,13 +33,15 @@ from core.best_moments import fetch_best_episode_clips
 from core.free_stream_fetcher import fetch_free_stream_clips
 from core.gdrive_manager import fetch_and_prepare_gdrive_footage
 from core.public_api_fetcher import check_clip_has_audio
-from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
+from core.effects_engine import (
+    build_cc_filter,
+    build_beat_flash_filters,
+    get_segment_velocity_profile,
+    build_velocity_clip_filter
+)
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata
-from core.opencut_engine import (
-    build_opencut_clip_filter,
-    build_clip_audio_fade,
-)
+from core.opencut_engine import build_clip_audio_fade
 from core.smart_downloader import smart_fetch_clips
 
 
@@ -253,63 +255,43 @@ def render_cinematic_edit(
     concat_v_inputs = []
     concat_a_inputs = []
     
-    # Build per-clip video filters (OpenCut: speed ramps, watermark crop, cinematic bars)
+    # Build per-clip video filters with velocity curves & slow-mo
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
-        zoom_filter = build_velocity_zoom_filter(seg["is_drop"], idx)
+        vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         
-        # OpenCut-style per-clip filter: crop + scale + speed ramp + SAR + FPS
-        opencut_vf = build_opencut_clip_filter(
+        # Frame-accurate velocity filter (slow-mo, speed ramp, zoom punch, 9:16 fit)
+        clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
             duration=seg["duration"],
-            is_drop=seg["is_drop"],
+            speed=vel_profile["speed"],
+            scale_factor=vel_profile["scale_factor"],
             video_width=VIDEO_WIDTH,
             video_height=VIDEO_HEIGHT,
             fps=FPS,
-            add_bars=(idx == 0)  # Cinematic bars only on first clip (dramatic intro)
+            add_bars=vel_profile.get("add_bars", False)
         )
         
-        v_chain = f"[{idx}:v]{opencut_vf},{zoom_filter},scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1[v{idx}]"
+        v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
         
-        # OpenCut-style per-clip audio fades + extraction
-        # Real clip audio: bring it up loud so character voice is featured
+        # Clip audio fades + extraction
         audio_fade = build_clip_audio_fade(seg["duration"])
         if has_aud:
             a_chain = (
-                f"[{idx}:a]atrim=duration={seg['duration']:.2f},asetpts=PTS-STARTPTS,"
+                f"[{idx}:a]atrim=duration={seg['duration']:.3f},asetpts=PTS-STARTPTS,"
                 f"{audio_fade},volume=1.60,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
             )
         else:
-            a_chain = f"aevalsrc=0:d={seg['duration']:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+            a_chain = f"aevalsrc=0:d={seg['duration']:.3f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
 
-    # OpenCut xfade-based video concat (replaces plain concat)
-    # Use xfade if we have multiple clips and a supported ffmpeg version
-    if len(clip_paths) > 1:
-        # Build sequential xfade chain with contextual transitions
-        XFADE_DUR = 0.10
-        from core.opencut_engine import pick_transition
-        
-        current_label = "[v0]"
-        seg_offset = 0.0
-        for i in range(1, len(clip_paths)):
-            transition = pick_transition(is_drop=drop_flags[i] if i < len(drop_flags) else True)
-            seg_offset += durations[i - 1] - XFADE_DUR
-            out_label = f"[xf{i}]" if i < len(clip_paths) - 1 else "[concatenated_v]"
-            
-            chain = (
-                f"{current_label}[v{i}]xfade=transition={transition}:"
-                f"duration={XFADE_DUR:.3f}:offset={seg_offset:.3f}{out_label}"
-            )
-            filter_chains.append(chain)
-            current_label = out_label
-    else:
-        concat_v_str = f"{concat_v_inputs[0]}null[concatenated_v]"
-        filter_chains.append(concat_v_str)
+    # Frame-Accurate Zero-Drift Video & Audio Concatenation
+    # Guarantees that every visual cut lands on the EXACT millisecond of the audio beat
+    concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
+    filter_chains.append(concat_v_str)
 
-    # Concat all clip audio segments
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
     

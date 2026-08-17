@@ -8,7 +8,12 @@ from pathlib import Path
 
 from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, CC_PRESETS, PHONK_DIR
 from core.beat_detector import generate_procedural_beat_grid, analyze_audio_beats
-from core.effects_engine import build_cc_filter, build_beat_flash_filters, build_velocity_zoom_filter
+from core.effects_engine import (
+    build_cc_filter,
+    build_beat_flash_filters,
+    get_segment_velocity_profile,
+    build_velocity_clip_filter
+)
 from core.clip_manager import generate_procedural_cinematic_scene, get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import list_available_phonk_tracks, get_random_or_specified_phonk, POPULAR_PHONK_CATALOG
 from core.public_api_fetcher import slice_scenepack_into_clips
@@ -52,8 +57,13 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertEqual(len(flashes), 3)
         self.assertIn("drawbox=", flashes[0])
 
-        zoom = build_velocity_zoom_filter(is_drop=True, seg_idx=0)
-        self.assertIn("scale=", zoom)
+        vel = get_segment_velocity_profile({"is_drop": True, "duration": 1.2}, 0, 10)
+        self.assertEqual(vel["role"], "power_slowmo")
+        self.assertAlmostEqual(vel["speed"], 0.50)
+
+        vf = build_velocity_clip_filter(0, 1.2, speed=vel["speed"], scale_factor=vel["scale_factor"])
+        self.assertIn("setpts=", vf)
+        self.assertIn("trim=duration=1.200", vf)
 
     def test_04_quote_ai_metadata(self):
         spidey = generate_edit_metadata("spiderman")
