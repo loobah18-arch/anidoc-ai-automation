@@ -133,8 +133,11 @@ def pick_best_file_for_character(
 
 def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -> Optional[Path]:
     """
-    Downloads a single targeted movie or episode from Google Drive in seconds
-    using high-speed direct chunked streaming with automatic confirmation token parsing.
+    Downloads a single targeted movie or episode from Google Drive in seconds.
+    Triple-fallback:
+      1. High-speed direct streaming with large-file confirmation token handling
+      2. Python gdown downloader
+      3. yt-dlp Google Drive extractor
     """
     download_dir.mkdir(parents=True, exist_ok=True)
     file_id = file_info["id"]
@@ -142,12 +145,14 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
     out_path = download_dir / safe_name
 
     if out_path.exists() and out_path.stat().st_size > 1_000_000:
-        print(f"⚡ [GoogleDrive] File already cached: {out_path.name}")
+        print(f"⚡ [GoogleDrive] File already cached: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
         return out_path
 
     print(f"🚀 [GoogleDrive] Downloading '{file_info['name']}' ({file_id})...")
 
-    # 1. Direct high-speed streaming with confirmation token handling
+    # ─────────────────────────────────────────────────────────────────────────
+    # METHOD 1: Direct requests streaming with confirmation token handling
+    # ─────────────────────────────────────────────────────────────────────────
     try:
         session = requests.Session()
         session.headers.update({
@@ -159,45 +164,69 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
         download_url = init_url
         download_params = {"id": file_id, "confirm": "t"}
         
-        # Check if Google returned a virus warning / large file confirmation page
-        if "text/html" in r.headers.get("content-type", ""):
+        # If Google returns an HTML warning/confirmation page, extract the action & hidden inputs
+        content_type = r.headers.get("content-type", "").lower()
+        if "text/html" in content_type or "text/plain" in content_type:
             form_match = re.search(r'<form [^>]*action=\"([^\"]+)\"', r.text)
             if form_match:
                 download_url = form_match.group(1)
                 inputs = re.findall(r'<input type=\"hidden\" name=\"([^\"]+)\" value=\"([^\"]+)\"', r.text)
                 download_params = dict(inputs)
+            elif "confirm=" in r.text:
+                c_match = re.search(r'confirm=([0-9A-Za-z_-]+)', r.text)
+                if c_match:
+                    download_params["confirm"] = c_match.group(1)
             
-            # Start actual file stream
-            r = session.get(download_url, params=download_params, stream=True, timeout=120)
+            # Follow download link
+            r = session.get(download_url, params=download_params, stream=True, timeout=180)
 
-        if r.status_code == 200 and ("application" in r.headers.get("content-type", "") or "video" in r.headers.get("content-type", "") or int(r.headers.get("content-length", 0)) > 100_000):
-            total_size = int(r.headers.get("content-length", 0))
-            downloaded = 0
+        if r.status_code == 200:
             with open(out_path, "wb") as f:
-                for chunk in r.iter_content(chunk_size=1024 * 1024):  # 1MB chunks
+                for chunk in r.iter_content(chunk_size=2 * 1024 * 1024):  # 2MB chunks
                     if chunk:
                         f.write(chunk)
-                        downloaded += len(chunk)
             
             if out_path.exists() and out_path.stat().st_size > 1_000_000:
-                print(f"✅ [GoogleDrive] Successfully downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
+                print(f"✅ [GoogleDrive] Direct stream downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
                 return out_path
+            else:
+                print(f"⚠️ [GoogleDrive] Direct stream file too small ({out_path.stat().st_size if out_path.exists() else 0} bytes). Trying fallback...")
+                if out_path.exists():
+                    out_path.unlink()
     except Exception as e:
-        print(f"⚠️ [GoogleDrive] Direct stream download failed: {e}")
+        print(f"⚠️ [GoogleDrive] Direct stream error: {e}")
 
-    # 2. Fallback to gdown CLI
+    # ─────────────────────────────────────────────────────────────────────────
+    # METHOD 2: Python gdown module
+    # ─────────────────────────────────────────────────────────────────────────
     try:
+        import gdown
+        print(f"🔄 [GoogleDrive] Trying gdown for file {file_id}...")
+        downloaded = gdown.download(id=file_id, output=str(out_path), quiet=False)
+        if downloaded and Path(downloaded).exists() and Path(downloaded).stat().st_size > 1_000_000:
+            print(f"✅ [GoogleDrive] gdown downloaded: {out_path.name} ({Path(downloaded).stat().st_size // (1024*1024)} MB)")
+            return Path(downloaded)
+    except Exception as e:
+        print(f"⚠️ [GoogleDrive] gdown module error: {e}")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # METHOD 3: yt-dlp Google Drive extractor
+    # ─────────────────────────────────────────────────────────────────────────
+    try:
+        print(f"🔄 [GoogleDrive] Trying yt-dlp for file {file_id}...")
         cmd = [
-            "gdown", f"https://drive.google.com/uc?id={file_id}",
-            "-O", str(out_path),
+            "yt-dlp",
+            f"https://drive.google.com/file/d/{file_id}/view",
+            "-o", str(out_path),
+            "--no-playlist",
             "--quiet"
         ]
-        subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        subprocess.run(cmd, capture_output=True, timeout=300)
         if out_path.exists() and out_path.stat().st_size > 1_000_000:
-            print(f"✅ [GoogleDrive] Downloaded via gdown: {out_path.name}")
+            print(f"✅ [GoogleDrive] yt-dlp downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
             return out_path
     except Exception as e:
-        print(f"⚠️ [GoogleDrive] gdown CLI failed: {e}")
+        print(f"⚠️ [GoogleDrive] yt-dlp error: {e}")
 
     return None
 
