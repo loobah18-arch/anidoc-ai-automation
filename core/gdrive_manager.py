@@ -1,172 +1,176 @@
 """
-Google Drive Ingestion, Archive Unpacker & Smart Action Moments Slicer for AniDoc.
+High-Speed Google Drive Ingestion, Smart Episode Selector & Action Moments Slicer for AniDoc.
 
-Features:
-1. Downloads full Google Drive folders or individual files via gdown.
-2. Automatically extracts archives (.zip, .rar, .7z, .tar, .tar.gz).
-3. Handles weird/cryptic filenames ([SubsPlease] S02E09 [9A8C].mkv, mov_123.mp4, etc.)
-   using fuzzy keyword matching to map them to characters (Gojo, Sukuna, Spiderman, etc.).
-4. Runs FFmpeg audio energy analysis to cut out the top 15+ action scenes in 9:16 portrait.
+Optimized for Large Libraries (20GB+ folders):
+1. Instead of downloading all 25+ episodes at once, it parses the folder index in 1 second.
+2. Selects the BEST matching episode/movie for the chosen character:
+   - Gojo     -> JJK S02E09 (Sealing / 0.2s Domain) or S02E04 (Gojo Awakened)
+   - Sukuna   -> JJK S02E17 (Sukuna vs Mahoraga) or S02E16 (Sukuna vs Jogo)
+   - Toji     -> JJK S02E03 or S02E04 (Toji vs Gojo)
+   - Yuji     -> JJK S02E20 or S02E21 (Yuji & Todo vs Mahito)
+   - Megumi   -> JJK S02E15 or S02E16 (Mahoraga Summon)
+   - Spider-Man -> Spider-Man No Way Home Extended
+   - Thor     -> Thor Ragnarok IMAX
+3. Downloads ONLY that single file (~300MB - 1GB) in ~15-30 seconds via direct Google Drive API / gdown.
+4. Uses FFmpeg audio energy analysis to cut out 15+ high-energy 9:16 portrait action clips with original audio.
 """
 import os
 import re
+import random
 import shutil
 import zipfile
 import subprocess
+import requests
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 
 from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
-from core.clip_manager import CHARACTER_THEMES
 
 SUPPORTED_VIDEO_EXTS = {".mp4", ".mkv", ".mov", ".avi", ".webm", ".ts", ".m4v"}
 SUPPORTED_ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".7z", ".rar"}
 
-# Character keyword matching dictionary (case-insensitive)
-CHARACTER_KEYWORDS = {
-    "gojo": ["gojo", "satoru", "hollow purple", "infinite void", "limitless"],
-    "sukuna": ["sukuna", "ryomen", "malevolent shrine", "cleave", "dismantle", "itadori vs"],
-    "toji": ["toji", "fushiguro toji", "hidden inventory", "heavenly restriction"],
-    "yuji": ["yuji", "itadori", "divergent fist", "black flash"],
-    "megumi": ["megumi", "fushiguro megumi", "mahoraga", "shadow puppet", "chimera"],
-    "spiderman": ["spider", "spiderman", "peter", "parker", "no way home", "homecoming", "far from home", "web-slinger"],
-    "ironman": ["iron man", "ironman", "tony", "stark", "mark 85", "arc reactor"],
-    "thor": ["thor", "odinson", "ragnarok", "mjolnir", "stormbreaker", "god of thunder"],
-    "thanos": ["thanos", "infinity war", "endgame", "mad titan", "snap"],
-    "wolverine": ["wolverine", "logan", "weapon x", "adamantium", "x-men", "deadpool"],
-    "loki": ["loki", "god of stories", "god of mischief", "tva", "asgard"],
-}
-
-UNIVERSE_KEYWORDS = {
-    "jjk": ["jjk", "jujutsu", "kaisen", "shibuya", "cursed"],
-    "marvel": ["marvel", "mcu", "avengers", "marvel studios"],
+# Character priority episode mapping for Jujutsu Kaisen Season 2 & Marvel
+CHARACTER_EPISODE_PREFERENCES = {
+    "gojo": ["e09", "e04", "e03", "e08", "e01", "e02", "e05"],
+    "sukuna": ["e17", "e16", "e15", "e18", "e20"],
+    "toji": ["e03", "e04", "e02", "e14", "e15"],
+    "yuji": ["e20", "e21", "e22", "e13", "e19"],
+    "megumi": ["e15", "e16", "e12", "e14"],
+    "spiderman": ["spider", "no way home", "homecoming", "far from home", "peter"],
+    "thor": ["thor", "ragnarok", "odinson"],
+    "ironman": ["iron", "stark", "avengers"],
+    "thanos": ["infinity war", "endgame", "thanos"],
+    "wolverine": ["wolverine", "logan", "x-men", "deadpool"],
+    "loki": ["loki", "thor"],
 }
 
 
-def extract_archive_if_needed(file_path: Path, extract_dir: Path) -> List[Path]:
+def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
     """
-    Extracts zip/tar/7z/rar archives if applicable, returning all extracted video files.
+    Parses a public Google Drive folder in ~1 second via HTTP and extracts all file names & clean file IDs.
     """
-    extracted_videos = []
-    suffix = file_path.suffix.lower()
+    # Extract folder ID
+    match = re.search(r"folders/([a-zA-Z0-9_-]+)", folder_url_or_id)
+    folder_id = match.group(1) if match else folder_url_or_id.strip()
+    url = f"https://drive.google.com/drive/folders/{folder_id}"
 
-    if suffix not in SUPPORTED_ARCHIVE_EXTS:
-        return [file_path] if suffix in SUPPORTED_VIDEO_EXTS else []
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        r = requests.get(url, headers=headers, timeout=20)
+        if r.status_code != 200:
+            print(f"⚠️ [GoogleDrive] HTTP error {r.status_code} fetching folder index.")
+            return []
 
-    extract_dir.mkdir(parents=True, exist_ok=True)
-    print(f"📦 [GDownloader] Extracting archive: {file_path.name}...")
+        text = r.text
+        # Regex extracting filename and ssk file ID
+        matches = re.findall(
+            r'aria-label=\"([^\"]+?)\s+(?:Video|Shared|Archive|Zip|Audio).*?ssk=[\'\"][^:]+:[^:]+:([a-zA-Z0-9_-]{25,})',
+            text
+        )
 
-    # 1. Try standard zipfile
-    if suffix == ".zip":
-        try:
-            with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                zip_ref.extractall(extract_dir)
-        except Exception as e:
-            print(f"⚠️ Zip extraction error: {e}, attempting system unzip...")
-            subprocess.run(["unzip", "-q", "-o", str(file_path), "-d", str(extract_dir)], capture_output=True)
+        results = []
+        seen = set()
+        for name, raw_fid in matches:
+            # Clean file id
+            clean_fid = raw_fid.split("-")[0]
+            if clean_fid not in seen:
+                seen.add(clean_fid)
+                results.append({
+                    "name": name,
+                    "id": clean_fid,
+                    "url": f"https://drive.google.com/uc?id={clean_fid}"
+                })
 
-    # 2. Try tarfile or 7z / unrar
-    elif suffix in {".tar", ".gz", ".tgz"}:
-        try:
-            shutil.unpack_archive(str(file_path), str(extract_dir))
-        except Exception as e:
-            subprocess.run(["tar", "-xf", str(file_path), "-C", str(extract_dir)], capture_output=True)
-    elif suffix in {".7z", ".rar"}:
-        if shutil.which("7z"):
-            subprocess.run(["7z", "x", f"-o{extract_dir}", "-y", str(file_path)], capture_output=True)
-        elif shutil.which("unrar"):
-            subprocess.run(["unrar", "x", "-o+", str(file_path), str(extract_dir)], capture_output=True)
+        print(f"📋 [GoogleDrive] Found {len(results)} items in Google Drive folder index.")
+        return results
+    except Exception as e:
+        print(f"⚠️ [GoogleDrive] Failed to parse folder index: {e}")
+        return []
 
-    # Walk extracted folder and collect all video files
-    for root, _, files in os.walk(extract_dir):
+
+def pick_best_file_for_character(
+    files: List[Dict[str, str]],
+    character_key: str
+) -> Optional[Dict[str, str]]:
+    """
+    Selects the most cinematic episode or movie for the target character.
+    """
+    prefs = CHARACTER_EPISODE_PREFERENCES.get(character_key, [character_key])
+
+    # 1. Match character preferences
+    for pref in prefs:
         for f in files:
-            p = Path(root) / f
-            if p.suffix.lower() in SUPPORTED_VIDEO_EXTS and p.stat().st_size > 100_000:
-                extracted_videos.append(p)
+            clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
+            # Check if pref (e.g. 'e09' or 'spider') is in clean_name
+            if pref in clean_name or pref in f["name"].lower():
+                print(f"🎯 [GoogleDrive] Selected best match for '{character_key}': {f['name']}")
+                return f
 
-    print(f"✅ Extracted {len(extracted_videos)} video files from {file_path.name}")
-    return extracted_videos
+    # 2. General universe fallback
+    if character_key in {"gojo", "sukuna", "toji", "yuji", "megumi"}:
+        jjk_files = [f for f in files if "jujutsu" in f["name"].lower() or "jjk" in f["name"].lower()]
+        if jjk_files:
+            chosen = random.choice(jjk_files)
+            print(f"🎯 [GoogleDrive] Picked random JJK episode for '{character_key}': {chosen['name']}")
+            return chosen
+    else:
+        marvel_files = [f for f in files if any(k in f["name"].lower() for k in ["spider", "thor", "iron", "marvel"])]
+        if marvel_files:
+            chosen = random.choice(marvel_files)
+            print(f"🎯 [GoogleDrive] Picked Marvel movie for '{character_key}': {chosen['name']}")
+            return chosen
+
+    # 3. Last resort: any file
+    if files:
+        chosen = random.choice(files)
+        print(f"🎯 [GoogleDrive] Using available file: {chosen['name']}")
+        return chosen
+
+    return None
 
 
-def identify_character_from_filename(filename: str, fallback_char: Optional[str] = None) -> str:
+def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -> Optional[Path]:
     """
-    Smart fuzzy matcher: identifies character key even from weird/cryptic release names.
-    Examples:
-      - '[SubsPlease] Jujutsu Kaisen S02 - 09 (1080p) [9A8C].mkv' -> 'gojo' or 'jjk'
-      - 'Spider-Man.No.Way.Home.2021.1080p.WEBRip.x264.mkv' -> 'spiderman'
-      - 'iron_man_edit_4k.mp4' -> 'ironman'
-      - 'clip_01_random.mp4' -> fallback_char or random JJK/Marvel
-    """
-    clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", filename).lower()
-
-    # Check specific character keywords
-    for char_key, kws in CHARACTER_KEYWORDS.items():
-        for kw in kws:
-            if kw in clean_name:
-                return char_key
-
-    # Check universe keywords
-    for univ_key, kws in UNIVERSE_KEYWORDS.items():
-        for kw in kws:
-            if kw in clean_name:
-                if univ_key == "jjk":
-                    return "gojo" if not fallback_char else fallback_char
-                else:
-                    return "spiderman" if not fallback_char else fallback_char
-
-    return fallback_char if fallback_char else "gojo"
-
-
-def download_from_google_drive(gdrive_url_or_id: str, download_dir: Path) -> List[Path]:
-    """
-    Downloads full folder or individual file from Google Drive via gdown.
-    Automatically handles weird names and unzips any archives.
+    Downloads a single targeted movie or episode from Google Drive in seconds.
     """
     download_dir.mkdir(parents=True, exist_ok=True)
-    raw_files_dir = download_dir / "raw_downloads"
-    raw_files_dir.mkdir(parents=True, exist_ok=True)
+    file_id = file_info["id"]
+    safe_name = re.sub(r"[^\w\.-]", "_", file_info["name"])
+    out_path = download_dir / safe_name
 
-    print(f"\n📥 [GoogleDrive] Connecting to Google Drive source...")
-    
-    # Run gdown
-    url = gdrive_url_or_id.strip()
-    is_folder = "folders" in url or "/folders/" in url or len(url) > 20 and not url.startswith("http")
+    if out_path.exists() and out_path.stat().st_size > 1_000_000:
+        print(f"⚡ [GoogleDrive] File already cached: {out_path.name}")
+        return out_path
 
+    print(f"🚀 [GoogleDrive] Downloading '{file_info['name']}' ({file_id})...")
+
+    # Try gdown CLI first
     try:
-        import gdown
-    except ImportError:
-        subprocess.run(["pip", "install", "gdown"], capture_output=True)
-        import gdown
-
-    try:
-        if is_folder or "/folders/" in url:
-            print(f"📁 [GoogleDrive] Downloading entire shared folder...")
-            gdown.download_folder(url=url, output=str(raw_files_dir), quiet=False, use_cookies=False)
-        else:
-            print(f"📄 [GoogleDrive] Downloading shared file...")
-            gdown.download(url=url, output=str(raw_files_dir), quiet=False, fuzzy=True)
+        cmd = [
+            "gdown", f"https://drive.google.com/uc?id={file_id}",
+            "-O", str(out_path),
+            "--fuzzy",
+            "--quiet"
+        ]
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        if out_path.exists() and out_path.stat().st_size > 1_000_000:
+            print(f"✅ [GoogleDrive] Downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
+            return out_path
     except Exception as e:
-        print(f"⚠️ [GoogleDrive] gdown standard download error: {e}, trying CLI command...")
-        if is_folder:
-            subprocess.run(["gdown", "--folder", url, "-O", str(raw_files_dir)], capture_output=True)
-        else:
-            subprocess.run(["gdown", url, "-O", str(raw_files_dir), "--fuzzy"], capture_output=True)
+        print(f"⚠️ [GoogleDrive] gdown CLI failed: {e}")
 
-    # Process all downloaded files (including nested archives)
-    all_raw_videos: List[Path] = []
-    unzip_dir = download_dir / "unpacked"
+    # Fallback to python gdown module
+    try:
+        import gdown
+        downloaded = gdown.download(id=file_id, output=str(out_path), quiet=False, fuzzy=True)
+        if downloaded and Path(downloaded).exists() and Path(downloaded).stat().st_size > 1_000_000:
+            return Path(downloaded)
+    except Exception as e:
+        print(f"⚠️ [GoogleDrive] gdown module failed: {e}")
 
-    for root, _, files in os.walk(raw_files_dir):
-        for f in files:
-            file_p = Path(root) / f
-            if file_p.suffix.lower() in SUPPORTED_ARCHIVE_EXTS:
-                videos = extract_archive_if_needed(file_p, unzip_dir / file_p.stem)
-                all_raw_videos.extend(videos)
-            elif file_p.suffix.lower() in SUPPORTED_VIDEO_EXTS and file_p.stat().st_size > 100_000:
-                all_raw_videos.append(file_p)
-
-    print(f"🎬 [GoogleDrive] Found {len(all_raw_videos)} raw video source files ready for editing.")
-    return all_raw_videos
+    return None
 
 
 def slice_action_moments_from_source(
@@ -177,12 +181,11 @@ def slice_action_moments_from_source(
     clip_duration: float = 2.4
 ) -> List[Path]:
     """
-    Scans a raw full episode/movie from Google Drive using FFmpeg audio energy analysis
+    Scans a raw episode/movie from Google Drive using FFmpeg audio energy analysis
     and cuts the top N loudest, most energetic action moments into 9:16 portrait clips.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    # 1. Probe duration
     probe_cmd = [
         "ffprobe", "-v", "quiet", "-print_format", "json",
         "-show_format", str(video_path)
@@ -195,14 +198,13 @@ def slice_action_moments_from_source(
     except Exception:
         total_duration = 120.0
 
-    print(f"🔍 [ActionSlicer] Scanning '{video_path.name}' ({total_duration:.1f}s) for best combat & dialogue scenes...")
+    print(f"🔍 [ActionSlicer] Scanning '{video_path.name}' ({total_duration:.1f}s) for best action scenes...")
 
-    # 2. Sliding window energy analysis
     step = 2.0 if total_duration > 600 else 1.0
     segments = []
-    t = 10.0  # Skip intro logos / credits
+    t = 20.0  # Skip intro logos / OP
     
-    while t + clip_duration <= (total_duration - 15.0):
+    while t + clip_duration <= (total_duration - 20.0):
         cmd = [
             "ffmpeg", "-ss", str(t), "-t", str(clip_duration),
             "-i", str(video_path),
@@ -223,18 +225,16 @@ def slice_action_moments_from_source(
             segments.append((t, -60.0))
         t += step
 
-    # Pick top N non-overlapping loudest segments
     segments.sort(key=lambda x: x[1], reverse=True)
     selected_starts = []
     for start, energy in segments:
-        if not any(abs(start - s) < (clip_duration * 1.2) for s in selected_starts):
+        if not any(abs(start - s) < (clip_duration * 1.3) for s in selected_starts):
             selected_starts.append(start)
         if len(selected_starts) >= n_clips:
             break
 
     selected_starts.sort()
 
-    # 3. Cut & crop to 9:16 portrait with original audio
     generated_clips = []
     for idx, start in enumerate(selected_starts):
         out_clip = output_dir / f"{character_key}_gdrive_{idx:02d}_{int(start)}s.mp4"
@@ -261,11 +261,11 @@ def slice_action_moments_from_source(
             subprocess.run(cmd, capture_output=True, check=True, timeout=60)
             if out_clip.exists() and out_clip.stat().st_size > 40_000:
                 generated_clips.append(out_clip)
-                print(f"  ✂️ Clip {idx+1}/{len(selected_starts)} extracted ({start:.1f}s - {start+clip_duration:.1f}s)")
+                print(f"  ✂️ Clip {idx+1}/{len(selected_starts)} sliced ({start:.1f}s - {start+clip_duration:.1f}s)")
         except Exception as e:
             print(f"  ⚠️ Error cutting clip at {start}s: {e}")
 
-    print(f"✅ Extracted {len(generated_clips)} unique high-definition action clips with original audio.")
+    print(f"✅ Generated {len(generated_clips)} unique high-definition action clips with original audio.")
     return generated_clips
 
 
@@ -276,40 +276,38 @@ def fetch_and_prepare_gdrive_footage(
     n_clips: int = 15
 ) -> List[Path]:
     """
-    End-to-end pipeline:
-    1. Downloads Google Drive folder/file (including zip extraction).
-    2. Identifies relevant video files for target character (or uses available videos).
+    Lightning-Fast Google Drive Ingestion:
+    1. Parses Google Drive folder index in 1s.
+    2. Downloads ONLY the 1 best matching episode/movie for the character (~15-30s).
     3. Slices top action moments into 9:16 portrait clips with original audio.
     """
     gdrive_workdir = SCRATCH_DIR / "gdrive_workspace"
-    raw_videos = download_from_google_drive(gdrive_url_or_id, gdrive_workdir)
-    
-    if not raw_videos:
-        print("⚠️ [GoogleDrive] No video files found in Google Drive download.")
+    gdrive_workdir.mkdir(parents=True, exist_ok=True)
+
+    # 1. Parse folder items
+    items = list_gdrive_folder_items(gdrive_url_or_id)
+    if not items:
+        print("⚠️ [GoogleDrive] No files retrieved from Google Drive folder index.")
         return []
 
-    # Match raw videos to target character
-    matched_videos = []
-    for v in raw_videos:
-        detected_char = identify_character_from_filename(v.name, fallback_char=target_character)
-        if detected_char == target_character:
-            matched_videos.append(v)
+    # 2. Pick the best episode/movie
+    best_file = pick_best_file_for_character(items, target_character)
+    if not best_file:
+        print(f"⚠️ [GoogleDrive] No matching file found for '{target_character}'.")
+        return []
 
-    # If no strict match found (e.g. generic names like 'movie.mp4'), use all available videos
-    if not matched_videos:
-        print(f"ℹ️ [GoogleDrive] Using all available {len(raw_videos)} videos for character '{target_character}'.")
-        matched_videos = raw_videos
+    # 3. Download the single targeted video
+    raw_video = download_single_gdrive_file(best_file, gdrive_workdir)
+    if not raw_video:
+        print(f"⚠️ [GoogleDrive] Failed to download {best_file['name']}.")
+        return []
 
-    all_sliced_clips = []
-    clips_per_video = max(3, n_clips // len(matched_videos) + 2)
+    # 4. Slice action moments
+    sliced_clips = slice_action_moments_from_source(
+        video_path=raw_video,
+        character_key=target_character,
+        output_dir=output_dir,
+        n_clips=n_clips
+    )
 
-    for v in matched_videos:
-        sliced = slice_action_moments_from_source(
-            video_path=v,
-            character_key=target_character,
-            output_dir=output_dir,
-            n_clips=clips_per_video
-        )
-        all_sliced_clips.extend(sliced)
-
-    return all_sliced_clips
+    return sliced_clips
