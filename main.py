@@ -33,7 +33,7 @@ def main():
     parser = argparse.ArgumentParser(description="AniDoc 4K Phonk / Scene Edit Automation Engine (Marvel & JJK)")
     parser.add_argument("--character", type=str, default=None, help="Character key (e.g. spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi)")
     parser.add_argument("--universe", type=str, choices=["marvel", "jjk"], default=None, help="Universe filter (marvel or jjk)")
-    parser.add_argument("--duration", type=float, default=22.0, help="Target video duration in seconds (default: 22.0)")
+    parser.add_argument("--duration", type=float, default=35.0, help="Target video duration in seconds (default: 35.0)")
     parser.add_argument("--phonk", type=str, default=None, help="Phonk track name or ID from library (e.g. tokyo_drift_phonk, brazilian_phonk_montagem, dark_shadow_phonk, cyber_phonk_beat, gigachad_phonk)")
     parser.add_argument("--subtitle-style", type=str, choices=["viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"], default="viral_karaoke", help="Dynamic kinetic subtitle preset")
     parser.add_argument("--burn-subtitles", action="store_true", default=False, help="Burn kinetic subtitles onto the video (default: False for clean pure video)")

@@ -70,7 +70,7 @@ def render_cinematic_edit(
     audio_path: Optional[Path] = None,
     phonk_track: Optional[str] = None,
     output_path: Optional[Path] = None,
-    target_duration: float = 22.0,
+    target_duration: float = 35.0,
     subtitle_style: str = "viral_karaoke",
     burn_subtitles: bool = False,
     custom_quote: Optional[str] = None,
