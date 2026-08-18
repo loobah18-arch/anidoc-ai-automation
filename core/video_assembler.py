@@ -342,12 +342,18 @@ def render_cinematic_edit(
     )
     
     clean_chains = [c.strip().strip(";") for c in filter_chains if c and c.strip()]
-    full_filter_complex = ";".join(clean_chains)
+    full_filter_complex = ";\n".join(clean_chains)
+    
+    # Write filtergraph to script file to avoid Linux CLI argument overflow with 50+ inputs
+    filter_script_path = SCRATCH_DIR / f"filtergraph_{character_key}.txt"
+    filter_script_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(filter_script_path, "w", encoding="utf-8") as f:
+        f.write(full_filter_complex)
     
     cmd = [
         "ffmpeg", "-y",
         *cmd_inputs,
-        "-filter_complex", full_filter_complex,
+        "-filter_complex_script", str(filter_script_path),
         "-map", "[vout]",
         "-map", "[aout]",
         "-c:v", "libx264",
