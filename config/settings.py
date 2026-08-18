@@ -23,7 +23,7 @@ SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 VIDEO_WIDTH = 1080
 VIDEO_HEIGHT = 1920
 FPS = 30
-DEFAULT_DURATION = 35.0  # 30-40s optimal high-retention Short length
+DEFAULT_DURATION = 42.0  # Extended 40-45s high-retention Short length
 
 # Color Grading (CC) Presets for 4K HDR Look
 CC_PRESETS = {

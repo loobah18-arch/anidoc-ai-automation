@@ -229,69 +229,69 @@ def download_phonk_track(track_id: str, query_override: Optional[str] = None) ->
     return result
 
 
-PHONK_HISTORY_FILE = SCRATCH_DIR / "phonk_rotation_history.json"
+PHONK_STATE_FILE = PHONK_DIR / "rotation_state.json"
 
 
-def _load_phonk_history() -> List[str]:
-    """Loads previously played phonk track IDs."""
-    if PHONK_HISTORY_FILE.exists():
+def _load_phonk_state() -> Dict[str, Any]:
+    """Loads current phonk rotation state."""
+    if PHONK_STATE_FILE.exists():
         try:
-            with open(PHONK_HISTORY_FILE, "r") as f:
-                return json.load(f).get("used_tracks", [])
+            with open(PHONK_STATE_FILE, "r") as f:
+                return json.load(f)
         except Exception:
             pass
-    return []
+    return {"last_index": -1, "used_tracks": []}
 
 
-def _save_phonk_history(used: List[str]):
-    """Saves played phonk track IDs."""
+def _save_phonk_state(state: Dict[str, Any]):
+    """Saves phonk rotation state."""
     try:
-        PHONK_HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(PHONK_HISTORY_FILE, "w") as f:
-            json.dump({"used_tracks": used}, f, indent=2)
+        PHONK_DIR.mkdir(parents=True, exist_ok=True)
+        with open(PHONK_STATE_FILE, "w") as f:
+            json.dump(state, f, indent=2)
     except Exception as e:
-        print(f"⚠️ [Phonk] Failed to save rotation history: {e}")
+        print(f"⚠️ [Phonk] Failed to save rotation state: {e}")
 
 
 def get_random_or_specified_phonk(track_id: Optional[str] = None) -> Optional[Path]:
     """
     Returns a phonk audio Path. Priority:
     1. If specific track_id given → return that exact curated track
-    2. If 'random' or None → intelligently rotates through the 10 Top Viral AURA Phonk songs
+    2. If 'random' or None → rotates sequentially through all 10 Top Viral AURA Phonk songs
     3. Fallback: live trending fetch or procedural audio
     """
     PHONK_DIR.mkdir(parents=True, exist_ok=True)
+    curated_tracks = sorted([f for f in PHONK_DIR.glob("*.mp3") if f.stat().st_size > 50_000], key=lambda x: x.name)
 
     # 1. Specific track requested
     if track_id and track_id not in ("random", ""):
         direct = PHONK_DIR / f"{track_id}.mp3"
         if direct.exists() and direct.stat().st_size > 50_000:
             return direct
-        for f in PHONK_DIR.glob("*.mp3"):
+        for f in curated_tracks:
             if track_id in f.stem:
                 return f
 
-    # 2. Intelligent Non-Repeating Rotation from curated 10 AURA Phonk library
-    curated_tracks = [f for f in PHONK_DIR.glob("*.mp3") if f.stat().st_size > 50_000]
+    # 2. Sequential Non-Repeating Rotation across 10 Curated Tracks
     if curated_tracks:
-        used_history = _load_phonk_history()
-        unused_tracks = [f for f in curated_tracks if f.stem not in used_history]
+        state = _load_phonk_state()
+        last_idx = state.get("last_index", -1)
+        next_idx = (last_idx + 1) % len(curated_tracks)
         
-        if not unused_tracks:
-            print("🔄 [Phonk] All 10 Aura tracks have been rotated through. Resetting rotation cycle.")
-            used_history = []
-            unused_tracks = curated_tracks
-
-        chosen = random.choice(unused_tracks)
-        used_history.append(chosen.stem)
-        _save_phonk_history(used_history)
-        print(f"🎧 [Phonk] Selected fresh rotated Aura track ({len(used_history)}/{len(curated_tracks)}): {chosen.stem}")
+        chosen = curated_tracks[next_idx]
+        state["last_index"] = next_idx
+        state["last_track"] = chosen.stem
+        _save_phonk_state(state)
+        
+        print(f"🎧 [Phonk] Selected rotated Aura track ({next_idx + 1}/{len(curated_tracks)}): {chosen.stem}")
         return chosen
 
     # 3. Live trending fallback
     live = fetch_trending_phonk_2026(n=1)
     if live:
         return live[0]
+
+    return None
 
     return None
 

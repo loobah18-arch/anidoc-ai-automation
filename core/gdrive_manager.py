@@ -363,14 +363,53 @@ def slice_action_moments_from_source(
     candidates.sort(key=lambda x: x[1], reverse=True)
     print(f"⚔️ [ActionSlicer] Discovered {len(candidates)} genuine fight/combat moments.")
 
-    selected_starts = []
+    unique_candidates = []
     for start, score, h_v, s_v in candidates:
-        if not any(abs(start - s) < (clip_duration * 1.8) for s in selected_starts):
-            selected_starts.append(start)
-        if len(selected_starts) >= n_clips:
+        if not any(abs(start - s[0]) < (clip_duration * 1.5) for s in unique_candidates):
+            unique_candidates.append((start, score))
+        if len(unique_candidates) >= n_clips + 8:
             break
 
-    selected_starts.sort()
+    if not unique_candidates:
+        unique_candidates = [(start_bound + i * 5.0, 50.0) for i in range(n_clips)]
+
+    # ── Intelligent Scene Orchestration for Beat Drops ───────────────────────
+    # The #1 loudest explosion / blast is specifically mapped to the Beat Drop (index 4)
+    # The #2 blast is mapped to the Bridge Drop (~index 22)
+    # The #3 impact is mapped to the Climax Outro Finisher (last clip)
+    # The lowest energy scenes are mapped to the Intro (clips 00-03)
+    drop_idx = min(4, max(0, n_clips - 1))
+    bridge_idx = min(22, max(0, n_clips - 2)) if n_clips > 24 else min(12, max(0, n_clips - 2))
+    last_idx = n_clips - 1
+
+    drop_climax = unique_candidates[0]
+    sec_drop = unique_candidates[1] if len(unique_candidates) > 1 else unique_candidates[0]
+    finisher = unique_candidates[2] if len(unique_candidates) > 2 else unique_candidates[0]
+    remaining_cand = unique_candidates[3:] if len(unique_candidates) > 3 else unique_candidates
+
+    # Sort remaining into intro (lowest score dialogue/walk) and combat (high energy clashes)
+    sorted_by_energy = sorted(remaining_cand, key=lambda x: x[1])
+    intro_pool = sorted_by_energy[:drop_idx]
+    combat_pool = sorted_by_energy[drop_idx:] if len(sorted_by_energy) > drop_idx else sorted_by_energy
+
+    selected_starts = [None] * n_clips
+    for i in range(min(drop_idx, len(intro_pool))):
+        selected_starts[i] = intro_pool[i][0]
+
+    selected_starts[drop_idx] = drop_climax[0]
+    selected_starts[bridge_idx] = sec_drop[0]
+    selected_starts[last_idx] = finisher[0]
+
+    c_idx = 0
+    for i in range(n_clips):
+        if selected_starts[i] is None:
+            if combat_pool:
+                selected_starts[i] = combat_pool[c_idx % len(combat_pool)][0]
+            else:
+                selected_starts[i] = unique_candidates[c_idx % len(unique_candidates)][0]
+            c_idx += 1
+
+    print(f"💥 [ActionSlicer] Mapped #1 EXPLOSION scene ({drop_climax[0]:.1f}s, score: {drop_climax[1]:.1f}) directly to Beat Drop (Clip {drop_idx+1})!")
 
     generated_clips = []
     new_used_ts = []
@@ -401,7 +440,8 @@ def slice_action_moments_from_source(
             if out_clip.exists() and out_clip.stat().st_size > 40_000:
                 generated_clips.append(out_clip)
                 new_used_ts.append(start)
-                print(f"  ✂️ Clip {idx+1}/{len(selected_starts)} sliced ({start:.1f}s - {start+clip_duration:.1f}s)")
+                tag = "💥 BEAT DROP EXPLOSION" if idx == drop_idx else ("⚡ SECONDARY DROP" if idx == bridge_idx else ("🔥 FINISHER" if idx == last_idx else "⚔️ Action"))
+                print(f"  ✂️ Clip {idx+1:02d}/{len(selected_starts)} sliced ({start:.1f}s - {start+clip_duration:.1f}s) [{tag}]")
         except Exception as e:
             print(f"  ⚠️ Error cutting clip at {start}s: {e}")
 
