@@ -280,12 +280,15 @@ def extract_best_clips(
         out_clip = output_dir / f"{character_key}_best_{i:02d}_{int(start)}s.mp4"
         dur = end - start
 
-        # Extract clip: crop + scale to 9:16 portrait, keep original audio
+        # Extract clip: crop + scale to 1:1 canvas, keep English original audio
+        from core.gdrive_manager import get_english_audio_map
+        eng_audio_map = get_english_audio_map(video_path)
         cmd = [
             "ffmpeg", "-y",
             "-ss", str(start),
             "-t", str(dur),
             "-i", str(video_path),
+        ] + eng_audio_map + [
             "-vf", (
                 f"crop=in_h:in_h:(in_w-in_h)/2:0,"
                 f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},"

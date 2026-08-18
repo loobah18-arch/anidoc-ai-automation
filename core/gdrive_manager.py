@@ -258,6 +258,43 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
     return None
 
 
+def get_english_audio_map(video_path: Path) -> List[str]:
+    """
+    Probes video streams and returns the FFmpeg -map arguments for the English audio track,
+    preferring English Dub streams in multi-language MKV/MP4 files.
+    """
+    cmd = [
+        "ffprobe", "-v", "error",
+        "-show_entries", "stream=index,codec_type:stream_tags=language,title",
+        "-of", "json", str(video_path)
+    ]
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        data = json.loads(res.stdout)
+        streams = data.get("streams", [])
+        
+        eng_audio_idx = None
+        first_audio_idx = None
+        for s in streams:
+            if s.get("codec_type") == "audio":
+                idx = s.get("index")
+                if first_audio_idx is None:
+                    first_audio_idx = idx
+                tags = s.get("tags", {})
+                lang = tags.get("language", "").lower()
+                title = tags.get("title", "").lower()
+                if "eng" in lang or "english" in title or "dub" in title:
+                    eng_audio_idx = idx
+                    break
+        
+        chosen_idx = eng_audio_idx if eng_audio_idx is not None else first_audio_idx
+        if chosen_idx is not None:
+            return ["-map", "0:v:0", "-map", f"0:{chosen_idx}"]
+    except Exception:
+        pass
+    return ["-map", "0:v:0", "-map", "0:a:0?"]
+
+
 def slice_action_moments_from_source(
     video_path: Path,
     character_key: str,
@@ -411,6 +448,9 @@ def slice_action_moments_from_source(
 
     print(f"💥 [ActionSlicer] Mapped #1 EXPLOSION scene ({drop_climax[0]:.1f}s, score: {drop_climax[1]:.1f}) directly to Beat Drop (Clip {drop_idx+1})!")
 
+    # Probe English Dub audio stream mapping
+    eng_audio_map = get_english_audio_map(video_path)
+
     generated_clips = []
     new_used_ts = []
 
@@ -421,6 +461,7 @@ def slice_action_moments_from_source(
             "-ss", str(start),
             "-t", str(clip_duration),
             "-i", str(video_path),
+        ] + eng_audio_map + [
             "-vf", (
                 f"crop=in_h:in_h:(in_w-in_h)/2:0,"
                 f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},"
