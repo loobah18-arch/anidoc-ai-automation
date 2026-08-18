@@ -19,30 +19,30 @@ SCRATCH_DIR = BASE_DIR / "scratch"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
-# Video Rendering Config (9:16 Portrait Fullscreen Format for YouTube Shorts & TikTok)
+# Video Rendering Config (1:1 1080x1080 60FPS Universal Anime Edit Format matching viral JJK edits)
 VIDEO_WIDTH = 1080
-VIDEO_HEIGHT = 1920
-FPS = 30
-DEFAULT_DURATION = 42.0  # Extended 40-45s high-retention Short length
+VIDEO_HEIGHT = 1080
+FPS = 60
+DEFAULT_DURATION = 38.0  # Optimal high-retention 35-40s range matching reference edits
 
-# Color Grading (CC) Presets for 4K HDR Look
+# Color Grading (CC) Presets for 4K 60FPS HDR Look
 CC_PRESETS = {
     "marvel_hdr": {
-        "contrast": 1.24,
+        "contrast": 1.28,
         "brightness": -0.02,
-        "saturation": 1.35,
-        "gamma": 0.96,
-        "unsharp": "5:5:1.2:5:5:0.0",
-        "vignette": "PI/4.5",
+        "saturation": 1.40,
+        "gamma": 0.95,
+        "unsharp": "5:5:1.3:5:5:0.0",
+        "vignette": "PI/4.2",
         "primary_color": "&H00D2FF00",  # Cyan / Gold glow
         "accent_color": "#00D2FF"
     },
     "jjk_void": {
-        "contrast": 1.28,
+        "contrast": 1.34,
         "brightness": -0.03,
-        "saturation": 1.40,
-        "gamma": 0.94,
-        "unsharp": "5:5:1.3:5:5:0.0",
+        "saturation": 1.45,
+        "gamma": 0.92,
+        "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "PI/4.0",
         "primary_color": "&H00FF55D2",  # Electric Violet / Hollow Purple
         "accent_color": "#D200FF"

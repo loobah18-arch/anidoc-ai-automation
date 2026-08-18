@@ -107,7 +107,7 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
-          CMD="python main.py --duration 42.0"
+          CMD="python main.py --duration 38.0"
           
           if [ "${{ github.event.inputs.universe }}" != "random" ] && [ -n "${{ github.event.inputs.universe }}" ]; then
             CMD="$CMD --universe ${{ github.event.inputs.universe }}"

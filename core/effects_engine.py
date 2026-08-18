@@ -80,25 +80,25 @@ def build_velocity_clip_filter(
     duration: float,
     speed: float = 1.0,
     scale_factor: float = 1.0,
-    video_width: int = 1080,
-    video_height: int = 1920,
-    fps: int = 30,
+    video_width: int = VIDEO_WIDTH,
+    video_height: int = VIDEO_HEIGHT,
+    fps: int = FPS,
     add_bars: bool = False
 ) -> str:
     """
-    Builds the agency-grade per-clip video filter:
+    Builds the agency-grade per-clip video filter for 60FPS viral anime edits:
     1. Edge crop to remove potential broadcast watermarks.
-    2. Aspect ratio fit & center crop for true 9:16 portrait (1080x1920).
+    2. Aspect ratio fit & center crop for 1080x1080 1:1 square canvas.
     3. Twixtor-style speed ramp with frame-blending motion blur on slow-mo (speed < 0.8x).
     4. Continuous animated dynamic zoom punch (zooms in to 1.25x and eases down on impact).
-    5. FPS & SAR normalization.
+    5. 60 FPS & SAR normalization.
     6. Exact duration trimming to lock zero-drift beat sync.
     """
     pts_mult = 1.0 / max(0.2, speed)
     filters = [
         # Watermark-free edge crop
         "crop=in_w-24:in_h-24:12:12",
-        # Fit to 9:16 portrait
+        # Fit to 1:1 square canvas
         f"scale={video_width}:{video_height}:force_original_aspect_ratio=increase",
         f"crop={video_width}:{video_height}",
         # Velocity speed ramp
@@ -109,11 +109,11 @@ def build_velocity_clip_filter(
     if speed < 0.80:
         filters.append("tblend=all_mode=average")
 
-    # Animated Dynamic Zoom Punch (Continuous ease-down from punch scale to 1.0x over first 8 frames)
+    # Animated Dynamic Zoom Punch (Continuous ease-down from punch scale to 1.0x over first 14 frames @ 60fps)
     if scale_factor > 1.05:
         punch_delta = scale_factor - 1.0
-        # Zoompan dynamic punch expression
-        zoom_expr = f"if(lte(in,8),{scale_factor:.2f}-{punch_delta:.2f}*(in/8),1.0)"
+        punch_frames = 14 if fps >= 50 else 8
+        zoom_expr = f"if(lte(in,{punch_frames}),{scale_factor:.2f}-{punch_delta:.2f}*(in/{punch_frames}),1.0)"
         filters.append(
             f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
         )
@@ -127,8 +127,8 @@ def build_velocity_clip_filter(
     ])
 
     if add_bars:
-        # Cinematic 2.39:1 letterbox bars on intro (240px top and bottom on 1080x1920)
-        bar_h = 240
+        # Cinematic 2.39:1 letterbox bars on intro (100px top and bottom on 1080x1080)
+        bar_h = 100
         filters.append(f"drawbox=x=0:y=0:w=iw:h={bar_h}:color=black:t=fill")
         filters.append(f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black:t=fill")
 
