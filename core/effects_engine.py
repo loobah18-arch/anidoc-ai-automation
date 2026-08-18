@@ -159,12 +159,9 @@ def build_velocity_clip_filter(
         filters.append(f"fps={fps}")
 
     # 6. Rack-Focus DoF blur (xtlw3zvKGAE: shallow depth-of-field pull on character face)
-    # boxblur envelope: starts sharp, peaks at blur=3px at mid-clip, returns to sharp
     if add_rack_focus:
         dur_f = max(0.4, duration)
-        dur_half = dur_f * 0.5
-        blur_expr = f"if(lt(t,{dur_half:.2f}),t/{dur_half:.2f}*2.5,(1-t/{dur_f:.2f})*5)"
-        filters.append(f"boxblur=luma_radius='max(0,min(3,{blur_expr}))':luma_power=1")
+        filters.append(f"boxblur=luma_radius=2:luma_power=1:enable='between(t,0,{dur_f:.2f})'")
 
     # 7. Camera Shake (9_VAGhAdne8: rapid ±12px translate burst on first 8 frames of impact)
     if add_shake:
