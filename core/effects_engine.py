@@ -168,7 +168,7 @@ def build_velocity_clip_filter(
         shake_frames = 8
         shake_amp = 12
         sx_expr = (
-            f"if(lt(in,{shake_frames}),if(eq(mod(in,2),0),{shake_amp},-{shake_amp}),0)"
+            f"if(lt(N,{shake_frames}),if(eq(mod(N,2),0),{shake_amp},-{shake_amp}),0)"
         )
         filters.append(
             f"geq=lum='p(X+({sx_expr}),Y)':cb='cb(X+({sx_expr}),Y)':cr='cr(X+({sx_expr}),Y)'"
@@ -178,7 +178,7 @@ def build_velocity_clip_filter(
     if add_chr_aber:
         split_px = 5
         filters.append(
-            f"geq=r='r(X+{split_px},Y)':g='g(X,Y)':b='b(X-{split_px},Y)'"
+            f"geq=lum='p(X+{split_px},Y)':cb='cb(X,Y)':cr='cr(X-{split_px},Y)'"
         )
 
     # 9. Cursed Technique Bloom Glow (8Fyb0LXw1BU: highlight overexposure + soft unsharp fringe)
