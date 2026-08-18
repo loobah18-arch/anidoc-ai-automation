@@ -315,27 +315,34 @@ def render_cinematic_edit(
         sub_filter = ""
     
     # Video Post-processing (Concatenated + Flash + CC)
-    filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter}{sub_filter}[vout]")
+    post_v = []
+    if flash_str and flash_str != "null":
+        post_v.append(flash_str)
+    if cc_filter:
+        post_v.append(cc_filter)
+    if sub_filter:
+        post_v.append(sub_filter.lstrip(","))
+    
+    post_v_str = ",".join(post_v) if post_v else "null"
+    filter_chains.append(f"[concatenated_v]{post_v_str}[vout]")
     
     # Audio Dynamic Structure:
     # 70% Phonk BGM / 30% Original Anime/Movie Voice & SFX
-    # Track 1: Real clip audio (Voice/SFX) — 30% weight
-    # Track 2: Phonk BGM (Aura Phonk) — 70% weight
-    # Master: loudnorm to -12 dB (commercial streaming loudness)
+    filter_chains.append(f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in]")
+    filter_chains.append(f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=0.30[csfx_intro]")
+    filter_chains.append(f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.50[csfx_drop]")
+    filter_chains.append(f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full]")
+    filter_chains.append(f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in]")
+    filter_chains.append(f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=1000,volume=0.45[p_intro]")
+    filter_chains.append(f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.35[p_drop]")
+    filter_chains.append(f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic]")
     filter_chains.append(
-        f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in];"
-        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=0.30[csfx_intro];"
-        f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.50[csfx_drop];"
-        f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full];"
-        f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
-        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=1000,volume=0.45[p_intro];"
-        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.35[p_drop];"
-        f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
         f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:weights=7 3:dropout_transition=2,"
         f"volume=1.30,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"
     )
     
-    full_filter_complex = ";".join(filter_chains)
+    clean_chains = [c.strip().strip(";") for c in filter_chains if c and c.strip()]
+    full_filter_complex = ";".join(clean_chains)
     
     cmd = [
         "ffmpeg", "-y",
