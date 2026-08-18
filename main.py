@@ -26,15 +26,19 @@ except ImportError:
 
 from core.clip_manager import CHARACTER_THEMES
 from core.video_assembler import render_cinematic_edit
+from core.ranking_assembler import render_ranking_countdown_edit
+from core.download_saver import save_to_downloads
 from publishers.youtube_publisher import upload_video_to_youtube
 from studio.server import start_studio_server
 
 def main():
     parser = argparse.ArgumentParser(description="AniDoc 4K Phonk / Scene Edit Automation Engine (Marvel & JJK)")
+    parser.add_argument("--mode", type=str, choices=["single", "ranking"], default="single", help="Edit mode: single character 4K edit or 5-tier ranking countdown edit")
+    parser.add_argument("--ranking", action="store_true", help="Shortcut for --mode ranking (replicates Top 5 countdown format)")
     parser.add_argument("--character", type=str, default=None, help="Character key (e.g. spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi)")
-    parser.add_argument("--universe", type=str, choices=["marvel", "jjk"], default=None, help="Universe filter (marvel or jjk)")
+    parser.add_argument("--universe", type=str, choices=["marvel", "jjk"], default="jjk", help="Universe filter (marvel or jjk)")
     parser.add_argument("--duration", type=float, default=38.0, help="Target video duration in seconds (default: 38.0)")
-    parser.add_argument("--phonk", type=str, default=None, help="Phonk track name or ID from library (e.g. tokyo_drift_phonk, brazilian_phonk_montagem, dark_shadow_phonk, cyber_phonk_beat, gigachad_phonk)")
+    parser.add_argument("--phonk", type=str, default=None, help="Phonk track name or ID from library")
     parser.add_argument("--subtitle-style", type=str, choices=["viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"], default="viral_karaoke", help="Dynamic kinetic subtitle preset")
     parser.add_argument("--burn-subtitles", action="store_true", default=False, help="Burn kinetic subtitles onto the video (default: False for clean pure video)")
     parser.add_argument("--quote", type=str, default=None, help="Custom dialogue monologue quote")
@@ -44,7 +48,7 @@ def main():
     parser.add_argument("--github-repo", type=str, default=None, help="GitHub repository URL or slug to fetch video clips from")
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
-    parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts")
+    parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts (default: False, saves to Download folder)")
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
     parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
     parser.add_argument("--studio", action="store_true", help="Launch the AniDoc Studio Web Video Editing Software")
@@ -56,8 +60,29 @@ def main():
     if args.studio:
         start_studio_server(port=args.port)
         return
+
+    # Handle Top 5 Ranking Countdown Mode
+    if args.mode == "ranking" or args.ranking:
+        print("🏆 [AniDoc] Mode: TOP 5 RANKING COUNTDOWN EDIT (Replicating viral countdown format)")
+        output_name = args.output if args.output else f"{args.universe.upper()}_Best_Edits_Ranking_Countdown.mp4"
+        title = args.title if args.title else f"Ranking Best {args.universe.upper()} edits"
+        final_video = render_ranking_countdown_edit(
+            universe=args.universe,
+            title_text=title,
+            output_filename=output_name,
+            save_to_device_downloads=True
+        )
+        if args.upload:
+            upload_video_to_youtube(
+                video_path=final_video,
+                title=f"Ranking The Best {args.universe.upper()} Edits 🔥 #anime #jjk #shorts",
+                description="Top 5 Viral Anime Edits Ranked with Phonk Soundtrack and 60fps velocity.",
+                tags=["jjk", "jujutsukaisen", "animeedit", "ranking", "phonk", "shorts"],
+                privacy_status=args.privacy
+            )
+        return
         
-    # Resolve character selection
+    # Single Character 4K Edit Mode
     chosen_char = args.character
     if not chosen_char:
         if args.universe:
@@ -100,7 +125,10 @@ def main():
     print(f"🏷️  Title:      {metadata['title']}")
     print("=======================================================\n")
     
-    # Upload to YouTube if requested
+    # Auto-save to device Download directory
+    save_to_downloads(output_path, custom_name=f"{chosen_char}_4k_phonk_edit.mp4")
+
+    # Upload to YouTube ONLY if explicitly requested
     if args.upload:
         upload_res = upload_video_to_youtube(
             video_path=output_path,
