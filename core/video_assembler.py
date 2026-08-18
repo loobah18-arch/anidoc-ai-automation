@@ -135,7 +135,8 @@ def render_cinematic_edit(
     clip_paths = []
 
     # ── TIER 0: Google Drive Personal Uploads (Raw 1080p/4K Movies & Series) ──
-    gdrive_target = gdrive_folder or os.environ.get("GDRIVE_FOLDER_URL") or os.environ.get("GDRIVE_URL")
+    default_gdrive = "https://drive.google.com/drive/folders/1KVDf7fuvaZyitvOKF48WLakV-aoFAIPW"
+    gdrive_target = gdrive_folder or os.environ.get("GDRIVE_FOLDER_URL") or os.environ.get("GDRIVE_URL") or default_gdrive
     if gdrive_target:
         print(f"📥 [GoogleDrive] Fetching uncompressed footage from Google Drive for '{character_key}'...")
         try:
