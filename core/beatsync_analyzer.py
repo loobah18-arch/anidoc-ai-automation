@@ -20,7 +20,13 @@ import sys
 import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
-import numpy as np
+
+try:
+    import numpy as np
+    _NUMPY_AVAILABLE = True
+except ImportError:
+    np = None
+    _NUMPY_AVAILABLE = False
 
 # ── Vendor path injection ────────────────────────────────────────────────────
 _VENDOR_DIR = Path(__file__).resolve().parent.parent / "vendor" / "BeatSync-Engine"
@@ -51,14 +57,14 @@ class BeatSyncResult:
     """
     def __init__(
         self,
-        beat_times: np.ndarray,
-        selected_beats: np.ndarray,
+        beat_times: Any,
+        selected_beats: Any,
         tempo: float,
         duration: float,
         drop_time: float,
         sections: List[Dict],
-        energy_wave: np.ndarray,
-        kick_strength: np.ndarray,
+        energy_wave: Any,
+        kick_strength: Any,
         section_cut_density: Dict[str, float],
     ):
         self.beat_times     = beat_times
@@ -121,7 +127,7 @@ def analyze_audio_beatsync(
 
     Falls back gracefully to our existing beat_detector if BeatSync unavailable.
     """
-    if not _BEATSYNC_AVAILABLE:
+    if not _BEATSYNC_AVAILABLE or not _NUMPY_AVAILABLE:
         return _fallback_beatsync(audio_path, target_duration)
 
     try:
@@ -207,6 +213,8 @@ def _detect_drop_from_sections(sections: List[Dict], beat_info: Dict, duration: 
 def _fallback_beatsync(audio_path: Path, target_duration: float) -> BeatSyncResult:
     """Simple librosa fallback when BeatSync-Engine vendor is unavailable."""
     try:
+        if not _NUMPY_AVAILABLE:
+            raise RuntimeError("numpy is not installed")
         import librosa
         y, sr = librosa.load(str(audio_path), sr=22050, duration=target_duration, mono=True)
         y = librosa.util.normalize(y)

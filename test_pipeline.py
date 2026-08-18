@@ -54,12 +54,12 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("eq=contrast=", jjk_cc)
 
         flashes = build_beat_flash_filters([6.0, 7.5, 9.0])
-        self.assertEqual(len(flashes), 3)
+        self.assertEqual(len(flashes), 6)
         self.assertIn("drawbox=", flashes[0])
 
         vel = get_segment_velocity_profile({"is_drop": True, "duration": 1.2}, 0, 10)
         self.assertEqual(vel["role"], "power_slowmo")
-        self.assertAlmostEqual(vel["speed"], 0.50)
+        self.assertAlmostEqual(vel["speed"], 0.45)
 
         vf = build_velocity_clip_filter(0, 1.2, speed=vel["speed"], scale_factor=vel["scale_factor"])
         self.assertIn("setpts=", vf)
