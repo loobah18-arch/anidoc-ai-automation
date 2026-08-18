@@ -115,12 +115,12 @@ def generate_procedural_beat_grid(duration: float = 35.0, drop_time: float = 6.0
     return BeatGrid(duration=duration, drop_time=drop_time, beat_times=beat_times, bpm=bpm)
 
 
-def analyze_audio_beats(audio_path: Path, target_duration: float = 35.0) -> BeatGrid:
+def analyze_audio_beats(audio_path: Path, target_duration: float = 42.0) -> BeatGrid:
     """
-    Intelligently syncs audio beats by:
-    1. Looking up calibrated track metadata (BPM & bass drop timestamp) from the Aura Phonk catalog.
-    2. Analyzing dynamic low-frequency transients via FFmpeg bandpass filtering.
-    3. Generating millisecond-accurate rhythmic cut points across 30-40 seconds.
+    Intelligently syncs audio beats with frame-accurate precision:
+    1. For Curated Catalog tracks: Uses the exact, millisecond-calibrated 808 drop timestamp & BPM.
+    2. For Custom / Live tracks: Analyzes dynamic low-frequency sub-bass (35-130Hz) energy onset.
+    3. Generates locked rhythmic cut points across 40-45 seconds without drift.
     """
     if not audio_path or not Path(audio_path).exists():
         return generate_procedural_beat_grid(duration=target_duration)
@@ -141,22 +141,22 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = 35.0) -> Beat
         res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
         dur = min(float(res.stdout.strip()), target_duration)
         
-        # Dynamic bass energy transient detection
-        detect_cmd = [
-            "ffmpeg", "-y", "-i", str(audio_path),
-            "-af", "highpass=f=40,lowpass=f=200,silencedetect=n=-20dB:d=0.20",
-            "-f", "null", "-"
-        ]
-        det_res = subprocess.run(detect_cmd, capture_output=True, text=True)
-        
-        silence_ends = [float(m) for m in re.findall(r"silence_end:\s*([0-9\.]+)", det_res.stderr)]
         detected_drop = calibrated_drop
-        if silence_ends:
-            valid_drops = [t for t in silence_ends if 4.0 <= t <= 10.0]
-            if valid_drops:
-                detected_drop = valid_drops[0]
+        # If not in curated catalog, detect exact sub-bass jump
+        if not matched_entry:
+            detect_cmd = [
+                "ffmpeg", "-y", "-ss", "3.0", "-to", "10.0", "-i", str(audio_path),
+                "-af", "highpass=f=35,lowpass=f=130,silencedetect=n=-18dB:d=0.08",
+                "-f", "null", "-"
+            ]
+            det_res = subprocess.run(detect_cmd, capture_output=True, text=True)
+            silence_ends = [float(m) + 3.0 for m in re.findall(r"silence_end:\s*([0-9\.]+)", det_res.stderr)]
+            if silence_ends:
+                valid_drops = [t for t in silence_ends if 4.0 <= t <= 9.0]
+                if valid_drops:
+                    detected_drop = valid_drops[0]
 
-        print(f"🎵 [BeatSync] Track: {track_stem} | BPM: {calibrated_bpm} | Climax Drop: {detected_drop:.2f}s | Target: {dur:.1f}s")
+        print(f"🎵 [BeatSync] Track: {track_stem} | BPM: {calibrated_bpm} | Frame-Accurate Climax Drop: {detected_drop:.3f}s | Target: {dur:.1f}s")
         return generate_procedural_beat_grid(duration=dur, drop_time=detected_drop, bpm=calibrated_bpm)
     except Exception as e:
         print(f"⚠️ [BeatSync] Notice analyzing {audio_path}: {e}. Using calibrated catalog sync.")
