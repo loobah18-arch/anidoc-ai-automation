@@ -255,11 +255,11 @@ def render_cinematic_edit(
     concat_v_inputs = []
     concat_a_inputs = []
     
-    # Build per-clip video filters with velocity curves & slow-mo
+    # Build per-clip video filters with velocity curves, slow-mo & all cinematic VFX
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         
-        # Frame-accurate velocity filter (slow-mo, speed ramp, zoom punch, 9:16 fit)
+        # Frame-accurate velocity filter + new cinematic VFX (DoF, shake, CA, bloom)
         clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
             duration=seg["duration"],
@@ -268,7 +268,11 @@ def render_cinematic_edit(
             video_width=VIDEO_WIDTH,
             video_height=VIDEO_HEIGHT,
             fps=FPS,
-            add_bars=vel_profile.get("add_bars", False)
+            add_bars=vel_profile.get("add_bars", False),
+            add_rack_focus=vel_profile.get("add_rack_focus", False),
+            add_shake=vel_profile.get("add_shake", False),
+            add_chr_aber=vel_profile.get("add_chr_aber", False),
+            add_bloom=vel_profile.get("add_bloom", False),
         )
         
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
@@ -299,8 +303,8 @@ def render_cinematic_edit(
     flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.09, opacity=0.60)
     flash_str = ",".join(flash_filters) if flash_filters else "null"
     
-    # 4K HDR Color Grade (CC Preset with S-curve colorlevels)
-    cc_filter = build_cc_filter(active_cc)
+    # 4K HDR Color Grade (CC Preset + light flicker pre-drop — xtlw3zvKGAE)
+    cc_filter = build_cc_filter(active_cc, with_flicker=True, drop_time=drop_t)
     
     # Subtitle Burn-in (Disabled by default to keep edit 100% pure video)
     if burn_subtitles and ass_path and ass_path.exists():
