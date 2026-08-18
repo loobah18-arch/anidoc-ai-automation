@@ -29,50 +29,58 @@ ANIME_SOURCES = {
     "gojo": {
         "show_slug": "jujutsu-kaisen",
         "show_title": "Jujutsu Kaisen",
-        # Best episodes for Gojo (1-indexed, confirmed great moments)
-        "key_episodes": [7, 13, 20, 24, 26, 28, 36, 48],
+        # Season 2 key episodes: 25-29 (Hidden Inventory / Awakened), 33 (Shibuya 0.2s Domain)
+        "key_episodes": [25, 27, 28, 29, 33],
         "search_queries": [
-            "jujutsu kaisen gojo satoru best fight moments",
-            "jujutsu kaisen hollow purple gojo",
-            "gojo vs sukuna jujutsu kaisen",
-            "jujutsu kaisen season 2 gojo hidden inventory",
+            "gojo awakened honored one dialogue scene audio 1080p jujutsu kaisen season 2",
+            "gojo vs toji hollow purple full scene original audio",
+            "gojo 0.2 second domain expansion unlimited void shibuya incident audio",
+            "jujutsu kaisen season 2 gojo hidden inventory best moments",
         ],
     },
     "sukuna": {
         "show_slug": "jujutsu-kaisen",
         "show_title": "Jujutsu Kaisen",
-        "key_episodes": [20, 24, 40, 41, 42, 47, 48],
+        # Season 2 key episodes: 39 (Awakened), 40 (vs Jogo Fire Arrow), 41 (vs Mahoraga Malevolent Shrine)
+        "key_episodes": [39, 40, 41],
         "search_queries": [
-            "ryomen sukuna malevolent shrine jujutsu kaisen",
-            "sukuna vs gojo jujutsu kaisen best moments",
-            "sukuna world cutting slash jujutsu kaisen",
+            "sukuna vs jogo stand proud you are strong scene original audio jjk s2",
+            "sukuna malevolent shrine domain expansion vs mahoraga audio 1080p",
+            "sukuna fire arrow open fuga scene original audio shibuya incident",
+            "ryomen sukuna playing with jogo shibuya destruction original audio",
         ],
     },
     "toji": {
         "show_slug": "jujutsu-kaisen",
         "show_title": "Jujutsu Kaisen",
-        "key_episodes": [26, 27, 28],
+        # Season 2 key episodes: 26-28 (vs Gojo), 38 (vs Dagon & Megumi)
+        "key_episodes": [26, 27, 28, 38],
         "search_queries": [
-            "toji fushiguro vs gojo jujutsu kaisen hidden inventory",
-            "toji fushiguro best moments jujutsu kaisen",
+            "toji fushiguro vs gojo hidden inventory episode 3 4 original audio",
+            "toji fushiguro vs dagon domain playful cloud blitz audio 1080p",
+            "toji fushiguro vs megumi alley fight scene original audio jjk s2",
         ],
     },
     "yuji": {
         "show_slug": "jujutsu-kaisen",
         "show_title": "Jujutsu Kaisen",
-        "key_episodes": [4, 12, 20, 39, 43],
+        # Season 2 key episodes: 43, 44, 45 (vs Mahito with Todo & I Am You)
+        "key_episodes": [43, 44, 45],
         "search_queries": [
-            "yuji itadori divergent fist jujutsu kaisen",
-            "yuji best fight moments jujutsu kaisen",
+            "yuji itadori and todo vs mahito black flash flurry original audio jjk s2",
+            "yuji itadori i am you monologue snow forest chase scene audio",
+            "yuji itadori 120 percent potential black flash audio 1080p",
         ],
     },
     "megumi": {
         "show_slug": "jujutsu-kaisen",
         "show_title": "Jujutsu Kaisen",
-        "key_episodes": [13, 23, 36],
+        # Season 2 key episodes: 40 (Summoning Mahoraga in Shibuya)
+        "key_episodes": [23, 38, 40],
         "search_queries": [
-            "megumi fushiguro mahoraga jujutsu kaisen",
-            "megumi best fight moments jujutsu kaisen",
+            "megumi fushiguro with this treasure i summon mahoraga scene original audio",
+            "megumi chimera shadow garden domain expansion audio 1080p",
+            "megumi fushiguro vs toji shibuya incident audio",
         ],
     },
 }

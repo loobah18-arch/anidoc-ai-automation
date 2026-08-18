@@ -59,15 +59,12 @@ def generate_procedural_beat_grid(duration: float = 35.0, drop_time: float = 6.0
     beat_times = []
     beat_interval = 60.0 / bpm
     
-    # ── Phase 1: Intro Atmospheric Buildup ───────────────────────────────────
-    curr = 0.0
-    while curr < drop_time - 0.6:
-        step = 1.8 if curr < 2.0 else 1.4
-        curr += step
-        if curr < drop_time - 0.4:
-            beat_times.append(round(curr, 2))
-            
-    # Explicit Climax Drop Anchor
+    # ── Phase 1: Intro Atmospheric Dialogue Buildup ───────────────────────────
+    # In viral anime edits, the character delivers their COMPLETE iconic dialogue line
+    # (e.g. "Honored One", "Stand proud", "Hello Peter") without mid-sentence chops.
+    # We maintain ONE continuous monologue shot (or max 2 if drop_time > 6.2s).
+    if drop_time > 6.2:
+        beat_times.append(round(drop_time / 2.0, 2))
     beat_times.append(round(drop_time, 2))
     
     # ── Phase 2: First Drop Frenzy (Drop to 18.0s) ────────────────────────────

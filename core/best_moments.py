@@ -26,54 +26,74 @@ from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
 
 
 # Search queries for real episodes / scenepacks per character
-# These target YouTube scenepacks that keep the original anime audio
+# Targeted at full fight scenes and complete iconic monologues with original voice tracks
 EPISODE_SCENEPACK_QUERIES = {
+    # ── Jujutsu Kaisen Season 2 (Hidden Inventory & Shibuya Incident) ─────────
     "gojo": [
-        "gojo satoru best moments scenepack with audio jujutsu kaisen",
-        "gojo hollow purple scene audio 1080p jujutsu kaisen",
-        "gojo vs toji scenepack with original audio",
-        "gojo infinity domain expansion audio scene",
+        "gojo awakened honored one dialogue scene audio 1080p jujutsu kaisen season 2",
+        "gojo vs toji hollow purple full scene original audio",
+        "gojo 0.2 second domain expansion unlimited void shibuya incident audio",
+        "gojo satoru best fight scenes 4k 60fps audio jujutsu kaisen",
+        "gojo vs disaster curses subway fight original audio 1080p",
     ],
     "sukuna": [
-        "ryomen sukuna best moments scenepack with audio",
-        "sukuna malevolent shrine scene original audio jujutsu kaisen",
-        "sukuna vs mahoraga scenepack audio 1080p",
+        "sukuna vs jogo stand proud you are strong scene original audio jjk s2",
+        "sukuna malevolent shrine domain expansion vs mahoraga audio 1080p",
+        "sukuna fire arrow open fuga scene original audio shibuya incident",
+        "ryomen sukuna 4k 60fps fight scenes scenepack with audio",
+        "sukuna playing with jogo shibuya destruction original audio",
     ],
     "toji": [
-        "toji fushiguro fight scenes original audio jujutsu kaisen",
-        "toji vs gojo scenepack with audio hidden inventory",
+        "toji fushiguro vs gojo hidden inventory episode 3 4 original audio",
+        "toji fushiguro vs dagon domain playful cloud blitz audio 1080p",
+        "toji fushiguro vs megumi alley fight scene original audio jjk s2",
+        "toji sorcerer killer best fight moments audio scenepack",
     ],
     "yuji": [
-        "yuji itadori best fight moments scenepack audio jujutsu kaisen",
-        "yuji divergent fist scene original audio",
+        "yuji itadori and todo vs mahito black flash flurry original audio jjk s2",
+        "yuji itadori i am you monologue snow forest chase scene audio",
+        "yuji itadori 120 percent potential black flash audio 1080p",
     ],
     "megumi": [
-        "megumi fushiguro mahoraga scene scenepack audio jujutsu kaisen",
-        "megumi best moments original audio 1080p",
+        "megumi fushiguro with this treasure i summon mahoraga scene original audio",
+        "megumi chimera shadow garden domain expansion audio 1080p",
+        "megumi fushiguro vs toji shibuya incident audio",
     ],
-    "spiderman": [
-        "spider-man best fight scenes scenepack original audio marvel",
-        "spiderman no way home best moments audio 1080p",
-    ],
-    "ironman": [
-        "iron man best moments scenepack original audio marvel mcu",
-        "tony stark suit up scene original audio avengers",
-    ],
+    # ── Thor: Ragnarok (MCU 2017) ───────────────────────────────────────────
     "thor": [
-        "thor best fight moments scenepack original audio marvel",
-        "thor ragnarok battle scene original audio 1080p",
-    ],
-    "wolverine": [
-        "wolverine best fight scenes original audio scenepack",
-        "wolverine berserker rage scene original audio x-men",
-    ],
-    "thanos": [
-        "thanos best moments scenepack original audio avengers",
-        "thanos snap scene original audio infinity war 1080p",
+        "thor ragnarok god of thunder awakening bifrost bridge scene audio 1080p",
+        "thor vs hulk gladiator arena he is a friend from work scene audio",
+        "thor ragnarok opening muspelheim surtur fight original audio",
+        "are you thor the god of hammers odin vision scene ragnarok audio",
+        "thor awakened lightning immigrant song battle 4k audio",
     ],
     "loki": [
-        "loki best moments scenepack original audio marvel",
-        "loki fight scene original audio thor avengers",
+        "loki your savior is here bifrost scene thor ragnarok original audio",
+        "loki i have been falling for thirty minutes thor ragnarok audio",
+        "loki and thor get help scene thor ragnarok 1080p audio",
+    ],
+    # ── Spider-Man: No Way Home (MCU 2021) ────────────────────────────────────
+    "spiderman": [
+        "spiderman no way home doc ock bridge fight hello peter scene audio 1080p",
+        "spiderman no way home green goblin apartment norman is on sabbatical audio",
+        "spiderman no way home statue of liberty final battle triple spiderman audio",
+        "spiderman with great power comes great responsibility aunt may scene audio",
+        "tom holland peter stops glider kill green goblin scene audio 1080p",
+    ],
+    "ironman": [
+        "iron man i am iron man endgame snap scene original audio 1080p",
+        "iron man vs thanos titan battle nanotech suit scene audio",
+        "tony stark mark 50 suit up infinity war original audio",
+    ],
+    "thanos": [
+        "thanos i am inevitable endgame battle scene original audio 1080p",
+        "thanos vs iron man thor captain america endgame fight audio",
+        "thanos snap infinity war wakanda original audio",
+    ],
+    "wolverine": [
+        "wolverine deadpool and wolverine car fight scene original audio 1080p",
+        "wolverine berserker rage fight scene original audio",
+        "logan best fight scenes original audio 1080p",
     ],
 }
 
