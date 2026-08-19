@@ -40,6 +40,45 @@ SUBTITLE_STYLE_PRESETS = {
         "margin_v": 85,                  # Sits in lower third of square
         "margin_lr": 60,
     },
+    "gojo_hollow_purple": {
+        "font": "Arial",
+        "fontsize": 66,
+        "primary": "&H00FFFFFF",
+        "active_word": "&H00FFF000",     # Electric Cyan Active
+        "outline": "&H00D000AA",         # Hollow Purple Outer Glow
+        "shadow": "&H99000000",
+        "outline_width": 7.0,
+        "shadow_depth": 4.0,
+        "alignment": 2,
+        "margin_v": 85,
+        "margin_lr": 60,
+    },
+    "sukuna_malevolent_shrine": {
+        "font": "Arial",
+        "fontsize": 68,
+        "primary": "&H00FFFFFF",
+        "active_word": "&H000000FF",     # Pure Blood Crimson Active
+        "outline": "&H00000088",         # Dark Crimson Shadow
+        "shadow": "&HBB000000",
+        "outline_width": 7.5,
+        "shadow_depth": 4.5,
+        "alignment": 2,
+        "margin_v": 85,
+        "margin_lr": 60,
+    },
+    "solo_leveling_monarch": {
+        "font": "Arial",
+        "fontsize": 66,
+        "primary": "&H00FFFFFF",
+        "active_word": "&H00FFAA00",     # Shadow Blue Active
+        "outline": "&H00000000",
+        "shadow": "&HAA000055",
+        "outline_width": 6.5,
+        "shadow_depth": 4.0,
+        "alignment": 2,
+        "margin_v": 85,
+        "margin_lr": 60,
+    },
     "cyber_glow": {
         "font": "Arial",
         "fontsize": 64,

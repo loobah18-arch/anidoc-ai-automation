@@ -144,12 +144,13 @@ def build_velocity_clip_filter(
     if speed < 0.70:
         filters.append("tblend=all_mode=average")
 
-    # 5. Animated Dynamic Zoom Punch (ease-down over 14 frames)
+    # 5. Animated Dynamic Zoom Punch (smooth exponential ease-down over 14 frames)
     if scale_factor > 1.05:
         punch_delta = scale_factor - 1.0
         punch_frames = 14 if fps >= 50 else 8
+        # Exponential easing curve: snaps instantly on frame 0, decays smoothly to 1.0
         zoom_expr = (
-            f"if(lte(in,{punch_frames}),{scale_factor:.2f}-{punch_delta:.2f}*(in/{punch_frames}),1.0)"
+            f"if(lte(in,{punch_frames}),{scale_factor:.2f}-{punch_delta:.2f}*(1-pow(1-(in/{punch_frames}),2)),1.0)"
         )
         filters.append(
             f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
@@ -163,22 +164,27 @@ def build_velocity_clip_filter(
         dur_f = max(0.4, duration)
         filters.append(f"boxblur=luma_radius=2:luma_power=1:enable='between(t,0,{dur_f:.2f})'")
 
-    # 7. Camera Shake (9_VAGhAdne8: rapid ±12px translate burst on first 8 frames of impact)
+    # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: rapid ±14px multi-directional translate burst)
     if add_shake:
         shake_frames = 8
-        shake_amp = 12
+        shake_amp = 14
         sx_expr = (
-            f"if(lt(N,{shake_frames}),if(eq(mod(N,2),0),{shake_amp},-{shake_amp}),0)"
+            f"if(lt(N,{shake_frames}),if(eq(mod(N,2),0),{shake_amp}*(1-N/{shake_frames}),-{shake_amp}*(1-N/{shake_frames})),0)"
+        )
+        sy_expr = (
+            f"if(lt(N,{shake_frames}),if(eq(mod(N,3),0),{shake_amp//2}*(1-N/{shake_frames}),-{shake_amp//2}*(1-N/{shake_frames})),0)"
         )
         filters.append(
-            f"geq=lum='p(X+({sx_expr}),Y)':cb='cb(X+({sx_expr}),Y)':cr='cr(X+({sx_expr}),Y)'"
+            f"geq=lum='p(X+({sx_expr}),Y+({sy_expr}))':cb='cb(X+({sx_expr}),Y+({sy_expr}))':cr='cr(X+({sx_expr}),Y+({sy_expr}))'"
         )
 
-    # 8. Chromatic Aberration RGB Split (8Fyb0LXw1BU: ±5px horizontal channel split on drop)
+    # 8. Chromatic Aberration RGB Split (8Fyb0LXw1BU: dynamic decaying horizontal channel split on drop)
     if add_chr_aber:
-        split_px = 5
+        split_frames = 10
+        split_amp = 6
+        split_expr = f"if(lt(N,{split_frames}),{split_amp}*(1-N/{split_frames}),0)"
         filters.append(
-            f"geq=lum='p(X+{split_px},Y)':cb='cb(X,Y)':cr='cr(X-{split_px},Y)'"
+            f"geq=lum='p(X+({split_expr}),Y)':cb='cb(X,Y)':cr='cr(X-({split_expr}),Y)'"
         )
 
     # 9. Cursed Technique Bloom Glow (8Fyb0LXw1BU: highlight overexposure + soft unsharp fringe)
