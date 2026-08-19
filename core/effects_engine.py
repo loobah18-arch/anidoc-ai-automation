@@ -118,7 +118,7 @@ def build_velocity_clip_filter(
       1. Edge crop (watermark strip)
       2. Scale + center crop to canvas
       3. Velocity speed ramp (setpts)
-      4. Twixtor-style tblend motion blur (slow-mo only)
+      4. Twixtor-style motion-compensated frame interpolation + blend (slow-mo only)
       5. Animated zoom punch (zoompan ease-down)
       6. Rack-Focus DoF blur (boxblur with time-based envelope) — intro
       7. Camera Shake (geq translate burst) — drop impact
@@ -140,8 +140,14 @@ def build_velocity_clip_filter(
     # 3. Velocity ramp
     filters.append(f"setpts={pts_mult:.4f}*PTS")
 
-    # 4. Twixtor-style frame-blend motion blur on slow-mo (< 0.70x)
+    # 4. Twixtor-style smooth slow-motion (< 0.70x): motion-compensated frame
+    #    interpolation generates true in-between frames (eliminating the judder
+    #    from naive setpts frame-duping), then a light tblend average adds the
+    #    cinematic motion blur expected on velocity punches.
     if speed < 0.70:
+        filters.append(
+            f"minterpolate=fps={fps}:mi_mode=mci:mc_mode=aobmc:vsbmc=1"
+        )
         filters.append("tblend=all_mode=average")
 
     # 5. Animated Dynamic Zoom Punch (ease-down over 14 frames)
