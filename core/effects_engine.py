@@ -222,10 +222,8 @@ def build_cc_filter(
         f":saturation={cfg['saturation']}:gamma={cfg['gamma']}"
     )
     unsharp_part = f"unsharp={cfg['unsharp']}"
-    vignette_part = f"vignette={cfg['vignette']}"
     levels_part = "colorlevels=rimin=0.03:gimin=0.03:bimin=0.03:rimax=0.98:gimax=0.98:bimax=0.98"
-
-    # Light flicker — xtlw3zvKGAE: brightness pulse in 2s window before drop
+    # Light flicker & vignette breathing — xtlw3zvKGAE & 9_VAGhAdne8: tension oscillation before drop
     if with_flicker and drop_time > 2.0:
         flicker_start = drop_time - 2.0
         flicker_end = drop_time
@@ -233,8 +231,14 @@ def build_cc_filter(
             f",eq=brightness='if(between(t,{flicker_start:.2f},{flicker_end:.2f}),"
             f"sin(t*6.28*3)*0.08,0)'"
         )
+        base_vig = cfg['vignette']
+        vignette_part = (
+            f"vignette='if(between(t,{flicker_start:.2f},{flicker_end:.2f}),"
+            f"{base_vig}+sin(t*6.28*2)*0.06,{base_vig})'"
+        )
     else:
         flicker_eq = ""
+        vignette_part = f"vignette={cfg['vignette']}"
 
     return f"{eq_part},{levels_part},{unsharp_part},{vignette_part}{flicker_eq}"
 
