@@ -113,6 +113,7 @@ def build_velocity_clip_filter(
     add_impact_invert: bool = False,
     add_speed_lines: bool = False,
     add_whip_pan: bool = False,
+    add_exposure_pulse: bool = False,
 ) -> str:
     """
     Builds the complete per-clip video filter chain implementing all cinematic techniques.
@@ -215,6 +216,10 @@ def build_velocity_clip_filter(
     # 11. Speed Lines (velocity streaks on fast slices)
     if add_speed_lines:
         filters.append("drawgrid=w=100:h=100:t=2:c=white@0.10:enable='between(n,0,5)'")
+
+    # 11b. Beat-Reactive Exposure Pulse (2-frame dynamic contrast/brightness punch on drop strikes)
+    if add_exposure_pulse:
+        filters.append("eq=contrast=1.14:brightness=0.04:enable='between(n,0,2)'")
 
     # 12. Cinematic letterbox bars — intro atmospheric framing
     if add_bars:

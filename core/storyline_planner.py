@@ -100,6 +100,7 @@ class PlannedSegment:
     add_impact_invert: bool = False
     add_speed_lines: bool = False
     add_whip_pan: bool = False
+    add_exposure_pulse: bool = False
     speed: float = 1.0
     scale_factor: float = 1.0
     section_type: str = "body"
@@ -178,6 +179,7 @@ class StorylinePlanner:
             add_impact_invert = False
             add_speed_lines = False
             add_whip_pan = False
+            add_exposure_pulse = False
 
             if phase.name == "HOOK":
                 speed = 0.30
@@ -191,6 +193,7 @@ class StorylinePlanner:
                 add_impact_invert = False
                 add_speed_lines = False
                 add_whip_pan = False
+                add_exposure_pulse = False
 
             elif phase.name == "BUILD":
                 # Accelerating speed ramp into drop
@@ -206,8 +209,10 @@ class StorylinePlanner:
                 add_impact_invert = False
                 add_speed_lines = (frac_in_build > 0.80)
                 add_whip_pan = (frac_in_build > 0.85 and idx % 2 == 1)
+                add_exposure_pulse = False
 
             elif phase.name == "DROP":
+                add_exposure_pulse = (is_drop or kick > 0.85)
                 if not seg.get("prev_is_drop", True):
                     # First drop segment: explosive velocity snap + impact invert
                     speed = 1.50
@@ -256,6 +261,7 @@ class StorylinePlanner:
                 add_impact_invert = False
                 add_speed_lines = False
                 add_whip_pan = False
+                add_exposure_pulse = False
 
             ps = PlannedSegment(
                 timeline_in=t,
@@ -274,6 +280,7 @@ class StorylinePlanner:
                 add_impact_invert=add_impact_invert,
                 add_speed_lines=add_speed_lines,
                 add_whip_pan=add_whip_pan,
+                add_exposure_pulse=add_exposure_pulse,
                 speed=speed,
                 scale_factor=scale_factor,
                 section_type=seg.get("section_type", "body"),
@@ -305,6 +312,7 @@ class StorylinePlanner:
                 "add_impact_invert": ps.add_impact_invert,
                 "add_speed_lines": ps.add_speed_lines,
                 "add_whip_pan": ps.add_whip_pan,
+                "add_exposure_pulse": ps.add_exposure_pulse,
                 "energy": ps.energy,
                 "section_type": ps.section_type,
             }
