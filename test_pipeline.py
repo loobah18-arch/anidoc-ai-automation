@@ -139,7 +139,7 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn(f"{VIDEO_WIDTH},{VIDEO_HEIGHT}", probe_res.stdout)
 
     def test_08_beatsync_engine_hpss(self):
-        phonk_audio = get_random_or_specified_phonk("tokyo_drift_phonk")
+        phonk_audio = get_random_or_specified_phonk("lonown_avangard_phonk")
         self.assertIsNotNone(phonk_audio)
         bs_res = analyze_audio_beatsync(phonk_audio, target_duration=8.0)
         self.assertTrue(len(bs_res.beat_times) >= 4)
@@ -151,7 +151,7 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("kick", segs[0])
 
     def test_09_ultimate_amv_stem_and_deadframe(self):
-        phonk_audio = get_random_or_specified_phonk("tokyo_drift_phonk")
+        phonk_audio = get_random_or_specified_phonk("lonown_avangard_phonk")
         self.assertIsNotNone(phonk_audio)
         beat_src = get_best_beat_source(phonk_audio, SCRATCH_DIR)
         self.assertTrue(Path(beat_src).exists())
