@@ -58,8 +58,8 @@ on:
         type: boolean
       upload:
         description: 'Upload rendered Short to YouTube'
-        required: true
-        default: true
+        required: false
+        default: false
         type: boolean
 
 jobs:
@@ -132,7 +132,7 @@ jobs:
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
           
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ]; then
+          if [ "${{ github.event.inputs.upload }}" = "true" ]; then
             CMD="$CMD --upload"
           fi
           
