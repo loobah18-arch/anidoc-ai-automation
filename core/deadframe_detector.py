@@ -99,7 +99,10 @@ def measure_clip_motion(
                 scores.append(diff)
             previous = frame
 
-        proc.stdout.close()
+        if proc.stdout:
+            proc.stdout.close()
+        if proc.stderr:
+            proc.stderr.close()
         proc.wait(timeout=5)
 
         if not scores:
