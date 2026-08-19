@@ -318,6 +318,7 @@ def render_cinematic_edit(
             add_bloom=vel_profile.get("add_bloom", False),
             add_impact_invert=vel_profile.get("add_impact_invert", False),
             add_speed_lines=vel_profile.get("add_speed_lines", False),
+            add_whip_pan=vel_profile.get("add_whip_pan", False),
         )
         
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"

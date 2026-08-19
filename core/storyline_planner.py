@@ -99,6 +99,7 @@ class PlannedSegment:
     add_flash: bool
     add_impact_invert: bool = False
     add_speed_lines: bool = False
+    add_whip_pan: bool = False
     speed: float = 1.0
     scale_factor: float = 1.0
     section_type: str = "body"
@@ -176,6 +177,7 @@ class StorylinePlanner:
             # Velocity & VFX assignment based on Arc Phase
             add_impact_invert = False
             add_speed_lines = False
+            add_whip_pan = False
 
             if phase.name == "HOOK":
                 speed = 0.30
@@ -188,6 +190,7 @@ class StorylinePlanner:
                 add_flash = False
                 add_impact_invert = False
                 add_speed_lines = False
+                add_whip_pan = False
 
             elif phase.name == "BUILD":
                 # Accelerating speed ramp into drop
@@ -202,6 +205,7 @@ class StorylinePlanner:
                 add_flash = (frac_in_build > 0.85)
                 add_impact_invert = False
                 add_speed_lines = (frac_in_build > 0.80)
+                add_whip_pan = (frac_in_build > 0.85 and idx % 2 == 1)
 
             elif phase.name == "DROP":
                 if not seg.get("prev_is_drop", True):
@@ -214,6 +218,7 @@ class StorylinePlanner:
                     add_bloom = False
                     add_impact_invert = True
                     add_speed_lines = True
+                    add_whip_pan = False
                 elif duration > 0.80:
                     # Power slow-mo: technique release
                     speed = 0.45
@@ -224,6 +229,7 @@ class StorylinePlanner:
                     add_bloom = True
                     add_impact_invert = False
                     add_speed_lines = False
+                    add_whip_pan = False
                 else:
                     # Fast combat clash
                     speed = 1.40
@@ -234,6 +240,7 @@ class StorylinePlanner:
                     add_bloom = False
                     add_impact_invert = (kick > 0.90 and idx % 6 == 0)
                     add_speed_lines = (speed > 1.35 and idx % 3 == 0)
+                    add_whip_pan = (speed > 1.35 and idx % 2 == 1)
                 add_bars = False
                 add_rf = False
 
@@ -248,6 +255,7 @@ class StorylinePlanner:
                 add_flash = False
                 add_impact_invert = False
                 add_speed_lines = False
+                add_whip_pan = False
 
             ps = PlannedSegment(
                 timeline_in=t,
@@ -265,6 +273,7 @@ class StorylinePlanner:
                 add_flash=add_flash,
                 add_impact_invert=add_impact_invert,
                 add_speed_lines=add_speed_lines,
+                add_whip_pan=add_whip_pan,
                 speed=speed,
                 scale_factor=scale_factor,
                 section_type=seg.get("section_type", "body"),
@@ -295,6 +304,7 @@ class StorylinePlanner:
                 "add_flash": ps.add_flash,
                 "add_impact_invert": ps.add_impact_invert,
                 "add_speed_lines": ps.add_speed_lines,
+                "add_whip_pan": ps.add_whip_pan,
                 "energy": ps.energy,
                 "section_type": ps.section_type,
             }

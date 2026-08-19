@@ -112,6 +112,7 @@ def build_velocity_clip_filter(
     add_bloom: bool = False,
     add_impact_invert: bool = False,
     add_speed_lines: bool = False,
+    add_whip_pan: bool = False,
 ) -> str:
     """
     Builds the complete per-clip video filter chain implementing all cinematic techniques.
@@ -123,13 +124,14 @@ def build_velocity_clip_filter(
       4. Twixtor-style tblend motion blur (slow-mo only)
       5. Animated zoom punch (zoompan ease-down)
       6. Rack-Focus DoF blur (boxblur with time-based envelope) — intro
-      7. Camera Shake (geq translate burst) — drop impact
-      8. Chromatic Aberration (geq R/B channel shift) — drop
-      9. Bloom Glow (curves highlight lift + unsharp) — technique shots
-     10. Impact Invert (1-frame negative color inversion on climax punch)
-     11. Speed Lines (high-speed velocity streaks on fast slices)
-     12. Cinematic letterbox bars — intro
-     13. SAR + duration trim + PTS reset
+      7. Directional Whip Pan (rapid 2-frame directional motion translation on fast cuts)
+      8. Camera Shake (geq translate burst) — drop impact
+      9. Chromatic Aberration (geq R/B channel shift) — drop
+     10. Bloom Glow (curves highlight lift + unsharp) — technique shots
+     11. Impact Invert (1-frame negative color inversion on climax punch)
+     12. Speed Lines (high-speed velocity streaks on fast slices)
+     13. Cinematic letterbox bars — intro
+     14. SAR + duration trim + PTS reset
     """
     pts_mult = 1.0 / max(0.15, speed)
     filters = []
@@ -168,6 +170,15 @@ def build_velocity_clip_filter(
     if add_rack_focus:
         dur_f = max(0.4, duration)
         filters.append(f"boxblur=luma_radius=2:luma_power=1:enable='between(t,0,{dur_f:.2f})'")
+
+    # 6b. Directional Whip Pan (2-frame dynamic translation snap)
+    if add_whip_pan:
+        whip_offset = 64
+        filters.append(
+            f"geq=lum='p(X+if(lte(N,1),{whip_offset}*(1-N),0),Y)':"
+            f"cb='cb(X+if(lte(N,1),{whip_offset}*(1-N),0),Y)':"
+            f"cr='cr(X+if(lte(N,1),{whip_offset}*(1-N),0),Y)'"
+        )
 
     # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: rapid ±14px multi-directional translate burst)
     if add_shake:
