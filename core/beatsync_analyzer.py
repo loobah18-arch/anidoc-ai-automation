@@ -299,8 +299,11 @@ def _analyze_sections(
         })
 
     if not any(s["type"] == "drop" for s in sections):
-        best = max(sections, key=lambda s: s["avg_energy"])
-        best["type"] = "drop"
+        if sections:
+            best = max(sections, key=lambda s: s["avg_energy"])
+            best["type"] = "drop"
+        else:
+            sections = [{"index": 0, "start": 0.0, "end": duration, "duration": duration, "type": "drop", "avg_energy": 0.8}]
 
     return sections
 
