@@ -30,7 +30,7 @@ HISTORY_FILE = SCRATCH_DIR / "gdrive_edit_history.json"
 
 # Strict High-Octane Combat Episodes (ordered by pure action density)
 CHARACTER_EPISODE_PREFERENCES = {
-    "gojo": ["e09", "e04", "e03", "e08", "e05", "e07", "e01"],       # Shibuya Curses, Awakened vs Toji, Subway Brawl
+    "gojo": ["e04", "e09", "e03", "e08"],                             # Awakened Hollow Purple, Shibuya Subway Blitz, Toji Clash, 0.2s Domain
     "sukuna": ["e17", "e16", "e15", "e18", "e20"],                   # Sukuna vs Mahoraga, Sukuna vs Jogo Meteor, Shibuya Climax
     "toji": ["e04", "e03", "e14", "e15", "e02"],                     # Toji vs Gojo Awakened, Toji vs Dagon, Toji vs Megumi
     "yuji": ["e20", "e21", "e13", "e19", "e22", "e18"],             # Yuji & Todo vs Mahito (Black Flash), Yuji vs Choso Brawl
