@@ -376,13 +376,11 @@ def render_cinematic_edit(
     filter_chains.append(f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.55[csfx_drop]")
     filter_chains.append(f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full]")
     
-    # Phonk dynamic envelope: lowpass muffled club filter that sweeps up dynamically 2s before drop
-    sweep_start = max(0.5, drop_t - 2.0)
+    # Phonk dynamic envelope: lowpass muffled club filter before explosive drop
     filter_chains.append(f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in]")
     filter_chains.append(
         f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,"
-        f"lowpass=f='if(between(t,{sweep_start:.2f},{drop_t:.2f}),1000+pow((t-{sweep_start:.2f})/({drop_t - sweep_start:.2f}),2)*14000,1000)',"
-        f"volume=0.48[p_intro]"
+        f"lowpass=f=1200,volume=0.48[p_intro]"
     )
     filter_chains.append(f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.35[p_drop]")
     filter_chains.append(f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic]")
