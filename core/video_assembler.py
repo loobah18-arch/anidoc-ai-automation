@@ -302,7 +302,7 @@ def render_cinematic_edit(
         else:
             vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         
-        # Frame-accurate velocity filter + cinematic VFX (DoF, shake, CA, bloom)
+        # Frame-accurate velocity filter + cinematic VFX (DoF, shake, CA, bloom, impact invert, speed lines)
         clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
             duration=seg["duration"],
@@ -316,6 +316,8 @@ def render_cinematic_edit(
             add_shake=vel_profile.get("add_shake", False),
             add_chr_aber=vel_profile.get("add_chr_aber", False),
             add_bloom=vel_profile.get("add_bloom", False),
+            add_impact_invert=vel_profile.get("add_impact_invert", False),
+            add_speed_lines=vel_profile.get("add_speed_lines", False),
         )
         
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"

@@ -97,10 +97,12 @@ class PlannedSegment:
     add_chr_aber: bool
     add_bloom: bool
     add_flash: bool
-    speed: float
-    scale_factor: float
-    section_type: str
-    energy: float
+    add_impact_invert: bool = False
+    add_speed_lines: bool = False
+    speed: float = 1.0
+    scale_factor: float = 1.0
+    section_type: str = "body"
+    energy: float = 0.5
     start: float = 0.0
     end: float = 0.0
 
@@ -172,38 +174,46 @@ class StorylinePlanner:
             duration = seg["duration"]
 
             # Velocity & VFX assignment based on Arc Phase
+            add_impact_invert = False
+            add_speed_lines = False
+
             if phase.name == "HOOK":
                 speed = 0.30
                 scale_factor = 1.03
                 add_bars = True
-                add_rf = (idx == 0) # Rack-focus on opening character reveal
+                add_rf = True
                 add_shake = False
                 add_chr = False
                 add_bloom = False
                 add_flash = False
+                add_impact_invert = False
+                add_speed_lines = False
 
             elif phase.name == "BUILD":
-                build_span = max(0.01, (phase.end_frac - phase.start_frac) * self.total_duration)
-                build_progress = (t - phase.start_frac * self.total_duration) / build_span
-                build_progress = max(0.0, min(1.0, build_progress))
-                speed = 0.30 + build_progress * 0.40  # 0.30x -> 0.70x acceleration
-                scale_factor = 1.03 + build_progress * 0.04
+                # Accelerating speed ramp into drop
+                frac_in_build = (t - (phase.start_frac * self.total_duration)) / max(0.1, (phase.end_frac - phase.start_frac) * self.total_duration)
+                speed = 0.50 + 0.50 * frac_in_build
+                scale_factor = 1.05 + 0.08 * frac_in_build
                 add_bars = True
                 add_rf = False
-                add_shake = False
+                add_shake = (frac_in_build > 0.70)
                 add_chr = False
-                add_bloom = energy > 0.65
-                add_flash = False
+                add_bloom = False
+                add_flash = (frac_in_build > 0.85)
+                add_impact_invert = False
+                add_speed_lines = (frac_in_build > 0.80)
 
             elif phase.name == "DROP":
                 if not seg.get("prev_is_drop", True):
-                    # First drop segment: explosive velocity snap
+                    # First drop segment: explosive velocity snap + impact invert
                     speed = 1.50
-                    scale_factor = 1.20
+                    scale_factor = 1.22
                     add_shake = True
                     add_chr = True
                     add_flash = True
                     add_bloom = False
+                    add_impact_invert = True
+                    add_speed_lines = True
                 elif duration > 0.80:
                     # Power slow-mo: technique release
                     speed = 0.45
@@ -212,6 +222,8 @@ class StorylinePlanner:
                     add_chr = False
                     add_flash = False
                     add_bloom = True
+                    add_impact_invert = False
+                    add_speed_lines = False
                 else:
                     # Fast combat clash
                     speed = 1.40
@@ -220,6 +232,8 @@ class StorylinePlanner:
                     add_chr = (kick > 0.80)
                     add_flash = (kick > 0.75 or idx % 5 == 0)
                     add_bloom = False
+                    add_impact_invert = (kick > 0.90 and idx % 6 == 0)
+                    add_speed_lines = (speed > 1.35 and idx % 3 == 0)
                 add_bars = False
                 add_rf = False
 
@@ -232,6 +246,8 @@ class StorylinePlanner:
                 add_chr = False
                 add_bloom = True
                 add_flash = False
+                add_impact_invert = False
+                add_speed_lines = False
 
             ps = PlannedSegment(
                 timeline_in=t,
@@ -247,6 +263,8 @@ class StorylinePlanner:
                 add_chr_aber=add_chr,
                 add_bloom=add_bloom,
                 add_flash=add_flash,
+                add_impact_invert=add_impact_invert,
+                add_speed_lines=add_speed_lines,
                 speed=speed,
                 scale_factor=scale_factor,
                 section_type=seg.get("section_type", "body"),
@@ -275,6 +293,8 @@ class StorylinePlanner:
                 "add_chr_aber": ps.add_chr_aber,
                 "add_bloom": ps.add_bloom,
                 "add_flash": ps.add_flash,
+                "add_impact_invert": ps.add_impact_invert,
+                "add_speed_lines": ps.add_speed_lines,
                 "energy": ps.energy,
                 "section_type": ps.section_type,
             }

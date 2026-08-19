@@ -110,6 +110,8 @@ def build_velocity_clip_filter(
     add_shake: bool = False,
     add_chr_aber: bool = False,
     add_bloom: bool = False,
+    add_impact_invert: bool = False,
+    add_speed_lines: bool = False,
 ) -> str:
     """
     Builds the complete per-clip video filter chain implementing all cinematic techniques.
@@ -124,8 +126,10 @@ def build_velocity_clip_filter(
       7. Camera Shake (geq translate burst) — drop impact
       8. Chromatic Aberration (geq R/B channel shift) — drop
       9. Bloom Glow (curves highlight lift + unsharp) — technique shots
-     10. Cinematic letterbox bars — intro
-     11. SAR + duration trim + PTS reset
+     10. Impact Invert (1-frame negative color inversion on climax punch)
+     11. Speed Lines (high-speed velocity streaks on fast slices)
+     12. Cinematic letterbox bars — intro
+     13. SAR + duration trim + PTS reset
     """
     pts_mult = 1.0 / max(0.15, speed)
     filters = []
@@ -193,13 +197,21 @@ def build_velocity_clip_filter(
         filters.append("curves=all='0/0 0.5/0.55 0.75/0.90 1/1'")
         filters.append("unsharp=11:11:2.2:11:11:0.0")
 
-    # 10. Cinematic letterbox bars — intro atmospheric framing
+    # 10. Impact Invert Frame (1-frame negative color inversion on climax strike)
+    if add_impact_invert:
+        filters.append("negate=enable='between(n,0,1)'")
+
+    # 11. Speed Lines (velocity streaks on fast slices)
+    if add_speed_lines:
+        filters.append("drawgrid=w=100:h=100:t=2:c=white@0.10:enable='between(n,0,5)'")
+
+    # 12. Cinematic letterbox bars — intro atmospheric framing
     if add_bars:
         bar_h = 90
         filters.append(f"drawbox=x=0:y=0:w=iw:h={bar_h}:color=black:t=fill")
         filters.append(f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black:t=fill")
 
-    # 11. SAR normalization + exact duration trim + PTS reset
+    # 13. SAR normalization + exact duration trim + PTS reset
     filters.append("setsar=1")
     filters.append(f"trim=duration={duration:.3f}")
     filters.append("setpts=PTS-STARTPTS")
@@ -216,6 +228,7 @@ def build_cc_filter(
     Builds the 4K HDR Color Grade filtergraph snippet.
     Adds xtlw3zvKGAE-style light flicker: sinusoidal brightness oscillation at 3Hz
     in the 2 seconds immediately before the beat drop.
+    Adds fine film grain (noise) to eliminate flat digital gradients and provide texture.
     """
     cfg = CC_PRESETS.get(preset_name, CC_PRESETS["marvel_hdr"])
     eq_part = (
@@ -224,6 +237,8 @@ def build_cc_filter(
     )
     unsharp_part = f"unsharp={cfg['unsharp']}"
     levels_part = "colorlevels=rimin=0.03:gimin=0.03:bimin=0.03:rimax=0.98:gimax=0.98:bimax=0.98"
+    grain_part = "noise=alls=5:allf=t+u"
+
     # Light flicker & vignette breathing — xtlw3zvKGAE & 9_VAGhAdne8: tension oscillation before drop
     if with_flicker and drop_time > 2.0:
         flicker_start = drop_time - 2.0
@@ -241,7 +256,7 @@ def build_cc_filter(
         flicker_eq = ""
         vignette_part = f"vignette={cfg['vignette']}"
 
-    return f"{eq_part},{levels_part},{unsharp_part},{vignette_part}{flicker_eq}"
+    return f"{eq_part},{levels_part},{unsharp_part},{vignette_part},{grain_part}{flicker_eq}"
 
 
 def build_beat_flash_filters(
