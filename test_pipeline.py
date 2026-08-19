@@ -20,6 +20,10 @@ from core.public_api_fetcher import slice_scenepack_into_clips
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata
 from core.video_assembler import render_cinematic_edit, generate_fallback_phonk_audio
+from core.beatsync_analyzer import analyze_audio_beatsync
+from core.stem_separator import get_best_beat_source
+from core.deadframe_detector import measure_clip_motion, filter_action_packed_clips
+from core.storyline_planner import StorylinePlanner
 
 class TestAniDocPipeline(unittest.TestCase):
     def setUp(self):
@@ -134,5 +138,63 @@ class TestAniDocPipeline(unittest.TestCase):
         probe_res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
         self.assertIn(f"{VIDEO_WIDTH},{VIDEO_HEIGHT}", probe_res.stdout)
 
+    def test_08_beatsync_engine_hpss(self):
+        phonk_audio = get_random_or_specified_phonk("tokyo_drift_phonk")
+        self.assertIsNotNone(phonk_audio)
+        bs_res = analyze_audio_beatsync(phonk_audio, target_duration=8.0)
+        self.assertTrue(len(bs_res.beat_times) >= 4)
+        self.assertTrue(bs_res.tempo > 50.0)
+        self.assertTrue(len(bs_res.sections) >= 1)
+        segs = bs_res.get_cut_segments()
+        self.assertTrue(len(segs) >= 2)
+        self.assertIn("energy", segs[0])
+        self.assertIn("kick", segs[0])
+
+    def test_09_ultimate_amv_stem_and_deadframe(self):
+        phonk_audio = get_random_or_specified_phonk("tokyo_drift_phonk")
+        self.assertIsNotNone(phonk_audio)
+        beat_src = get_best_beat_source(phonk_audio, SCRATCH_DIR)
+        self.assertTrue(Path(beat_src).exists())
+
+        # Test deadframe & motion measurement on procedural clip
+        test_clip = SCRATCH_DIR / "test_proc_scene.mp4"
+        if test_clip.exists():
+            motion_res = measure_clip_motion(test_clip, max_duration=2.0)
+            self.assertIn("action_score", motion_res)
+            self.assertIn("deadframe_ratio", motion_res)
+            filtered = filter_action_packed_clips([test_clip])
+            self.assertTrue(len(filtered) >= 1)
+
+    def test_10_openstoryline_arc_planner(self):
+        planner = StorylinePlanner(drop_time=6.0, total_duration=20.0)
+        self.assertEqual(len(planner.phases), 4)
+        phase_names = [p.name for p in planner.phases]
+        self.assertEqual(phase_names, ["HOOK", "BUILD", "DROP", "OUTRO"])
+
+        # Test segment planning from simulated segments
+        sim_segs = [
+            {"start": 0.0, "end": 1.0, "duration": 1.0, "is_drop": False, "energy": 0.3, "kick": 0.2},
+            {"start": 1.0, "end": 6.0, "duration": 5.0, "is_drop": False, "energy": 0.6, "kick": 0.5},
+            {"start": 6.0, "end": 7.0, "duration": 1.0, "is_drop": True, "prev_is_drop": False, "energy": 0.95, "kick": 0.9},
+            {"start": 7.0, "end": 18.0, "duration": 11.0, "is_drop": True, "prev_is_drop": True, "energy": 0.85, "kick": 0.8},
+            {"start": 18.0, "end": 20.0, "duration": 2.0, "is_drop": True, "prev_is_drop": True, "energy": 0.4, "kick": 0.3},
+        ]
+        planned = planner.plan_from_beatsync(sim_segs)
+        self.assertEqual(len(planned), 5)
+        self.assertEqual(planned[0].arc_phase, "HOOK")
+        self.assertEqual(planned[0].add_rack_focus, True) # Hook rack-focus
+        self.assertEqual(planned[2].arc_phase, "DROP")
+        self.assertEqual(planned[2].add_shake, True)      # First drop shake
+        self.assertEqual(planned[2].add_chr_aber, True)   # First drop chromatic aberration
+        self.assertEqual(planned[2].add_flash, True)      # First drop flash
+        self.assertEqual(planned[4].arc_phase, "OUTRO")
+        self.assertEqual(planned[4].add_bloom, True)      # Outro resolve bloom
+
+        # Dict conversion
+        dicts = planner.to_segment_dicts(planned)
+        self.assertEqual(len(dicts), 5)
+        self.assertEqual(dicts[0]["arc_phase"], "HOOK")
+
 if __name__ == "__main__":
     unittest.main()
+

@@ -27,6 +27,10 @@ from config.settings import (
     VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS
 )
 from core.beat_detector import analyze_audio_beats, BeatGrid
+from core.beatsync_analyzer import analyze_audio_beatsync, BeatSyncResult
+from core.stem_separator import get_best_beat_source
+from core.storyline_planner import StorylinePlanner
+from core.deadframe_detector import filter_action_packed_clips
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
 from core.best_moments import fetch_best_episode_clips
@@ -110,7 +114,7 @@ def render_cinematic_edit(
     print(f"💬 Quote: \"{quote_text}\"")
     print(f"📌 Title: {title_text}")
     
-    # 2. Audio Sourcing & Beat Analysis
+    # 2. Audio Sourcing, Ultimate-AMV Stem Separation & BeatSync-Engine Analysis
     if not audio_path or not Path(audio_path).exists():
         chosen_audio = get_random_or_specified_phonk(phonk_track)
         if chosen_audio and chosen_audio.exists():
@@ -119,11 +123,41 @@ def render_cinematic_edit(
         else:
             audio_path = SCRATCH_DIR / f"phonk_synth_{character_key}.aac"
             generate_fallback_phonk_audio(target_duration, audio_path)
-            
-    beat_grid = analyze_audio_beats(audio_path, target_duration=target_duration)
-    segments = beat_grid.get_cut_segments()
-    drop_t = max(0.5, beat_grid.drop_time)
-    print(f"🎵 Beat Grid: {len(segments)} scene cuts detected across {beat_grid.duration:.1f}s (Drop at {drop_t:.1f}s)")
+
+    # Ultimate-AMV Stem Separation: clean instrumental stem for beat tracking
+    beat_source = get_best_beat_source(audio_path, SCRATCH_DIR)
+    if beat_source != audio_path:
+        print(f"🎛️  [Ultimate-AMV] Clean instrumental stem isolated for beat detection: {beat_source.name}")
+
+    # BeatSync-Engine: 6-stage HPSS + section-aware cut density
+    try:
+        bs_result = analyze_audio_beatsync(beat_source, target_duration=target_duration)
+        drop_t = max(0.5, bs_result.drop_time)
+
+        # FireRed-OpenStoryline: 4-phase narrative arc (HOOK -> BUILD -> DROP -> OUTRO)
+        planner = StorylinePlanner(drop_time=drop_t, total_duration=bs_result.duration)
+        print(planner.summary())
+        raw_segs = bs_result.get_cut_segments()
+        planned = planner.plan_from_beatsync(raw_segs)
+        segments = planner.to_segment_dicts(planned)
+
+        class _BeatGridCompat:
+            beat_times = bs_result.beat_times
+            duration = bs_result.duration
+            def get_cut_segments(self):
+                return segments
+
+        beat_grid = _BeatGridCompat()
+        print(
+            f"🎵 [BeatSync+OpenStoryline] BPM={bs_result.tempo:.1f} | "
+            f"{len(segments)} arc-planned cuts | Drop@{drop_t:.2f}s"
+        )
+    except Exception as _bs_err:
+        print(f"⚠️  [BeatSync] Falling back to legacy detector: {_bs_err}")
+        beat_grid = analyze_audio_beats(audio_path, target_duration=target_duration)
+        segments = beat_grid.get_cut_segments()
+        drop_t = max(0.5, beat_grid.drop_time)
+        print(f"🎵 Beat Grid: {len(segments)} scene cuts detected across {beat_grid.duration:.1f}s (Drop at {drop_t:.1f}s)")
     
     # 3. Clip Sourcing — 4-tier waterfall (Google Drive -> FreeStream -> BestMoments -> SmartDownloader)
     durations = [seg["duration"] for seg in segments]
@@ -212,6 +246,10 @@ def render_cinematic_edit(
             )
             clip_paths.extend(extra)
 
+    # ── Ultimate-AMV: Filter out static hold frames & deadframes ────────────
+    if len(clip_paths) > n_clips:
+        clip_paths = filter_action_packed_clips(clip_paths, min_action_score=0.20)
+
     # ── Normalise clip list to exactly n_clips ──────────────────────────────
     if len(clip_paths) > n_clips:
         clip_paths = clip_paths[:n_clips]
@@ -257,15 +295,19 @@ def render_cinematic_edit(
     concat_a_inputs = []
     
     # Build per-clip video filters with velocity curves, slow-mo & all cinematic VFX
+    # Segments from StorylinePlanner already carry arc-phase VFX flags directly
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
-        vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
+        if "add_rack_focus" in seg:
+            vel_profile = seg
+        else:
+            vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         
-        # Frame-accurate velocity filter + new cinematic VFX (DoF, shake, CA, bloom)
+        # Frame-accurate velocity filter + cinematic VFX (DoF, shake, CA, bloom)
         clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
             duration=seg["duration"],
-            speed=vel_profile["speed"],
-            scale_factor=vel_profile["scale_factor"],
+            speed=vel_profile.get("speed", 1.0),
+            scale_factor=vel_profile.get("scale_factor", 1.0),
             video_width=VIDEO_WIDTH,
             video_height=VIDEO_HEIGHT,
             fps=FPS,
