@@ -6,13 +6,14 @@ NO AI VOICE — real clip audio (original anime/movie sound) is featured through
 
 Clip Sourcing Priority (all FREE, no subscriptions):
   1. FreeStream: Anime sites (gogoanime/aniwatchtv) + VidSrc movie embeds via yt-dlp
-     (These sites are NOT blocked on GitHub Actions — only YouTube is)
   2. BestMoments: YouTube scenepack download + FFmpeg energy analysis fallback
   3. SmartDownloader: Archive.org + Pixabay/Pexels last-resort fallback
 
-Editing Engine:
-  OpenCut-inspired: xfade transitions, speed ramps, cinematic bars, audio fades.
-  All implemented in FFmpeg filtergraph.
+Editing Engine (upgraded with 3 open-source repos):
+  BeatSync-Engine  (Merserk)       : 6-stage HPSS beat analysis — kick/snare/hihat bands,
+                                     section-aware energy-wave cut density (intro 0.5 CPS → drop 4 CPS)
+  FireRed-OpenStoryline (FireRedTeam): HOOK→BUILD→DROP→OUTRO narrative arc with CPS targeting
+  Ultimate-AMV (ElishaPervez)      : audio-separator stem split for cleaner beat detection
 
 Phonk: Live trending August 2026 fetch via yt-dlp YouTube search.
 """
@@ -27,10 +28,9 @@ from config.settings import (
     VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS
 )
 from core.beat_detector import analyze_audio_beats, BeatGrid
-from core.beatsync_analyzer import analyze_audio_beatsync, BeatSyncResult
-from core.stem_separator import get_best_beat_source
-from core.storyline_planner import StorylinePlanner
-from core.deadframe_detector import filter_action_packed_clips
+from core.beatsync_analyzer import analyze_audio_beatsync       # BeatSync-Engine (Merserk)
+from core.storyline_planner import StorylinePlanner              # FireRed-OpenStoryline
+from core.stem_separator import get_best_beat_source             # Ultimate-AMV (ElishaPervez)
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
 from core.best_moments import fetch_best_episode_clips
@@ -114,7 +114,9 @@ def render_cinematic_edit(
     print(f"💬 Quote: \"{quote_text}\"")
     print(f"📌 Title: {title_text}")
     
-    # 2. Audio Sourcing, Ultimate-AMV Stem Separation & BeatSync-Engine Analysis
+    # 2. Audio Sourcing, Beat Analysis & Narrative Arc Planning
+    #    ┌─ BeatSync-Engine  : 6-stage HPSS beat analysis (Merserk/BeatSync-Engine)
+    #    └─ OpenStoryline    : HOOK→BUILD→DROP→OUTRO arc planner (FireRedTeam)
     if not audio_path or not Path(audio_path).exists():
         chosen_audio = get_random_or_specified_phonk(phonk_track)
         if chosen_audio and chosen_audio.exists():
@@ -124,39 +126,40 @@ def render_cinematic_edit(
             audio_path = SCRATCH_DIR / f"phonk_synth_{character_key}.aac"
             generate_fallback_phonk_audio(target_duration, audio_path)
 
-    # Ultimate-AMV Stem Separation: clean instrumental stem for beat tracking
+    # ── Ultimate-AMV Stem Separation: get clean instrumental for beat detection ──
     beat_source = get_best_beat_source(audio_path, SCRATCH_DIR)
     if beat_source != audio_path:
-        print(f"🎛️  [Ultimate-AMV] Clean instrumental stem isolated for beat detection: {beat_source.name}")
+        print(f"🔀 [Ultimate-AMV] Beat detection on clean instrumental stem: {beat_source.name}")
 
-    # BeatSync-Engine: 6-stage HPSS + section-aware cut density
+    # ── BeatSync-Engine: 6-stage HPSS + section-aware cut density ──────────
     try:
         bs_result = analyze_audio_beatsync(beat_source, target_duration=target_duration)
-        drop_t = max(0.5, bs_result.drop_time)
+        drop_t    = max(0.5, bs_result.drop_time)
 
-        # FireRed-OpenStoryline: 4-phase narrative arc (HOOK -> BUILD -> DROP -> OUTRO)
-        planner = StorylinePlanner(drop_time=drop_t, total_duration=bs_result.duration)
+        # ── OpenStoryline: HOOK/BUILD/DROP/OUTRO narrative arc ──────────────
+        planner  = StorylinePlanner(drop_time=drop_t, total_duration=bs_result.duration)
         print(planner.summary())
         raw_segs = bs_result.get_cut_segments()
-        planned = planner.plan_from_beatsync(raw_segs)
+        planned  = planner.plan_from_beatsync(raw_segs)
         segments = planner.to_segment_dicts(planned)
 
+        # Build a BeatGrid-compatible object for downstream subtitle/flash use
         class _BeatGridCompat:
             beat_times = bs_result.beat_times
-            duration = bs_result.duration
-            def get_cut_segments(self):
-                return segments
-
+            duration   = bs_result.duration
+            def get_cut_segments(self): return segments
         beat_grid = _BeatGridCompat()
+
         print(
             f"🎵 [BeatSync+OpenStoryline] BPM={bs_result.tempo:.1f} | "
             f"{len(segments)} arc-planned cuts | Drop@{drop_t:.2f}s"
         )
     except Exception as _bs_err:
+        # Graceful fallback to existing detector
         print(f"⚠️  [BeatSync] Falling back to legacy detector: {_bs_err}")
         beat_grid = analyze_audio_beats(audio_path, target_duration=target_duration)
-        segments = beat_grid.get_cut_segments()
-        drop_t = max(0.5, beat_grid.drop_time)
+        segments  = beat_grid.get_cut_segments()
+        drop_t    = max(0.5, beat_grid.drop_time)
         print(f"🎵 Beat Grid: {len(segments)} scene cuts detected across {beat_grid.duration:.1f}s (Drop at {drop_t:.1f}s)")
     
     # 3. Clip Sourcing — 4-tier waterfall (Google Drive -> FreeStream -> BestMoments -> SmartDownloader)
@@ -169,8 +172,7 @@ def render_cinematic_edit(
     clip_paths = []
 
     # ── TIER 0: Google Drive Personal Uploads (Raw 1080p/4K Movies & Series) ──
-    default_gdrive = "https://drive.google.com/drive/folders/1KVDf7fuvaZyitvOKF48WLakV-aoFAIPW"
-    gdrive_target = gdrive_folder or os.environ.get("GDRIVE_FOLDER_URL") or os.environ.get("GDRIVE_URL") or default_gdrive
+    gdrive_target = gdrive_folder or os.environ.get("GDRIVE_FOLDER_URL") or os.environ.get("GDRIVE_URL")
     if gdrive_target:
         print(f"📥 [GoogleDrive] Fetching uncompressed footage from Google Drive for '{character_key}'...")
         try:
@@ -246,10 +248,6 @@ def render_cinematic_edit(
             )
             clip_paths.extend(extra)
 
-    # ── Ultimate-AMV: Filter out static hold frames & deadframes ────────────
-    if len(clip_paths) > n_clips:
-        clip_paths = filter_action_packed_clips(clip_paths, min_action_score=0.20)
-
     # ── Normalise clip list to exactly n_clips ──────────────────────────────
     if len(clip_paths) > n_clips:
         clip_paths = clip_paths[:n_clips]
@@ -295,18 +293,20 @@ def render_cinematic_edit(
     concat_a_inputs = []
     
     # Build per-clip video filters with velocity curves, slow-mo & all cinematic VFX
-    # Segments from StorylinePlanner already carry arc-phase VFX flags directly
+    # Segments from StorylinePlanner already carry arc-phase VFX flags directly;
+    # fall back to get_segment_velocity_profile for legacy BeatGrid segments.
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
+        # Prefer arc-phase flags embedded by StorylinePlanner; else derive from effects_engine
         if "add_rack_focus" in seg:
-            vel_profile = seg
+            vel_profile = seg   # OpenStoryline already planned VFX
         else:
             vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
-        
-        # Frame-accurate velocity filter + cinematic VFX (DoF, shake, CA, bloom)
+
+        # Frame-accurate velocity filter + cinematic VFX
         clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
             duration=seg["duration"],
-            speed=vel_profile.get("speed", 1.0),
+            speed=vel_profile.get("speed", vel_profile.get("speed", 1.0)),
             scale_factor=vel_profile.get("scale_factor", 1.0),
             video_width=VIDEO_WIDTH,
             video_height=VIDEO_HEIGHT,
@@ -357,45 +357,32 @@ def render_cinematic_edit(
         sub_filter = ""
     
     # Video Post-processing (Concatenated + Flash + CC)
-    post_v = []
-    if flash_str and flash_str != "null":
-        post_v.append(flash_str)
-    if cc_filter:
-        post_v.append(cc_filter)
-    if sub_filter:
-        post_v.append(sub_filter.lstrip(","))
-    
-    post_v_str = ",".join(post_v) if post_v else "null"
-    filter_chains.append(f"[concatenated_v]{post_v_str}[vout]")
+    filter_chains.append(f"[concatenated_v]{flash_str},{cc_filter}{sub_filter}[vout]")
     
     # Audio Dynamic Structure:
     # 70% Phonk BGM / 30% Original Anime/Movie Voice & SFX
-    filter_chains.append(f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in]")
-    filter_chains.append(f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=0.30[csfx_intro]")
-    filter_chains.append(f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.50[csfx_drop]")
-    filter_chains.append(f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full]")
-    filter_chains.append(f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in]")
-    filter_chains.append(f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=1000,volume=0.45[p_intro]")
-    filter_chains.append(f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.35[p_drop]")
-    filter_chains.append(f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic]")
+    # Track 1: Real clip audio (Voice/SFX) — 30% weight
+    # Track 2: Phonk BGM (Aura Phonk) — 70% weight
+    # Master: loudnorm to -12 dB (commercial streaming loudness)
     filter_chains.append(
+        f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in];"
+        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=0.30[csfx_intro];"
+        f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.50[csfx_drop];"
+        f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full];"
+        f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
+        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=1000,volume=0.45[p_intro];"
+        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.35[p_drop];"
+        f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
         f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:weights=7 3:dropout_transition=2,"
         f"volume=1.30,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"
     )
     
-    clean_chains = [c.strip().strip(";") for c in filter_chains if c and c.strip()]
-    full_filter_complex = ";\n".join(clean_chains)
-    
-    # Write filtergraph to script file to avoid Linux CLI argument overflow with 50+ inputs
-    filter_script_path = SCRATCH_DIR / f"filtergraph_{character_key}.txt"
-    filter_script_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(filter_script_path, "w", encoding="utf-8") as f:
-        f.write(full_filter_complex)
+    full_filter_complex = ";".join(filter_chains)
     
     cmd = [
         "ffmpeg", "-y",
         *cmd_inputs,
-        "-filter_complex_script", str(filter_script_path),
+        "-filter_complex", full_filter_complex,
         "-map", "[vout]",
         "-map", "[aout]",
         "-c:v", "libx264",

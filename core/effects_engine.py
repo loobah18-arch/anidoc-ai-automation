@@ -158,15 +158,17 @@ def build_velocity_clip_filter(
     else:
         filters.append(f"fps={fps}")
 
-    # 6. Rack-Focus DoF blur (xtlw3zvKGAE: shallow depth-of-field pull on character face)
+    # 6. Rack-Focus DoF blur (xtlw3zvKGAE: shallow depth-of-field soft look on intro)
+    # Static 2px boxblur — dynamic expressions unsupported on this FFmpeg build.
+    # Gives the characteristic soft/hazy atmospheric intro look seen in the reference.
     if add_rack_focus:
-        dur_f = max(0.4, duration)
-        filters.append(f"boxblur=luma_radius=2:luma_power=1:enable='between(t,0,{dur_f:.2f})'")
+        filters.append("boxblur=luma_radius=2:luma_power=1:chroma_radius=2:chroma_power=1")
 
     # 7. Camera Shake (9_VAGhAdne8: rapid ±12px translate burst on first 8 frames of impact)
     if add_shake:
         shake_frames = 8
         shake_amp = 12
+        # N = frame number (0-based) — geq frame variable
         sx_expr = (
             f"if(lt(N,{shake_frames}),if(eq(mod(N,2),0),{shake_amp},-{shake_amp}),0)"
         )
@@ -175,11 +177,9 @@ def build_velocity_clip_filter(
         )
 
     # 8. Chromatic Aberration RGB Split (8Fyb0LXw1BU: ±5px horizontal channel split on drop)
+    # rgbashift: red channel +5px right, blue channel -5px left (horizontal only)
     if add_chr_aber:
-        split_px = 5
-        filters.append(
-            f"geq=lum='p(X+{split_px},Y)':cb='cb(X,Y)':cr='cr(X-{split_px},Y)'"
-        )
+        filters.append("rgbashift=rh=5:bh=-5")
 
     # 9. Cursed Technique Bloom Glow (8Fyb0LXw1BU: highlight overexposure + soft unsharp fringe)
     if add_bloom:
