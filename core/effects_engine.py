@@ -181,15 +181,16 @@ def build_velocity_clip_filter(
             f"cr='cr(X+if(lte(N,1),{whip_offset}*(1-N),0),Y)'"
         )
 
-    # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: rapid ±14px multi-directional translate burst)
+    # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: multi-harmonic exponential decay shake)
     if add_shake:
-        shake_frames = 8
-        shake_amp = 14
+        shake_frames = 10
+        shake_amp = 16
+        # Multi-harmonic exponential decay: explosive instant punch on frame 0, organic damping over 10 frames
         sx_expr = (
-            f"if(lt(N,{shake_frames}),if(eq(mod(N,2),0),{shake_amp}*(1-N/{shake_frames}),-{shake_amp}*(1-N/{shake_frames})),0)"
+            f"if(lt(N,{shake_frames}),{shake_amp}*sin(N*2.2)*exp(-0.30*N),0)"
         )
         sy_expr = (
-            f"if(lt(N,{shake_frames}),if(eq(mod(N,3),0),{shake_amp//2}*(1-N/{shake_frames}),-{shake_amp//2}*(1-N/{shake_frames})),0)"
+            f"if(lt(N,{shake_frames}),{shake_amp//2}*cos(N*3.1)*exp(-0.30*N),0)"
         )
         filters.append(
             f"geq=lum='p(X+({sx_expr}),Y+({sy_expr}))':cb='cb(X+({sx_expr}),Y+({sy_expr}))':cr='cr(X+({sx_expr}),Y+({sy_expr}))'"
