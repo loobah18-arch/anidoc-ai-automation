@@ -420,7 +420,7 @@ def render_cinematic_edit(
     cmd = [
         "ffmpeg", "-y",
         *cmd_inputs,
-        "-/filter_complex", str(filter_script_path),
+        "-filter_complex_script", str(filter_script_path),
         "-map", "[vout]",
         "-map", "[aout]",
         "-c:v", "libx264",
