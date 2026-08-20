@@ -147,10 +147,11 @@ def build_velocity_clip_filter(
     # 3. Velocity ramp
     filters.append(f"setpts={pts_mult:.4f}*PTS")
 
-    # 4. Twixtor-style motion-compensated interpolation + frame-blend on slow-mo (< 0.70x)
+    # 4. Twixtor-style motion-compensated optical-flow interpolation on slow-mo (< 0.70x)
     if speed < 0.70:
-        filters.append(f"minterpolate=fps={fps}:mi_mode=mci:mc_mode=aobmc:vsbmc=1")
-        filters.append("tblend=all_mode=average")
+        filters.append(
+            f"minterpolate=fps={fps}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:me=epzs:search_param=32:vsbmc=1:scd=fdiff:scd_threshold=10.0"
+        )
 
     # 5. Animated Dynamic Zoom Punch (smooth exponential ease-down over 14 frames)
     if scale_factor > 1.05:
