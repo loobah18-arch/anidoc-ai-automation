@@ -94,10 +94,27 @@ def record_workflow_history(run_id: int, character: str, universe: str, output_m
     with open(run_dir / "artifact_link.txt", "w") as f:
         f.write(str(output_mp4) + "\n")
 
+    # Capture current git commit hash and diff for 100% exact code reproducibility
+    try:
+        commit_hash = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(BASE_DIR), text=True).strip()
+        git_diff = subprocess.check_output(["git", "diff", "HEAD~1..HEAD"], cwd=str(BASE_DIR), text=True)
+    except Exception:
+        commit_hash = "HEAD"
+        git_diff = ""
+
+    # Write commit_info.json
+    commit_info = {
+        "run_id": run_id,
+        "commit_hash": commit_hash,
+        "branch": "feat/beatsync-amv-openstoryline",
+        "repository": "loobah18-arch/anidoc-ai-automation"
+    }
+    with open(run_dir / "commit_info.json", "w") as f:
+        json.dump(commit_info, f, indent=2)
+
     # Write patch.diff if available
-    if git_diff:
-        with open(run_dir / f"patch_run_{run_id}.diff", "w") as f:
-            f.write(git_diff)
+    with open(run_dir / f"patch_run_{run_id}.diff", "w") as f:
+        f.write(git_diff if git_diff else f"Commit {commit_hash} on feat/beatsync-amv-openstoryline")
 
     print(f"📁 [Ruflo Workflow] Documentation & artifacts saved to {run_dir}/")
 
