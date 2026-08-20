@@ -14,6 +14,12 @@ temp/
 /*.jpg
 /*.png
 
+# Node / Remotion editor ignores
+node_modules/
+studio/remotion_editor/node_modules/
+studio/remotion_editor/dist/
+studio/remotion_editor/out/
+
 # Ensure assets are tracked
 !assets/
 !assets/**
