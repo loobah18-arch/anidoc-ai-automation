@@ -196,13 +196,15 @@ def build_velocity_clip_filter(
             f"geq=lum='p(X+({sx_expr}),Y+({sy_expr}))':cb='cb(X+({sx_expr}),Y+({sy_expr}))':cr='cr(X+({sx_expr}),Y+({sy_expr}))'"
         )
 
-    # 8. Chromatic Aberration RGB Split (8Fyb0LXw1BU: dynamic decaying horizontal channel split on drop)
+    # 8. Multi-Harmonic Chromatic Dispersion RGB Split (Boris FX Sapphire / 8Fyb0LXw1BU style)
     if add_chr_aber:
         split_frames = 10
-        split_amp = 6
-        split_expr = f"if(lt(N,{split_frames}),{split_amp}*(1-N/{split_frames}),0)"
+        split_amp = 8
+        # Multi-plane optical dispersion: instant explosive color refraction decaying with exponential damping
+        split_x = f"if(lt(N,{split_frames}),{split_amp}*cos(N*1.8)*exp(-0.32*N),0)"
+        split_y = f"if(lt(N,{split_frames}),{split_amp//2}*sin(N*2.4)*exp(-0.32*N),0)"
         filters.append(
-            f"geq=lum='p(X+({split_expr}),Y)':cb='cb(X,Y)':cr='cr(X-({split_expr}),Y)'"
+            f"geq=lum='p(X+({split_x}),Y+({split_y}))':cb='cb(X,Y)':cr='cr(X-({split_x}),Y-({split_y}))'"
         )
 
     # 9. Cursed Technique Bloom Glow (8Fyb0LXw1BU: highlight overexposure + soft unsharp fringe)
@@ -239,19 +241,41 @@ def build_velocity_clip_filter(
 def build_cc_filter(
     preset_name: str = "marvel_hdr",
     with_flicker: bool = False,
-    drop_time: float = 0.0
+    drop_time: float = 0.0,
+    dynamic_mood_shift: bool = True
 ) -> str:
     """
     Builds the 4K HDR Color Grade filtergraph snippet.
+    Dynamic Mood Shift:
+      - Pre-drop (t < drop_time): Moody desaturation (0.72x) + subtle contrast pull for tense atmosphere
+      - Drop & Climax (t >= drop_time): Hyper-vibrant color explosion (1.20x saturation) + punchy HDR contrast
     Adds xtlw3zvKGAE-style light flicker: sinusoidal brightness oscillation at 3Hz
     in the 2 seconds immediately before the beat drop.
     Adds fine film grain (noise) to eliminate flat digital gradients and provide texture.
     """
     cfg = CC_PRESETS.get(preset_name, CC_PRESETS["marvel_hdr"])
-    eq_part = (
-        f"eq=contrast={cfg['contrast']}:brightness={cfg['brightness']}"
-        f":saturation={cfg['saturation']}:gamma={cfg['gamma']}"
-    )
+
+    if dynamic_mood_shift and drop_time > 0.8:
+        # Pre-drop desaturated cinematic grade -> Drop neon color explosion
+        sat_expr = (
+            f"'if(lt(t,{drop_time:.2f}),{cfg['saturation']*0.72:.2f},{cfg['saturation']*1.20:.2f})'"
+        )
+        con_expr = (
+            f"'if(lt(t,{drop_time:.2f}),{cfg['contrast']*0.94:.2f},{cfg['contrast']*1.06:.2f})'"
+        )
+        gam_expr = (
+            f"'if(lt(t,{drop_time:.2f}),{cfg['gamma']*1.04:.2f},{cfg['gamma']*0.96:.2f})'"
+        )
+        eq_part = (
+            f"eq=contrast={con_expr}:brightness={cfg['brightness']}"
+            f":saturation={sat_expr}:gamma={gam_expr}:eval=frame"
+        )
+    else:
+        eq_part = (
+            f"eq=contrast={cfg['contrast']}:brightness={cfg['brightness']}"
+            f":saturation={cfg['saturation']}:gamma={cfg['gamma']}"
+        )
+
     unsharp_part = f"unsharp={cfg['unsharp']}"
     levels_part = "colorlevels=rimin=0.03:gimin=0.03:bimin=0.03:rimax=0.98:gimax=0.98:bimax=0.98"
     grain_part = "noise=alls=5:allf=t+u"
@@ -262,12 +286,12 @@ def build_cc_filter(
         flicker_end = drop_time
         flicker_eq = (
             f",eq=brightness='if(between(t,{flicker_start:.2f},{flicker_end:.2f}),"
-            f"sin(t*6.28*3)*0.08,0)'"
+            f"sin(t*6.28*3)*0.08,0)':eval=frame"
         )
         base_vig = cfg['vignette']
         vignette_part = (
             f"vignette='if(between(t,{flicker_start:.2f},{flicker_end:.2f}),"
-            f"{base_vig}+sin(t*6.28*2)*0.06,{base_vig})'"
+            f"{base_vig}+sin(t*6.28*2)*0.06,{base_vig})':eval=frame"
         )
     else:
         flicker_eq = ""
