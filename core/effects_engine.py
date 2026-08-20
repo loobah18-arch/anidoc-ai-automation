@@ -62,13 +62,14 @@ def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: 
         return {
             "role": "drop_snap",
             "speed": 1.50,
-            "scale_factor": 1.20,
+            "scale_factor": 1.25,
             "add_bars": False,
             "add_rack_focus": False,
             "add_shake": True,
             "add_chr_aber": True,
             "add_bloom": False,
             "add_flash": True,
+            "add_exposure_pulse": True,
         }
 
     if duration > 0.80:
@@ -259,7 +260,7 @@ def build_cc_filter(
     if dynamic_mood_shift and drop_time > 0.8:
         # Pre-drop desaturated cinematic grade -> Drop neon color explosion
         sat_expr = (
-            f"'if(lt(t,{drop_time:.2f}),{cfg['saturation']*0.72:.2f},{cfg['saturation']*1.20:.2f})'"
+            f"'if(lt(t,{drop_time:.2f}),{cfg['saturation']*0.72:.2f},{cfg['saturation']*1.28:.2f})'"
         )
         con_expr = (
             f"'if(lt(t,{drop_time:.2f}),{cfg['contrast']*0.94:.2f},{cfg['contrast']*1.06:.2f})'"
