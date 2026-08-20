@@ -15,11 +15,13 @@ from typing import Dict, Any
 BASE_DIR = Path(__file__).resolve().parent.parent
 HISTORY_DIR = Path("/sdcard/Download/anidoc_workflow_history")
 DOWNLOADS_DIR = Path("/sdcard/Download")
+WORKFLOW_DIR = Path("/sdcard/Download/workflow")
 
 def ensure_history_dir(run_id: int) -> Path:
     run_dir = HISTORY_DIR / f"workflow_{run_id}"
     run_dir.mkdir(parents=True, exist_ok=True)
     DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    WORKFLOW_DIR.mkdir(parents=True, exist_ok=True)
     return run_dir
 
 def run_ruflo_swarm_evaluation(run_id: int, character: str, universe: str) -> Dict[str, Any]:
@@ -89,6 +91,16 @@ def record_workflow_history(run_id: int, character: str, universe: str, output_m
     # Write eval_report.json
     with open(run_dir / "eval_report.json", "w") as f:
         json.dump(eval_report, f, indent=2)
+
+    # Copy output video to /sdcard/Download/workflow/ as requested
+    try:
+        if output_mp4.exists():
+            dest_wf = WORKFLOW_DIR / output_mp4.name
+            if output_mp4 != dest_wf:
+                import shutil
+                shutil.copy2(output_mp4, dest_wf)
+    except Exception:
+        pass
 
     # Write artifact_link.txt
     with open(run_dir / "artifact_link.txt", "w") as f:
