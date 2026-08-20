@@ -50,6 +50,7 @@ def main():
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
     parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts (default: False, saves to Download folder)")
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
+    parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
     parser.add_argument("--remotion-config", type=str, default="studio/remotion_editor/src/editor-state.json", help="Path to Remotion editor state JSON with visual layout & text overrides")
     parser.add_argument("--studio", action="store_true", help="Launch the AniDoc Studio Web Video Editing Software")
     parser.add_argument("--port", type=int, default=7860, help="Port for AniDoc Studio server (default: 7860)")
