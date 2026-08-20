@@ -399,9 +399,9 @@ def render_cinematic_edit(
     filter_chains.append(f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in]")
     filter_chains.append(
         f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,"
-        f"lowpass=f=1200,volume='if(gte(t,{notch_start:.2f}),0.0,0.48)':eval=frame[p_intro]"
+        f"lowpass=f=400,volume='if(gte(t,{notch_start:.2f}),0.0,0.45)':eval=frame[p_intro]"
     )
-    filter_chains.append(f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.35[p_drop]")
+    filter_chains.append(f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.45[p_drop]")
     filter_chains.append(f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic]")
     filter_chains.append(
         f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:weights=7 3:dropout_transition=2,"
@@ -420,7 +420,7 @@ def render_cinematic_edit(
     cmd = [
         "ffmpeg", "-y",
         *cmd_inputs,
-        "-filter_complex_script", str(filter_script_path),
+        "-/filter_complex", str(filter_script_path),
         "-map", "[vout]",
         "-map", "[aout]",
         "-c:v", "libx264",
