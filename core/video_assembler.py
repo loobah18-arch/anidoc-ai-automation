@@ -103,9 +103,22 @@ def render_cinematic_edit(
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
-    print(f"\n🎬 [VideoAssembler] Starting 4K Edit for: {theme['name']} ({theme['universe'].upper()})")
-    
-    # 1. Generate Metadata & Quotes
+    # 1. Load Remotion Visual Editor overrides if available
+    rem_config_file = Path(__file__).resolve().parent.parent / "studio" / "remotion_editor" / "src" / "editor-state.json"
+    if rem_config_file.exists():
+        try:
+            with open(rem_config_file, "r") as f:
+                rem_data = json.load(f)
+            text_overrides = rem_data.get("textOverrides", {})
+            if text_overrides.get("quote"):
+                custom_quote = text_overrides["quote"]
+            if text_overrides.get("title"):
+                custom_title = text_overrides["title"]
+            print(f"🎨 [RemotionEditor] Applied visual editor overrides from {rem_config_file.name}")
+        except Exception as e:
+            pass
+
+    # 2. Generate Metadata & Quotes
     metadata = generate_edit_metadata(character_key)
     quote_text = custom_quote or metadata["quote"]
     title_text = custom_title or metadata["title"]
