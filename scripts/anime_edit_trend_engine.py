@@ -37,10 +37,29 @@ REVERSE_ENGINEERED_STYLES = {
     }
 }
 
-def search_trending_anime_edits(query: str = "anime edit phonk 4k shorts", limit: int = 3) -> List[Dict[str, Any]]:
+import random
+
+SEARCH_QUERIES = [
+    "Jujutsu Kaisen 4K Phonk Edit Shorts",
+    "Demon Slayer Sakuga Beat Sync AMV Shorts",
+    "Solo Leveling Badass Edit TikTok",
+    "Chainsaw Man Velocity Edit 60FPS",
+    "Attack on Titan Levi Action Edit Phonk",
+    "Bleach Bankai 4K Edit AMV",
+    "Naruto Kakashi Phonk Beat Sync",
+    "Dragon Ball Super Ultra Instinct Edit 4K",
+    "One Piece Gear 5 Phonk Edit 4K",
+    "Hunter x Hunter Netero Badass Edit",
+    "Mob Psycho 100 Sakuga Edit Shorts"
+]
+
+def search_trending_anime_edits(query: str = None, limit: int = 4) -> List[Dict[str, Any]]:
     """
-    Uses yt-dlp to search and fetch metadata for top trending anime edits.
+    Uses yt-dlp to search and fetch metadata for top trending anime edits across rotating categories.
     """
+    if not query:
+        query = random.choice(SEARCH_QUERIES)
+        
     print(f"🔍 [TrendEngine] Searching trending anime edits for: '{query}'...")
     cmd = [
         "yt-dlp",
