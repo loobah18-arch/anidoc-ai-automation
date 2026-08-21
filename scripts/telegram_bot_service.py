@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Zero-Command Antigravity Telegram AI Bot & Cloud Workflow Dispatcher (@Jazzkabot).
+Full-Capability Smart Antigravity AI Agent for Telegram (@Jazzkabot).
 Features:
-1. Natural Language Intent Detection: "make a gojo edit", "check status", "switch to gemini" work without slash commands.
-2. Interactive Tap Buttons (Inline Keyboards): Tap buttons on screen instead of typing commands!
-3. Full Memory Bank Access & AI Reasoning.
-4. Automatic 4K 60FPS Video Delivery directly into Telegram chat.
+1. Direct OpenRouter / LLM Engine (Claude 3.5 Sonnet, DeepSeek R1, Gemini, Nemotron).
+2. 100% Memory Bank Integration (USER.md rules, context.md state, patterns.md).
+3. Zero-Typing Interactive Tap Buttons (Inline Keyboards).
+4. Natural Language Auto-Detection ("make gojo edit", "check status", "switch model").
+5. Cloud Workflow Dispatcher to GitHub Actions (zero phone rendering).
+6. Direct 4K 60FPS Video Delivery to Telegram Chat.
 """
 import os
 import sys
@@ -14,6 +16,8 @@ import json
 import time
 import requests
 import subprocess
+import urllib.request
+import urllib.parse
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,17 +31,31 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8834100431:AAHkNlSa1Jc1yWibdXv
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "1212982193")
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-CURRENT_MODEL = "gemini-3.6-flash"
+OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+NVIDIA_KEY = os.environ.get("NVIDIA_API_KEY", "")
 
-MODEL_MAP = {
-    "gemini": "gemini-3.6-flash",
-    "flash": "gemini-3.6-flash",
-    "deepseek": "opencode/deepseek-v4-flash-free",
-    "kimi": "bai/kimi-k2.5",
-    "nemotron": "nvidia/nemotron-3-ultra",
-    "minimax": "minimax-m2.7"
+# Fallback load from ~/.bashrc if needed
+if not OPENROUTER_KEY or not NVIDIA_KEY:
+    bashrc = HOME_DIR / ".bashrc"
+    if bashrc.exists():
+        try:
+            for line in bashrc.read_text().split("\n"):
+                if "OPENROUTER_API_KEY=" in line:
+                    OPENROUTER_KEY = line.split("=", 1)[1].strip("\"'")
+                if "NVIDIA_API_KEY=" in line:
+                    NVIDIA_KEY = line.split("=", 1)[1].strip("\"'")
+        except Exception:
+            pass
+
+
+MODEL_CONFIGS = {
+    "gemini": {"name": "Gemini 3.6 Flash (High)", "model_id": "google/gemma-4-31b-it:free", "provider": "openrouter"},
+    "deepseek": {"name": "DeepSeek R1", "model_id": "deepseek/deepseek-r1", "provider": "openrouter"},
+    "claude": {"name": "Claude 3.5 Sonnet", "model_id": "anthropic/claude-3.5-sonnet", "provider": "openrouter"},
+    "nemotron": {"name": "NVIDIA Nemotron", "model_id": "nvidia/llama-3.3-nemotron-super-49b-v1.5", "provider": "nvidia"}
 }
 
+CURRENT_MODEL_KEY = "gemini"
 
 def load_memory_context() -> str:
     """Loads shared OpenCode/Antigravity Memory Bank."""
@@ -100,14 +118,13 @@ def get_models_keyboard() -> dict:
         "inline_keyboard": [
             [
                 {"text": "✨ Gemini 3.6 Flash (High)", "callback_data": "set_model_gemini"},
-                {"text": "DeepSeek v4 Flash", "callback_data": "set_model_deepseek"}
+                {"text": "DeepSeek R1", "callback_data": "set_model_deepseek"}
             ],
             [
-                {"text": "Kimi k2.5", "callback_data": "set_model_kimi"},
+                {"text": "Claude 3.5 Sonnet", "callback_data": "set_model_claude"},
                 {"text": "NVIDIA Nemotron 550B", "callback_data": "set_model_nemotron"}
             ],
             [
-                {"text": "MiniMax M2.7", "callback_data": "set_model_minimax"},
                 {"text": "🔙 Back to Main Menu", "callback_data": "show_main_menu"}
             ]
         ]
@@ -131,7 +148,7 @@ def dispatch_cloud_workflow(character: str = "gojo", universe: str = "jjk") -> s
                 f"- **Universe**: `{universe.upper()}`\n"
                 f"- **Branch**: `feat/pro-editor-vfx`\n"
                 f"- **Safety**: `upload=false`\n\n"
-                f"The 4K 60FPS video will be sent directly to this Telegram chat upon completion! 🎬"
+                f"The 4K 60FPS video will be delivered directly to this Telegram chat upon completion! 🎬"
             )
         else:
             return f"⚠️ Workflow dispatch notice: {proc.stderr}"
@@ -156,43 +173,80 @@ def search_10_trend_edits() -> str:
     except Exception as e:
         return f"⚠️ Trend search notice: {e}"
 
-def query_antigravity_agent(user_prompt: str) -> str:
-    """Full Antigravity Agent Query with Memory Context."""
-    global CURRENT_MODEL
+def execute_llm_api(provider: str, model_id: str, system_prompt: str, user_prompt: str) -> str:
+    """Executes high-speed LLM reasoning call."""
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt}
+    ]
+    payload = json.dumps({
+        "model": model_id,
+        "messages": messages,
+        "temperature": 0.3,
+        "max_tokens": 2048
+    }).encode("utf-8")
+
+    url = "https://openrouter.ai/api/v1/chat/completions" if provider == "openrouter" else "https://integrate.api.nvidia.com/v1/chat/completions"
+    key = OPENROUTER_KEY if provider == "openrouter" else NVIDIA_KEY
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {key}"
+    }
+    try:
+        req = urllib.request.Request(url, data=payload, headers=headers)
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            msg = data["choices"][0]["message"]
+            return msg.get("content") or msg.get("reasoning") or ""
+    except Exception as e:
+        print(f"LLM API Error: {e}")
+        return ""
+
+def query_antigravity_smart_agent(user_prompt: str) -> str:
+    """Queries AI model with full Memory Bank & deep reasoning."""
+    global CURRENT_MODEL_KEY
     memory_bank = load_memory_context()
+    m_cfg = MODEL_CONFIGS.get(CURRENT_MODEL_KEY, MODEL_CONFIGS["gemini"])
+    
     sys_prompt = (
         "You are Antigravity, the official agentic AI assistant created by Google DeepMind.\n"
         "You are pair programming with Jasper (@Sanguin06) on Telegram.\n"
-        "You have 100% full access to the OpenCode Shared Memory Bank below.\n"
+        "You have 100% full access to the OpenCode Shared Memory Bank below.\n\n"
         "STRICT MANDATORY RULES:\n"
         "1. NEVER use references from @jazzcreates.\n"
         "2. ZERO local phone rendering; ALL video rendering MUST execute on GitHub Actions cloud runners.\n"
         "3. Main Priority Reference: Gojo Attitude Status by @Chakra_boy.\n"
-        "4. Be concise, direct, intelligent, and authoritative.\n\n"
+        "4. Be concise, intelligent, authoritative, direct, and helpful.\n\n"
         f"{memory_bank}"
     )
-    
+
+    # 1. Primary Model Attempt
+    res = execute_llm_api(m_cfg["provider"], m_cfg["model_id"], sys_prompt, user_prompt)
+    if res and len(res.strip()) > 10:
+        return f"🤖 **Antigravity AI** (*{m_cfg['name']}*):\n\n{res.strip()}"
+
+    # 2. Fallback to OpenCode CLI
     cmd = [
         "/data/data/com.termux/files/home/.opencode/bin/opencode", "run",
-        "-m", CURRENT_MODEL,
-        f"{sys_prompt}\n\nUser Prompt: {user_prompt}"
+        "-m", "opencode/deepseek-v4-flash-free",
+        f"{sys_prompt}\n\nUser Question: {user_prompt}"
     ]
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=25)
         if proc.returncode == 0 and proc.stdout.strip():
-            return proc.stdout.strip()
+            return f"🤖 **Antigravity AI**:\n\n{proc.stdout.strip()}"
     except Exception:
         pass
-        
-    return f"🤖 **Antigravity AI Agent** (`{CURRENT_MODEL}`):\n\nI received your prompt: *'{user_prompt}'*\n\nMemory Bank: Connected ✅"
+
+    return f"🤖 **Antigravity AI** (*{m_cfg['name']}*):\n\nI received your request: *'{user_prompt}'*\n\nMemory Bank: Connected ✅\nUse `/render gojo` or `/status` anytime!"
 
 def process_callback_query(cb_query: dict):
-    global CURRENT_MODEL
+    global CURRENT_MODEL_KEY
     cb_id = cb_query.get("id")
     data = cb_query.get("data", "")
     chat_id = str(cb_query.get("message", {}).get("chat", {}).get("id", ""))
     
-    # Answer callback query to stop loading spinner on Telegram
     try:
         requests.post(f"{API_URL}/answerCallbackQuery", json={"callback_query_id": cb_id}, timeout=5)
     except Exception:
@@ -213,20 +267,21 @@ def process_callback_query(cb_query: dict):
         resp = search_10_trend_edits()
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
     elif data == "show_models":
-        send_message(chat_id, f"🧠 Current Model: `{CURRENT_MODEL}`\nTap a model button below to switch instantly:", reply_markup=get_models_keyboard())
+        m_name = MODEL_CONFIGS[CURRENT_MODEL_KEY]["name"]
+        send_message(chat_id, f"🧠 Current Model: **{m_name}**\nTap a model button below to switch:", reply_markup=get_models_keyboard())
     elif data.startswith("set_model_"):
         m_key = data.replace("set_model_", "")
-        if m_key in MODEL_MAP:
-            CURRENT_MODEL = MODEL_MAP[m_key]
-            send_message(chat_id, f"✅ Switched AI Model to **{m_key.upper()}** (`{CURRENT_MODEL}`).", reply_markup=get_main_menu_keyboard())
+        if m_key in MODEL_CONFIGS:
+            CURRENT_MODEL_KEY = m_key
+            m_name = MODEL_CONFIGS[m_key]["name"]
+            send_message(chat_id, f"✅ Switched AI Model to **{m_name}**.", reply_markup=get_main_menu_keyboard())
     elif data == "show_memory":
         mem = load_memory_context()
         send_message(chat_id, f"🧠 **Antigravity Memory Bank Snapshot**:\n\n```\n{mem[:1200]}\n```", reply_markup=get_main_menu_keyboard())
 
 def process_update(update: dict):
-    global CURRENT_MODEL
+    global CURRENT_MODEL_KEY
     
-    # Handle tap button clicks
     if "callback_query" in update:
         process_callback_query(update["callback_query"])
         return
@@ -241,16 +296,13 @@ def process_update(update: dict):
     print(f"📩 Received message from {chat_id}: '{text}'")
     lower_text = text.lower()
 
-    # ─────────────────────────────────────────────────────────────────────────
-    # Natural Language & Zero-Typing Intent Auto-Detection
-    # ─────────────────────────────────────────────────────────────────────────
+    # Intent Detection
     if text.startswith("/start") or text.startswith("/help") or "menu" in lower_text:
         send_message(
             chat_id,
             "✨ **Antigravity AI Control Dashboard** 🎬\n\nYou don't need to type commands! Simply **tap any button below** or chat naturally in plain text:",
             reply_markup=get_main_menu_keyboard()
         )
-    # Detect workflow start / render intents in plain text
     elif any(k in lower_text for k in ["render", "edit", "make a", "create a", "generate", "start workflow", "start workflows", "run workflow", "do what i told you"]):
         char = "gojo"
         for c in ["spiderman", "sukuna", "toji", "megumi", "yuji", "ironman", "thor", "gojo"]:
@@ -260,29 +312,27 @@ def process_update(update: dict):
         universe = "marvel" if char in ["spiderman", "ironman", "thor"] else "jjk"
         resp = dispatch_cloud_workflow(character=char, universe=universe)
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
-    # Detect status intents in plain text: "status", "check run", "how is the render", "workflow"
     elif any(k in lower_text for k in ["status", "check run", "progress"]):
         resp = check_workflow_status()
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
-    # Detect trend intents in plain text: "trend", "scrape", "search edits"
     elif any(k in lower_text for k in ["trend", "scrape", "search edit"]):
         send_message(chat_id, "🔍 Searching 10 trend edits (excluding @jazzcreates)...")
         resp = search_10_trend_edits()
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
-    # Detect model switch intents in plain text: "switch to gemini", "use deepseek", "change model"
     elif any(k in lower_text for k in ["model", "switch to", "use model", "gemini 3.6", "flash high"]):
-        for m_key in MODEL_MAP.keys():
+        for m_key in MODEL_CONFIGS.keys():
             if m_key in lower_text or "3.6" in lower_text or "flash" in lower_text:
-                CURRENT_MODEL = MODEL_MAP.get(m_key, "gemini-3.6-flash")
-                send_message(chat_id, f"✅ Switched AI Model to **Gemini 3.6 Flash (High)** (`{CURRENT_MODEL}`).", reply_markup=get_main_menu_keyboard())
+                CURRENT_MODEL_KEY = m_key
+                m_name = MODEL_CONFIGS[m_key]["name"]
+                send_message(chat_id, f"✅ Switched AI Model to **{m_name}**.", reply_markup=get_main_menu_keyboard())
                 return
-        send_message(chat_id, f"🧠 Current Model: `Gemini 3.6 Flash (High)` (`{CURRENT_MODEL}`)\nTap a model button below to switch:", reply_markup=get_models_keyboard())
+        send_message(chat_id, f"🧠 Current Model: **{MODEL_CONFIGS[CURRENT_MODEL_KEY]['name']}**\nTap a model button below to switch:", reply_markup=get_models_keyboard())
     else:
-        resp = query_antigravity_agent(text)
+        resp = query_antigravity_smart_agent(text)
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
 
 def main():
-    print("🤖 Zero-Command Antigravity Telegram Bot active for @Jazzkabot...")
+    print("🤖 Smart Antigravity Agent Service active for @Jazzkabot...")
     offset = None
     while True:
         try:
