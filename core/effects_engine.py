@@ -191,14 +191,14 @@ def build_velocity_clip_filter(
 
     # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: multi-harmonic exponential decay shake)
     if add_shake:
-        shake_frames = 10
-        shake_amp = 16
-        # Multi-harmonic exponential decay: explosive instant punch on frame 0, organic damping over 10 frames
+        shake_frames = 12
+        shake_amp = 18
+        # Multi-harmonic exponential decay: explosive instant punch on frame 0, organic damping over 12 frames
         sx_expr = (
-            f"if(lt(N,{shake_frames}),{shake_amp}*sin(N*2.2)*exp(-0.30*N),0)"
+            f"if(lt(N,{shake_frames}),{shake_amp}*sin(N*2.4)*exp(-0.28*N),0)"
         )
         sy_expr = (
-            f"if(lt(N,{shake_frames}),{shake_amp//2}*cos(N*3.1)*exp(-0.30*N),0)"
+            f"if(lt(N,{shake_frames}),{shake_amp//2}*cos(N*3.3)*exp(-0.28*N),0)"
         )
         filters.append(
             f"geq=lum='p(X+({sx_expr}),Y+({sy_expr}))':cb='cb(X+({sx_expr}),Y+({sy_expr}))':cr='cr(X+({sx_expr}),Y+({sy_expr}))'"
