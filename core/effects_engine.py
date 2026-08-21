@@ -230,7 +230,7 @@ def build_velocity_clip_filter(
 
     # 11b. Beat-Reactive Exposure & Saturation Pulse (2-frame high-shutter contrast/saturation burst on drop impacts)
     if add_exposure_pulse:
-        filters.append("eq=contrast=1.25:brightness=0.06:saturation=1.40:enable='between(n,0,2)'")
+        filters.append("eq=contrast=1.28:brightness=0.07:saturation=1.45:enable='between(n,0,2)'")
     else:
         # Subtle S-curve contrast boost for rich deep blacks and vivid highlights
         filters.append("eq=contrast=1.08:saturation=1.12")
