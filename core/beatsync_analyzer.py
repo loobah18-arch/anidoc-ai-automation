@@ -338,8 +338,8 @@ def _select_wave_cuts(
             step = max(2, cfg.bar_beats // 2)
             min_gap = cfg.medium_energy_min_interval
         elif stype == "drop":
-            step = 1
-            min_gap = cfg.peak_energy_min_interval
+            step = 2
+            min_gap = max(0.90, cfg.peak_energy_min_interval)
         elif stype == "outro":
             step = max(4, cfg.bar_beats)
             min_gap = cfg.medium_energy_max_hold
@@ -353,13 +353,18 @@ def _select_wave_cuts(
                 continue
 
             if stype == "drop":
-                if impact[idx] >= 0.40 or k % step == 0 or (t - selected[-1]) >= 1.2:
+                if (impact[idx] >= 0.65 or k % step == 0) or (t - selected[-1]) >= 1.5:
                     selected.append(t)
             else:
                 if k % step == 0 or (t - selected[-1]) >= cfg.low_energy_max_hold:
                     selected.append(t)
 
-    return _unique_sorted(np.asarray(selected, dtype=float), cfg.peak_energy_min_interval)
+    res = _unique_sorted(np.asarray(selected, dtype=float), cfg.peak_energy_min_interval)
+    if len(res) > 20:
+        # Cap max cuts to 20 for human-level 1.5s-2.5s pacing and fast rendering
+        idx_pick = np.linspace(0, len(res) - 1, 20, dtype=int)
+        res = res[idx_pick]
+    return res
 
 
 # ── Public API ───────────────────────────────────────────────────────────────
