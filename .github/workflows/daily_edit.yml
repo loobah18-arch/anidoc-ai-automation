@@ -61,6 +61,11 @@ on:
         required: false
         default: false
         type: boolean
+      audit:
+        description: 'Run post-render quality audit vs priority reference (@Chakra_boy)'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   render_and_publish:
@@ -188,6 +193,128 @@ jobs:
             fi
           fi
 
+      - name: Quality Audit vs Priority Reference
+        if: ${{ github.event.inputs.audit == 'true' }}
+        run: |
+          mkdir -p audit/reference audit/frames
+          RENDERED=$(ls output/*.mp4 | head -1)
+          echo "Auditing: $RENDERED"
+
+          # Download priority + secondary references
+          yt-dlp -f "bv*[height<=1920]+ba/b" --merge-output-format mp4 \
+            -o "audit/reference/priority_ref.mp4" "https://youtube.com/shorts/R6NJ1ItHzdY" || true
+          yt-dlp -f "bv*[height<=1920]+ba/b" --merge-output-format mp4 \
+            -o "audit/reference/secondary_ref.mp4" "https://youtube.com/shorts/QrzRe5DM0iQ" || true
+
+          # Extract 10 keyframes from rendered video
+          DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$RENDERED")
+          for i in $(seq 1 10); do
+            T=$(python3 -c "print(round($DUR * $i / 11.0, 2))")
+            ffmpeg -y -ss "$T" -i "$RENDERED" -frames:v 1 -q:v 2 "audit/frames/rendered_$(printf '%02d' $i).png" 2>/dev/null || true
+          done
+
+          # Extract keyframes from references
+          for label in priority_ref secondary_ref; do
+            if [ -f "audit/reference/${label}.mp4" ]; then
+              RDUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "audit/reference/${label}.mp4")
+              for i in $(seq 1 10); do
+                T=$(python3 -c "print(round($RDUR * $i / 11.0, 2))")
+                ffmpeg -y -ss "$T" -i "audit/reference/${label}.mp4" -frames:v 1 -q:v 2 "audit/frames/${label}_$(printf '%02d' $i).png" 2>/dev/null || true
+              done
+            fi
+          done
+
+          # Compute comparison metrics
+          python3 - <<'EOF'
+          import json, subprocess, os
+
+          def probe(path):
+              out = subprocess.run(["ffprobe","-v","error","-show_entries",
+                  "format=duration:stream=width,height,r_frame_rate",
+                  "-of","json",path],capture_output=True,text=True)
+              return json.loads(out.stdout)
+
+          def scene_cuts(path):
+              r = subprocess.run(["ffmpeg","-i",path,"-filter_complex",
+                  "select='gt(scene,0.35)',metadata=print","-f","null","-"],
+                  capture_output=True,text=True)
+              return sum(1 for l in r.stderr.splitlines() if "pts_time" in l)
+
+          def signal_stats(path):
+              r = subprocess.run(["ffmpeg","-i",path,"-vf",
+                  "signalstats,metadata=print:key=lavfi.signalstats.YAVG:lavfi.signalstats.SATAVG:lavfi.signalstats.CONTRAST",
+                  "-f","null","-"],capture_output=True,text=True)
+              yavg=sat=con=n=0
+              for l in r.stderr.splitlines():
+                  if "YAVG=" in l:
+                      yavg+=float(l.split("YAVG=")[1].split()[0]); n+=1
+                  elif "SATAVG=" in l:
+                      sat+=float(l.split("SATAVG=")[1].split()[0])
+                  elif "CONTRAST=" in l:
+                      con+=float(l.split("CONTRAST=")[1].split()[0])
+              return {"yavg":round(yavg/max(n,1),1),"saturation":round(sat/max(n,1),1),"contrast":round(con/max(n,1),1)}
+
+          rendered = sorted(__import__("glob").glob("output/*.mp4"))[0]
+          report = {"rendered": {}, "references": {}}
+
+          p = probe(rendered)
+          report["rendered"] = {
+              "file": os.path.basename(rendered),
+              "duration": round(float(p["format"]["duration"]),2),
+              "resolution": f'{p["streams"][0]["width"]}x{p["streams"][0]["height"]}',
+              "fps": p["streams"][0].get("r_frame_rate"),
+              "scene_cuts": scene_cuts(rendered),
+              **signal_stats(rendered)
+          }
+
+          for label in ["priority_ref","secondary_ref"]:
+              path = f"audit/reference/{label}.mp4"
+              if os.path.exists(path):
+                  p = probe(path)
+                  report["references"][label] = {
+                      "duration": round(float(p["format"]["duration"]),2),
+                      "resolution": f'{p["streams"][0]["width"]}x{p["streams"][0]["height"]}',
+                      "fps": p["streams"][0].get("r_frame_rate"),
+                      "scene_cuts": scene_cuts(path),
+                      **signal_stats(path)
+                  }
+
+          if "priority_ref" in report["references"]:
+              pr = report["references"]["priority_ref"]; rd = report["rendered"]
+              dur_scale = rd["duration"]/max(pr["duration"],0.1)
+              scaled_cuts = round(pr["scene_cuts"]*dur_scale)
+              report["gap_analysis"] = {
+                  "cut_count_rendered_vs_scaled_ref": [rd["scene_cuts"], scaled_cuts],
+                  "cut_delta": rd["scene_cuts"]-scaled_cuts,
+                  "saturation_delta": round(rd["saturation"]-pr["saturation"],1),
+                  "contrast_delta": round(rd["contrast"]-pr["contrast"],1),
+                  "brightness_delta": round(rd["yavg"]-pr["yavg"],1),
+                  "verdict_cut_pacing": "MATCH" if abs(rd["scene_cuts"]-scaled_cuts)<=3 else "ADJUST",
+                  "verdict_color": "MATCH" if abs(rd["saturation"]-pr["saturation"])<8 else "ADJUST"
+              }
+          with open("audit/eval_report.json","w") as f:
+              json.dump(report,f,indent=2)
+          print(json.dumps(report,indent=2))
+          EOF
+
+      - name: Send Audit Report & Frames to Telegram
+        if: ${{ always() && github.event.inputs.audit == 'true' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -f audit/eval_report.json ] && [ -n "$TELEGRAM_BOT_TOKEN" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+              -F "chat_id=${TELEGRAM_CHAT_ID}" \
+              -F "document=@audit/eval_report.json" \
+              -F "caption=📊 Quality Audit Report (Run #${{ github.run_id }})" || true
+            zip -q -r audit_frames_run_${{ github.run_id }}.zip audit/frames/
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+              -F "chat_id=${TELEGRAM_CHAT_ID}" \
+              -F "document=@audit_frames_run_${{ github.run_id }}.zip" \
+              -F "caption=🖼️ Keyframes: rendered vs priority_ref vs secondary_ref (Run #${{ github.run_id }})" || true
+          fi
+
       - name: Upload Output Artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -196,5 +323,7 @@ jobs:
           path: |
             output/*.mp4
             scratch/*.ass
+            audit/eval_report.json
+            audit/frames/*.png
           retention-days: 7
 
