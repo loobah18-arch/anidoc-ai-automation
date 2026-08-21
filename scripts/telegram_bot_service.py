@@ -81,8 +81,19 @@ def check_workflow_status() -> str:
     except Exception as e:
         return f"⚠️ Status check error: {e}"
 
+CURRENT_MODEL = "opencode/deepseek-v4-flash-free"
+
+MODEL_MAP = {
+    "deepseek": "opencode/deepseek-v4-flash-free",
+    "gemini": "gemini-2.0-flash",
+    "kimi": "bai/kimi-k2.5",
+    "nemotron": "nvidia/nemotron-3-ultra",
+    "minimax": "minimax-m2.7"
+}
+
 def query_antigravity_llm(user_prompt: str) -> str:
-    """Queries LLM with full Memory Bank context."""
+    """Queries selected LLM model with full Memory Bank context."""
+    global CURRENT_MODEL
     memory_bank = load_memory_context()
     sys_prompt = (
         "You are Antigravity, a powerful agentic AI assistant pair programming with Jasper (@Sanguin06).\n"
@@ -95,10 +106,9 @@ def query_antigravity_llm(user_prompt: str) -> str:
         f"{memory_bank}"
     )
     
-    # Query OpenCode CLI or direct API fallback
     cmd = [
         "/data/data/com.termux/files/home/.opencode/bin/opencode", "run",
-        "-m", "opencode/deepseek-v4-flash-free",
+        "-m", CURRENT_MODEL,
         f"{sys_prompt}\n\nUser Question: {user_prompt}"
     ]
     try:
@@ -108,9 +118,10 @@ def query_antigravity_llm(user_prompt: str) -> str:
     except Exception:
         pass
         
-    return f"🤖 **Antigravity AI**: Received your message: *'{user_prompt}'*.\n\nMemory Bank Status: Connected ✅\n(You can use `/render gojo` or `/status` anytime!)"
+    return f"🤖 **Antigravity AI** (Model: `{CURRENT_MODEL}`):\n\n{user_prompt}\n\n*(Use /model to switch AI models, or /render to dispatch cloud edits!)*"
 
 def process_update(update: dict):
+    global CURRENT_MODEL
     msg = update.get("message", {})
     text = msg.get("text", "").strip()
     chat_id = str(msg.get("chat", {}).get("id", ""))
@@ -121,7 +132,16 @@ def process_update(update: dict):
     print(f"📩 Received message from {chat_id}: '{text}'")
 
     if text.startswith("/start"):
-        send_message(chat_id, "✨ **Antigravity AI Assistant & Cloud Edit Dispatcher** 🎬\n\nI have **FULL memory access** to your project context, rules, and reference preferences!\n\nCommands:\n- `/render <character>` (e.g. `/render gojo`, `/render spiderman`)\n- `/status` — View Cloud Workflow Runs\n- Or ask me any coding/edit question directly!")
+        send_message(chat_id, "✨ **Antigravity AI Assistant & Cloud Edit Dispatcher** 🎬\n\nI have **FULL memory access** to your project context, rules, and reference preferences!\n\nCommands:\n- `/render <character>` — Render 4K Short in Cloud\n- `/status` — View Cloud Workflow Runs\n- `/model <name>` — Switch AI Model (deepseek, gemini, kimi, nemotron, minimax)\n- Or ask me any question directly!")
+    elif text.startswith("/model"):
+        parts = text.split()
+        if len(parts) > 1 and parts[1].lower() in MODEL_MAP:
+            m_key = parts[1].lower()
+            CURRENT_MODEL = MODEL_MAP[m_key]
+            send_message(chat_id, f"✅ Switched AI Model to **{m_key.upper()}** (`{CURRENT_MODEL}`).")
+        else:
+            avail = ", ".join([f"`{k}`" for k in MODEL_MAP.keys()])
+            send_message(chat_id, f"🧠 Current Model: `{CURRENT_MODEL}`\n\nTo switch models, use:\n`/model <name>`\nAvailable models: {avail}")
     elif text.startswith("/render"):
         parts = text.split()
         char = parts[1].lower() if len(parts) > 1 else "gojo"
@@ -134,6 +154,7 @@ def process_update(update: dict):
     else:
         resp = query_antigravity_llm(text)
         send_message(chat_id, resp)
+
 
 def main():
     print("🤖 Full-Memory Antigravity Telegram Bot Service started for @Jazzkabot...")
