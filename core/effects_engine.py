@@ -230,7 +230,7 @@ def build_velocity_clip_filter(
 
     # 11b. Beat-Reactive Exposure & Saturation Pulse (2-frame high-shutter contrast/saturation burst on drop impacts)
     if add_exposure_pulse:
-        filters.append("eq=contrast=1.22:brightness=0.05:saturation=1.36:enable='between(n,0,2)'")
+        filters.append("eq=contrast=1.25:brightness=0.06:saturation=1.40:enable='between(n,0,2)'")
 
     # 12. Cinematic letterbox bars — intro atmospheric framing
     if add_bars:
