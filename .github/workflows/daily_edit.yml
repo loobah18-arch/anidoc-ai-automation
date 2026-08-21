@@ -141,6 +141,24 @@ jobs:
           echo "Executing: $CMD"
           eval $CMD
 
+      - name: Send Output Video to Telegram Chat
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            for vid in output/*.mp4; do
+              if [ -f "$vid" ]; then
+                echo "🚀 Sending $vid to Telegram Chat ($TELEGRAM_CHAT_ID)..."
+                curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
+                  -F "chat_id=${TELEGRAM_CHAT_ID}" \
+                  -F "video=@${vid}" \
+                  -F "caption=🎬 4K 60FPS Edit Rendered & Ready! 🚀" || true
+              fi
+            done
+          fi
+
       - name: Upload Output Artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -150,3 +168,4 @@ jobs:
             output/*.mp4
             scratch/*.ass
           retention-days: 7
+
