@@ -161,10 +161,21 @@ jobs:
             for vid in output/*.mp4; do
               if [ -f "$vid" ]; then
                 echo "🚀 Sending $vid to Telegram Chat ($TELEGRAM_CHAT_ID)..."
-                curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
+                
+                # First try sendVideo
+                RESP=$(curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
                   -F "chat_id=${TELEGRAM_CHAT_ID}" \
                   -F "video=@${vid}" \
-                  -F "caption=🎬 4K 60FPS Cloud Edit Rendered! 🚀%0AGit Commit: ${SHORT_SHA} (Run #${RUN_ID})" || true
+                  -F "caption=🎬 4K 60FPS Cloud Edit Rendered! 🚀%0AGit Commit: ${SHORT_SHA} (Run #${RUN_ID})")
+                
+                # If sendVideo fails (e.g. file > 50MB), send as document (supports up to 2GB!)
+                if echo "$RESP" | grep -q '"ok":false'; then
+                  echo "⚠️ sendVideo returned error (likely >50MB). Sending as Document (up to 2GB)..."
+                  curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+                    -F "chat_id=${TELEGRAM_CHAT_ID}" \
+                    -F "document=@${vid}" \
+                    -F "caption=🎬 4K 60FPS Video File (Run #${RUN_ID} / Commit ${SHORT_SHA})" || true
+                fi
               fi
             done
 
