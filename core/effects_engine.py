@@ -154,14 +154,19 @@ def build_velocity_clip_filter(
             f"minterpolate=fps={fps}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:me=epzs:search_param=32:vsbmc=1:scd=fdiff:scd_threshold=10.0"
         )
 
-    # 5. Animated Dynamic Zoom Punch (smooth exponential ease-down over 14 frames)
+    # 5. Animated Dynamic Zoom (Slowmo Progressive Ease Zoom vs. Drop Impact Zoom Punch)
     if scale_factor > 1.05:
         punch_delta = scale_factor - 1.0
-        punch_frames = 14 if fps >= 50 else 8
-        # Exponential easing curve: snaps instantly on frame 0, decays smoothly to 1.0
-        zoom_expr = (
-            f"if(lte(in,{punch_frames}),{scale_factor:.2f}-{punch_delta:.2f}*(1-pow(1-(in/{punch_frames}),2)),1.0)"
-        )
+        if speed < 0.70:
+            # Slowmo optical-flow buildup (QrzRe5DM0iQ inspiration): smooth progressive zoom-in over full clip duration
+            total_f = max(1, int(duration * fps))
+            zoom_expr = f"min({scale_factor:.3f},1.0+{punch_delta:.3f}*(in/{total_f}))"
+        else:
+            # Beat Drop impact zoom punch: instant snap on frame 0, smooth exponential ease-down
+            punch_frames = 14 if fps >= 50 else 8
+            zoom_expr = (
+                f"if(lte(in,{punch_frames}),{scale_factor:.2f}-{punch_delta:.2f}*(1-pow(1-(in/{punch_frames}),2)),1.0)"
+            )
         filters.append(
             f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
             f":s={video_width}x{video_height}:fps={fps}"
