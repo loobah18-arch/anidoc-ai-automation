@@ -141,22 +141,40 @@ jobs:
           echo "Executing: $CMD"
           eval $CMD
 
-      - name: Send Output Video to Telegram Chat
+      - name: Send Output Video & Code Snapshot Bundle to Telegram
         if: always()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            RUN_ID="${{ github.run_id }}"
+            COMMIT_SHA="${{ github.sha }}"
+            SHORT_SHA="${COMMIT_SHA:0:7}"
+            BUNDLE_NAME="code_snapshot_run_${RUN_ID}_${SHORT_SHA}.zip"
+
+            # Create code snapshot bundle archive
+            git log -1 --stat > run_${RUN_ID}_commit.txt || true
+            git diff HEAD~1 > run_${RUN_ID}_patch.diff || true
+            zip -q -r "$BUNDLE_NAME" core/ config/ scripts/ .github/ run_${RUN_ID}_commit.txt run_${RUN_ID}_patch.diff -x "*.pyc" "*/__pycache__/*"
+
             for vid in output/*.mp4; do
               if [ -f "$vid" ]; then
                 echo "🚀 Sending $vid to Telegram Chat ($TELEGRAM_CHAT_ID)..."
                 curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
                   -F "chat_id=${TELEGRAM_CHAT_ID}" \
                   -F "video=@${vid}" \
-                  -F "caption=🎬 4K 60FPS Edit Rendered & Ready! 🚀" || true
+                  -F "caption=🎬 4K 60FPS Cloud Edit Rendered! 🚀%0AGit Commit: ${SHORT_SHA} (Run #${RUN_ID})" || true
               fi
             done
+
+            if [ -f "$BUNDLE_NAME" ]; then
+              echo "📦 Sending Code Snapshot Bundle $BUNDLE_NAME to Telegram..."
+              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+                -F "chat_id=${TELEGRAM_CHAT_ID}" \
+                -F "document=@${BUNDLE_NAME}" \
+                -F "caption=📦 Code Snapshot Archive (Run #${RUN_ID} / Commit ${SHORT_SHA}). Send me this ZIP anytime to revert code!" || true
+            fi
           fi
 
       - name: Upload Output Artifacts
