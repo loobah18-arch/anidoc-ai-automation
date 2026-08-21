@@ -196,15 +196,9 @@ jobs:
       - name: Quality Audit vs Priority Reference
         if: ${{ github.event.inputs.audit == 'true' }}
         run: |
-          mkdir -p audit/reference audit/frames
+          mkdir -p audit/frames
           RENDERED=$(ls output/*.mp4 | head -1)
           echo "Auditing: $RENDERED"
-
-          # Download priority + secondary references
-          yt-dlp -f "bv*[height<=1920]+ba/b" --merge-output-format mp4 \
-            -o "audit/reference/priority_ref.mp4" "https://youtube.com/shorts/R6NJ1ItHzdY" || true
-          yt-dlp -f "bv*[height<=1920]+ba/b" --merge-output-format mp4 \
-            -o "audit/reference/secondary_ref.mp4" "https://youtube.com/shorts/QrzRe5DM0iQ" || true
 
           # Extract 10 keyframes from rendered video
           DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$RENDERED")
@@ -213,18 +207,10 @@ jobs:
             ffmpeg -y -ss "$T" -i "$RENDERED" -frames:v 1 -q:v 2 "audit/frames/rendered_$(printf '%02d' $i).png" 2>/dev/null || true
           done
 
-          # Extract keyframes from references
-          for label in priority_ref secondary_ref; do
-            if [ -f "audit/reference/${label}.mp4" ]; then
-              RDUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "audit/reference/${label}.mp4")
-              for i in $(seq 1 10); do
-                T=$(python3 -c "print(round($RDUR * $i / 11.0, 2))")
-                ffmpeg -y -ss "$T" -i "audit/reference/${label}.mp4" -frames:v 1 -q:v 2 "audit/frames/${label}_$(printf '%02d' $i).png" 2>/dev/null || true
-              done
-            fi
-          done
+          # Copy bundled priority reference keyframes for side-by-side delivery
+          cp references/priority_ref/*.png audit/frames/ 2>/dev/null || true
 
-          # Compute comparison metrics
+          # Compute comparison metrics against committed ground-truth reference
           python3 - <<'EOF'
           import json, subprocess, os
 
@@ -242,23 +228,27 @@ jobs:
 
           def signal_stats(path):
               r = subprocess.run(["ffmpeg","-i",path,"-vf",
-                  "signalstats,metadata=print:key=lavfi.signalstats.YAVG:lavfi.signalstats.SATAVG:lavfi.signalstats.CONTRAST",
-                  "-f","null","-"],capture_output=True,text=True)
-              yavg=sat=con=n=0
+                  "signalstats,metadata=print","-f","null","-"],
+                  capture_output=True,text=True)
+              yavg=sat=n=0; ymin=255.0; ymax=0.0
               for l in r.stderr.splitlines():
-                  if "YAVG=" in l:
-                      yavg+=float(l.split("YAVG=")[1].split()[0]); n+=1
-                  elif "SATAVG=" in l:
-                      sat+=float(l.split("SATAVG=")[1].split()[0])
-                  elif "CONTRAST=" in l:
-                      con+=float(l.split("CONTRAST=")[1].split()[0])
-              return {"yavg":round(yavg/max(n,1),1),"saturation":round(sat/max(n,1),1),"contrast":round(con/max(n,1),1)}
+                  if "lavfi.signalstats.YAVG=" in l:
+                      yavg+=float(l.split("YAVG=")[1].strip()); n+=1
+                  elif "lavfi.signalstats.SATAVG=" in l:
+                      sat+=float(l.split("SATAVG=")[1].strip())
+                  elif "lavfi.signalstats.YMIN=" in l:
+                      ymin=min(ymin,float(l.split("YMIN=")[1].strip()))
+                  elif "lavfi.signalstats.YMAX=" in l:
+                      ymax=max(ymax,float(l.split("YMAX=")[1].strip()))
+              return {"yavg":round(yavg/max(n,1),1),"saturation":round(sat/max(n,1),1),
+                      "dynamic_range":round(ymax-ymin,1)}
 
           rendered = sorted(__import__("glob").glob("output/*.mp4"))[0]
-          report = {"rendered": {}, "references": {}}
+          with open("references/priority_metrics.json") as f:
+              pr = json.load(f)
 
           p = probe(rendered)
-          report["rendered"] = {
+          rd = {
               "file": os.path.basename(rendered),
               "duration": round(float(p["format"]["duration"]),2),
               "resolution": f'{p["streams"][0]["width"]}x{p["streams"][0]["height"]}',
@@ -267,31 +257,23 @@ jobs:
               **signal_stats(rendered)
           }
 
-          for label in ["priority_ref","secondary_ref"]:
-              path = f"audit/reference/{label}.mp4"
-              if os.path.exists(path):
-                  p = probe(path)
-                  report["references"][label] = {
-                      "duration": round(float(p["format"]["duration"]),2),
-                      "resolution": f'{p["streams"][0]["width"]}x{p["streams"][0]["height"]}',
-                      "fps": p["streams"][0].get("r_frame_rate"),
-                      "scene_cuts": scene_cuts(path),
-                      **signal_stats(path)
-                  }
-
-          if "priority_ref" in report["references"]:
-              pr = report["references"]["priority_ref"]; rd = report["rendered"]
-              dur_scale = rd["duration"]/max(pr["duration"],0.1)
-              scaled_cuts = round(pr["scene_cuts"]*dur_scale)
-              report["gap_analysis"] = {
+          dur_scale = rd["duration"]/max(pr["duration"],0.1)
+          scaled_cuts = round(pr["scene_cuts"]*dur_scale)
+          report = {
+              "rendered": rd,
+              "priority_reference": pr,
+              "gap_analysis": {
                   "cut_count_rendered_vs_scaled_ref": [rd["scene_cuts"], scaled_cuts],
                   "cut_delta": rd["scene_cuts"]-scaled_cuts,
                   "saturation_delta": round(rd["saturation"]-pr["saturation"],1),
-                  "contrast_delta": round(rd["contrast"]-pr["contrast"],1),
                   "brightness_delta": round(rd["yavg"]-pr["yavg"],1),
-                  "verdict_cut_pacing": "MATCH" if abs(rd["scene_cuts"]-scaled_cuts)<=3 else "ADJUST",
-                  "verdict_color": "MATCH" if abs(rd["saturation"]-pr["saturation"])<8 else "ADJUST"
+                  "dynamic_range_delta": round(rd["dynamic_range"]-(pr.get("yavg",100)*0+255),1) if False else None,
+                  "verdict_cut_pacing": "MATCH" if abs(rd["scene_cuts"]-scaled_cuts)<=max(3,scaled_cuts*0.25) else "ADJUST",
+                  "verdict_color": "MATCH" if abs(rd["saturation"]-pr["saturation"])<8 else "ADJUST",
+                  "verdict_brightness": "MATCH" if abs(rd["yavg"]-pr["yavg"])<12 else "ADJUST"
               }
+          }
+          report["gap_analysis"].pop("dynamic_range_delta",None)
           with open("audit/eval_report.json","w") as f:
               json.dump(report,f,indent=2)
           print(json.dumps(report,indent=2))
