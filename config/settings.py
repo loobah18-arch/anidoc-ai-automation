@@ -19,9 +19,9 @@ SCRATCH_DIR = BASE_DIR / "scratch"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
-# Video Rendering Config (1:1 1080x1080 60FPS Universal Anime Edit Format matching viral JJK edits)
+# Video Rendering Config (9:16 1080x1920 60FPS Portrait YouTube Shorts / TikTok Format)
 VIDEO_WIDTH = 1080
-VIDEO_HEIGHT = 1080
+VIDEO_HEIGHT = 1920
 FPS = 60
 DEFAULT_DURATION = 38.0  # Optimal high-retention 35-40s range matching reference edits
 
