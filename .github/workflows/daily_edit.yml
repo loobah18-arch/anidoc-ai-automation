@@ -96,6 +96,7 @@ jobs:
 
       - name: Generate 4K Phonk Scene Edit
         env:
+          PYTHONUNBUFFERED: "1"
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
