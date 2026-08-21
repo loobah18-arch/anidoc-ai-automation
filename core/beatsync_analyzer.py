@@ -32,16 +32,16 @@ class BeatSyncConfig:
     hop_length: int = 512
     n_fft: int = 2048
 
-    # Safety limits for cut durations across energy levels
-    low_energy_min_interval: float = 0.90
-    medium_energy_min_interval: float = 0.58
-    high_energy_min_interval: float = 0.38
-    peak_energy_min_interval: float = 0.28
+    # Safety limits for cut durations across energy levels (Human Pro Editor Pacing)
+    low_energy_min_interval: float = 1.40
+    medium_energy_min_interval: float = 0.95
+    high_energy_min_interval: float = 0.70
+    peak_energy_min_interval: float = 0.55
 
     low_energy_max_hold: float = 3.80
     medium_energy_max_hold: float = 2.80
-    high_energy_max_hold: float = 1.85
-    peak_energy_max_hold: float = 1.25
+    high_energy_max_hold: float = 2.00
+    peak_energy_max_hold: float = 1.50
 
     phrase_beats: int = 8
     bar_beats: int = 4
