@@ -27,15 +27,17 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8834100431:AAHkNlSa1Jc1yWibdXv
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "1212982193")
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-CURRENT_MODEL = "opencode/deepseek-v4-flash-free"
+CURRENT_MODEL = "gemini-3.6-flash"
 
 MODEL_MAP = {
+    "gemini": "gemini-3.6-flash",
+    "flash": "gemini-3.6-flash",
     "deepseek": "opencode/deepseek-v4-flash-free",
-    "gemini": "gemini-2.0-flash",
     "kimi": "bai/kimi-k2.5",
     "nemotron": "nvidia/nemotron-3-ultra",
     "minimax": "minimax-m2.7"
 }
+
 
 def load_memory_context() -> str:
     """Loads shared OpenCode/Antigravity Memory Bank."""
@@ -97,8 +99,8 @@ def get_models_keyboard() -> dict:
     return {
         "inline_keyboard": [
             [
-                {"text": "DeepSeek v4 Flash", "callback_data": "set_model_deepseek"},
-                {"text": "Gemini 2.0 Flash", "callback_data": "set_model_gemini"}
+                {"text": "✨ Gemini 3.6 Flash (High)", "callback_data": "set_model_gemini"},
+                {"text": "DeepSeek v4 Flash", "callback_data": "set_model_deepseek"}
             ],
             [
                 {"text": "Kimi k2.5", "callback_data": "set_model_kimi"},
