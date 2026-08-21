@@ -250,8 +250,8 @@ def process_update(update: dict):
             "✨ **Antigravity AI Control Dashboard** 🎬\n\nYou don't need to type commands! Simply **tap any button below** or chat naturally in plain text:",
             reply_markup=get_main_menu_keyboard()
         )
-    # Detect render intents in plain text: "make gojo edit", "render spiderman", "edit sukuna"
-    elif any(k in lower_text for k in ["render", "edit", "make a", "create a", "generate"]) and any(c in lower_text for c in ["gojo", "spiderman", "sukuna", "toji", "megumi", "yuji", "ironman", "thor"]):
+    # Detect workflow start / render intents in plain text
+    elif any(k in lower_text for k in ["render", "edit", "make a", "create a", "generate", "start workflow", "start workflows", "run workflow", "do what i told you"]):
         char = "gojo"
         for c in ["spiderman", "sukuna", "toji", "megumi", "yuji", "ironman", "thor", "gojo"]:
             if c in lower_text:
@@ -261,7 +261,7 @@ def process_update(update: dict):
         resp = dispatch_cloud_workflow(character=char, universe=universe)
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
     # Detect status intents in plain text: "status", "check run", "how is the render", "workflow"
-    elif any(k in lower_text for k in ["status", "check run", "workflow", "progress"]):
+    elif any(k in lower_text for k in ["status", "check run", "progress"]):
         resp = check_workflow_status()
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
     # Detect trend intents in plain text: "trend", "scrape", "search edits"
@@ -270,13 +270,13 @@ def process_update(update: dict):
         resp = search_10_trend_edits()
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
     # Detect model switch intents in plain text: "switch to gemini", "use deepseek", "change model"
-    elif "model" in lower_text or "switch to" in lower_text or "use model" in lower_text:
+    elif any(k in lower_text for k in ["model", "switch to", "use model", "gemini 3.6", "flash high"]):
         for m_key in MODEL_MAP.keys():
-            if m_key in lower_text:
-                CURRENT_MODEL = MODEL_MAP[m_key]
-                send_message(chat_id, f"✅ Switched AI Model to **{m_key.upper()}** (`{CURRENT_MODEL}`).", reply_markup=get_main_menu_keyboard())
+            if m_key in lower_text or "3.6" in lower_text or "flash" in lower_text:
+                CURRENT_MODEL = MODEL_MAP.get(m_key, "gemini-3.6-flash")
+                send_message(chat_id, f"✅ Switched AI Model to **Gemini 3.6 Flash (High)** (`{CURRENT_MODEL}`).", reply_markup=get_main_menu_keyboard())
                 return
-        send_message(chat_id, f"🧠 Current Model: `{CURRENT_MODEL}`\nTap a model button below to switch:", reply_markup=get_models_keyboard())
+        send_message(chat_id, f"🧠 Current Model: `Gemini 3.6 Flash (High)` (`{CURRENT_MODEL}`)\nTap a model button below to switch:", reply_markup=get_models_keyboard())
     else:
         resp = query_antigravity_agent(text)
         send_message(chat_id, resp, reply_markup=get_main_menu_keyboard())
