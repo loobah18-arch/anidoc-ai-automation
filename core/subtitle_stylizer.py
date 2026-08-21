@@ -47,8 +47,8 @@ SUBTITLE_STYLE_PRESETS = {
         "active_word": "&H00FFF000",     # Electric Cyan Active
         "outline": "&H00D000AA",         # Hollow Purple Outer Glow
         "shadow": "&H99000000",
-        "outline_width": 7.0,
-        "shadow_depth": 4.0,
+        "outline_width": 8.0,
+        "shadow_depth": 5.0,
         "alignment": 2,
         "margin_v": 240,
         "margin_lr": 60,
