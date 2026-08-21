@@ -29,7 +29,7 @@ def format_ass_timestamp(seconds: float) -> str:
 SUBTITLE_STYLE_PRESETS = {
     "viral_karaoke": {
         "font": "Arial",
-        "fontsize": 64,                  # Proportional for 1:1 square canvas
+        "fontsize": 64,                  # Proportional for portrait canvas
         "primary": "&H00FFFFFF",
         "active_word": "&H002BF5FF",     # Bright Cyan Active
         "outline": "&H00000000",
@@ -37,7 +37,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 6.0,
         "shadow_depth": 3.5,
         "alignment": 2,                  # Bottom-center
-        "margin_v": 85,                  # Sits in lower third of square
+        "margin_v": 240,                 # Sits in golden lower-third of 9:16 canvas
         "margin_lr": 60,
     },
     "gojo_hollow_purple": {
@@ -50,7 +50,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 7.0,
         "shadow_depth": 4.0,
         "alignment": 2,
-        "margin_v": 85,
+        "margin_v": 240,
         "margin_lr": 60,
     },
     "sukuna_malevolent_shrine": {
@@ -63,7 +63,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 7.5,
         "shadow_depth": 4.5,
         "alignment": 2,
-        "margin_v": 85,
+        "margin_v": 240,
         "margin_lr": 60,
     },
     "solo_leveling_monarch": {
@@ -76,7 +76,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 6.5,
         "shadow_depth": 4.0,
         "alignment": 2,
-        "margin_v": 85,
+        "margin_v": 240,
         "margin_lr": 60,
     },
     "cyber_glow": {
@@ -89,7 +89,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 6.0,
         "shadow_depth": 3.5,
         "alignment": 2,
-        "margin_v": 85,
+        "margin_v": 240,
         "margin_lr": 60,
     },
     "anime_shrine": {

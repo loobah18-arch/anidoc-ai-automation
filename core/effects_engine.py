@@ -179,7 +179,7 @@ def build_velocity_clip_filter(
         dur_f = max(0.4, duration)
         filters.append(f"boxblur=luma_radius=2:luma_power=1:enable='between(t,0,{dur_f:.2f})'")
 
-    # 6b. Directional Whip Pan (2-frame dynamic translation snap)
+    # 6b. Directional Whip Pan (2-frame dynamic translation snap + directional motion blur)
     if add_whip_pan:
         whip_offset = 64
         filters.append(
@@ -187,6 +187,7 @@ def build_velocity_clip_filter(
             f"cb='cb(X+if(lte(N,1),{whip_offset}*(1-N),0),Y)':"
             f"cr='cr(X+if(lte(N,1),{whip_offset}*(1-N),0),Y)'"
         )
+        filters.append("boxblur=luma_radius=4:luma_power=1:enable='lte(n,1)'")
 
     # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: multi-harmonic exponential decay shake)
     if add_shake:
