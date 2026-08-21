@@ -29,41 +29,41 @@ DEFAULT_DURATION = 38.0  # Optimal high-retention 35-40s range matching referenc
 CC_PRESETS = {
     "marvel_hdr": {
         "contrast": 1.28,
-        "brightness": -0.02,
+        "brightness": 0.05,
         "saturation": 1.40,
-        "gamma": 0.95,
+        "gamma": 1.10,
         "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/4.2",
+        "vignette": "PI/5.5",
         "primary_color": "&H00D2FF00",  # Cyan / Gold glow
         "accent_color": "#00D2FF"
     },
     "jjk_void": {
         "contrast": 1.34,
-        "brightness": -0.03,
+        "brightness": 0.05,
         "saturation": 1.45,
-        "gamma": 0.92,
+        "gamma": 1.10,
         "unsharp": "5:5:1.4:5:5:0.0",
-        "vignette": "PI/4.0",
+        "vignette": "PI/5.5",
         "primary_color": "&H00FF55D2",  # Electric Violet / Hollow Purple
         "accent_color": "#D200FF"
     },
     "sukuna_shrine": {
         "contrast": 1.30,
-        "brightness": -0.03,
+        "brightness": 0.05,
         "saturation": 1.45,
-        "gamma": 0.92,
+        "gamma": 1.10,
         "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/3.8",
+        "vignette": "PI/5.5",
         "primary_color": "&H003333FF",  # Crimson / Blood Red
         "accent_color": "#FF2233"
     },
     "cyber_phonk": {
         "contrast": 1.25,
-        "brightness": -0.02,
+        "brightness": 0.05,
         "saturation": 1.38,
-        "gamma": 0.95,
+        "gamma": 1.10,
         "unsharp": "5:5:1.2:5:5:0.0",
-        "vignette": "PI/4.2",
+        "vignette": "PI/5.5",
         "primary_color": "&H00FFFF00",  # Neon Cyan
         "accent_color": "#00FFFF"
     }

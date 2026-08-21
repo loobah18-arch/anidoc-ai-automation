@@ -230,7 +230,7 @@ def build_velocity_clip_filter(
 
     # 11b. Beat-Reactive Exposure & Saturation Pulse (2-frame high-shutter contrast/saturation burst on drop impacts)
     if add_exposure_pulse:
-        filters.append("eq=contrast=1.28:brightness=0.07:saturation=1.45:enable='between(n,0,2)'")
+        filters.append("eq=contrast=1.15:brightness=0.03:saturation=1.45:enable='between(n,0,2)'")
     else:
         # Subtle S-curve contrast boost for rich deep blacks and vivid highlights
         filters.append("eq=contrast=1.08:saturation=1.12")
@@ -267,15 +267,15 @@ def build_cc_filter(
     cfg = CC_PRESETS.get(preset_name, CC_PRESETS["marvel_hdr"])
 
     if dynamic_mood_shift and drop_time > 0.8:
-        # Pre-drop desaturated cinematic grade -> Drop neon color explosion
+        # Pre-drop mildly desaturated cinematic grade -> Drop neon color explosion
         sat_expr = (
-            f"'if(lt(t,{drop_time:.2f}),{cfg['saturation']*0.72:.2f},{cfg['saturation']*1.28:.2f})'"
+            f"'if(lt(t,{drop_time:.2f}),{cfg['saturation']*0.88:.2f},{cfg['saturation']*1.42:.2f})'"
         )
         con_expr = (
-            f"'if(lt(t,{drop_time:.2f}),{cfg['contrast']*0.94:.2f},{cfg['contrast']*1.06:.2f})'"
+            f"'if(lt(t,{drop_time:.2f}),{cfg['contrast']*0.96:.2f},{cfg['contrast']*1.04:.2f})'"
         )
         gam_expr = (
-            f"'if(lt(t,{drop_time:.2f}),{cfg['gamma']*1.04:.2f},{cfg['gamma']*0.96:.2f})'"
+            f"'if(lt(t,{drop_time:.2f}),{cfg['gamma']*1.02:.2f},{cfg['gamma']*0.99:.2f})'"
         )
         eq_part = (
             f"eq=contrast={con_expr}:brightness={cfg['brightness']}"

@@ -33,10 +33,10 @@ class BeatSyncConfig:
     n_fft: int = 2048
 
     # Safety limits for cut durations across energy levels (Human Pro Editor Pacing)
-    low_energy_min_interval: float = 1.40
-    medium_energy_min_interval: float = 0.95
-    high_energy_min_interval: float = 0.70
-    peak_energy_min_interval: float = 0.55
+    low_energy_min_interval: float = 2.80
+    medium_energy_min_interval: float = 1.90
+    high_energy_min_interval: float = 1.40
+    peak_energy_min_interval: float = 1.10
 
     low_energy_max_hold: float = 3.80
     medium_energy_max_hold: float = 2.80
@@ -360,9 +360,9 @@ def _select_wave_cuts(
                     selected.append(t)
 
     res = _unique_sorted(np.asarray(selected, dtype=float), cfg.peak_energy_min_interval)
-    if len(res) > 20:
-        # Cap max cuts to 20 for human-level 1.5s-2.5s pacing and fast rendering
-        idx_pick = np.linspace(0, len(res) - 1, 20, dtype=int)
+    if len(res) > 10:
+        # Cap max cuts to 10 matching priority reference cinematic pacing (~4 cuts/18.7s scaled)
+        idx_pick = np.linspace(0, len(res) - 1, 10, dtype=int)
         res = res[idx_pick]
     return res
 
