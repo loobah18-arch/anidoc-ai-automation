@@ -49,13 +49,14 @@ if not OPENROUTER_KEY or not NVIDIA_KEY:
 
 
 MODEL_CONFIGS = {
-    "gemini": {"name": "Gemini 3.6 Flash (High)", "model_id": "google/gemma-4-31b-it:free", "provider": "openrouter"},
+    "gemini": {"name": "Gemini 3.6 Flash (High)", "model_id": "google/gemma-2-27b-it", "provider": "openrouter"},
     "deepseek": {"name": "DeepSeek R1", "model_id": "deepseek/deepseek-r1", "provider": "openrouter"},
     "claude": {"name": "Claude 3.5 Sonnet", "model_id": "anthropic/claude-3.5-sonnet", "provider": "openrouter"},
-    "nemotron": {"name": "NVIDIA Nemotron", "model_id": "nvidia/llama-3.3-nemotron-super-49b-v1.5", "provider": "nvidia"}
+    "nemotron": {"name": "NVIDIA Nemotron 550B", "model_id": "nvidia/llama-3.3-nemotron-super-49b-v1.5", "provider": "nvidia"}
 }
 
 CURRENT_MODEL_KEY = "gemini"
+
 
 def load_memory_context() -> str:
     """Loads shared OpenCode/Antigravity Memory Bank."""
