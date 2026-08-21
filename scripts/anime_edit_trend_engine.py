@@ -53,28 +53,38 @@ SEARCH_QUERIES = [
     "Mob Psycho 100 Sakuga Edit Shorts"
 ]
 
-def search_trending_anime_edits(query: str = None, limit: int = 4) -> List[Dict[str, Any]]:
+def search_trending_anime_edits(query: str = None, limit: int = 10) -> List[Dict[str, Any]]:
     """
-    Uses yt-dlp to search and fetch metadata for top trending anime edits across rotating categories.
+    Uses yt-dlp to search and fetch metadata for top 10 trending anime edits across rotating categories.
+    Strictly filters out any videos from user's channel '@jazzcreates'.
     """
     if not query:
         query = random.choice(SEARCH_QUERIES)
         
-    print(f"🔍 [TrendEngine] Searching trending anime edits for: '{query}'...")
+    print(f"🔍 [TrendEngine] Searching 10 trending anime edits for: '{query}'...")
     cmd = [
         "yt-dlp",
-        f"ytsearch{limit}:{query}",
+        f"ytsearch{limit + 5}:{query}",  # Fetch extra to filter out any excluded uploaders
         "--dump-json",
         "--no-playlist",
         "--skip-download"
     ]
     results = []
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
         for line in proc.stdout.strip().split("\n"):
             if line:
                 try:
                     data = json.loads(line)
+                    uploader = str(data.get("uploader") or "").lower()
+                    channel = str(data.get("channel") or "").lower()
+                    channel_url = str(data.get("channel_url") or "").lower()
+                    
+                    # Exclude any videos from @jazzcreates
+                    if "jazzcreates" in uploader or "jazzcreates" in channel or "jazzcreates" in channel_url:
+                        print(f"🚫 [TrendEngine] Excluded reference video from @jazzcreates: {data.get('title')}")
+                        continue
+
                     results.append({
                         "title": data.get("title"),
                         "uploader": data.get("uploader"),
@@ -83,6 +93,8 @@ def search_trending_anime_edits(query: str = None, limit: int = 4) -> List[Dict[
                         "duration": data.get("duration"),
                         "url": data.get("webpage_url")
                     })
+                    if len(results) >= limit:
+                        break
                 except Exception:
                     pass
     except Exception as e:
