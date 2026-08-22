@@ -192,16 +192,12 @@ def build_velocity_clip_filter(
     # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: multi-harmonic exponential decay shake)
     if add_shake:
         shake_frames = 12
-        shake_amp = 9
-        # Multi-harmonic exponential decay: explosive instant punch on frame 0, organic damping over 12 frames
-        sx_expr = (
-            f"if(lt(N,{shake_frames}),{shake_amp}*sin(N*2.4)*exp(-0.28*N),0)"
-        )
-        sy_expr = (
-            f"if(lt(N,{shake_frames}),{shake_amp//2}*cos(N*3.3)*exp(-0.28*N),0)"
-        )
+        shake_amp = 8
+        # Smooth organic crop-displacement camera shake
+        sx_expr = f"if(lt(n,{shake_frames}),8+{shake_amp}*sin(n*2.4)*exp(-0.28*n),8)"
+        sy_expr = f"if(lt(n,{shake_frames}),8+{shake_amp//2}*cos(n*3.3)*exp(-0.28*n),8)"
         filters.append(
-            f"geq=lum='p(X+({sx_expr}),Y+({sy_expr}))':cb='cb(X+({sx_expr}),Y+({sy_expr}))':cr='cr(X+({sx_expr}),Y+({sy_expr}))'"
+            f"crop=w=iw-16:h=ih-16:x='{sx_expr}':y='{sy_expr}',scale={video_width}:{video_height}"
         )
 
     # 8. Multi-Harmonic Chromatic Dispersion RGB Split (Boris FX Sapphire / 8Fyb0LXw1BU style)
