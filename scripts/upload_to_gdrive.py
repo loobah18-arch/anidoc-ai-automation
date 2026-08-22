@@ -59,11 +59,19 @@ def api(token: str, method: str, url: str, payload=None):
 
 
 def find_folder(token: str, name: str, parent_id: str):
-    q = (f"name = '{name}' and '{parent_id}' in parents and "
-         f"mimeType = '{FOLDER_MIME}' and trashed = false")
-    url = FILES_URL + "?" + urllib.parse.urlencode({"q": q, "supportsAllDrives": True})
-    items = api(token, "GET", url).get("files", [])
-    return items[0]["id"] if items else None
+    try:
+        q = (f"name = '{name}' and '{parent_id}' in parents and "
+             f"mimeType = '{FOLDER_MIME}' and trashed = false")
+        url = FILES_URL + "?" + urllib.parse.urlencode({
+            "q": q,
+            "supportsAllDrives": "true",
+            "includeItemsFromAllDrives": "true"
+        })
+        items = api(token, "GET", url).get("files", [])
+        return items[0]["id"] if items else None
+    except Exception as err:
+        print(f"⚠️ Folder search query notice: {err}")
+        return None
 
 
 def ensure_run_folder(token: str, label: str, parent_id: str) -> str:
@@ -71,13 +79,18 @@ def ensure_run_folder(token: str, label: str, parent_id: str) -> str:
     if existing:
         print(f"📁 Reusing existing folder: {label}")
         return existing
-    created = api(token, "POST", FILES_URL + "?supportsAllDrives=true", {
-        "name": label,
-        "mimeType": FOLDER_MIME,
-        "parents": [parent_id],
-    })
-    print(f"📁 Created folder: {label}")
-    return created["id"]
+    try:
+        created = api(token, "POST", FILES_URL + "?supportsAllDrives=true", {
+            "name": label,
+            "mimeType": FOLDER_MIME,
+            "parents": [parent_id],
+        })
+        print(f"📁 Created folder: {label}")
+        return created["id"]
+    except Exception as err:
+        print(f"⚠️ Subfolder creation notice under {parent_id}: {err}")
+        print(f"📁 Falling back to uploading directly into target Google Drive folder {parent_id}")
+        return parent_id
 
 
 def resumable_upload(token: str, path: str, folder_id: str) -> str:
