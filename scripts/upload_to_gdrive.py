@@ -180,13 +180,9 @@ def main() -> int:
                 break
             except urllib.error.HTTPError as err:
                 body = err.read().decode(errors="replace")
-                if err.code == 403:
-                    print(f"⚠️ Google Drive upload notice (HTTP 403): refresh token missing drive.file scope. "
-                          f"Artifacts preserved in Telegram & Actions.")
-                    return 0
-                print(f"⚠️ Attempt {attempt}/3 failed for {path}: HTTP {err.code}")
+                print(f"⚠️ Attempt {attempt}/3 failed for {path}: HTTP {err.code} - {body}")
                 if attempt == 3:
-                    print(f"⚠️ Google Drive upload skipped due to HTTP {err.code}")
+                    print(f"⚠️ Skipping upload for {path} after 3 attempts.")
                     return 0
                 time.sleep(5 * attempt)
 
