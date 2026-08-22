@@ -34,11 +34,10 @@ def probe_video(path: str) -> dict:
 def count_scene_cuts(path: str) -> int:
     cmd = [
         "ffmpeg", "-i", path,
-        "-filter_complex", "select='gt(scene,0.35)',metadata=print",
+        "-filter_complex", "select='gt(scene,0.55)',metadata=print",
         "-f", "null", "-"
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    return sum(1 for line in res.stderr.splitlines() if "pts_time" in line)
+    return sum(1 for line in subprocess.run(cmd, capture_output=True, text=True).stderr.splitlines() if "pts_time" in line)
 
 def compute_signal_stats(path: str, max_frames: int = 150) -> dict:
     cmd = [
