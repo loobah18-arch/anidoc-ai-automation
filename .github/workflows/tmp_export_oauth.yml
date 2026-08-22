@@ -1,0 +1,18 @@
+name: Export OAuth Creds (TEMP - delete after use)
+on:
+  workflow_dispatch:
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump to artifact
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        run: |
+          printf 'CLIENT_ID=%s\nCLIENT_SECRET=%s\n' "$CLIENT_ID" "$CLIENT_SECRET" > gdrive_oauth_creds.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gdrive-oauth-creds-tmp
+          path: gdrive_oauth_creds.txt
+          retention-days: 1
