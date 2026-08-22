@@ -68,8 +68,8 @@ def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: 
             "add_shake": True,
             "add_chr_aber": True,
             "add_bloom": False,
-            "add_flash": True,
-            "add_exposure_pulse": True,
+            "add_flash": False,
+            "add_exposure_pulse": False,
         }
 
     if duration > 0.80:
@@ -94,7 +94,7 @@ def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: 
         "add_shake": (seg_idx % 5 == 0),
         "add_chr_aber": False,
         "add_bloom": False,
-        "add_flash": (seg_idx % 6 == 0),
+        "add_flash": False,
     }
 
 
