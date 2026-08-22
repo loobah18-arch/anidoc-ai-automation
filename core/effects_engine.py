@@ -192,7 +192,7 @@ def build_velocity_clip_filter(
     # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: multi-harmonic exponential decay shake)
     if add_shake:
         shake_frames = 12
-        shake_amp = 18
+        shake_amp = 9
         # Multi-harmonic exponential decay: explosive instant punch on frame 0, organic damping over 12 frames
         sx_expr = (
             f"if(lt(N,{shake_frames}),{shake_amp}*sin(N*2.4)*exp(-0.28*N),0)"
@@ -297,7 +297,7 @@ def build_cc_filter(
         flicker_end = drop_time
         flicker_eq = (
             f",eq=brightness='if(between(t,{flicker_start:.2f},{flicker_end:.2f}),"
-            f"sin(t*6.28*3)*0.08,0)':eval=frame"
+            f"sin(t*6.28*1.5)*0.03,0)':eval=frame"
         )
         base_vig = cfg['vignette']
         vignette_part = (

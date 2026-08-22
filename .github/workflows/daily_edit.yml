@@ -245,7 +245,14 @@ jobs:
               r = subprocess.run(["ffmpeg","-i",path,"-filter_complex",
                   "select='gt(scene,0.35)',metadata=print","-f","null","-"],
                   capture_output=True,text=True)
-              return sum(1 for l in r.stderr.splitlines() if "pts_time" in l)
+              ts=[]
+              for l in r.stderr.splitlines():
+                  if "pts_time" in l:
+                      import re as _re
+                      m=_re.search(r"pts_time:([\d.]+)",l)
+                      if m: ts.append(round(float(m.group(1)),2))
+              scene_cuts.last_ts=ts
+              return len(ts)
 
           def signal_stats(path):
               r = subprocess.run(["ffmpeg","-i",path,"-vf",
@@ -269,12 +276,14 @@ jobs:
               pr = json.load(f)
 
           p = probe(rendered)
+          n_cuts = scene_cuts(rendered)
           rd = {
               "file": os.path.basename(rendered),
               "duration": round(float(p["format"]["duration"]),2),
               "resolution": f'{p["streams"][0]["width"]}x{p["streams"][0]["height"]}',
               "fps": p["streams"][0].get("r_frame_rate"),
-              "scene_cuts": scene_cuts(rendered),
+              "scene_cuts": n_cuts,
+              "cut_timestamps": scene_cuts.last_ts[:60],
               **signal_stats(rendered)
           }
 

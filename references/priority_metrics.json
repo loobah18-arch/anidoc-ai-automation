@@ -1,11 +1,10 @@
 {
-  "source": "Gojo Attitude Status by @Chakra_boy (R6NJ1ItHzdY)",
-  "duration": 18.67,
-  "resolution": "720x1280",
-  "fps": "30/1",
-  "scene_cuts": 4,
-  "yavg": 102.8,
-  "saturation": 32.6,
-  "contrast": 0.0,
-  "samples": 560
+  "source": "Combined profile: xT4qeJwVnDI + VV6UFUfFmXI + lX7bIlY_KEE (user-selected style refs)",
+  "duration": 38.0,
+  "resolution": "1080x1920",
+  "fps": "60/1",
+  "scene_cuts": 14,
+  "yavg": 103.0,
+  "saturation": 15.0,
+  "notes": "cuts: avg 0.367/s scaled to 38s; yavg bright mids (105/101/~dark-content); sat wide range 3-26, midpoint ~15; pacing beat-locked ~1.8s holds; smooth morph + hard cut mix; NO flash bursts"
 }
