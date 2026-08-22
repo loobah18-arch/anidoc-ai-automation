@@ -166,21 +166,42 @@ jobs:
             for vid in output/*.mp4; do
               if [ -f "$vid" ]; then
                 echo "🚀 Sending $vid to Telegram Chat ($TELEGRAM_CHAT_ID)..."
-                
-                # First try sendVideo
+
+                # Telegram Bot API hard limit: 50MB. Compress to fit if oversized.
+                SIZE_MB=$(du -m "$vid" | cut -f1)
+                SEND_FILE="$vid"
+                if [ "$SIZE_MB" -gt 48 ]; then
+                  echo "⚠️ Video is ${SIZE_MB}MB (>50MB Telegram limit). Re-encoding to fit under 48MB..."
+                  DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$vid")
+                  # Target total bitrate: (47MB * 8192 kbit) / duration, split 90% video / 10% audio
+                  TOTAL_KBPS=$(python3 -c "print(int(47*8192/float('${DUR}')))")
+                  VBITRATE=$(python3 -c "print(max(1200, int(${TOTAL_KBPS}*0.9)))")
+                  ABITRATE=$(python3 -c "print(min(192, max(96, int(${TOTAL_KBPS}*0.1))))")
+                  COMPRESSED="telegram_${vid##*/}"
+                  ffmpeg -y -i "$vid" -c:v libx264 -preset medium -b:v "${VBITRATE}k" -maxrate "${VBITRATE}k" -bufsize "$((VBITRATE*2))k" \
+                    -pix_fmt yuv420p -c:a aac -b:a "${ABITRATE}k" -movflags +faststart "$COMPRESSED"
+                  SEND_FILE="$COMPRESSED"
+                  echo "✅ Compressed to $(du -m "$SEND_FILE" | cut -f1)MB (${VBITRATE}k video / ${ABITRATE}k audio)"
+                fi
+
+                # Send as streaming video (sendVideo keeps it playable inline in Telegram)
                 RESP=$(curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
                   -F "chat_id=${TELEGRAM_CHAT_ID}" \
-                  -F "video=@${vid}" \
+                  -F "video=@${SEND_FILE}" \
+                  -F "supports_streaming=true" \
                   -F "caption=🎬 4K 60FPS Cloud Edit Rendered! 🚀%0AGit Commit: ${SHORT_SHA} (Run #${RUN_ID})")
-                
-                # If sendVideo fails (e.g. file > 50MB), send as document (supports up to 2GB!)
+
+                # Fallback to document if sendVideo still fails
                 if echo "$RESP" | grep -q '"ok":false'; then
-                  echo "⚠️ sendVideo returned error (likely >50MB). Sending as Document (up to 2GB)..."
+                  echo "⚠️ sendVideo failed. Sending as Document..."
                   curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
                     -F "chat_id=${TELEGRAM_CHAT_ID}" \
-                    -F "document=@${vid}" \
+                    -F "document=@${SEND_FILE}" \
                     -F "caption=🎬 4K 60FPS Video File (Run #${RUN_ID} / Commit ${SHORT_SHA})" || true
                 fi
+
+                # Cleanup compressed temp file
+                rm -f "$SEND_FILE" 2>/dev/null || true
               fi
             done
 
