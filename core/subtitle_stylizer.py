@@ -207,9 +207,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             for j, w in enumerate(chunk_words):
                 w_upper = w.upper()
                 if j == word_in_chunk_idx:
-                    # Active word: Highlighted color + 118% dynamic bounce scale
+                    # Active word: Highlighted color + gentle 108% ease (clean cinematic, no strobing pop)
                     line_parts.append(
-                        f"{{\\c{cfg['active_word']}\\t(0,100,\\fscx118\\fscy118)\\t(100,200,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
+                        f"{{\\c{cfg['active_word']}\\t(0,300,\\fscx108\\fscy108)}}{w_upper}{{\\rBaseText}}"
                     )
                 else:
                     # Inactive word: Clean white

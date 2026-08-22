@@ -31,7 +31,7 @@ CC_PRESETS = {
         "contrast": 1.28,
         "brightness": 0.05,
         "saturation": 1.40,
-        "gamma": 1.10,
+        "gamma": 1.14,
         "unsharp": "5:5:1.3:5:5:0.0",
         "vignette": "PI/5.5",
         "primary_color": "&H00D2FF00",  # Cyan / Gold glow
@@ -41,7 +41,7 @@ CC_PRESETS = {
         "contrast": 1.34,
         "brightness": 0.05,
         "saturation": 1.45,
-        "gamma": 1.10,
+        "gamma": 1.14,
         "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "PI/5.5",
         "primary_color": "&H00FF55D2",  # Electric Violet / Hollow Purple
@@ -51,7 +51,7 @@ CC_PRESETS = {
         "contrast": 1.30,
         "brightness": 0.05,
         "saturation": 1.45,
-        "gamma": 1.10,
+        "gamma": 1.14,
         "unsharp": "5:5:1.3:5:5:0.0",
         "vignette": "PI/5.5",
         "primary_color": "&H003333FF",  # Crimson / Blood Red
@@ -61,7 +61,7 @@ CC_PRESETS = {
         "contrast": 1.25,
         "brightness": 0.05,
         "saturation": 1.38,
-        "gamma": 1.10,
+        "gamma": 1.14,
         "unsharp": "5:5:1.2:5:5:0.0",
         "vignette": "PI/5.5",
         "primary_color": "&H00FFFF00",  # Neon Cyan
