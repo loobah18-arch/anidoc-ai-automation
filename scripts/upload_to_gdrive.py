@@ -25,10 +25,13 @@ FOLDER_MIME = "application/vnd.google-apps.folder"
 
 
 def get_access_token() -> str:
+    refresh_token = os.environ.get("GDRIVE_REFRESH_TOKEN") or os.environ.get("REFRESH_TOKEN")
+    if not refresh_token:
+        raise ValueError("Neither GDRIVE_REFRESH_TOKEN nor REFRESH_TOKEN set.")
     data = urllib.parse.urlencode({
         "client_id": os.environ["CLIENT_ID"],
         "client_secret": os.environ["CLIENT_SECRET"],
-        "refresh_token": os.environ["REFRESH_TOKEN"],
+        "refresh_token": refresh_token,
         "grant_type": "refresh_token",
     }).encode()
     req = urllib.request.Request(TOKEN_URL, data=data)
