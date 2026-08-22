@@ -214,6 +214,41 @@ jobs:
             fi
           fi
 
+      - name: Upload Video & Code Snapshot to Google Drive
+        if: always()
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+          GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
+        run: |
+          RUN_ID="${{ github.run_id }}"
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          RUN_DATE=$(date -u +%Y-%m-%d)
+          RUN_LABEL="Run_${RUN_ID}_${RUN_DATE}_${SHORT_SHA}"
+          BUNDLE_NAME="code_snapshot_run_${RUN_ID}_${SHORT_SHA}.zip"
+
+          # Rebuild snapshot zip if the Telegram step didn't create it (secrets may be absent)
+          if [ ! -f "$BUNDLE_NAME" ]; then
+            git log -1 --stat > run_${RUN_ID}_commit.txt || true
+            git diff HEAD~1 > run_${RUN_ID}_patch.diff || true
+            zip -q -r "$BUNDLE_NAME" core/ config/ scripts/ .github/ run_${RUN_ID}_commit.txt run_${RUN_ID}_patch.diff -x "*.pyc" "*/__pycache__/*"
+          fi
+
+          FILES=""
+          for vid in output/*.mp4; do
+            [ -f "$vid" ] && FILES="$FILES $vid"
+          done
+          FILES="$FILES $BUNDLE_NAME"
+
+          if [ -z "$GDRIVE_FOLDER_URL" ]; then
+            echo "⚠️ GDRIVE_FOLDER_URL not set; skipping Google Drive upload."
+            exit 0
+          fi
+
+          echo "☁️ Uploading to Google Drive folder: Run_${RUN_ID}_${RUN_DATE}_${SHORT_SHA}"
+          python3 scripts/upload_to_gdrive.py $FILES --label "$RUN_LABEL"
+
       - name: Quality Audit vs Priority Reference
         if: ${{ github.event.inputs.audit == 'true' }}
         run: |
