@@ -4,6 +4,7 @@ Features dynamic non-repeating clip shuffling, multi-source scenepack rotation, 
 """
 import os
 import random
+import re
 import subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -264,3 +265,57 @@ def list_available_character_clips(universe: Optional[str] = None) -> Dict[str, 
                 "size_kb": clip.stat().st_size // 1024
             })
     return result
+
+
+def find_clean_shot_window(clip_path, duration: float, threshold: float = 0.30) -> float:
+    """Returns a start offset such that [offset, offset+duration] contains no internal
+    shot change (single continuous shot per segment — matches clean cinematic refs).
+    Falls back to 0.0 when no clean window exists or analysis fails."""
+    try:
+        probe = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(clip_path)],
+            capture_output=True, text=True)
+        total = float(probe.stdout.strip())
+    except Exception:
+        return 0.0
+    if total <= duration + 0.5:
+        return 0.0
+
+    try:
+        r = subprocess.run(
+            ["ffmpeg", "-i", str(clip_path), "-filter_complex",
+             "select='gt(scene,0.30)',metadata=print", "-f", "null", "-"],
+            capture_output=True, text=True)
+        ts = []
+        for line in r.stderr.splitlines():
+            if "pts_time" in line:
+                m = re.search(r"pts_time:([\d.]+)", line)
+                if m:
+                    ts.append(float(m.group(1)))
+    except Exception:
+        return 0.0
+
+    # Candidate boundaries: 0 plus each detected shot change
+    boundaries = [0.0] + [t for t in ts if t < total - duration]
+    best_start, best_score = 0.0, None
+    for b in boundaries:
+        end = b + duration
+        internal = sum(1 for t in ts if b < t < end)
+        margin = min(b, total - end)  # distance from both edges
+        score = (internal, -margin)
+        if best_score is None or score < best_score:
+            best_score = score
+            best_start = round(max(0.0, b), 2)
+    return best_start
+
+
+def assign_clean_shot_clips(segment_durations, is_drop_flags, clip_paths):
+    """Re-picks trim offsets so every segment plays ONE continuous shot."""
+    offsets = []
+    cache = {}
+    for cp, dur in zip(clip_paths, segment_durations):
+        key = (str(cp), round(dur, 2))
+        if key not in cache:
+            cache[key] = find_clean_shot_window(cp, dur)
+        offsets.append(cache[key])
+    return offsets
