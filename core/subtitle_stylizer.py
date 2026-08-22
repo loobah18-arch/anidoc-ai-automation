@@ -207,9 +207,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             for j, w in enumerate(chunk_words):
                 w_upper = w.upper()
                 if j == word_in_chunk_idx:
-                    # Active word: Highlighted color + gentle 108% ease (clean cinematic, no strobing pop)
+                    # Active word: Highlighted color + dynamic 115% pop with smooth return ease (video-ffmpeg-engineer standard)
                     line_parts.append(
-                        f"{{\\c{cfg['active_word']}\\t(0,300,\\fscx108\\fscy108)}}{w_upper}{{\\rBaseText}}"
+                        f"{{\\c{cfg['active_word']}\\fscx115\\fscy115\\t(0,150,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
                     )
                 else:
                     # Inactive word: Clean white
