@@ -16,8 +16,9 @@ RENDERED_DIR = AUDIT_DIR / "rendered"
 REF_DIR = AUDIT_DIR / "reference"
 FRAMES_DIR = AUDIT_DIR / "frames"
 
-PRIORITY_REF_URL = "https://youtube.com/shorts/R6NJ1ItHzdY"
-SECONDARY_REF_URL = "https://youtube.com/shorts/QrzRe5DM0iQ"
+PRIORITY_REF_URL_1 = "https://youtube.com/shorts/VV6UFUfFmXI"
+PRIORITY_REF_URL_2 = "https://youtube.com/shorts/lX7bIlY_KEE"
+PRIORITY_REF_URL_3 = "https://youtube.com/shorts/xT4qeJwVnDI"
 
 def probe_video(path: str) -> dict:
     cmd = [

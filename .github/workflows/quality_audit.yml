@@ -42,12 +42,13 @@ jobs:
       - name: Download Reference Videos (Priority @Chakra_boy + Secondary Gojo 4K)
         run: |
           cd audit/reference
-          # Priority reference: Gojo Attitude Status by @Chakra_boy
-          yt-dlp -f "bv*[height<=1920]+ba/b" --merge-output-format mp4 \
-            -o "priority_ref.mp4" "https://youtube.com/shorts/R6NJ1ItHzdY" || true
-          # Secondary reference: Satoru Gojo 4K Edit
-          yt-dlp -f "bv*[height<=1920]+ba/b" --merge-output-format mp4 \
-            -o "secondary_ref.mp4" "https://youtube.com/shorts/QrzRe5DM0iQ" || true
+          # Priority references provided by user:
+          yt-dlp -f "bv*[height<=1080]+ba/b" --merge-output-format mp4 \
+            -o "priority_ref_1.mp4" "https://youtube.com/shorts/VV6UFUfFmXI" || true
+          yt-dlp -f "bv*[height<=1080]+ba/b" --merge-output-format mp4 \
+            -o "priority_ref_2.mp4" "https://youtube.com/shorts/lX7bIlY_KEE" || true
+          yt-dlp -f "bv*[height<=1080]+ba/b" --merge-output-format mp4 \
+            -o "priority_ref_3.mp4" "https://youtube.com/shorts/xT4qeJwVnDI" || true
           ls -la
 
       - name: Extract Keyframes (Rendered vs References)
