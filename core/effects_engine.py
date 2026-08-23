@@ -145,20 +145,21 @@ def build_velocity_clip_filter(
     filters.append(f"scale={video_width}:{video_height}:force_original_aspect_ratio=increase")
     filters.append(f"crop={video_width}:{video_height}")
 
-    # 3. Velocity ramp
+    # 3. Velocity ramp (time stretch)
     filters.append(f"setpts={pts_mult:.4f}*PTS")
 
-    # 4. High-fidelity motion-compensated motion interpolation on slow-mo (< 0.65x)
-    if speed < 0.65:
-        filters.append(
-            f"framerate=fps={fps}:interp_start=64:interp_end=192:scene=10.0"
-        )
+    # 4. Butter-Smooth Twixtor-Style Motion Interpolation on Slow-Mo (speed < 0.85x)
+    # Anime is drawn at 12-24fps. Stretching time duplicates identical frames causing jitter.
+    # Motion-compensated frame blending generates smooth intermediate motion transitions.
+    if speed < 0.85:
+        filters.append(f"minterpolate=fps={fps}:mi_mode=blend:scd=none")
+        filters.append("tblend=all_mode=average")
 
     # 5. Animated Dynamic Zoom (Slowmo Progressive Ease Zoom vs. Drop Impact Zoom Punch)
     if scale_factor > 1.05:
         punch_delta = scale_factor - 1.0
         if speed < 0.70:
-            # Slowmo optical-flow buildup (QrzRe5DM0iQ inspiration): smooth progressive zoom-in over full clip duration
+            # Slowmo optical-flow buildup: smooth progressive zoom-in over full clip duration
             total_f = max(1, int(duration * fps))
             zoom_expr = f"min({scale_factor:.3f},1.0+{punch_delta:.3f}*(in/{total_f}))"
         else:
