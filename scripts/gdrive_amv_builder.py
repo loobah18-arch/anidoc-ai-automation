@@ -592,10 +592,13 @@ def run_gdrive_amv(
         except Exception as e:
             print(f"  ⚠️ YouTube upload error: {e}")
 
-    if not upload:
+    if not upload_youtube and not upload_gdrive:
         print(f"\n✅ Done (local only): {output_path}")
     else:
-        print(f"\n✅ Run complete. Drive: {drive_url or 'see above'}")
+        parts = []
+        if upload_gdrive:  parts.append(f"Drive: {drive_url or 'see above'}")
+        if upload_youtube: parts.append("YouTube: see above")
+        print(f"\n✅ Run complete. {' | '.join(parts)}")
 
     # Cleanup tmp trimmed clips
     shutil.rmtree(SCRATCH_DIR / "amv_trimmed", ignore_errors=True)
@@ -612,11 +615,11 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # JJK Gojo 75s with upload:
-  python3 scripts/gdrive_amv_builder.py --universe jjk --character gojo --duration 75 --upload
+  # JJK Gojo 75s — upload to both:
+  python3 scripts/gdrive_amv_builder.py --universe jjk --character gojo --duration 75 --upload-youtube --upload-gdrive
 
-  # Marvel auto-character 60s:
-  python3 scripts/gdrive_amv_builder.py --universe marvel --duration 60 --upload
+  # Marvel 60s — Drive only:
+  python3 scripts/gdrive_amv_builder.py --universe marvel --duration 60 --upload-gdrive
 
   # Custom source folder, no upload:
   python3 scripts/gdrive_amv_builder.py --source-folder FOLDER_ID --universe jjk --duration 90
