@@ -462,7 +462,8 @@ def run_gdrive_amv(
     universe: str,
     character,
     target_duration: float,
-    upload: bool,
+    upload_youtube: bool = False,
+    upload_gdrive: bool = False,
     phonk_name=None,
 ) -> Path:
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -489,15 +490,24 @@ def run_gdrive_amv(
 
     # Fetch clips from source GDrive folder
     print(f"\n📥 [1/4] Fetching footage from Drive...")
+    gdrive_clip_dir = SCRATCH_DIR / "gdrive_clips"
+    gdrive_clip_dir.mkdir(parents=True, exist_ok=True)
     clips = fetch_and_prepare_gdrive_footage(
-        folder_url_or_id=source_folder,
-        character_key=character,
-        max_clips=25,
+        gdrive_url_or_id=source_folder,
+        target_character=character,
+        output_dir=gdrive_clip_dir,
+        n_clips=25,
     )
     if not clips:
         print("  ⚠️ Drive clips empty — trying free-stream fallback...")
         from core.free_stream_fetcher import fetch_free_stream_clips
-        clips = fetch_free_stream_clips(character_key=character, max_clips=20)
+        fallback_dir = SCRATCH_DIR / "freestream_clips"
+        fallback_dir.mkdir(parents=True, exist_ok=True)
+        clips = fetch_free_stream_clips(
+            character_key=character,
+            output_dir=fallback_dir,
+            n_clips=20,
+        )
     if not clips:
         raise RuntimeError(f"No clips found for '{character}'. Check Drive folder.")
     print(f"  ✅ {len(clips)} clips ready")
@@ -524,16 +534,16 @@ def run_gdrive_amv(
         cc_preset=cc_preset,
     )
 
-    # Step 4: Upload output + code snapshot to Google Drive
+    # Step 4: Upload MP4 + code snapshot to Google Drive
     drive_url = None
-    if upload:
+    if upload_gdrive:
         print(f"\n☁️  [4/5] Uploading to Drive AMV_Outputs/...")
         try:
             token = _gdrive_token()
             amv_out_id = _find_or_create_folder(token, "AMV_Outputs", source_folder)
             run_folder_id = _find_or_create_folder(token, label, amv_out_id)
-            _upload_file(token, output_path, run_folder_id)
-            snap = _snapshot_code(label)
+            _upload_file(token, output_path, run_folder_id)   # MP4 only
+            snap = _snapshot_code(label)                       # code snapshot ZIP
             _upload_file(token, snap, run_folder_id)
             drive_url = f"https://drive.google.com/drive/folders/{run_folder_id}"
             print(f"  ✅ Drive folder: {drive_url}")
@@ -541,8 +551,8 @@ def run_gdrive_amv(
             print(f"  ⚠️ Drive upload error: {e}")
             print(f"     Local output: {output_path}")
 
-    # Step 5: Upload to YouTube
-    if upload:
+    # Step 5: Upload MP4 ONLY to YouTube (no code snapshot)
+    if upload_youtube:
         print(f"\n🎬 [5/5] Uploading to YouTube...")
         try:
             from publishers.youtube_publisher import upload_video_to_youtube
@@ -623,8 +633,10 @@ Examples:
                         help="Target AMV duration in seconds (default: 75.0)")
     parser.add_argument("--phonk", default=None,
                         help="Specific phonk track name from library (auto-picked if omitted)")
-    parser.add_argument("--upload", action="store_true",
-                        help="Upload MP4 + code snapshot to AMV_Outputs/ in Drive")
+    parser.add_argument("--upload-youtube", action="store_true",
+                        help="Upload final MP4 to YouTube Shorts (public). Code snapshot is NOT uploaded here.")
+    parser.add_argument("--upload-gdrive", action="store_true",
+                        help="Upload final MP4 + code snapshot ZIP to AMV_Outputs/ in your Drive folder.")
     parser.add_argument("--list-styles", action="store_true",
                         help="Print all VFX styles with rotation status and exit")
 
@@ -647,7 +659,8 @@ Examples:
         universe=args.universe,
         character=args.character,
         target_duration=args.duration,
-        upload=args.upload,
+        upload_youtube=args.upload_youtube,
+        upload_gdrive=args.upload_gdrive,
         phonk_name=args.phonk,
     )
     return 0
