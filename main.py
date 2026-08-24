@@ -29,7 +29,6 @@ from core.video_assembler import render_cinematic_edit
 from core.ranking_assembler import render_ranking_countdown_edit
 from core.download_saver import save_to_downloads
 from publishers.youtube_publisher import upload_video_to_youtube
-from studio.server import start_studio_server
 from scripts.gdrive_amv_builder import run_gdrive_amv, SOURCE_FOLDER_ID as _AMV_SRC
 
 def main():
@@ -76,6 +75,7 @@ def main():
 
     # If --studio is specified, launch web video editor
     if args.studio:
+        from studio.server import start_studio_server
         start_studio_server(port=args.port)
         return
 

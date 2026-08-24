@@ -48,7 +48,9 @@ from core.beat_detector import analyze_audio_beats
 
 # ─── constants ──────────────────────────────────────────────────────────────
 SOURCE_FOLDER_ID = "1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4"
-STYLE_STATE_FILE = SCRATCH_DIR / "amv_style_rotation.json"
+# Stored in config/ (git-tracked) so style rotation persists across CI runs.
+# scratch/ is gitignored and wiped every run — putting it there would always reset to style 0.
+STYLE_STATE_FILE = Path(__file__).resolve().parent.parent / "config" / "amv_style_rotation.json"
 
 # ─── VFX Style Pool — sequential rotation across runs ───────────────────────
 STYLE_POOL = [
