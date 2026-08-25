@@ -63,27 +63,6 @@ def get_valid_access_token() -> Optional[str]:
     return None
 
 
-def get_channel_info(access_token: str) -> Dict[str, Any]:
-    """Fetches channel details for the authenticated user to verify target channel."""
-    try:
-        from googleapiclient.discovery import build
-        from google.oauth2.credentials import Credentials
-        creds = Credentials(token=access_token)
-        youtube = build("youtube", "v3", credentials=creds)
-        res = youtube.channels().list(mine=True, part="snippet").execute()
-        items = res.get("items", [])
-        if items:
-            snip = items[0].get("snippet", {})
-            return {
-                "id": items[0].get("id"),
-                "title": snip.get("title"),
-                "customUrl": snip.get("customUrl"),
-            }
-    except Exception as e:
-        print(f"[YouTube] Channel check notice: {e}")
-    return {}
-
-
 def upload_video_to_youtube(
     video_path: Path,
     title: str,
@@ -102,13 +81,8 @@ def upload_video_to_youtube(
     video_path = Path(video_path)
     if not video_path.exists():
         return {"status": "error", "reason": "Video file not found"}
-
-    channel_info = get_channel_info(access_token)
-    ch_title = channel_info.get("title") or "Unknown Channel"
-    ch_handle = channel_info.get("customUrl") or ""
-    print(f"📺 [YouTube] Target Channel: {ch_title} ({ch_handle})")
         
-    print(f"🚀 [YouTube] Uploading {video_path.name} to YouTube Shorts...")
+    print(f"🚀 [YouTube] Uploading {video_path.name} to YouTube...")
     try:
         from googleapiclient.discovery import build
         from googleapiclient.http import MediaFileUpload

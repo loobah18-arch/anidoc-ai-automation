@@ -1,25 +1,22 @@
+# Secrets & environment
 .env
+*.env
+
+# Output & temp directories
+scratch/
+output/
+audit/
 __pycache__/
 *.pyc
-output/
-scratch/
-temp/
-.DS_Store
+*.pyo
+.pytest_cache/
+.coverage
 
-# Ignore temporary root video outputs
-/*.mp4
-/*.mkv
-/*.mov
-/*.webm
-/*.jpg
-/*.png
-
-# Node / Remotion editor ignores
+# Node modules & editor data
 node_modules/
-studio/remotion_editor/node_modules/
-studio/remotion_editor/dist/
-studio/remotion_editor/out/
-
-# Ensure assets are tracked
-!assets/
-!assets/**
+.omo/
+.opencode/
+.claude/
+.claude-flow/
+.swarm/
+.agents/

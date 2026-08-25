@@ -40,45 +40,6 @@ SUBTITLE_STYLE_PRESETS = {
         "margin_v": 85,                  # Sits in lower third of square
         "margin_lr": 60,
     },
-    "gojo_hollow_purple": {
-        "font": "Arial",
-        "fontsize": 66,
-        "primary": "&H00FFFFFF",
-        "active_word": "&H00FFF000",     # Electric Cyan Active
-        "outline": "&H00D000AA",         # Hollow Purple Outer Glow
-        "shadow": "&H99000000",
-        "outline_width": 7.0,
-        "shadow_depth": 4.0,
-        "alignment": 2,
-        "margin_v": 85,
-        "margin_lr": 60,
-    },
-    "sukuna_malevolent_shrine": {
-        "font": "Arial",
-        "fontsize": 68,
-        "primary": "&H00FFFFFF",
-        "active_word": "&H000000FF",     # Pure Blood Crimson Active
-        "outline": "&H00000088",         # Dark Crimson Shadow
-        "shadow": "&HBB000000",
-        "outline_width": 7.5,
-        "shadow_depth": 4.5,
-        "alignment": 2,
-        "margin_v": 85,
-        "margin_lr": 60,
-    },
-    "solo_leveling_monarch": {
-        "font": "Arial",
-        "fontsize": 66,
-        "primary": "&H00FFFFFF",
-        "active_word": "&H00FFAA00",     # Shadow Blue Active
-        "outline": "&H00000000",
-        "shadow": "&HAA000055",
-        "outline_width": 6.5,
-        "shadow_depth": 4.0,
-        "alignment": 2,
-        "margin_v": 85,
-        "margin_lr": 60,
-    },
     "cyber_glow": {
         "font": "Arial",
         "fontsize": 64,
@@ -174,18 +135,12 @@ PlayResY: {VIDEO_HEIGHT}
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: BaseText,{cfg['font']},{cfg['fontsize']},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{cfg['outline_width']},{cfg['shadow_depth']},{cfg['alignment']},{margin_lr},{margin_lr},{cfg['margin_v']},1
-Style: Watermark,{cfg['font']},24,&H70FFFFFF,&H00000000,&H00000000,&H90000000,0,0,0,0,100,100,3,0,1,1.0,1.0,7,45,45,45,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     
     events = []
-
-    # Subtle aesthetic watermark during intro (top-left)
-    if character_name:
-        intro_end_ts = format_ass_timestamp(min(end_time, 3.5))
-        events.append(f"Dialogue: 0,0:00:00.20,{intro_end_ts},Watermark,,0,0,0,,{{\\fad(300,500)}}// {character_name.upper()} //")
     
     # Word-by-word karaoke lines (NO badge — removed ugly [CHARACTER] top tag)
     for chunk_idx in range(0, len(words), chunk_size):
