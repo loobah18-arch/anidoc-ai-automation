@@ -137,69 +137,73 @@ def get_beat_timeline(audio_path: Path, target_duration: float) -> list:
     """
     Returns structured segments: [{start, duration, is_drop, is_peak, role}]
 
-    Structure matching reference video analysis:
-      Intro (0-20%):    slow holds 1.5-3s, atmospheric
-      Drop 1 (20-55%):  fast cuts 0.2-0.5s, action bursts
-      Breakdown (55-70%): medium 0.8-1.5s, slower
-      Drop 2 (70-90%):  ultra-fast 0.12-0.3s
-      Outro (90-100%):  slow cinematic hold
+    Uses the BeatGrid's calibrated drop time and BPM directly (instead of
+    re-detecting from scratch) so that cut points align with the actual 808 drop.
+
+    Phase mapping:
+      intro      (before drop):        slow holds 1.5-3s
+      drop1      (drop -> 55%):        fast cuts 0.2-0.5s, high energy
+      breakdown  (55% -> 70%):         medium 0.8-1.5s
+      drop2      (70% -> 90%):         ultra-fast 0.12-0.28s
+      outro      (90% -> end):         cinematic slow hold
+
+    is_peak fires every 2 cuts in drop sections and every cut at
+    breakdown/outro boundaries — these are where slow-mo inserts.
     """
     try:
-        beats = analyze_audio_beats(str(audio_path))
-        if beats and beats.beat_times and len(beats.beat_times) >= 8:
-            raw = [t for t in beats.beat_times if t < target_duration]
-            segments = []
-            n = len(raw)
-            drop_threshold = 0.38  # beat gap < this = fast section = drop
-            in_drop = False
-            drop_count = 0
+        grid = analyze_audio_beats(str(audio_path), target_duration=target_duration)
+        raw_segs = grid.get_cut_segments()  # uses calibrated BPM + drop time
 
-            for i in range(len(raw) - 1):
-                bt = raw[i]
-                gap = raw[i+1] - bt
-                was_drop = in_drop
-                in_drop = gap < drop_threshold
-                if not was_drop and in_drop:
-                    drop_count += 1
+        drop_t   = grid.drop_time
+        bd_t     = drop_t + (target_duration - drop_t) * 0.50   # breakdown start
+        drop2_t  = drop_t + (target_duration - drop_t) * 0.70   # drop2 start
+        outro_t  = target_duration * 0.90
 
-                # Assign role and duration
-                if i < 6:
-                    role = "intro"
-                    dur = min(gap * 2.5, 3.0)
-                elif in_drop and drop_count == 1:
-                    role = "drop1"
-                    dur = max(gap * 0.8, 0.18)
-                elif not in_drop and drop_count >= 1:
-                    role = "breakdown"
-                    dur = min(gap * 1.5, 2.0)
-                elif in_drop and drop_count >= 2:
-                    role = "drop2"
-                    dur = max(gap * 0.6, 0.12)
-                else:
-                    role = "mid"
-                    dur = gap
+        segments = []
+        drop1_idx = 0   # counter within drop1 for is_peak spacing
+        drop2_idx = 0
 
-                segments.append({
-                    "start": bt,
-                    "duration": round(max(dur, 0.12), 3),
-                    "is_drop": in_drop,
-                    "is_peak": (i % 4 == 0) and in_drop,
-                    "role": role,
-                })
+        for seg in raw_segs:
+            s = seg["start"]
+            dur = seg["duration"]
 
-            # Outro
-            if raw:
-                rem = target_duration - raw[-1]
-                if rem > 1.0:
-                    segments.append({
-                        "start": raw[-1],
-                        "duration": round(rem, 3),
-                        "is_drop": False, "is_peak": False, "role": "outro",
-                    })
+            if s < drop_t:
+                role = "intro"
+                # Stretch intro clips: they should feel long and atmospheric
+                dur = min(max(dur, 1.4), 3.0)
+                is_peak = False
+            elif s < bd_t:
+                role = "drop1"
+                # Clamp to fast-cut range
+                dur = max(min(dur, 0.55), 0.18)
+                is_peak = (drop1_idx % 2 == 0)  # every 2nd cut = slow-mo candidate
+                drop1_idx += 1
+            elif s < drop2_t:
+                role = "breakdown"
+                dur = max(min(dur, 1.8), 0.7)
+                is_peak = True   # every breakdown clip = slow-mo (cinematic)
+            elif s < outro_t:
+                role = "drop2"
+                dur = max(min(dur, 0.30), 0.12)
+                is_peak = (drop2_idx % 2 == 0)
+                drop2_idx += 1
+            else:
+                role = "outro"
+                dur = max(dur, 1.5)
+                is_peak = True   # outro = butter slow-mo hold
 
-            total = sum(s["duration"] for s in segments)
-            print(f"  🎵 Beat timeline: {len(segments)} cuts, {total:.1f}s, {drop_count} drops detected")
-            return segments
+            segments.append({
+                "start": round(s, 3),
+                "duration": round(max(dur, 0.12), 3),
+                "is_drop": role in ("drop1", "drop2"),
+                "is_peak": is_peak,
+                "role": role,
+            })
+
+        total = sum(s["duration"] for s in segments)
+        peaks = sum(1 for s in segments if s["is_peak"])
+        print(f"  🎵 Beat timeline: {len(segments)} cuts, {total:.1f}s | drop@{drop_t:.2f}s | {peaks} slow-mo peaks")
+        return segments
     except Exception as e:
         print(f"  ⚠️ Beat analysis error: {e} — using structured fallback")
 
@@ -254,31 +258,32 @@ def _fallback_timeline(dur: float) -> list:
 
 def get_velocity(seg: dict, style: dict) -> float:
     """
-    Professional velocity curves matching reference video analysis:
-      intro:     0.30x — atmospheric slow tension, holds on face
-      drop1:     1.50x — explosive snap, burst action
-      breakdown: 0.70x — slightly slow for clarity
-      drop2:     1.80x — even faster, ultra-cut frenzy
-      peak:      0.45x — sakuga slow-mo on key moments
-      outro:     0.40x — dramatic fade into black
+    Professional velocity curves:
+      intro:     0.30x — atmospheric slow tension
+      drop1:     1.50x — explosive snap
+      breakdown: 0.70x — clarity breather
+      drop2:     1.80x — ultra-cut frenzy
+      peak:      0.45x — butter slow-mo (minterpolate handles frame creation)
+      outro:     0.40x — dramatic cinematic hold
     """
     role = seg.get("role", "mid")
     is_peak = seg.get("is_peak", False)
 
-    # Slow Cinema: no speed changes
+    # Slow Cinema: no speed changes (only motion blur)
     if not style.get("velocity") and not style.get("slow_mo_peaks"):
         return 1.0
 
-    if style.get("slow_mo_peaks") and is_peak:
-        return 0.45
+    # Peaks get butter slow-mo regardless of velocity flag
+    if is_peak and style.get("slow_mo_peaks"):
+        return 0.35  # 0.35x = 35% speed — very dramatic, minterpolate fills frames
 
     return {
         "intro":     0.30 if style.get("velocity") else 0.60,
         "drop1":     1.50 if style.get("velocity") else 1.00,
-        "breakdown": 0.70 if style.get("velocity") else 0.85,
+        "breakdown": 0.65 if style.get("velocity") else 0.80,
         "drop2":     1.80 if style.get("velocity") else 1.20,
         "mid":       1.10,
-        "outro":     0.40 if style.get("velocity") else 0.50,
+        "outro":     0.35 if style.get("velocity") else 0.45,
     }.get(role, 1.0)
 
 
@@ -289,6 +294,20 @@ def get_velocity(seg: dict, style: dict) -> float:
 def _motion_blur(speed: float) -> str:
     """Frame-blend motion blur on fast sections only."""
     return "tblend=all_mode=average" if speed > 1.2 else ""
+
+
+def _smooth_slowmo(speed: float) -> str:
+    """
+    Butter-smooth slow motion using minterpolate frame interpolation.
+    Creates new in-between frames from adjacent frames (like Twixtor/optical flow).
+    Only applied when speed < 0.5 (slow-mo peaks).
+    fps=60 target ensures smooth playback on mobile YouTube.
+    """
+    if speed >= 0.5:
+        return ""
+    # minterpolate: mi_mode=blend is fast + smooth enough for 0.35x
+    # For ultra-smooth: mi_mode=mci (slower but highest quality)
+    return f"minterpolate=fps={FPS}:mi_mode=blend:mc_mode=aobmc:me_mode=bidir:vsbmc=1"
 
 
 def _zoom_punch(scale: float = 1.08) -> str:
@@ -395,45 +414,66 @@ def build_clip_vfx(style: dict, seg: dict, accent_hex: str, next_role: str = "")
 
     vf = []
     af = []
+    is_slow_mo = is_peak and style.get("slow_mo_peaks") and speed < 0.5
 
-    # ── 1. Velocity setpts ────────────────────────────────────────────────
+    # ── 1. Smooth slow-mo FIRST (minterpolate must come before setpts) ────
+    #    minterpolate generates interpolated frames at full FPS, then setpts
+    #    slows it down. This gives butter-smooth slow motion instead of
+    #    choppy frame-repeat from setpts alone.
+    if is_slow_mo:
+        sm = _smooth_slowmo(speed)
+        if sm:
+            vf.append(sm)
+
+    # ── 2. Velocity setpts ────────────────────────────────────────────────
     if speed != 1.0:
         vf.append(f"setpts={1.0/speed:.4f}*PTS")
-        if speed < 0.5:
-            af.append(f"atempo=0.5,atempo={speed/0.5:.3f}")
-        elif speed > 2.0:
-            af.append(f"atempo=2.0,atempo={speed/2.0:.3f}")
+        # Audio: only apply atempo when NOT slow-mo (slow-mo clips use video audio muted)
+        if not is_slow_mo:
+            if speed < 0.5:
+                af.append(f"atempo=0.5,atempo={max(speed/0.5, 0.5):.3f}")
+            elif speed > 2.0:
+                af.append(f"atempo=2.0,atempo={min(speed/2.0, 2.0):.3f}")
+            else:
+                af.append(f"atempo={speed:.3f}")
         else:
-            af.append(f"atempo={speed:.3f}")
+            # Slow-mo segments: silence the original audio (phonk BGM covers it)
+            af.append("volume=0")
 
-    # ── 2. Motion blur on fast sections ──────────────────────────────────
-    if style.get("motion_blur") and not uses_glitch:
+    # ── 3. Motion blur on fast sections (not on slow-mo — minterpolate handles it) ──
+    if style.get("motion_blur") and not uses_glitch and not is_slow_mo:
         mb = _motion_blur(speed)
         if mb:
             vf.append(mb)
 
-    # ── 3. Chromatic aberration on drops (uses rgbashift, no filter_complex) ──
-    if uses_glitch and is_drop:
+    # ── 4. Chromatic aberration on drops ─────────────────────────────────
+    if uses_glitch and is_drop and not is_slow_mo:
         vf.append("rgbashift=rh=6:bh=-6")
 
-    # ── 4. Camera shake on drop entry ─────────────────────────────────────
-    if is_drop and (style.get("zoom_punch") or style.get("glitch")):
+    # ── 5. Camera shake on drop entry (not on slow-mo — defeats the drama) ─
+    if is_drop and not is_slow_mo and (style.get("zoom_punch") or style.get("glitch")):
         vf.append(_camera_shake())
 
-    # ── 5. Zoom punch with ease-down curve ───────────────────────────────
-    if style.get("zoom_punch") and (is_peak or is_drop):
+    # ── 6. Zoom punch with ease-down curve ───────────────────────────────
+    if style.get("zoom_punch") and is_drop and not is_slow_mo:
         factor = 1.14 if role == "drop2" else 1.09
         vf.append(_zoom_punch(factor))
 
-    # ── 6. Pre-drop flicker (last clip before drop) ───────────────────────
+    # ── 7. Subtle zoom-IN on slow-mo peaks (feels cinematic, not shaky) ──
+    if is_slow_mo and style.get("zoom_punch"):
+        # Gentle 4% zoom hold — stable, like a camera push-in
+        vf.append(f"scale={int(VIDEO_WIDTH*1.04)}:{int(VIDEO_HEIGHT*1.04)},"
+                  f"crop={VIDEO_WIDTH}:{VIDEO_HEIGHT}")
+
+    # ── 8. Pre-drop flicker (last clip before drop) ───────────────────────
     if style.get("beat_cuts") and role == "breakdown" and next_role in ("drop1", "drop2"):
         vf.append(_pre_drop_flicker(dur))
 
-    # ── 7. Flash + dark dip on first drop frame ───────────────────────────
-    if style.get("flash_frames") and is_drop and is_peak:
+    # ── 9. Flash + dark dip on drop entry ────────────────────────────────
+    if style.get("flash_frames") and is_drop and is_peak and not is_slow_mo:
         vf.append(_flash_and_dip(flash_t=0.0, flash_dur=0.06, dip_dur=0.04))
 
-    # ── 8. Color flash on beat cuts ───────────────────────────────────────
+    # ── 10. Color flash on beat cuts ──────────────────────────────────────
     if style.get("color_flash") and style.get("beat_cuts") and not is_peak:
         hex_c = accent_hex.lstrip("#")[:6] if accent_hex else "ffffff"
         try: int(hex_c, 16)
@@ -442,11 +482,11 @@ def build_clip_vfx(style: dict, seg: dict, accent_hex: str, next_role: str = "")
         fdur = 0.03 if is_drop else 0.05
         vf.append(_color_flash(hex_c, opacity, fdur))
 
-    # ── 9. Letterbox on non-action sections ──────────────────────────────
-    if style.get("letterbox") and role in ("intro", "breakdown", "outro"):
+    # ── 11. Letterbox on non-action and slow-mo sections ─────────────────
+    if style.get("letterbox") and role in ("intro", "breakdown", "outro", "peak") or is_slow_mo:
         vf.append(_letterbox(80))
 
-    # ── 10. Always scale pad last ─────────────────────────────────────────
+    # ── 12. Always scale pad last ─────────────────────────────────────────
     vf.append(_scale_pad())
 
     return ",".join(vf), (",".join(af) if af else "anull"), speed
@@ -837,17 +877,22 @@ def run_gdrive_amv(
         try:
             from publishers.youtube_publisher import upload_video_to_youtube
             char_name = theme.get("name", (character or universe).title())
-            yt_title = (
-                f"{char_name} AMV 🔥 {style['name']} Edit | "
-                f"{'JJK' if universe == 'jjk' else 'Marvel'} {datetime.now().strftime('%Y')} #anime #shorts"
-            )[:95]
+            track_name = Path(str(audio_path)).stem.replace("_", " ").title() if audio_path else "Phonk Audio"
+            yt_title = f"{char_name} 4K Phonk AMV 🔥 {style['name']} Edit #shorts"
             yt_desc = (
-                f"🎬 {char_name} AMV Edit\n🎨 Style: {style['name']}\n🎵 Music: Phonk\n"
-                f"#anime #amv #jjk #marvel #phonk #edit #shorts #viral"
+                f"🎬 {char_name} 4K Velocity Phonk AMV Edit\n"
+                f"✨ Visual Style: {style['name']} ({style['description']})\n"
+                f"🎧 Soundtrack: {track_name}\n"
+                f"⚡ Universe: {'Jujutsu Kaisen (JJK)' if universe == 'jjk' else 'Marvel Cinematic Universe'}\n"
+                f"🔥 Quality: 4K 60FPS Beat-Synced Cut"
             )
+            yt_tags = [
+                char_name, universe.upper(), "AMV", "anime edit", "phonk",
+                "shorts", "velocity", "4k", "jujutsukaisen", "marvel", "edit"
+            ]
             result = upload_video_to_youtube(
                 video_path=output_path, title=yt_title, description=yt_desc,
-                tags=[char_name, universe.upper(), "AMV", "anime edit", "phonk", "Shorts", "2026"],
+                tags=yt_tags,
                 privacy_status="public",
             )
             if result.get("status") == "success":

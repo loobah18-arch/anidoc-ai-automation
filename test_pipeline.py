@@ -84,8 +84,8 @@ class TestVelocityCurves(unittest.TestCase):
     def test_velocity_rush_drop2_is_180(self):
         self.assertAlmostEqual(self._spd("drop2", "Velocity Rush"), 1.80, places=2)
 
-    def test_peak_slow_mo_is_045(self):
-        self.assertAlmostEqual(self._spd("drop1", "Velocity Rush", is_peak=True), 0.45, places=2)
+    def test_peak_slow_mo_is_035(self):
+        self.assertAlmostEqual(self._spd("drop1", "Velocity Rush", is_peak=True), 0.35, places=2)
 
     def test_slow_cinema_no_speed_change(self):
         # Slow Cinema has velocity=False and slow_mo_peaks=True
@@ -159,7 +159,7 @@ class TestBuildClipVFX(unittest.TestCase):
 
     def test_peak_is_slow_mo(self):
         _, _, speed = self._vfx("Velocity Rush", "drop1", is_peak=True, duration=0.3)
-        self.assertAlmostEqual(speed, 0.45, places=2)
+        self.assertAlmostEqual(speed, 0.35, places=2)
 
     def test_breakdown_before_drop_has_flicker(self):
         vf, _, _ = self._vfx("Velocity Rush", "breakdown", duration=1.5, next_role="drop1")
@@ -255,6 +255,30 @@ class TestPhonkLibrary(unittest.TestCase):
         path = get_random_or_specified_phonk(None)
         if path:
             self.assertTrue(Path(str(path)).exists())
+
+
+class TestYouTubeMetadataAndCopyright(unittest.TestCase):
+    """YouTube metadata must contain clean titles, hashtags, and standard copyright disclaimers."""
+
+    def test_format_youtube_metadata_adds_copyright_and_hashtags(self):
+        from publishers.youtube_publisher import format_youtube_metadata, STANDARD_COPYRIGHT_DISCLAIMER
+        title = "Gojo Satoru 4K Phonk AMV"
+        desc = "Epic Gojo Satoru edit featuring 60fps velocity ramp."
+        tags = ["gojo", "jjk", "phonk", "amv"]
+
+        clean_title, clean_desc, clean_tags = format_youtube_metadata(
+            title=title, description=desc, tags=tags, character_name="Gojo", universe="jjk"
+        )
+
+        self.assertIn("#shorts", clean_title)
+        self.assertLessEqual(len(clean_title), 95)
+        self.assertIn("COPYRIGHT DISCLAIMER", clean_desc)
+        self.assertIn("FAIR USE NOTICE", clean_desc)
+        self.assertIn("#shorts", clean_desc)
+        self.assertIn("#gojo", clean_desc)
+        self.assertLessEqual(len(clean_tags), 15)
+        for t in clean_tags:
+            self.assertNotIn("#", t)
 
 
 class TestSourceFolderConfig(unittest.TestCase):

@@ -3,6 +3,8 @@ name: Daily AMV & Scene Edit Generator — YouTube Auto-Upload
 on:
   schedule:
     - cron: '30 6,18 * * *'  # Twice daily: 06:30 UTC & 18:30 UTC — auto-uploads to YouTube
+  push:
+    branches: [ main ]
   workflow_dispatch:
     inputs:
       mode:
@@ -164,11 +166,11 @@ jobs:
         run: |
           # ── Determine run context ─────────────────────────────────────────
           IS_SCHEDULED="false"
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "push" ]; then
             IS_SCHEDULED="true"
           fi
 
-          # Scheduled runs always upload to both YouTube and GDrive
+          # Scheduled runs & pushes to main always upload to both YouTube and GDrive
           SHOULD_UPLOAD_YT="${{ github.event.inputs.upload_youtube }}"
           SHOULD_UPLOAD_GD="${{ github.event.inputs.upload_gdrive }}"
           if [ "$IS_SCHEDULED" = "true" ]; then
@@ -188,7 +190,7 @@ jobs:
           echo "========================================"
           echo " Mode        : $MODE"
           echo " Scheduled   : $IS_SCHEDULED"
-          echo " Upload YT   : $SHOULD_UPLOAD"
+          echo " Upload YT   : $SHOULD_UPLOAD_YT"
           echo "========================================"
 
           # ── gdrive-amv mode (new hybrid AMV builder) ──────────────────────
