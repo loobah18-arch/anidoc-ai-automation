@@ -296,20 +296,7 @@ def render_cinematic_edit(
     cmd_inputs = []
     has_clip_audio_list = []
     
-    # Shot-aware trim offsets: each segment plays ONE continuous shot (clean cinematic refs)
-    try:
-        from core.clip_manager import assign_clean_shot_clips
-        seg_durs = [seg["duration"] for seg in segments]
-        drop_flags = [seg.get("is_drop", False) for seg in segments]
-        clip_offsets = assign_clean_shot_clips(seg_durs, drop_flags, clip_paths)
-        print(f"🎬 Shot-aware offsets: {clip_offsets}")
-    except Exception as e:
-        print(f"⚠️ Shot-aware offset fallback: {e}")
-        clip_offsets = [0.0] * len(clip_paths)
-
-    for cp, off in zip(clip_paths, clip_offsets):
-        if off > 0.1:
-            cmd_inputs.extend(["-ss", f"{off:.2f}"])
+    for cp in clip_paths:
         cmd_inputs.extend(["-i", str(cp)])
         has_clip_audio_list.append(check_clip_has_audio(cp))
         
@@ -437,9 +424,8 @@ def render_cinematic_edit(
         "-map", "[vout]",
         "-map", "[aout]",
         "-c:v", "libx264",
-        "-preset", "ultrafast",
-        "-crf", "20",
-        "-threads", "0",
+        "-preset", "veryfast",
+        "-crf", "18",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "192k",

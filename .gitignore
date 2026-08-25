@@ -23,4 +23,3 @@ studio/remotion_editor/out/
 # Ensure assets are tracked
 !assets/
 !assets/**
-audit/

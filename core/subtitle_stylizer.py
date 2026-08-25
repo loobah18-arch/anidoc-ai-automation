@@ -29,7 +29,7 @@ def format_ass_timestamp(seconds: float) -> str:
 SUBTITLE_STYLE_PRESETS = {
     "viral_karaoke": {
         "font": "Arial",
-        "fontsize": 64,                  # Proportional for portrait canvas
+        "fontsize": 64,                  # Proportional for 1:1 square canvas
         "primary": "&H00FFFFFF",
         "active_word": "&H002BF5FF",     # Bright Cyan Active
         "outline": "&H00000000",
@@ -37,7 +37,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 6.0,
         "shadow_depth": 3.5,
         "alignment": 2,                  # Bottom-center
-        "margin_v": 240,                 # Sits in golden lower-third of 9:16 canvas
+        "margin_v": 85,                  # Sits in lower third of square
         "margin_lr": 60,
     },
     "gojo_hollow_purple": {
@@ -47,10 +47,10 @@ SUBTITLE_STYLE_PRESETS = {
         "active_word": "&H00FFF000",     # Electric Cyan Active
         "outline": "&H00D000AA",         # Hollow Purple Outer Glow
         "shadow": "&H99000000",
-        "outline_width": 8.0,
-        "shadow_depth": 5.0,
+        "outline_width": 7.0,
+        "shadow_depth": 4.0,
         "alignment": 2,
-        "margin_v": 240,
+        "margin_v": 85,
         "margin_lr": 60,
     },
     "sukuna_malevolent_shrine": {
@@ -63,7 +63,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 7.5,
         "shadow_depth": 4.5,
         "alignment": 2,
-        "margin_v": 240,
+        "margin_v": 85,
         "margin_lr": 60,
     },
     "solo_leveling_monarch": {
@@ -76,7 +76,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 6.5,
         "shadow_depth": 4.0,
         "alignment": 2,
-        "margin_v": 240,
+        "margin_v": 85,
         "margin_lr": 60,
     },
     "cyber_glow": {
@@ -89,7 +89,7 @@ SUBTITLE_STYLE_PRESETS = {
         "outline_width": 6.0,
         "shadow_depth": 3.5,
         "alignment": 2,
-        "margin_v": 240,
+        "margin_v": 85,
         "margin_lr": 60,
     },
     "anime_shrine": {
@@ -207,9 +207,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             for j, w in enumerate(chunk_words):
                 w_upper = w.upper()
                 if j == word_in_chunk_idx:
-                    # Active word: Highlighted color + dynamic 115% pop with smooth return ease (video-ffmpeg-engineer standard)
+                    # Active word: Highlighted color + 118% dynamic bounce scale
                     line_parts.append(
-                        f"{{\\c{cfg['active_word']}\\fscx115\\fscy115\\t(0,150,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
+                        f"{{\\c{cfg['active_word']}\\t(0,100,\\fscx118\\fscy118)\\t(100,200,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
                     )
                 else:
                     # Inactive word: Clean white

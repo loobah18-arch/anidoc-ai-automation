@@ -32,16 +32,16 @@ class BeatSyncConfig:
     hop_length: int = 512
     n_fft: int = 2048
 
-    # Safety limits for cut durations across energy levels (Human Pro Editor Pacing)
-    low_energy_min_interval: float = 2.80
-    medium_energy_min_interval: float = 1.90
-    high_energy_min_interval: float = 1.40
-    peak_energy_min_interval: float = 1.10
+    # Safety limits for cut durations across energy levels
+    low_energy_min_interval: float = 0.90
+    medium_energy_min_interval: float = 0.58
+    high_energy_min_interval: float = 0.38
+    peak_energy_min_interval: float = 0.28
 
     low_energy_max_hold: float = 3.80
     medium_energy_max_hold: float = 2.80
-    high_energy_max_hold: float = 2.00
-    peak_energy_max_hold: float = 1.50
+    high_energy_max_hold: float = 1.85
+    peak_energy_max_hold: float = 1.25
 
     phrase_beats: int = 8
     bar_beats: int = 4
@@ -338,8 +338,8 @@ def _select_wave_cuts(
             step = max(2, cfg.bar_beats // 2)
             min_gap = cfg.medium_energy_min_interval
         elif stype == "drop":
-            step = 2
-            min_gap = max(0.90, cfg.peak_energy_min_interval)
+            step = 1
+            min_gap = cfg.peak_energy_min_interval
         elif stype == "outro":
             step = max(4, cfg.bar_beats)
             min_gap = cfg.medium_energy_max_hold
@@ -353,18 +353,13 @@ def _select_wave_cuts(
                 continue
 
             if stype == "drop":
-                if (impact[idx] >= 0.65 or k % step == 0) or (t - selected[-1]) >= 1.5:
+                if impact[idx] >= 0.40 or k % step == 0 or (t - selected[-1]) >= 1.2:
                     selected.append(t)
             else:
                 if k % step == 0 or (t - selected[-1]) >= cfg.low_energy_max_hold:
                     selected.append(t)
 
-    res = _unique_sorted(np.asarray(selected, dtype=float), cfg.peak_energy_min_interval)
-    if len(res) > 10:
-        # Cap max cuts to 10 matching priority reference cinematic pacing (~4 cuts/18.7s scaled)
-        idx_pick = np.linspace(0, len(res) - 1, 10, dtype=int)
-        res = res[idx_pick]
-    return res
+    return _unique_sorted(np.asarray(selected, dtype=float), cfg.peak_energy_min_interval)
 
 
 # ── Public API ───────────────────────────────────────────────────────────────

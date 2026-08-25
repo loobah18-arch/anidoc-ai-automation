@@ -1,51 +1,12 @@
-name: Daily AMV & Scene Edit Generator — YouTube Auto-Upload
+name: Daily 4K Phonk / Scene Edit Generator & YouTube Auto-Upload
 
 on:
   schedule:
-    - cron: '30 6,18 * * *'  # Twice daily: 06:30 UTC & 18:30 UTC — auto-uploads to YouTube
-  push:
-    branches: [ main ]
+    - cron: '30 6,18 * * *'  # Runs twice daily at 06:30 UTC & 18:30 UTC
   workflow_dispatch:
     inputs:
-      mode:
-        description: 'Edit mode'
-        required: false
-        default: 'gdrive-amv'
-        type: choice
-        options:
-          - 'gdrive-amv'      # Hybrid AMV from your Drive raw footage (recommended)
-          - 'single'          # Classic single-character 4K phonk edit
-          - 'ranking'         # Top-5 ranking countdown edit
-
-      # ── AMV mode inputs ──────────────────────────────────────────────────
-      amv_source_folder:
-        description: '[AMV] Source Drive folder ID/URL (leave blank = use default raw footage folder)'
-        required: false
-        default: ''
-        type: string
-      amv_universe:
-        description: '[AMV] Universe — jjk or marvel (auto-alternates on schedule)'
-        required: false
-        default: 'random'
-        type: choice
-        options:
-          - 'random'
-          - 'jjk'
-          - 'marvel'
-      amv_character:
-        description: '[AMV] Specific character (gojo/sukuna/ironman/spiderman/etc). Auto-pick if blank.'
-        required: false
-        default: ''
-        type: string
-      amv_duration:
-        description: '[AMV] Target duration in seconds (60-90 recommended)'
-        required: false
-        default: '75'
-        type: string
-
-      # ── Classic mode inputs ───────────────────────────────────────────────
       universe:
-        description: '[Classic] Universe (marvel, jjk, or random)'
+        description: 'Universe (marvel, jjk, or random)'
         required: false
         default: 'random'
         type: choice
@@ -54,7 +15,7 @@ on:
           - 'marvel'
           - 'jjk'
       character:
-        description: '[Classic] Specific character (spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi, yuji)'
+        description: 'Specific character (spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi, yuji)'
         required: false
         default: ''
         type: string
@@ -86,29 +47,19 @@ on:
           - 'anime_shrine'
           - 'cinematic_minimal'
       gdrive_folder:
-        description: '[Classic] Google Drive folder link or ID containing raw movies/episodes (optional)'
+        description: 'Google Drive folder link or ID containing raw movies/episodes (optional)'
         required: false
         default: ''
         type: string
       refresh_clips:
-        description: '[Classic] Download & slice fresh scenepack cuts'
+        description: 'Download & slice fresh scenepack cuts (multi-source: yt-dlp → Archive.org → Pixabay)'
         required: false
         default: false
         type: boolean
-      upload_youtube:
-        description: 'Upload final MP4 to YouTube Shorts (always true on scheduled runs)'
+      upload:
+        description: 'Upload rendered Short to YouTube'
         required: false
-        default: true
-        type: boolean
-      upload_gdrive:
-        description: 'Upload final MP4 + code snapshot ZIP to Google Drive AMV_Outputs/ folder'
-        required: false
-        default: true
-        type: boolean
-      audit:
-        description: 'Run post-render quality audit vs priority reference (@Chakra_boy)'
-        required: false
-        default: true
+        default: false
         type: boolean
 
 jobs:
@@ -143,233 +94,51 @@ jobs:
         run: |
           python test_pipeline.py
 
-      - name: Build & Upload AMV or Scene Edit
+      - name: Generate 4K Phonk Scene Edit
         env:
-          PYTHONUNBUFFERED: "1"
-          # Google Drive OAuth (for raw footage download + output upload)
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
-          GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
-          # YouTube OAuth
-          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
-          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
-          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID || secrets.CLIENT_ID }}
-          YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
-          # Optional AI / stock APIs
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
+          # Optional stock video APIs (free at pixabay.com & pexels.com)
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
-          # ── Determine run context ─────────────────────────────────────────
-          IS_SCHEDULED="false"
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "push" ]; then
-            IS_SCHEDULED="true"
+          CMD="python main.py --duration 38.0"
+          
+          if [ "${{ github.event.inputs.universe }}" != "random" ] && [ -n "${{ github.event.inputs.universe }}" ]; then
+            CMD="$CMD --universe ${{ github.event.inputs.universe }}"
+          fi
+          
+          if [ -n "${{ github.event.inputs.character }}" ]; then
+            CMD="$CMD --character ${{ github.event.inputs.character }}"
+          fi
+          
+          if [ "${{ github.event.inputs.phonk }}" != "random" ] && [ -n "${{ github.event.inputs.phonk }}" ]; then
+            CMD="$CMD --phonk ${{ github.event.inputs.phonk }}"
+          fi
+          
+          if [ -n "${{ github.event.inputs.subtitle_style }}" ]; then
+            CMD="$CMD --subtitle-style ${{ github.event.inputs.subtitle_style }}"
           fi
 
-          # Scheduled runs & pushes to main always upload to both YouTube and GDrive
-          SHOULD_UPLOAD_YT="${{ github.event.inputs.upload_youtube }}"
-          SHOULD_UPLOAD_GD="${{ github.event.inputs.upload_gdrive }}"
-          if [ "$IS_SCHEDULED" = "true" ]; then
-            SHOULD_UPLOAD_YT="true"
-            SHOULD_UPLOAD_GD="true"
+          if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
+            CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
           fi
-          if [ -z "$SHOULD_UPLOAD_YT" ]; then SHOULD_UPLOAD_YT="true"; fi
-          if [ -z "$SHOULD_UPLOAD_GD" ]; then SHOULD_UPLOAD_GD="true"; fi
-
-          # ── Determine mode ────────────────────────────────────────────────
-          # Scheduled runs alternate JJK → Marvel by hour
-          MODE="${{ github.event.inputs.mode }}"
-          if [ -z "$MODE" ] || [ "$IS_SCHEDULED" = "true" ]; then
-            MODE="gdrive-amv"
+          
+          # Always refresh clips to get diverse sources each run
+          CMD="$CMD --refresh-clips"
+          
+          if [ "${{ github.event.inputs.upload }}" = "true" ]; then
+            CMD="$CMD --upload"
           fi
-
-          echo "========================================"
-          echo " Mode        : $MODE"
-          echo " Scheduled   : $IS_SCHEDULED"
-          echo " Upload YT   : $SHOULD_UPLOAD_YT"
-          echo "========================================"
-
-          # ── gdrive-amv mode (new hybrid AMV builder) ──────────────────────
-          if [ "$MODE" = "gdrive-amv" ]; then
-            # Universe: alternates JJK (06:30) / Marvel (18:30) on schedule
-            HOUR=$(date -u +%H)
-            if [ "$IS_SCHEDULED" = "true" ]; then
-              if [ "$HOUR" -lt 12 ]; then
-                AMV_UNIVERSE="jjk"
-              else
-                AMV_UNIVERSE="marvel"
-              fi
-            else
-              AMV_UNIVERSE="${{ github.event.inputs.amv_universe }}"
-              if [ -z "$AMV_UNIVERSE" ] || [ "$AMV_UNIVERSE" = "random" ]; then
-                AMV_UNIVERSE=$([ $((RANDOM % 2)) -eq 0 ] && echo "jjk" || echo "marvel")
-              fi
-            fi
-
-            AMV_SRC="${{ github.event.inputs.amv_source_folder }}"
-            # Default to hardcoded raw footage folder if not overridden
-            if [ -z "$AMV_SRC" ]; then
-              AMV_SRC="1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4"
-            fi
-
-            AMV_CHAR="${{ github.event.inputs.amv_character }}"
-            AMV_DUR="${{ github.event.inputs.amv_duration }}"
-            if [ -z "$AMV_DUR" ]; then AMV_DUR="75"; fi
-
-            CMD="python scripts/gdrive_amv_builder.py"
-            CMD="$CMD --source-folder $AMV_SRC"
-            CMD="$CMD --universe $AMV_UNIVERSE"
-            CMD="$CMD --duration $AMV_DUR"
-
-            if [ -n "$AMV_CHAR" ]; then
-              CMD="$CMD --character $AMV_CHAR"
-            fi
-
-            if [ "$SHOULD_UPLOAD_YT" = "true" ]; then
-              CMD="$CMD --upload-youtube"
-            fi
-            if [ "$SHOULD_UPLOAD_GD" = "true" ]; then
-              CMD="$CMD --upload-gdrive"
-            fi
-
-            echo "Executing: $CMD"
-            eval $CMD
-
-          # ── classic single / ranking mode ──────────────────────────────────
-          else
-            CMD="python main.py --mode $MODE --duration 38.0"
-
-            UNI="${{ github.event.inputs.universe }}"
-            if [ -n "$UNI" ] && [ "$UNI" != "random" ]; then
-              CMD="$CMD --universe $UNI"
-            fi
-
-            if [ -n "${{ github.event.inputs.character }}" ]; then
-              CMD="$CMD --character ${{ github.event.inputs.character }}"
-            fi
-
-            if [ "${{ github.event.inputs.phonk }}" != "random" ] && [ -n "${{ github.event.inputs.phonk }}" ]; then
-              CMD="$CMD --phonk ${{ github.event.inputs.phonk }}"
-            fi
-
-            if [ -n "${{ github.event.inputs.subtitle_style }}" ]; then
-              CMD="$CMD --subtitle-style ${{ github.event.inputs.subtitle_style }}"
-            fi
-
-            if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
-              CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
-            fi
-
-            CMD="$CMD --refresh-clips"
-
-            if [ "$SHOULD_UPLOAD_YT" = "true" ]; then
-              CMD="$CMD --upload"
-            fi
-
-            echo "Executing: $CMD"
-            eval $CMD
-          fi
-
-
-      - name: Quality Audit vs Priority Reference
-        if: ${{ github.event.inputs.audit == 'true' }}
-        run: |
-          mkdir -p audit/frames
-          RENDERED=$(ls output/*.mp4 | head -1)
-          echo "Auditing: $RENDERED"
-
-          # Extract 10 keyframes from rendered video
-          DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$RENDERED")
-          for i in $(seq 1 10); do
-            T=$(python3 -c "print(round($DUR * $i / 11.0, 2))")
-            ffmpeg -y -ss "$T" -i "$RENDERED" -frames:v 1 -q:v 2 "audit/frames/rendered_$(printf '%02d' $i).png" 2>/dev/null || true
-          done
-
-          # Copy bundled priority reference keyframes for side-by-side delivery
-          cp references/priority_ref/*.png audit/frames/ 2>/dev/null || true
-
-          # Compute comparison metrics against committed ground-truth reference
-          python3 - <<'EOF'
-          import json, subprocess, os
-
-          def probe(path):
-              out = subprocess.run(["ffprobe","-v","error","-show_entries",
-                  "format=duration:stream=width,height,r_frame_rate",
-                  "-of","json",path],capture_output=True,text=True)
-              return json.loads(out.stdout)
-
-          def scene_cuts(path):
-              r = subprocess.run(["ffmpeg","-i",path,"-filter_complex",
-                  "select='gt(scene,0.35)',metadata=print","-f","null","-"],
-                  capture_output=True,text=True)
-              ts=[]
-              for l in r.stderr.splitlines():
-                  if "pts_time" in l:
-                      import re as _re
-                      m=_re.search(r"pts_time:([\d.]+)",l)
-                      if m: ts.append(round(float(m.group(1)),2))
-              scene_cuts.last_ts=ts
-              return len(ts)
-
-          def signal_stats(path):
-              r = subprocess.run(["ffmpeg","-i",path,"-vf",
-                  "signalstats,metadata=print","-f","null","-"],
-                  capture_output=True,text=True)
-              yavg=sat=n=0; ymin=255.0; ymax=0.0
-              for l in r.stderr.splitlines():
-                  if "lavfi.signalstats.YAVG=" in l:
-                      yavg+=float(l.split("YAVG=")[1].strip()); n+=1
-                  elif "lavfi.signalstats.SATAVG=" in l:
-                      sat+=float(l.split("SATAVG=")[1].strip())
-                  elif "lavfi.signalstats.YMIN=" in l:
-                      ymin=min(ymin,float(l.split("YMIN=")[1].strip()))
-                  elif "lavfi.signalstats.YMAX=" in l:
-                      ymax=max(ymax,float(l.split("YMAX=")[1].strip()))
-              return {"yavg":round(yavg/max(n,1),1),"saturation":round(sat/max(n,1),1),
-                      "dynamic_range":round(ymax-ymin,1)}
-
-          rendered = sorted(__import__("glob").glob("output/*.mp4"))[0]
-          with open("references/priority_metrics.json") as f:
-              pr = json.load(f)
-
-          p = probe(rendered)
-          n_cuts = scene_cuts(rendered)
-          rd = {
-              "file": os.path.basename(rendered),
-              "duration": round(float(p["format"]["duration"]),2),
-              "resolution": f'{p["streams"][0]["width"]}x{p["streams"][0]["height"]}',
-              "fps": p["streams"][0].get("r_frame_rate"),
-              "scene_cuts": n_cuts,
-              "cut_timestamps": scene_cuts.last_ts[:60],
-              **signal_stats(rendered)
-          }
-
-          dur_scale = rd["duration"]/max(pr["duration"],0.1)
-          scaled_cuts = round(pr["scene_cuts"]*dur_scale)
-          report = {
-              "rendered": rd,
-              "priority_reference": pr,
-              "gap_analysis": {
-                  "cut_count_rendered_vs_scaled_ref": [rd["scene_cuts"], scaled_cuts],
-                  "cut_delta": rd["scene_cuts"]-scaled_cuts,
-                  "saturation_delta": round(rd["saturation"]-pr["saturation"],1),
-                  "brightness_delta": round(rd["yavg"]-pr["yavg"],1),
-                  "dynamic_range_delta": round(rd["dynamic_range"]-(pr.get("yavg",100)*0+255),1) if False else None,
-                  "verdict_cut_pacing": "MATCH" if abs(rd["scene_cuts"]-scaled_cuts)<=max(3,scaled_cuts*0.25) else "ADJUST",
-                  "verdict_color": "MATCH" if abs(rd["saturation"]-pr["saturation"])<8 else "ADJUST",
-                  "verdict_brightness": "MATCH" if abs(rd["yavg"]-pr["yavg"])<12 else "ADJUST"
-              }
-          }
-          report["gap_analysis"].pop("dynamic_range_delta",None)
-          with open("audit/eval_report.json","w") as f:
-              json.dump(report,f,indent=2)
-          print(json.dumps(report,indent=2))
-          EOF
-
+          
+          echo "Executing: $CMD"
+          eval $CMD
 
       - name: Upload Output Artifacts
         uses: actions/upload-artifact@v4
@@ -379,7 +148,4 @@ jobs:
           path: |
             output/*.mp4
             scratch/*.ass
-            audit/eval_report.json
-            audit/frames/*.png
           retention-days: 7
-

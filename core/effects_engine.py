@@ -68,8 +68,8 @@ def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: 
             "add_shake": True,
             "add_chr_aber": True,
             "add_bloom": False,
-            "add_flash": False,
-            "add_exposure_pulse": False,
+            "add_flash": True,
+            "add_exposure_pulse": True,
         }
 
     if duration > 0.80:
@@ -94,7 +94,7 @@ def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: 
         "add_shake": (seg_idx % 5 == 0),
         "add_chr_aber": False,
         "add_bloom": False,
-        "add_flash": False,
+        "add_flash": (seg_idx % 6 == 0),
     }
 
 
@@ -145,29 +145,23 @@ def build_velocity_clip_filter(
     filters.append(f"scale={video_width}:{video_height}:force_original_aspect_ratio=increase")
     filters.append(f"crop={video_width}:{video_height}")
 
-    # 3. Velocity ramp (time stretch)
+    # 3. Velocity ramp
     filters.append(f"setpts={pts_mult:.4f}*PTS")
 
-    # 4. Butter-Smooth Twixtor-Style Motion Interpolation on Slow-Mo (speed < 0.85x)
-    # Anime is drawn at 12-24fps. Stretching time duplicates identical frames causing jitter.
-    # Motion-compensated frame blending generates smooth intermediate motion transitions.
-    if speed < 0.85:
-        filters.append(f"minterpolate=fps={fps}:mi_mode=blend:scd=none")
-        filters.append("tblend=all_mode=average")
+    # 4. Twixtor-style motion-compensated optical-flow interpolation on slow-mo (< 0.70x)
+    if speed < 0.70:
+        filters.append(
+            f"minterpolate=fps={fps}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:me=epzs:search_param=32:vsbmc=1:scd=fdiff:scd_threshold=10.0"
+        )
 
-    # 5. Animated Dynamic Zoom (Slowmo Progressive Ease Zoom vs. Drop Impact Zoom Punch)
+    # 5. Animated Dynamic Zoom Punch (smooth exponential ease-down over 14 frames)
     if scale_factor > 1.05:
         punch_delta = scale_factor - 1.0
-        if speed < 0.70:
-            # Slowmo optical-flow buildup: smooth progressive zoom-in over full clip duration
-            total_f = max(1, int(duration * fps))
-            zoom_expr = f"min({scale_factor:.3f},1.0+{punch_delta:.3f}*(in/{total_f}))"
-        else:
-            # Beat Drop impact zoom punch: instant snap on frame 0, smooth exponential ease-down
-            punch_frames = 14 if fps >= 50 else 8
-            zoom_expr = (
-                f"if(lte(in,{punch_frames}),{scale_factor:.2f}-{punch_delta:.2f}*(1-pow(1-(in/{punch_frames}),2)),1.0)"
-            )
+        punch_frames = 14 if fps >= 50 else 8
+        # Exponential easing curve: snaps instantly on frame 0, decays smoothly to 1.0
+        zoom_expr = (
+            f"if(lte(in,{punch_frames}),{scale_factor:.2f}-{punch_delta:.2f}*(1-pow(1-(in/{punch_frames}),2)),1.0)"
+        )
         filters.append(
             f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
             f":s={video_width}x{video_height}:fps={fps}"
@@ -180,7 +174,7 @@ def build_velocity_clip_filter(
         dur_f = max(0.4, duration)
         filters.append(f"boxblur=luma_radius=2:luma_power=1:enable='between(t,0,{dur_f:.2f})'")
 
-    # 6b. Directional Whip Pan (2-frame dynamic translation snap + directional motion blur)
+    # 6b. Directional Whip Pan (2-frame dynamic translation snap)
     if add_whip_pan:
         whip_offset = 64
         filters.append(
@@ -188,17 +182,20 @@ def build_velocity_clip_filter(
             f"cb='cb(X+if(lte(N,1),{whip_offset}*(1-N),0),Y)':"
             f"cr='cr(X+if(lte(N,1),{whip_offset}*(1-N),0),Y)'"
         )
-        filters.append("boxblur=luma_radius=4:luma_power=1:enable='lte(n,1)'")
 
     # 7. Camera Shake (9_VAGhAdne8 & CapCut Auto-Velocity: multi-harmonic exponential decay shake)
     if add_shake:
-        shake_frames = 12
-        shake_amp = 8
-        # Smooth organic crop-displacement camera shake
-        sx_expr = f"if(lt(n,{shake_frames}),8+{shake_amp}*sin(n*2.4)*exp(-0.28*n),8)"
-        sy_expr = f"if(lt(n,{shake_frames}),8+{shake_amp//2}*cos(n*3.3)*exp(-0.28*n),8)"
+        shake_frames = 10
+        shake_amp = 16
+        # Multi-harmonic exponential decay: explosive instant punch on frame 0, organic damping over 10 frames
+        sx_expr = (
+            f"if(lt(N,{shake_frames}),{shake_amp}*sin(N*2.2)*exp(-0.30*N),0)"
+        )
+        sy_expr = (
+            f"if(lt(N,{shake_frames}),{shake_amp//2}*cos(N*3.1)*exp(-0.30*N),0)"
+        )
         filters.append(
-            f"crop=w=iw-16:h=ih-16:x='{sx_expr}':y='{sy_expr}',scale={video_width}:{video_height}"
+            f"geq=lum='p(X+({sx_expr}),Y+({sy_expr}))':cb='cb(X+({sx_expr}),Y+({sy_expr}))':cr='cr(X+({sx_expr}),Y+({sy_expr}))'"
         )
 
     # 8. Multi-Harmonic Chromatic Dispersion RGB Split (Boris FX Sapphire / 8Fyb0LXw1BU style)
@@ -225,12 +222,9 @@ def build_velocity_clip_filter(
     if add_speed_lines:
         filters.append("drawgrid=w=100:h=100:t=2:c=white@0.10:enable='between(n,0,5)'")
 
-    # 11b. Beat-Reactive Exposure & Saturation Pulse (2-frame high-shutter contrast/saturation burst on drop impacts)
+    # 11b. Beat-Reactive Exposure Pulse (2-frame dynamic contrast/brightness punch on drop strikes)
     if add_exposure_pulse:
-        filters.append("eq=contrast=1.15:brightness=0.03:saturation=1.45:enable='between(n,0,2)'")
-    else:
-        # Subtle S-curve contrast boost for rich deep blacks and vivid highlights
-        filters.append("eq=contrast=1.08:saturation=1.12")
+        filters.append("eq=contrast=1.14:brightness=0.04:enable='between(n,0,2)'")
 
     # 12. Cinematic letterbox bars — intro atmospheric framing
     if add_bars:
@@ -264,15 +258,15 @@ def build_cc_filter(
     cfg = CC_PRESETS.get(preset_name, CC_PRESETS["marvel_hdr"])
 
     if dynamic_mood_shift and drop_time > 0.8:
-        # Pre-drop mildly desaturated cinematic grade -> Drop neon color explosion
+        # Pre-drop desaturated cinematic grade -> Drop neon color explosion
         sat_expr = (
-            f"'if(lt(t,{drop_time:.2f}),{cfg['saturation']*0.88:.2f},{cfg['saturation']*1.42:.2f})'"
+            f"'if(lt(t,{drop_time:.2f}),{cfg['saturation']*0.72:.2f},{cfg['saturation']*1.28:.2f})'"
         )
         con_expr = (
-            f"'if(lt(t,{drop_time:.2f}),{cfg['contrast']*0.96:.2f},{cfg['contrast']*1.04:.2f})'"
+            f"'if(lt(t,{drop_time:.2f}),{cfg['contrast']*0.94:.2f},{cfg['contrast']*1.06:.2f})'"
         )
         gam_expr = (
-            f"'if(lt(t,{drop_time:.2f}),{cfg['gamma']*1.02:.2f},{cfg['gamma']*0.99:.2f})'"
+            f"'if(lt(t,{drop_time:.2f}),{cfg['gamma']*1.04:.2f},{cfg['gamma']*0.96:.2f})'"
         )
         eq_part = (
             f"eq=contrast={con_expr}:brightness={cfg['brightness']}"
@@ -294,7 +288,7 @@ def build_cc_filter(
         flicker_end = drop_time
         flicker_eq = (
             f",eq=brightness='if(between(t,{flicker_start:.2f},{flicker_end:.2f}),"
-            f"sin(t*6.28*1.5)*0.03,0)':eval=frame"
+            f"sin(t*6.28*3)*0.08,0)':eval=frame"
         )
         base_vig = cfg['vignette']
         vignette_part = (

@@ -1,294 +1,200 @@
-#!/usr/bin/env python3
 """
-AMV Pipeline Test Suite v2 — validates gdrive_amv_builder.py v2 and core deps.
-All tests use the new v2 API signatures.
+Comprehensive Test Suite for AniDoc 4K Phonk & Scene Edit Automation Engine.
+Validates Phonk Audio Library, Public API / GitHub Clip Fetcher, Subtitle Stylizer, and Studio Server.
 """
-import sys
 import unittest
+import subprocess
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from config.settings import (
-    SCRATCH_DIR, OUTPUT_DIR, PHONK_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS
+from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, CC_PRESETS, PHONK_DIR
+from core.beat_detector import generate_procedural_beat_grid, analyze_audio_beats
+from core.effects_engine import (
+    build_cc_filter,
+    build_beat_flash_filters,
+    get_segment_velocity_profile,
+    build_velocity_clip_filter
 )
-from scripts.gdrive_amv_builder import (
-    STYLE_POOL, STYLE_STATE_FILE, SOURCE_FOLDER_ID,
-    pick_style, _load_style_state, _save_style_state,
-    build_clip_vfx, get_beat_timeline, get_velocity,
-    _camera_shake, _glitch, _zoom_punch, _flash_and_dip,
-    _pre_drop_flicker, _motion_blur, _letterbox, _scale_pad,
-)
-from core.effects_engine import build_cc_filter
-from core.clip_manager import CHARACTER_THEMES
-from core.phonk_manager import list_available_phonk_tracks, get_random_or_specified_phonk
+from core.clip_manager import generate_procedural_cinematic_scene, get_character_scene_clips, CHARACTER_THEMES
+from core.phonk_manager import list_available_phonk_tracks, get_random_or_specified_phonk, POPULAR_PHONK_CATALOG
+from core.public_api_fetcher import slice_scenepack_into_clips
+from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
+from core.quote_ai import generate_edit_metadata
+from core.video_assembler import render_cinematic_edit, generate_fallback_phonk_audio
+from core.beatsync_analyzer import analyze_audio_beatsync
+from core.stem_separator import get_best_beat_source
+from core.deadframe_detector import measure_clip_motion, filter_action_packed_clips
+from core.storyline_planner import StorylinePlanner
 
-
-# ── Helper: build a segment dict (v2 API) ────────────────────────────────────
-def seg(role, is_peak=False, is_drop=None, duration=1.0):
-    if is_drop is None:
-        is_drop = role in ("drop1", "drop2")
-    return {"role": role, "is_drop": is_drop, "is_peak": is_peak, "duration": duration}
-
-
-class TestStyleRotation(unittest.TestCase):
-    """VFX style rotation must advance and never repeat until full cycle."""
-
+class TestAniDocPipeline(unittest.TestCase):
     def setUp(self):
-        self._real = _load_style_state()
-        _save_style_state({"run_count": 0})
+        SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 
-    def tearDown(self):
-        _save_style_state(self._real)
-
-    def test_style_pool_has_6_entries(self):
-        self.assertEqual(len(STYLE_POOL), 6)
-
-    def test_each_style_has_required_keys(self):
-        required = {
-            "name", "description", "velocity", "zoom_punch", "color_flash",
-            "letterbox", "beat_cuts", "slow_mo_peaks", "glitch",
-            "flash_frames", "motion_blur",
-        }
-        for s in STYLE_POOL:
-            self.assertTrue(required.issubset(s.keys()),
-                            f"Style '{s['name']}' missing keys: {required - s.keys()}")
-
-    def test_rotation_advances_each_run(self):
-        seen = [pick_style()["name"] for _ in range(6)]
-        self.assertEqual(len(set(seen)), 6, f"Rotation repeated: {seen}")
-
-    def test_rotation_wraps_around(self):
-        for _ in range(6): pick_style()
-        seventh = pick_style()
-        self.assertEqual(seventh["name"], STYLE_POOL[0]["name"])
-
-    def test_state_file_in_config_not_scratch(self):
-        self.assertIn("config", str(STYLE_STATE_FILE))
-        self.assertNotIn("scratch", str(STYLE_STATE_FILE))
-
-
-class TestVelocityCurves(unittest.TestCase):
-    """Velocity must match professional AMV reference values."""
-
-    def _spd(self, role, style_name, is_peak=False):
-        style = next(s for s in STYLE_POOL if s["name"] == style_name)
-        return get_velocity(seg(role, is_peak=is_peak), style)
-
-    def test_velocity_rush_intro_is_030(self):
-        self.assertAlmostEqual(self._spd("intro", "Velocity Rush"), 0.30, places=2)
-
-    def test_velocity_rush_drop1_is_150(self):
-        self.assertAlmostEqual(self._spd("drop1", "Velocity Rush"), 1.50, places=2)
-
-    def test_velocity_rush_drop2_is_180(self):
-        self.assertAlmostEqual(self._spd("drop2", "Velocity Rush"), 1.80, places=2)
-
-    def test_peak_slow_mo_is_035(self):
-        self.assertAlmostEqual(self._spd("drop1", "Velocity Rush", is_peak=True), 0.35, places=2)
-
-    def test_slow_cinema_no_speed_change(self):
-        # Slow Cinema has velocity=False and slow_mo_peaks=True
-        # non-peak segments should stay at or near 1.0 (it can do slow-mo on peaks)
-        speed = self._spd("drop1", "Slow Cinema", is_peak=False)
-        self.assertLessEqual(speed, 1.2, "Slow Cinema non-peak should not speed up significantly")
-
-
-class TestVFXFiltergraph(unittest.TestCase):
-    """Each filter builder must produce a valid non-empty string."""
-
-    def test_glitch_uses_rgbashift(self):
-        self.assertIn("rgbashift", _glitch())
-
-    def test_camera_shake_uses_geq(self):
-        shake = _camera_shake()
-        self.assertIn("geq", shake)
-        self.assertIn("14", shake)   # ±14px displacement
-
-    def test_zoom_punch_uses_zoompan(self):
-        zp = _zoom_punch(1.09)
-        self.assertIn("zoompan", zp)
-        self.assertIn("1.090", zp)
-
-    def test_flash_and_dip_has_white_and_black(self):
-        f = _flash_and_dip(0.0, 0.06, 0.04)
-        self.assertIn("white", f)
-        self.assertIn("black", f)
-
-    def test_pre_drop_flicker_has_sin(self):
-        f = _pre_drop_flicker(2.5)
-        self.assertIn("sin", f)
-        self.assertIn("brightness", f)
-
-    def test_motion_blur_only_on_fast(self):
-        self.assertEqual(_motion_blur(1.0), "")
-        self.assertEqual(_motion_blur(1.19), "")
-        self.assertIn("tblend", _motion_blur(1.5))
-
-    def test_letterbox_has_top_and_bottom_bars(self):
-        lb = _letterbox(80)
-        self.assertEqual(lb.count("drawbox"), 2)
-        self.assertIn("y=0", lb)
-
-    def test_scale_pad_ends_with_black(self):
-        self.assertTrue(_scale_pad().endswith("black"))
-
-
-class TestBuildClipVFX(unittest.TestCase):
-    """build_clip_vfx (v2 API) must return correct chains per role."""
-
-    def _vfx(self, style_name, role, is_peak=False, duration=0.3, next_role=""):
-        style = next(s for s in STYLE_POOL if s["name"] == style_name)
-        s = seg(role, is_peak=is_peak, duration=duration)
-        vf, af, speed = build_clip_vfx(style, s, "#3b82f6", next_role=next_role)
-        return vf, af, speed
-
-    def test_intro_has_setpts_slow(self):
-        vf, _, speed = self._vfx("Velocity Rush", "intro", duration=2.5)
-        self.assertIn("setpts", vf)
-        self.assertAlmostEqual(speed, 0.30, places=2)
-
-    def test_drop1_has_camera_shake(self):
-        vf, _, _ = self._vfx("Velocity Rush", "drop1", duration=0.3)
-        self.assertIn("geq", vf)
-
-    def test_drop2_faster_than_drop1(self):
-        _, _, spd1 = self._vfx("Velocity Rush", "drop1", duration=0.25)
-        _, _, spd2 = self._vfx("Velocity Rush", "drop2", duration=0.18)
-        self.assertGreater(spd2, spd1)
-
-    def test_peak_is_slow_mo(self):
-        _, _, speed = self._vfx("Velocity Rush", "drop1", is_peak=True, duration=0.3)
-        self.assertAlmostEqual(speed, 0.35, places=2)
-
-    def test_breakdown_before_drop_has_flicker(self):
-        vf, _, _ = self._vfx("Velocity Rush", "breakdown", duration=1.5, next_role="drop1")
-        self.assertIn("sin", vf)
-
-    def test_glitch_storm_has_rgbashift_on_drop(self):
-        vf, _, _ = self._vfx("Glitch Storm", "drop1", duration=0.3)
-        self.assertIn("rgbashift", vf)
-
-    def test_slow_cinema_no_zoom_punch(self):
-        vf, _, _ = self._vfx("Slow Cinema", "drop1", duration=0.5)
-        self.assertNotIn("zoompan", vf)
-
-    def test_scale_pad_always_last(self):
-        for style in STYLE_POOL:
-            for role in ("intro", "drop1", "drop2", "outro"):
-                vf, _, _ = self._vfx(style["name"], role, duration=0.3)
-                self.assertTrue(
-                    vf.endswith("black"),
-                    f"Style '{style['name']}' role '{role}': scale pad must be last — got ...{vf[-40:]}"
-                )
-
-    def test_audio_tempo_chained_for_extreme_speeds(self):
-        # drop2 at 1.8x — should use atempo=1.800, not chain (within 0.5-2.0 range)
-        _, af, _ = self._vfx("Velocity Rush", "drop2", duration=0.18)
-        self.assertIn("atempo", af)
-
-
-class TestFallbackTimeline(unittest.TestCase):
-    """Fallback timeline must cover the full duration with correct roles."""
-
-    def test_fallback_covers_full_duration(self):
-        from scripts.gdrive_amv_builder import _fallback_timeline
-        segs = _fallback_timeline(75.0)
-        total = sum(s["duration"] for s in segs)
-        self.assertGreater(total, 70.0, "Fallback must cover at least 70s of 75s target")
-
-    def test_fallback_has_all_roles(self):
-        from scripts.gdrive_amv_builder import _fallback_timeline
-        segs = _fallback_timeline(75.0)
-        roles = {s["role"] for s in segs}
-        for expected in ("intro", "drop1", "breakdown", "drop2", "outro"):
-            self.assertIn(expected, roles, f"Fallback missing '{expected}' role")
-
-    def test_fallback_drop_clips_are_short(self):
-        from scripts.gdrive_amv_builder import _fallback_timeline
-        segs = _fallback_timeline(75.0)
-        drops = [s for s in segs if s["role"] == "drop2"]
-        for d in drops:
-            self.assertLessEqual(d["duration"], 0.35, f"drop2 clip too long: {d['duration']}")
-
-
-class TestColorGrades(unittest.TestCase):
-    """CC presets must produce non-empty filter strings."""
-
-    def test_all_cc_presets_produce_filters(self):
-        for preset in CC_PRESETS:
-            self.assertGreater(len(build_cc_filter(preset)), 0,
-                               f"CC preset '{preset}' returned empty filter")
-
-    def test_jjk_and_marvel_presets_exist(self):
-        self.assertIn("jjk_void", CC_PRESETS)
-        self.assertIn("marvel_hdr", CC_PRESETS)
-
-
-class TestCharacterThemes(unittest.TestCase):
-    """Character themes must be complete and universe-separated."""
-
-    def test_no_cross_universe_characters(self):
-        jjk = {k for k, v in CHARACTER_THEMES.items() if v.get("universe") == "jjk"}
-        marvel = {k for k, v in CHARACTER_THEMES.items() if v.get("universe") == "marvel"}
-        self.assertEqual(jjk & marvel, set())
-
-    def test_all_themes_have_cc_preset(self):
-        for name, theme in CHARACTER_THEMES.items():
-            self.assertIn("cc_preset", theme, f"'{name}' missing cc_preset")
-            self.assertIn(theme["cc_preset"], CC_PRESETS,
-                          f"'{name}' has unknown cc_preset '{theme['cc_preset']}'")
-
-    def test_all_themes_have_colors(self):
-        for name, theme in CHARACTER_THEMES.items():
-            self.assertGreater(len(theme.get("colors", [])), 0, f"'{name}' has no colors")
-
-
-class TestPhonkLibrary(unittest.TestCase):
-    """Phonk library must be accessible."""
-
-    def test_phonk_tracks_exist(self):
+    def test_01_phonk_library_manager(self):
         tracks = list_available_phonk_tracks()
-        self.assertGreater(len(tracks), 0, "No phonk tracks in assets/audio/phonk/")
+        self.assertTrue(len(tracks) >= 2, "Should have at least 2 phonk tracks downloaded in library")
+        self.assertTrue(len(POPULAR_PHONK_CATALOG) >= 5)
+        
+        # Test retrieval
+        phonk_audio = get_random_or_specified_phonk("tokyo_drift_phonk")
+        self.assertIsNotNone(phonk_audio)
+        self.assertTrue(Path(phonk_audio).exists())
 
-    def test_get_random_phonk_returns_valid_path(self):
-        path = get_random_or_specified_phonk(None)
-        if path:
-            self.assertTrue(Path(str(path)).exists())
+    def test_02_beat_grid_generation(self):
+        grid = generate_procedural_beat_grid(duration=20.0, drop_time=6.0, bpm=130.0)
+        self.assertEqual(grid.duration, 20.0)
+        self.assertEqual(grid.drop_time, 6.0)
+        self.assertTrue(len(grid.beat_times) >= 10)
+        segments = grid.get_cut_segments()
+        self.assertTrue(len(segments) >= 10)
+        self.assertTrue(any(s["is_drop"] for s in segments))
 
+    def test_03_effects_filter_builders(self):
+        marvel_cc = build_cc_filter("marvel_hdr")
+        self.assertIn("eq=contrast=", marvel_cc)
+        self.assertIn("unsharp=", marvel_cc)
+        self.assertIn("vignette=", marvel_cc)
 
-class TestYouTubeMetadataAndCopyright(unittest.TestCase):
-    """YouTube metadata must contain clean titles, hashtags, and standard copyright disclaimers."""
+        jjk_cc = build_cc_filter("jjk_void")
+        self.assertIn("eq=contrast=", jjk_cc)
 
-    def test_format_youtube_metadata_adds_copyright_and_hashtags(self):
-        from publishers.youtube_publisher import format_youtube_metadata, STANDARD_COPYRIGHT_DISCLAIMER
-        title = "Gojo Satoru 4K Phonk AMV"
-        desc = "Epic Gojo Satoru edit featuring 60fps velocity ramp."
-        tags = ["gojo", "jjk", "phonk", "amv"]
+        flashes = build_beat_flash_filters([6.0, 7.5, 9.0])
+        self.assertEqual(len(flashes), 6)
+        self.assertIn("drawbox=", flashes[0])
 
-        clean_title, clean_desc, clean_tags = format_youtube_metadata(
-            title=title, description=desc, tags=tags, character_name="Gojo", universe="jjk"
+        vel = get_segment_velocity_profile({"is_drop": True, "duration": 1.2}, 0, 10)
+        self.assertEqual(vel["role"], "power_slowmo")
+        self.assertAlmostEqual(vel["speed"], 0.45)
+
+        vf = build_velocity_clip_filter(0, 1.2, speed=vel["speed"], scale_factor=vel["scale_factor"])
+        self.assertIn("setpts=", vf)
+        self.assertIn("trim=duration=1.200", vf)
+
+    def test_04_quote_ai_metadata(self):
+        spidey = generate_edit_metadata("spiderman")
+        self.assertEqual(spidey["universe"], "marvel")
+        self.assertTrue(len(spidey["quote"]) > 5)
+        self.assertTrue(len(spidey["title"]) > 10)
+        self.assertTrue(len(spidey["tags"]) >= 4)
+
+        gojo = generate_edit_metadata("gojo")
+        self.assertEqual(gojo["universe"], "jjk")
+        self.assertTrue(len(gojo["quote"]) > 5)
+
+    def test_05_word_by_word_karaoke_subtitles(self):
+        ass_out = SCRATCH_DIR / "test_subs.ass"
+        for style in ["viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"]:
+            generate_kinetic_subtitles(
+                quote_text="Throughout heaven and earth I alone am the honored one",
+                start_time=0.5,
+                end_time=5.5,
+                output_ass_path=ass_out,
+                style_preset=style,
+                character_name="GOJO"
+            )
+            self.assertTrue(ass_out.exists())
+            with open(ass_out, "r", encoding="utf-8") as f:
+                content = f.read()
+                self.assertIn("[Script Info]", content)
+                self.assertIn("HONORED", content)
+                # Note: character badge removed from subtitles (cleaner look)
+                self.assertIn("BaseText", content)
+
+    def test_06_procedural_scene_rendering(self):
+        test_clip = SCRATCH_DIR / "test_proc_scene.mp4"
+        generate_procedural_cinematic_scene("gojo", 0, 2.0, test_clip, is_drop=False)
+        self.assertTrue(test_clip.exists())
+        self.assertTrue(test_clip.stat().st_size > 5000)
+
+        # Verify probe
+        probe_cmd = [
+            "ffprobe", "-v", "error",
+            "-show_entries", "stream=width,height",
+            "-of", "csv=p=0",
+            str(test_clip)
+        ]
+        res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
+        self.assertIn(f"{VIDEO_WIDTH},{VIDEO_HEIGHT}", res.stdout)
+
+    def test_07_end_to_end_video_assembly_with_phonk(self):
+        out_video = SCRATCH_DIR / "test_assembled_edit.mp4"
+        res = render_cinematic_edit(
+            character_key="spiderman",
+            phonk_track="lonown_avangard_phonk",
+            subtitle_style="viral_karaoke",
+            output_path=out_video,
+            target_duration=4.5
         )
+        self.assertEqual(res["status"], "success")
+        self.assertTrue(out_video.exists())
+        self.assertTrue(out_video.stat().st_size > 50000)
 
-        self.assertIn("#shorts", clean_title)
-        self.assertLessEqual(len(clean_title), 95)
-        self.assertIn("COPYRIGHT DISCLAIMER", clean_desc)
-        self.assertIn("FAIR USE NOTICE", clean_desc)
-        self.assertIn("#shorts", clean_desc)
-        self.assertIn("#gojo", clean_desc)
-        self.assertLessEqual(len(clean_tags), 15)
-        for t in clean_tags:
-            self.assertNotIn("#", t)
+        # Verify aspect ratio & duration
+        probe_cmd = [
+            "ffprobe", "-v", "error",
+            "-show_entries", "stream=width,height,codec_name",
+            "-of", "csv=p=0",
+            str(out_video)
+        ]
+        probe_res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
+        self.assertIn(f"{VIDEO_WIDTH},{VIDEO_HEIGHT}", probe_res.stdout)
 
+    def test_08_beatsync_engine_hpss(self):
+        phonk_audio = get_random_or_specified_phonk("lonown_avangard_phonk")
+        self.assertIsNotNone(phonk_audio)
+        bs_res = analyze_audio_beatsync(phonk_audio, target_duration=8.0)
+        self.assertTrue(len(bs_res.beat_times) >= 4)
+        self.assertTrue(bs_res.tempo > 50.0)
+        self.assertTrue(len(bs_res.sections) >= 1)
+        segs = bs_res.get_cut_segments()
+        self.assertTrue(len(segs) >= 2)
+        self.assertIn("energy", segs[0])
+        self.assertIn("kick", segs[0])
 
-class TestSourceFolderConfig(unittest.TestCase):
-    def test_source_folder_id_correct(self):
-        self.assertEqual(SOURCE_FOLDER_ID, "1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4")
+    def test_09_ultimate_amv_stem_and_deadframe(self):
+        phonk_audio = get_random_or_specified_phonk("lonown_avangard_phonk")
+        self.assertIsNotNone(phonk_audio)
+        beat_src = get_best_beat_source(phonk_audio, SCRATCH_DIR)
+        self.assertTrue(Path(beat_src).exists())
 
-    def test_output_dir_creatable(self):
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        self.assertTrue(OUTPUT_DIR.exists())
+        # Test deadframe & motion measurement on procedural clip
+        test_clip = SCRATCH_DIR / "test_proc_scene.mp4"
+        if test_clip.exists():
+            motion_res = measure_clip_motion(test_clip, max_duration=2.0)
+            self.assertIn("action_score", motion_res)
+            self.assertIn("deadframe_ratio", motion_res)
+            filtered = filter_action_packed_clips([test_clip])
+            self.assertTrue(len(filtered) >= 1)
 
+    def test_10_openstoryline_arc_planner(self):
+        planner = StorylinePlanner(drop_time=6.0, total_duration=20.0)
+        self.assertEqual(len(planner.phases), 4)
+        phase_names = [p.name for p in planner.phases]
+        self.assertEqual(phase_names, ["HOOK", "BUILD", "DROP", "OUTRO"])
+
+        # Test segment planning from simulated segments
+        sim_segs = [
+            {"start": 0.0, "end": 1.0, "duration": 1.0, "is_drop": False, "energy": 0.3, "kick": 0.2},
+            {"start": 1.0, "end": 6.0, "duration": 5.0, "is_drop": False, "energy": 0.6, "kick": 0.5},
+            {"start": 6.0, "end": 7.0, "duration": 1.0, "is_drop": True, "prev_is_drop": False, "energy": 0.95, "kick": 0.9},
+            {"start": 7.0, "end": 18.0, "duration": 11.0, "is_drop": True, "prev_is_drop": True, "energy": 0.85, "kick": 0.8},
+            {"start": 18.0, "end": 20.0, "duration": 2.0, "is_drop": True, "prev_is_drop": True, "energy": 0.4, "kick": 0.3},
+        ]
+        planned = planner.plan_from_beatsync(sim_segs)
+        self.assertEqual(len(planned), 5)
+        self.assertEqual(planned[0].arc_phase, "HOOK")
+        self.assertEqual(planned[0].add_rack_focus, True) # Hook rack-focus
+        self.assertEqual(planned[2].arc_phase, "DROP")
+        self.assertEqual(planned[2].add_shake, True)      # First drop shake
+        self.assertEqual(planned[2].add_chr_aber, True)   # First drop chromatic aberration
+        self.assertEqual(planned[2].add_flash, True)      # First drop flash
+        self.assertEqual(planned[4].arc_phase, "OUTRO")
+        self.assertEqual(planned[4].add_bloom, True)      # Outro resolve bloom
+
+        # Dict conversion
+        dicts = planner.to_segment_dicts(planned)
+        self.assertEqual(len(dicts), 5)
+        self.assertEqual(dicts[0]["arc_phase"], "HOOK")
 
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    unittest.main()
+

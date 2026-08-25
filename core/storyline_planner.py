@@ -35,9 +35,9 @@ ARC_PHASES = [
         name="HOOK",
         start_frac=0.0,
         end_frac=0.08,
-        cps_target=0.35,
-        cps_min=0.25,
-        cps_max=0.50,
+        cps_target=0.6,
+        cps_min=0.4,
+        cps_max=0.8,
         preferred_roles=["dialogue", "hero_pose"],
         add_bars=True,
         speed_bias="slow",
@@ -45,11 +45,11 @@ ARC_PHASES = [
     ),
     ArcPhase(
         name="BUILD",
-        start_frac=0.10,
+        start_frac=0.08,
         end_frac=0.25,
-        cps_target=0.55,
-        cps_min=0.40,
-        cps_max=0.75,
+        cps_target=1.4,
+        cps_min=0.9,
+        cps_max=2.0,
         preferred_roles=["tension", "action"],
         add_bars=True,
         speed_bias="ramp",
@@ -59,9 +59,9 @@ ARC_PHASES = [
         name="DROP",
         start_frac=0.25,
         end_frac=0.88,
-        cps_target=0.75,
-        cps_min=0.50,
-        cps_max=1.10,
+        cps_target=2.8,
+        cps_min=1.8,
+        cps_max=4.0,
         preferred_roles=["sakuga", "climax", "action"],
         add_bars=False,
         speed_bias="snap",
@@ -71,9 +71,9 @@ ARC_PHASES = [
         name="OUTRO",
         start_frac=0.88,
         end_frac=1.0,
-        cps_target=0.40,
-        cps_min=0.25,
-        cps_max=0.60,
+        cps_target=0.8,
+        cps_min=0.5,
+        cps_max=1.2,
         preferred_roles=["hero_pose", "dialogue"],
         add_bars=False,
         speed_bias="resolve",
@@ -182,8 +182,8 @@ class StorylinePlanner:
             add_exposure_pulse = False
 
             if phase.name == "HOOK":
-                speed = 0.35
-                scale_factor = 1.15
+                speed = 0.30
+                scale_factor = 1.03
                 add_bars = True
                 add_rf = True
                 add_shake = False
@@ -198,8 +198,8 @@ class StorylinePlanner:
             elif phase.name == "BUILD":
                 # Accelerating speed ramp into drop
                 frac_in_build = (t - (phase.start_frac * self.total_duration)) / max(0.1, (phase.end_frac - phase.start_frac) * self.total_duration)
-                speed = 0.45 + 0.50 * frac_in_build
-                scale_factor = 1.08 + 0.10 * frac_in_build
+                speed = 0.50 + 0.50 * frac_in_build
+                scale_factor = 1.05 + 0.08 * frac_in_build
                 add_bars = True
                 add_rf = False
                 add_shake = (frac_in_build > 0.70)
@@ -216,7 +216,7 @@ class StorylinePlanner:
                 if not seg.get("prev_is_drop", True):
                     # First drop segment: explosive velocity snap + impact invert
                     speed = 1.50
-                    scale_factor = 1.25
+                    scale_factor = 1.22
                     add_shake = True
                     add_chr = True
                     add_flash = True
@@ -225,9 +225,9 @@ class StorylinePlanner:
                     add_speed_lines = True
                     add_whip_pan = False
                 elif duration > 0.80:
-                    # Power slow-mo: optical-flow technique release (QrzRe5DM0iQ inspired)
-                    speed = 0.40
-                    scale_factor = 1.20
+                    # Power slow-mo: technique release
+                    speed = 0.45
+                    scale_factor = 1.14
                     add_shake = False
                     add_chr = False
                     add_flash = False

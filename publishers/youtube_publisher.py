@@ -63,74 +63,6 @@ def get_valid_access_token() -> Optional[str]:
     return None
 
 
-STANDARD_COPYRIGHT_DISCLAIMER = """--------------------------------------------------
-© COPYRIGHT DISCLAIMER & FAIR USE NOTICE:
-Title 17, US Code (Sections 107-118 of Copyright Law):
-This video is a non-commercial, transformative fan edit created for commentary, criticism, and entertainment purposes under Fair Use guidelines.
-
-All visuals, footage, audio, and character trademarks belong to their respective copyright holders:
-• Visual Media: MAPPA Co., Ltd., Gege Akutami, TOHO Animation, Shueisha, Marvel Studios, Walt Disney Studios.
-• Audio/Music: Respective Phonk Music Producers / Rightsholders.
-
-No copyright infringement intended. If you are a copyright owner and have concerns, please contact us directly for immediate removal or updated attribution.
---------------------------------------------------"""
-
-
-def format_youtube_metadata(
-    title: str,
-    description: str,
-    tags: Optional[list] = None,
-    character_name: Optional[str] = None,
-    universe: Optional[str] = None,
-) -> tuple:
-    """
-    Enforces high-converting, policy-compliant YouTube Shorts metadata:
-    - Title: max 95 characters, ensures '#shorts' tag included
-    - Description: Includes title/details, Fair Use Copyright Disclaimer, and formatted hashtags
-    - Tags: max 15 tags, stripped of '#' symbols
-    """
-    if tags is None:
-        tags = []
-
-    # 1. Clean Title
-    title_str = (title or "Anime Phonk Edit").strip()
-    if "#shorts" not in title_str.lower() and "#short" not in title_str.lower():
-        if len(title_str) <= 87:
-            title_str = f"{title_str} #shorts"
-    clean_title = title_str[:95].strip()
-
-    # 2. Clean & Deduplicate Tags
-    base_tags = ["shorts", "anime", "amv", "phonk", "animeedit", "4kedit", "velocityedit", "viral"]
-    if universe:
-        base_tags.append(universe.lower())
-    if character_name:
-        base_tags.append(character_name.lower().replace(" ", ""))
-
-    raw_tags = list(tags) + base_tags
-    clean_tags = []
-    seen = set()
-    for t in raw_tags:
-        cleaned = str(t).replace("#", "").strip().lower()
-        if cleaned and cleaned not in seen:
-            seen.add(cleaned)
-            clean_tags.append(cleaned)
-    clean_tags = clean_tags[:15]
-
-    # 3. Clean & Enrich Description
-    desc_str = (description or clean_title).strip()
-
-    # Append Copyright Disclaimer if missing
-    if "COPYRIGHT DISCLAIMER" not in desc_str.upper() and "FAIR USE" not in desc_str.upper():
-        desc_str = f"{desc_str}\n\n{STANDARD_COPYRIGHT_DISCLAIMER}"
-
-    # Build hashtag block
-    hashtag_block = " ".join(f"#{t}" for t in clean_tags)
-    if hashtag_block not in desc_str:
-        desc_str = f"{desc_str}\n\n{hashtag_block}"
-
-    return clean_title, desc_str, clean_tags
-
-
 def upload_video_to_youtube(
     video_path: Path,
     title: str,
@@ -139,7 +71,7 @@ def upload_video_to_youtube(
     privacy_status: str = "public"
 ) -> Dict[str, Any]:
     """
-    Uploads a video to YouTube using the Data API v3 with automatic title, hashtag, and copyright formatting.
+    Uploads a video to YouTube using the Data API v3.
     """
     access_token = get_valid_access_token()
     if not access_token:
@@ -150,12 +82,6 @@ def upload_video_to_youtube(
     if not video_path.exists():
         return {"status": "error", "reason": "Video file not found"}
         
-    clean_title, clean_description, clean_tags = format_youtube_metadata(
-        title=title,
-        description=description,
-        tags=tags,
-    )
-
     print(f"🚀 [YouTube] Uploading {video_path.name} to YouTube...")
     try:
         from googleapiclient.discovery import build
@@ -165,10 +91,13 @@ def upload_video_to_youtube(
         creds = Credentials(token=access_token)
         youtube = build("youtube", "v3", credentials=creds)
         
+        clean_title = title[:95]
+        clean_tags = [t.replace("#", "").strip() for t in tags][:15]
+        
         body = {
             "snippet": {
                 "title": clean_title,
-                "description": clean_description,
+                "description": description,
                 "tags": clean_tags,
                 "categoryId": "24"  # Entertainment / Animation
             },

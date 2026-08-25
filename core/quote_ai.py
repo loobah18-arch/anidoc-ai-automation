@@ -391,8 +391,6 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
     _save_title_history(used_titles)
     print(f"🎯 [QuoteAI] Selected fresh viral title: '{title}'")
     
-    from publishers.youtube_publisher import STANDARD_COPYRIGHT_DISCLAIMER
-
     return {
         "character_key": character_key,
         "character_name": theme["name"],
@@ -403,7 +401,8 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
         "description": (
             f"{title}\n\n"
             f"\"{quote}\"\n\n"
-            f"{STANDARD_COPYRIGHT_DISCLAIMER}\n\n"
+            "Disclaimer: This video is a transformative fan edit created for entertainment purposes. "
+            "All rights belong to their respective copyright owners.\n\n"
             + " ".join(f"#{t.lstrip('#')}" for t in tags)
         )
     }
