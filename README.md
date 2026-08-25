@@ -43,11 +43,14 @@ python main.py --character gojo --phonk brazilian_phonk_montagem --subtitle-styl
 # Generate a Spider-Man Marvel edit with Cyber Glow subtitles
 python main.py --character spiderman --phonk tokyo_drift_phonk --subtitle-style cyber_glow --duration 20.0
 
-# Ingest clips from a public GitHub repo and render
-python main.py --character gojo --github-repo loobah18-arch/anidoc-ai-automation --duration 18.0
+# Render and upload to YouTube as public Short
+python main.py --universe jjk --duration 22.0 --upload --upload-to youtube --privacy public
 
-# Render and upload directly as YouTube Shorts
-python main.py --universe jjk --duration 22.0 --upload --privacy public
+# Render and upload to Google Drive instead of YouTube
+python main.py --character gojo --duration 22.0 --upload --upload-to gdrive
+
+# Render and upload to BOTH YouTube and Google Drive
+python main.py --character sukuna --duration 22.0 --upload --upload-to both
 ```
 
 ### 3. Manage Phonk Music Library
@@ -75,5 +78,36 @@ python test_pipeline.py
 
 ---
 
+## 🔐 Upload Configuration
+
+### YouTube Upload Setup
+To upload videos to YouTube, configure these environment variables or GitHub Secrets:
+- `YOUTUBE_CLIENT_ID` - OAuth2 Client ID
+- `YOUTUBE_CLIENT_SECRET` - OAuth2 Client Secret
+- `YOUTUBE_REFRESH_TOKEN` - OAuth2 Refresh Token
+
+### Google Drive Upload Setup
+To upload videos to Google Drive, configure:
+- `GDRIVE_CREDENTIALS` - Service Account JSON or OAuth2 credentials
+- `GDRIVE_UPLOAD_FOLDER_ID` - (Optional) Folder ID where videos will be uploaded
+
+**Getting Google Drive Credentials:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing
+3. Enable Google Drive API
+4. Create credentials (Service Account or OAuth2)
+5. Download the JSON credentials file
+6. Set `GDRIVE_CREDENTIALS` to the JSON content or file path
+
+---
+
 ## 🤖 GitHub Actions Workflow
 The automated workflow runs twice daily at `06:30 UTC` and `18:30 UTC` via [`.github/workflows/daily_edit.yml`](.github/workflows/daily_edit.yml).
+
+**Workflow Dispatch Inputs:**
+- `universe` - Choose marvel, jjk, or random
+- `character` - Specific character to feature
+- `phonk` - Background music track
+- `upload` - Whether to upload the rendered video
+- `upload_to` - Destination: youtube, gdrive, or both
+- `gdrive_upload_folder` - Google Drive folder ID for uploads
