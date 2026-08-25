@@ -213,7 +213,7 @@ def render_cinematic_edit(
 
     # ── CRITICAL: Filter clips to ensure they match the selected character ──
     # This prevents using clips from wrong characters in the final video
-    from core.clip_manager import is_likely_intro_or_irrelevant
+    from core.clip_manager import is_likely_intro_or_irrelevant, prioritize_character_clips
 
     validated_clips = []
     for clip in clip_paths:
@@ -221,6 +221,9 @@ def render_cinematic_edit(
             validated_clips.append(clip)
         else:
             print(f"⚠️  [VideoAssembler] Filtered out mismatched clip: {clip.name}")
+
+    # Re-prioritize after tier aggregation so character-named clips lead
+    validated_clips = prioritize_character_clips(validated_clips, character_key)
 
     clip_paths = validated_clips
 

@@ -88,7 +88,7 @@ def build_velocity_clip_filter(
     """
     Builds the agency-grade per-clip video filter for 60FPS viral anime edits:
     1. Edge crop to remove potential broadcast watermarks.
-    2. Aspect ratio fit & center crop for 1080x1920 9:16 vertical canvas (YouTube Shorts).
+    2. Aspect ratio fit & center crop for 1080x1080 1:1 square canvas.
     3. Twixtor-style speed ramp with frame-blending motion blur on slow-mo (speed < 0.8x).
     4. Continuous animated dynamic zoom punch (zooms in to 1.25x and eases down on impact).
     5. 60 FPS & SAR normalization.
@@ -98,7 +98,7 @@ def build_velocity_clip_filter(
     filters = [
         # Watermark-free edge crop
         "crop=in_w-24:in_h-24:12:12",
-        # Fit to 9:16 vertical canvas (1080x1920)
+        # Fit to 1:1 square canvas
         f"scale={video_width}:{video_height}:force_original_aspect_ratio=increase",
         f"crop={video_width}:{video_height}",
         # Velocity speed ramp
@@ -127,10 +127,8 @@ def build_velocity_clip_filter(
     ])
 
     if add_bars:
-        # Cinematic 2.39:1 letterbox bars on intro (proportional for 1080x1920)
-        # 2.39:1 aspect ratio = height / 2.39 = 1920 / 2.39 ≈ 803px
-        # Bars = (1920 - 803) / 2 ≈ 558px top and bottom
-        bar_h = int(video_height * (1 - 1/2.39) / 2)
+        # Cinematic 2.39:1 letterbox bars on intro (100px top and bottom on 1080x1080)
+        bar_h = 100
         filters.append(f"drawbox=x=0:y=0:w=iw:h={bar_h}:color=black:t=fill")
         filters.append(f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black:t=fill")
 

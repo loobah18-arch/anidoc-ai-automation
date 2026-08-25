@@ -94,72 +94,120 @@ CHARACTER_THEMES = {
 }
 
 
-def is_likely_intro_or_irrelevant(clip_path: Path, character_key: str) -> bool:
-    """
-    Detects if a clip is likely an intro, outro, or irrelevant content.
-    Returns True if the clip should be filtered out.
+# Full-name aliases for every supported character (used for strict matching)
+CHARACTER_ALIASES = {
+    "gojo": ["gojo", "satoru", "satorugojo"],
+    "sukuna": ["sukuna", "ryomen", "ryomensukuna", "kingofcurses"],
+    "toji": ["toji", "fushiguro", "tojifushiguro", "zenin", "sorcererkiller"],
+    "yuji": ["yuji", "itadori", "yujiitadori"],
+    "megumi": ["megumi", "fushiguro", "megumifushiguro"],
+    "spiderman": ["spiderman", "spider-man", "spider_man", "spidey", "peter", "parker", "peterparker"],
+    "ironman": ["ironman", "iron-man", "iron_man", "tony", "stark", "tonystark"],
+    "thor": ["thor", "odinson"],
+    "wolverine": ["wolverine", "logan", "xmen", "x-men"],
+    "loki": ["loki", "laufeyson"],
+    "thanos": ["thanos", "madtitan"]
+}
 
-    CRITICAL: This ensures only the correct character's clips are used in videos.
-    """
-    filename = clip_path.name.lower()
+# Other well-known characters (not editable themes) whose named clips must never leak in.
+# If a clip filename mentions these alongside our characters, they are fight/versus clips
+# featuring someone else and must be rejected for strict character exclusivity.
+EXTRA_KNOWN_CHARACTERS = [
+    "jogo", "mahito", "choso", "todo", "mahoraga", "nobara", "geto", "kenjaku",
+    "nanami", "maki", "panda", "inumaki", "yuta", "rika", "urame",
+    "hulk", "deadpool", "greengoblin", "docock", "venom", "captainamerica",
+    "hawkeye", "blackwidow", "scarletwitch", "vision", "gamora", "drstrange",
+    "doctorstrange", "blackpanther", "antman", "wasp", "falcon", "wintersoldier",
+    "groot", "rocket", "starlord"
+]
 
-    # Get character theme for additional matching
-    theme = CHARACTER_THEMES.get(character_key, {})
-    character_name_parts = theme.get("name", "").lower().split() if theme else []
 
-    # Filter out clips with intro/outro/opening/ending keywords
-    intro_keywords = ["intro", "opening", "op", "ending", "ed", "credits", "preview", "next_episode",
-                      "trailer", "teaser", "recap"]
-    if any(keyword in filename for keyword in intro_keywords):
-        return True
-
-    # Build comprehensive character matching patterns
-    char_variants = [
+def _get_character_variants(character_key: str) -> List[str]:
+    """Builds every accepted filename token for a character (key + full-name aliases)."""
+    variants = {
         character_key,
         character_key.replace("_", ""),
         character_key.replace("-", ""),
-        character_key.replace(" ", "")
-    ]
-
-    # Add character name parts (e.g., "gojo", "satoru" for "Gojo Satoru")
-    char_variants.extend([part for part in character_name_parts if len(part) > 3])
-
-    # Special case handling for common character name variations
-    character_aliases = {
-        "gojo": ["gojo", "satoru", "satorugojo"],
-        "sukuna": ["sukuna", "ryomen", "ryomensukuna"],
-        "toji": ["toji", "fushiguro", "tojifushiguro", "zenin"],
-        "yuji": ["yuji", "itadori", "yujiitadori"],
-        "megumi": ["megumi", "fushiguro", "megumifushiguro"],
-        "spiderman": ["spiderman", "spider-man", "spidey", "peter", "parker", "peterparker"],
-        "ironman": ["ironman", "iron-man", "tony", "stark", "tonystark"],
-        "thor": ["thor", "odinson"],
-        "wolverine": ["wolverine", "logan", "xmen"],
-        "loki": ["loki", "odinson", "laufeyson"],
-        "thanos": ["thanos", "titan"]
     }
+    theme = CHARACTER_THEMES.get(character_key, {})
+    for part in theme.get("name", "").lower().replace("(", " ").replace(")", " ").split():
+        if len(part) > 3:
+            variants.add(part)
+    variants.update(CHARACTER_ALIASES.get(character_key, []))
+    return {v.lower() for v in variants}
 
-    if character_key in character_aliases:
-        char_variants.extend(character_aliases[character_key])
 
-    # Check if any character variant is in the filename
-    has_character_match = any(variant in filename for variant in char_variants)
+def is_likely_intro_or_irrelevant(clip_path: Path, character_key: str) -> bool:
+    """
+    Strict gatekeeper: returns True if a clip must NOT be used for this character's edit.
 
-    if not has_character_match:
-        # Check for wrong character names (clips from other characters)
-        all_other_characters = [k for k in CHARACTER_THEMES.keys() if k != character_key]
-        for other_char in all_other_characters:
-            other_variants = character_aliases.get(other_char, [other_char])
-            if any(variant in filename for variant in other_variants):
-                print(f"🚫 [ClipManager] Rejected clip with wrong character '{other_char}': {filename}")
-                return True
+    Rejects:
+      1. Intros/outros/openings/endings/credits/previews/trailers/recaps
+      2. Clips explicitly named after ANY other character (shared aliases like
+         'fushiguro' or 'odinson' never trigger false cross-rejections)
+      3. Generic clips with no action signal
 
-        # If no character match and no action keywords, filter it out
-        action_keywords = ["fight", "battle", "action", "scene", "clip", "moment", "edit", "vs"]
-        if not any(keyword in filename for keyword in action_keywords):
+    NOTE: A clip is only trusted when its filename names the target character.
+    Generic action-named files (fight_scene.mp4) are allowed as last-resort filler,
+    but character-named clips always take priority in selection order.
+    """
+    filename = clip_path.name.lower()
+
+    # 1. Intro/outro/irrelevant content keywords
+    intro_keywords = ["intro", "opening", " op ", "ending", "credits", "preview",
+                      "next_episode", "nextepisode", "trailer", "teaser", "recap",
+                      "eyecatch", " ED ", "amv_", "_amv"]
+    for kw in intro_keywords:
+        if kw.strip() in filename.split("_") or kw in filename:
+            print(f"🚫 [ClipManager] Rejected intro/outro clip: {filename}")
             return True
 
-    return False
+    target_variants = _get_character_variants(character_key)
+
+    # 2. Wrong-character detection — check ALL known characters except the target
+    all_known = dict(CHARACTER_ALIASES)
+    for extra in EXTRA_KNOWN_CHARACTERS:
+        all_known.setdefault(extra, [extra])
+
+    for other_char, other_variants in all_known.items():
+        if other_char == character_key:
+            continue
+        # Never let an alias shared with the target (e.g. 'fushiguro', 'odinson')
+        # cause a false rejection of the target character's own clips
+        unique_other = [v for v in other_variants if v not in target_variants]
+        if any(variant in filename for variant in unique_other):
+            # Only reject if the target itself isn't ALSO named (a 'gojo vs sukuna'
+            # clip still features gojo, so it stays for gojo edits)
+            if not any(variant in filename for variant in target_variants):
+                print(f"🚫 [ClipManager] Rejected clip featuring '{other_char}' "
+                      f"(target is '{character_key}'): {filename}")
+                return True
+
+    # 3. Must have explicit character match OR clear action signal
+    has_character_match = any(variant in filename for variant in target_variants)
+    if has_character_match:
+        return False
+
+    action_keywords = ["fight", "battle", "action", "scene", "clip", "moment",
+                       "pack", "scenepack", "edit", "vs", "combo", "blitz", "raw"]
+    if any(keyword in filename for keyword in action_keywords):
+        return False
+
+    print(f"🚫 [ClipManager] Rejected unidentifiable clip (no character/action signal): {filename}")
+    return True
+
+
+def prioritize_character_clips(clips: List[Path], character_key: str) -> List[Path]:
+    """
+    Sorts clips so explicitly character-named files come first.
+    Generic action clips are only used as filler when named clips run out.
+    """
+    target_variants = _get_character_variants(character_key)
+
+    def rank(p: Path) -> int:
+        return 0 if any(v in p.name.lower() for v in target_variants) else 1
+
+    return sorted(clips, key=rank)
 
 
 def generate_procedural_cinematic_scene(
@@ -254,10 +302,12 @@ def get_character_scene_clips(
                 unique_clips.append(p)
             else:
                 print(f"⚠️  [ClipManager] Filtered out intro/irrelevant clip: {p.name}")
-    raw_clips = sorted(unique_clips, key=lambda p: p.name)
-    
+
+    # PRIORITIZE: character-named clips first, generic action clips as filler
+    raw_clips = prioritize_character_clips(unique_clips, character_key)
+
     n_segs = len(segment_durations)
-    
+
     if not raw_clips:
         # Full procedural fallback
         clip_paths = []
@@ -266,18 +316,18 @@ def get_character_scene_clips(
             generate_procedural_cinematic_scene(character_key, idx, dur, out_p, is_drop)
             clip_paths.append(out_p)
         return clip_paths
-    
+
     # IMPROVED: Use all filtered clips as action clips (no artificial intro/action split)
     # Since we already filtered out intros above, all remaining clips are action-worthy
-    # Shuffle for variety while preventing consecutive repeats
-    random.shuffle(raw_clips)
+    # IMPORTANT: DO NOT shuffle — prioritize_character_clips already sorted by relevance.
+    # We only rotate to avoid consecutive repeats of the SAME file.
 
     clip_paths = []
     clip_idx = 0
     last_clip = None
 
     for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):
-        # Pick next clip from the shuffled pool
+        # Pick next clip from the prioritized pool
         candidate = raw_clips[clip_idx % len(raw_clips)]
         clip_idx += 1
 
@@ -288,7 +338,7 @@ def get_character_scene_clips(
 
         clip_paths.append(candidate)
         last_clip = candidate
-            
+
     return clip_paths
 
 
