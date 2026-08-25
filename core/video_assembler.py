@@ -211,6 +211,33 @@ def render_cinematic_edit(
             )
             clip_paths.extend(extra)
 
+    # ── CRITICAL: Filter clips to ensure they match the selected character ──
+    # This prevents using clips from wrong characters in the final video
+    from core.clip_manager import is_likely_intro_or_irrelevant
+
+    validated_clips = []
+    for clip in clip_paths:
+        if not is_likely_intro_or_irrelevant(clip, character_key):
+            validated_clips.append(clip)
+        else:
+            print(f"⚠️  [VideoAssembler] Filtered out mismatched clip: {clip.name}")
+
+    clip_paths = validated_clips
+
+    # If we filtered out too many clips, try to get more from clip_manager
+    if len(clip_paths) < n_clips and len(clip_paths) > 0:
+        print(f"⚠️  [VideoAssembler] Only {len(clip_paths)} validated clips for {character_key}. Fetching more...")
+        extra_needed = n_clips - len(clip_paths)
+        extra = get_character_scene_clips(
+            character_key=character_key,
+            segment_durations=durations[:extra_needed],
+            is_drop_flags=drop_flags[:extra_needed],
+            auto_fetch_online=auto_fetch_clips,
+            github_repo=github_repo,
+            force_refresh=False
+        )
+        clip_paths.extend(extra)
+
     # ── Normalise clip list to exactly n_clips ──────────────────────────────
     if len(clip_paths) > n_clips:
         clip_paths = clip_paths[:n_clips]

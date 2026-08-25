@@ -94,6 +94,74 @@ CHARACTER_THEMES = {
 }
 
 
+def is_likely_intro_or_irrelevant(clip_path: Path, character_key: str) -> bool:
+    """
+    Detects if a clip is likely an intro, outro, or irrelevant content.
+    Returns True if the clip should be filtered out.
+
+    CRITICAL: This ensures only the correct character's clips are used in videos.
+    """
+    filename = clip_path.name.lower()
+
+    # Get character theme for additional matching
+    theme = CHARACTER_THEMES.get(character_key, {})
+    character_name_parts = theme.get("name", "").lower().split() if theme else []
+
+    # Filter out clips with intro/outro/opening/ending keywords
+    intro_keywords = ["intro", "opening", "op", "ending", "ed", "credits", "preview", "next_episode",
+                      "trailer", "teaser", "recap"]
+    if any(keyword in filename for keyword in intro_keywords):
+        return True
+
+    # Build comprehensive character matching patterns
+    char_variants = [
+        character_key,
+        character_key.replace("_", ""),
+        character_key.replace("-", ""),
+        character_key.replace(" ", "")
+    ]
+
+    # Add character name parts (e.g., "gojo", "satoru" for "Gojo Satoru")
+    char_variants.extend([part for part in character_name_parts if len(part) > 3])
+
+    # Special case handling for common character name variations
+    character_aliases = {
+        "gojo": ["gojo", "satoru", "satorugojo"],
+        "sukuna": ["sukuna", "ryomen", "ryomensukuna"],
+        "toji": ["toji", "fushiguro", "tojifushiguro", "zenin"],
+        "yuji": ["yuji", "itadori", "yujiitadori"],
+        "megumi": ["megumi", "fushiguro", "megumifushiguro"],
+        "spiderman": ["spiderman", "spider-man", "spidey", "peter", "parker", "peterparker"],
+        "ironman": ["ironman", "iron-man", "tony", "stark", "tonystark"],
+        "thor": ["thor", "odinson"],
+        "wolverine": ["wolverine", "logan", "xmen"],
+        "loki": ["loki", "odinson", "laufeyson"],
+        "thanos": ["thanos", "titan"]
+    }
+
+    if character_key in character_aliases:
+        char_variants.extend(character_aliases[character_key])
+
+    # Check if any character variant is in the filename
+    has_character_match = any(variant in filename for variant in char_variants)
+
+    if not has_character_match:
+        # Check for wrong character names (clips from other characters)
+        all_other_characters = [k for k in CHARACTER_THEMES.keys() if k != character_key]
+        for other_char in all_other_characters:
+            other_variants = character_aliases.get(other_char, [other_char])
+            if any(variant in filename for variant in other_variants):
+                print(f"🚫 [ClipManager] Rejected clip with wrong character '{other_char}': {filename}")
+                return True
+
+        # If no character match and no action keywords, filter it out
+        action_keywords = ["fight", "battle", "action", "scene", "clip", "moment", "edit", "vs"]
+        if not any(keyword in filename for keyword in action_keywords):
+            return True
+
+    return False
+
+
 def generate_procedural_cinematic_scene(
     character_key: str,
     seg_idx: int,
@@ -175,13 +243,17 @@ def get_character_scene_clips(
     if not raw_clips:
         raw_clips = list(universe_dir.glob("*.mp4")) + list(scratch_char_dir.glob("*.mp4"))
 
-    # Deduplicate paths, remove empties
+    # Deduplicate paths, remove empties, and filter out intros/irrelevant clips
     seen = set()
     unique_clips = []
     for p in raw_clips:
         if p.exists() and p.stat().st_size > 10_000 and str(p) not in seen:
-            seen.add(str(p))
-            unique_clips.append(p)
+            # Skip intro/outro clips and clips that don't match the character
+            if not is_likely_intro_or_irrelevant(p, character_key):
+                seen.add(str(p))
+                unique_clips.append(p)
+            else:
+                print(f"⚠️  [ClipManager] Filtered out intro/irrelevant clip: {p.name}")
     raw_clips = sorted(unique_clips, key=lambda p: p.name)
     
     n_segs = len(segment_durations)
@@ -195,42 +267,24 @@ def get_character_scene_clips(
             clip_paths.append(out_p)
         return clip_paths
     
-    # Split into intro (calm) and action (drop) pools
-    intro_pool = [c for c in raw_clips if raw_clips.index(c) < min(4, len(raw_clips))]
-    action_pool = raw_clips[min(3, len(raw_clips) - 1):] if len(raw_clips) > 3 else raw_clips[:]
-    
-    # Shuffle both pools independently for max variety
-    random.shuffle(intro_pool)
-    random.shuffle(action_pool)
-    
-    if not intro_pool:
-        intro_pool = raw_clips[:]
-    if not action_pool:
-        action_pool = raw_clips[:]
+    # IMPROVED: Use all filtered clips as action clips (no artificial intro/action split)
+    # Since we already filtered out intros above, all remaining clips are action-worthy
+    # Shuffle for variety while preventing consecutive repeats
+    random.shuffle(raw_clips)
 
     clip_paths = []
-    action_idx = 0
-    intro_idx = 0
+    clip_idx = 0
     last_clip = None
 
     for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):
-        if not is_drop:
-            # Intro shots: pick from intro pool, no consecutive repeats
-            pool = intro_pool
-            candidate = pool[intro_idx % len(pool)]
-            intro_idx += 1
-            # Skip if same as last clip and we have options
-            if candidate == last_clip and len(pool) > 1:
-                candidate = pool[intro_idx % len(pool)]
-                intro_idx += 1
-        else:
-            # Drop/action shots: pick from action pool
-            pool = action_pool
-            candidate = pool[action_idx % len(pool)]
-            action_idx += 1
-            if candidate == last_clip and len(pool) > 1:
-                candidate = pool[action_idx % len(pool)]
-                action_idx += 1
+        # Pick next clip from the shuffled pool
+        candidate = raw_clips[clip_idx % len(raw_clips)]
+        clip_idx += 1
+
+        # Skip if same as last clip and we have options
+        if candidate == last_clip and len(raw_clips) > 1:
+            candidate = raw_clips[clip_idx % len(raw_clips)]
+            clip_idx += 1
 
         clip_paths.append(candidate)
         last_clip = candidate

@@ -353,34 +353,46 @@ def query_nvidia_nemotron(character_name: str, universe: str) -> Optional[Dict[s
 def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
     """
     Generates quote, title, description, and tags with non-repeating title rotation.
+    IMPORTANT: Always ensures the title matches the selected character.
     """
     if not character_key or character_key not in CHARACTER_THEMES:
         character_key = random.choice(list(CHARACTER_THEMES.keys()))
-        
+
     theme = CHARACTER_THEMES[character_key]
-    
+
     # 1. Try OpenCode DeepSeek v4 Flash (Priority 1)
     ai_meta = query_opencode_deepseek_v4_flash(theme["name"], theme["universe"])
-    
+
     # 2. Try NVIDIA Nemotron (Priority 2)
     if not ai_meta:
         ai_meta = query_nvidia_nemotron(theme["name"], theme["universe"])
-        
+
     used_titles = _load_title_history()
-    
+
     if ai_meta and ai_meta.get("title") and ai_meta.get("title") not in used_titles:
         chosen_concept = ai_meta
     else:
         # 3. Non-repeating rotation from curated rich viral concept catalog
-        catalog = CHARACTER_VIRAL_CONCEPTS.get(character_key, CHARACTER_VIRAL_CONCEPTS["gojo"])
-        unused_concepts = [c for c in catalog if c["title"] not in used_titles]
-        
-        if not unused_concepts:
-            print(f"🔄 [QuoteAI] All catalog titles rotated through for {character_key}. Resetting title history.")
-            unused_concepts = catalog
-            used_titles = [t for t in used_titles if t not in [c["title"] for c in catalog]]
-            
-        chosen_concept = random.choice(unused_concepts)
+        # CRITICAL FIX: Only use titles from the selected character's catalog
+        catalog = CHARACTER_VIRAL_CONCEPTS.get(character_key)
+
+        # Fallback: If character has no catalog, use character theme quote
+        if not catalog:
+            print(f"⚠️  [QuoteAI] No catalog for {character_key}, using character theme quote")
+            chosen_concept = {
+                "quote": theme["quote"],
+                "title": f"{theme['name']} Epic Moment 🔥 #{character_key} #{theme['universe']} #4kedit #shorts",
+                "tags": [character_key, theme['universe'], "animeedit", "4kedit", "shorts"]
+            }
+        else:
+            unused_concepts = [c for c in catalog if c["title"] not in used_titles]
+
+            if not unused_concepts:
+                print(f"🔄 [QuoteAI] All catalog titles rotated through for {character_key}. Resetting title history.")
+                unused_concepts = catalog
+                used_titles = [t for t in used_titles if t not in [c["title"] for c in catalog]]
+
+            chosen_concept = random.choice(unused_concepts)
         
     quote = chosen_concept["quote"]
     title = chosen_concept["title"]
