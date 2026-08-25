@@ -29,11 +29,14 @@ from core.video_assembler import render_cinematic_edit
 from core.ranking_assembler import render_ranking_countdown_edit
 from core.download_saver import save_to_downloads
 from publishers.youtube_publisher import upload_video_to_youtube
-from studio.server import start_studio_server
+from scripts.gdrive_amv_builder import run_gdrive_amv, SOURCE_FOLDER_ID as _AMV_SRC
 
 def main():
     parser = argparse.ArgumentParser(description="AniDoc 4K Phonk / Scene Edit Automation Engine (Marvel & JJK)")
-    parser.add_argument("--mode", type=str, choices=["single", "ranking"], default="single", help="Edit mode: single character 4K edit or 5-tier ranking countdown edit")
+    parser.add_argument("--mode", type=str, choices=["single", "ranking", "gdrive-amv"], default="single",
+                        help="Edit mode: single | ranking | gdrive-amv (hybrid AMV from Drive footage)")
+    parser.add_argument("--amv-source-folder", type=str, default=None,
+                        help=f"GDrive folder ID/URL with raw footage for gdrive-amv mode (default: {_AMV_SRC})")
     parser.add_argument("--ranking", action="store_true", help="Shortcut for --mode ranking (replicates Top 5 countdown format)")
     parser.add_argument("--character", type=str, default=None, help="Character key (e.g. spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi)")
     parser.add_argument("--universe", type=str, choices=["marvel", "jjk"], default="jjk", help="Universe filter (marvel or jjk)")
@@ -57,8 +60,22 @@ def main():
     
     args = parser.parse_args()
     
+    # ── GDrive AMV mode — hybrid action/cinematic edit from Drive footage ──────
+    if args.mode == "gdrive-amv":
+        print("🎬 [AniDoc] Mode: GDRIVE AMV — Hybrid Action/Cinematic Edit from Drive")
+        run_gdrive_amv(
+            source_folder=args.amv_source_folder or _AMV_SRC,
+            universe=args.universe,
+            character=args.character,
+            target_duration=args.duration if args.duration != 38.0 else 75.0,
+            upload=args.upload,
+            phonk_name=args.phonk,
+        )
+        return
+
     # If --studio is specified, launch web video editor
     if args.studio:
+        from studio.server import start_studio_server
         start_studio_server(port=args.port)
         return
 

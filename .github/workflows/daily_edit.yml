@@ -1,12 +1,51 @@
-name: Daily 4K Phonk / Scene Edit Generator & YouTube Auto-Upload
+name: Daily AMV & Scene Edit Generator — YouTube Auto-Upload
 
 on:
   schedule:
-    - cron: '30 6,18 * * *'  # Runs twice daily at 06:30 UTC & 18:30 UTC
+    - cron: '30 6,18 * * *'  # Twice daily: 06:30 UTC & 18:30 UTC — auto-uploads to YouTube
+  push:
+    branches: [ main ]
   workflow_dispatch:
     inputs:
+      mode:
+        description: 'Edit mode'
+        required: false
+        default: 'gdrive-amv'
+        type: choice
+        options:
+          - 'gdrive-amv'      # Hybrid AMV from your Drive raw footage (recommended)
+          - 'single'          # Classic single-character 4K phonk edit
+          - 'ranking'         # Top-5 ranking countdown edit
+
+      # ── AMV mode inputs ──────────────────────────────────────────────────
+      amv_source_folder:
+        description: '[AMV] Source Drive folder ID/URL (leave blank = use default raw footage folder)'
+        required: false
+        default: ''
+        type: string
+      amv_universe:
+        description: '[AMV] Universe — jjk or marvel (auto-alternates on schedule)'
+        required: false
+        default: 'random'
+        type: choice
+        options:
+          - 'random'
+          - 'jjk'
+          - 'marvel'
+      amv_character:
+        description: '[AMV] Specific character (gojo/sukuna/ironman/spiderman/etc). Auto-pick if blank.'
+        required: false
+        default: ''
+        type: string
+      amv_duration:
+        description: '[AMV] Target duration in seconds (60-90 recommended)'
+        required: false
+        default: '75'
+        type: string
+
+      # ── Classic mode inputs ───────────────────────────────────────────────
       universe:
-        description: 'Universe (marvel, jjk, or random)'
+        description: '[Classic] Universe (marvel, jjk, or random)'
         required: false
         default: 'random'
         type: choice
@@ -15,7 +54,7 @@ on:
           - 'marvel'
           - 'jjk'
       character:
-        description: 'Specific character (spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi, yuji)'
+        description: '[Classic] Specific character (spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi, yuji)'
         required: false
         default: ''
         type: string
@@ -47,19 +86,24 @@ on:
           - 'anime_shrine'
           - 'cinematic_minimal'
       gdrive_folder:
-        description: 'Google Drive folder link or ID containing raw movies/episodes (optional)'
+        description: '[Classic] Google Drive folder link or ID containing raw movies/episodes (optional)'
         required: false
         default: ''
         type: string
       refresh_clips:
-        description: 'Download & slice fresh scenepack cuts (multi-source: yt-dlp → Archive.org → Pixabay)'
+        description: '[Classic] Download & slice fresh scenepack cuts'
         required: false
         default: false
         type: boolean
-      upload:
-        description: 'Upload rendered Short to YouTube'
+      upload_youtube:
+        description: 'Upload final MP4 to YouTube Shorts (always true on scheduled runs)'
         required: false
-        default: false
+        default: true
+        type: boolean
+      upload_gdrive:
+        description: 'Upload final MP4 + code snapshot ZIP to Google Drive AMV_Outputs/ folder'
+        required: false
+        default: true
         type: boolean
       audit:
         description: 'Run post-render quality audit vs priority reference (@Chakra_boy)'
@@ -99,156 +143,137 @@ jobs:
         run: |
           python test_pipeline.py
 
-      - name: Generate 4K Phonk Scene Edit
+      - name: Build & Upload AMV or Scene Edit
         env:
           PYTHONUNBUFFERED: "1"
+          # Google Drive OAuth (for raw footage download + output upload)
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
+          GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
+          # YouTube OAuth
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID || secrets.CLIENT_ID }}
+          YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
+          # Optional AI / stock APIs
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
-          GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
-          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
-          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
-          YOUTUBE_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
-          # Optional stock video APIs (free at pixabay.com & pexels.com)
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
-          CMD="python main.py --duration 38.0"
-          
-          if [ "${{ github.event.inputs.universe }}" != "random" ] && [ -n "${{ github.event.inputs.universe }}" ]; then
-            CMD="$CMD --universe ${{ github.event.inputs.universe }}"
-          fi
-          
-          if [ -n "${{ github.event.inputs.character }}" ]; then
-            CMD="$CMD --character ${{ github.event.inputs.character }}"
-          fi
-          
-          if [ "${{ github.event.inputs.phonk }}" != "random" ] && [ -n "${{ github.event.inputs.phonk }}" ]; then
-            CMD="$CMD --phonk ${{ github.event.inputs.phonk }}"
-          fi
-          
-          if [ -n "${{ github.event.inputs.subtitle_style }}" ]; then
-            CMD="$CMD --subtitle-style ${{ github.event.inputs.subtitle_style }}"
+          # ── Determine run context ─────────────────────────────────────────
+          IS_SCHEDULED="false"
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "push" ]; then
+            IS_SCHEDULED="true"
           fi
 
-          if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
-            CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
+          # Scheduled runs & pushes to main always upload to both YouTube and GDrive
+          SHOULD_UPLOAD_YT="${{ github.event.inputs.upload_youtube }}"
+          SHOULD_UPLOAD_GD="${{ github.event.inputs.upload_gdrive }}"
+          if [ "$IS_SCHEDULED" = "true" ]; then
+            SHOULD_UPLOAD_YT="true"
+            SHOULD_UPLOAD_GD="true"
           fi
-          
-          # Always refresh clips to get diverse sources each run
-          CMD="$CMD --refresh-clips"
-          
-          if [ "${{ github.event.inputs.upload }}" = "true" ]; then
-            CMD="$CMD --upload"
+          if [ -z "$SHOULD_UPLOAD_YT" ]; then SHOULD_UPLOAD_YT="true"; fi
+          if [ -z "$SHOULD_UPLOAD_GD" ]; then SHOULD_UPLOAD_GD="true"; fi
+
+          # ── Determine mode ────────────────────────────────────────────────
+          # Scheduled runs alternate JJK → Marvel by hour
+          MODE="${{ github.event.inputs.mode }}"
+          if [ -z "$MODE" ] || [ "$IS_SCHEDULED" = "true" ]; then
+            MODE="gdrive-amv"
           fi
-          
-          echo "Executing: $CMD"
-          eval $CMD
 
-      - name: Send Output Video & Code Snapshot Bundle to Telegram
-        if: always()
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
-            RUN_ID="${{ github.run_id }}"
-            COMMIT_SHA="${{ github.sha }}"
-            SHORT_SHA="${COMMIT_SHA:0:7}"
-            BUNDLE_NAME="code_snapshot_run_${RUN_ID}_${SHORT_SHA}.zip"
+          echo "========================================"
+          echo " Mode        : $MODE"
+          echo " Scheduled   : $IS_SCHEDULED"
+          echo " Upload YT   : $SHOULD_UPLOAD_YT"
+          echo "========================================"
 
-            # Create code snapshot bundle archive
-            git log -1 --stat > run_${RUN_ID}_commit.txt || true
-            git diff HEAD~1 > run_${RUN_ID}_patch.diff || true
-            zip -q -r "$BUNDLE_NAME" core/ config/ scripts/ .github/ run_${RUN_ID}_commit.txt run_${RUN_ID}_patch.diff -x "*.pyc" "*/__pycache__/*"
-
-            for vid in output/*.mp4; do
-              if [ -f "$vid" ]; then
-                echo "🚀 Sending $vid to Telegram Chat ($TELEGRAM_CHAT_ID)..."
-
-                # Telegram Bot API hard limit: 50MB. Compress to fit if oversized.
-                SIZE_MB=$(du -m "$vid" | cut -f1)
-                SEND_FILE="$vid"
-                if [ "$SIZE_MB" -gt 48 ]; then
-                  echo "⚠️ Video is ${SIZE_MB}MB (>50MB Telegram limit). Re-encoding to fit under 48MB..."
-                  DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$vid")
-                  # Target total bitrate: (47MB * 8192 kbit) / duration, split 90% video / 10% audio
-                  TOTAL_KBPS=$(python3 -c "print(int(47*8192/float('${DUR}')))")
-                  VBITRATE=$(python3 -c "print(max(1200, int(${TOTAL_KBPS}*0.9)))")
-                  ABITRATE=$(python3 -c "print(min(192, max(96, int(${TOTAL_KBPS}*0.1))))")
-                  COMPRESSED="telegram_${vid##*/}"
-                  ffmpeg -y -i "$vid" -c:v libx264 -preset medium -b:v "${VBITRATE}k" -maxrate "${VBITRATE}k" -bufsize "$((VBITRATE*2))k" \
-                    -pix_fmt yuv420p -c:a aac -b:a "${ABITRATE}k" -movflags +faststart "$COMPRESSED"
-                  SEND_FILE="$COMPRESSED"
-                  echo "✅ Compressed to $(du -m "$SEND_FILE" | cut -f1)MB (${VBITRATE}k video / ${ABITRATE}k audio)"
-                fi
-
-                # Send as streaming video (sendVideo keeps it playable inline in Telegram)
-                RESP=$(curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo" \
-                  -F "chat_id=${TELEGRAM_CHAT_ID}" \
-                  -F "video=@${SEND_FILE}" \
-                  -F "supports_streaming=true" \
-                  -F "caption=🎬 4K 60FPS Cloud Edit Rendered! 🚀%0AGit Commit: ${SHORT_SHA} (Run #${RUN_ID})")
-
-                # Fallback to document if sendVideo still fails
-                if echo "$RESP" | grep -q '"ok":false'; then
-                  echo "⚠️ sendVideo failed. Sending as Document..."
-                  curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
-                    -F "chat_id=${TELEGRAM_CHAT_ID}" \
-                    -F "document=@${SEND_FILE}" \
-                    -F "caption=🎬 4K 60FPS Video File (Run #${RUN_ID} / Commit ${SHORT_SHA})" || true
-                fi
-
-                # Cleanup compressed temp file
-                rm -f "$SEND_FILE" 2>/dev/null || true
+          # ── gdrive-amv mode (new hybrid AMV builder) ──────────────────────
+          if [ "$MODE" = "gdrive-amv" ]; then
+            # Universe: alternates JJK (06:30) / Marvel (18:30) on schedule
+            HOUR=$(date -u +%H)
+            if [ "$IS_SCHEDULED" = "true" ]; then
+              if [ "$HOUR" -lt 12 ]; then
+                AMV_UNIVERSE="jjk"
+              else
+                AMV_UNIVERSE="marvel"
               fi
-            done
-
-            if [ -f "$BUNDLE_NAME" ]; then
-              echo "📦 Sending Code Snapshot Bundle $BUNDLE_NAME to Telegram..."
-              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
-                -F "chat_id=${TELEGRAM_CHAT_ID}" \
-                -F "document=@${BUNDLE_NAME}" \
-                -F "caption=📦 Code Snapshot Archive (Run #${RUN_ID} / Commit ${SHORT_SHA}). Send me this ZIP anytime to revert code!" || true
+            else
+              AMV_UNIVERSE="${{ github.event.inputs.amv_universe }}"
+              if [ -z "$AMV_UNIVERSE" ] || [ "$AMV_UNIVERSE" = "random" ]; then
+                AMV_UNIVERSE=$([ $((RANDOM % 2)) -eq 0 ] && echo "jjk" || echo "marvel")
+              fi
             fi
+
+            AMV_SRC="${{ github.event.inputs.amv_source_folder }}"
+            # Default to hardcoded raw footage folder if not overridden
+            if [ -z "$AMV_SRC" ]; then
+              AMV_SRC="1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4"
+            fi
+
+            AMV_CHAR="${{ github.event.inputs.amv_character }}"
+            AMV_DUR="${{ github.event.inputs.amv_duration }}"
+            if [ -z "$AMV_DUR" ]; then AMV_DUR="75"; fi
+
+            CMD="python scripts/gdrive_amv_builder.py"
+            CMD="$CMD --source-folder $AMV_SRC"
+            CMD="$CMD --universe $AMV_UNIVERSE"
+            CMD="$CMD --duration $AMV_DUR"
+
+            if [ -n "$AMV_CHAR" ]; then
+              CMD="$CMD --character $AMV_CHAR"
+            fi
+
+            if [ "$SHOULD_UPLOAD_YT" = "true" ]; then
+              CMD="$CMD --upload-youtube"
+            fi
+            if [ "$SHOULD_UPLOAD_GD" = "true" ]; then
+              CMD="$CMD --upload-gdrive"
+            fi
+
+            echo "Executing: $CMD"
+            eval $CMD
+
+          # ── classic single / ranking mode ──────────────────────────────────
+          else
+            CMD="python main.py --mode $MODE --duration 38.0"
+
+            UNI="${{ github.event.inputs.universe }}"
+            if [ -n "$UNI" ] && [ "$UNI" != "random" ]; then
+              CMD="$CMD --universe $UNI"
+            fi
+
+            if [ -n "${{ github.event.inputs.character }}" ]; then
+              CMD="$CMD --character ${{ github.event.inputs.character }}"
+            fi
+
+            if [ "${{ github.event.inputs.phonk }}" != "random" ] && [ -n "${{ github.event.inputs.phonk }}" ]; then
+              CMD="$CMD --phonk ${{ github.event.inputs.phonk }}"
+            fi
+
+            if [ -n "${{ github.event.inputs.subtitle_style }}" ]; then
+              CMD="$CMD --subtitle-style ${{ github.event.inputs.subtitle_style }}"
+            fi
+
+            if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
+              CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
+            fi
+
+            CMD="$CMD --refresh-clips"
+
+            if [ "$SHOULD_UPLOAD_YT" = "true" ]; then
+              CMD="$CMD --upload"
+            fi
+
+            echo "Executing: $CMD"
+            eval $CMD
           fi
 
-      - name: Upload Video & Code Snapshot to Google Drive
-        if: always()
-        env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          GDRIVE_REFRESH_TOKEN: ${{ secrets.GDRIVE_REFRESH_TOKEN }}
-          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-          GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
-        run: |
-          RUN_ID="${{ github.run_id }}"
-          SHORT_SHA="${GITHUB_SHA:0:7}"
-          RUN_DATE=$(date -u +%Y-%m-%d)
-          RUN_LABEL="Run_${RUN_ID}_${RUN_DATE}_${SHORT_SHA}"
-          BUNDLE_NAME="code_snapshot_run_${RUN_ID}_${SHORT_SHA}.zip"
-
-          # Rebuild snapshot zip if the Telegram step didn't create it (secrets may be absent)
-          if [ ! -f "$BUNDLE_NAME" ]; then
-            git log -1 --stat > run_${RUN_ID}_commit.txt || true
-            git diff HEAD~1 > run_${RUN_ID}_patch.diff || true
-            zip -q -r "$BUNDLE_NAME" core/ config/ scripts/ .github/ run_${RUN_ID}_commit.txt run_${RUN_ID}_patch.diff -x "*.pyc" "*/__pycache__/*"
-          fi
-
-          FILES=""
-          for vid in output/*.mp4; do
-            [ -f "$vid" ] && FILES="$FILES $vid"
-          done
-          FILES="$FILES $BUNDLE_NAME"
-
-          if [ -z "$GDRIVE_FOLDER_URL" ]; then
-            echo "⚠️ GDRIVE_FOLDER_URL not set; skipping Google Drive upload."
-            exit 0
-          fi
-
-          echo "☁️ Uploading to Google Drive folder: Run_${RUN_ID}_${RUN_DATE}_${SHORT_SHA}"
-          python3 scripts/upload_to_gdrive.py $FILES --label "$RUN_LABEL"
 
       - name: Quality Audit vs Priority Reference
         if: ${{ github.event.inputs.audit == 'true' }}
@@ -345,23 +370,6 @@ jobs:
           print(json.dumps(report,indent=2))
           EOF
 
-      - name: Send Audit Report & Frames to Telegram
-        if: ${{ always() && github.event.inputs.audit == 'true' }}
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          if [ -f audit/eval_report.json ] && [ -n "$TELEGRAM_BOT_TOKEN" ]; then
-            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
-              -F "chat_id=${TELEGRAM_CHAT_ID}" \
-              -F "document=@audit/eval_report.json" \
-              -F "caption=📊 Quality Audit Report (Run #${{ github.run_id }})" || true
-            zip -q -r audit_frames_run_${{ github.run_id }}.zip audit/frames/
-            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
-              -F "chat_id=${TELEGRAM_CHAT_ID}" \
-              -F "document=@audit_frames_run_${{ github.run_id }}.zip" \
-              -F "caption=🖼️ Keyframes: rendered vs priority_ref vs secondary_ref (Run #${{ github.run_id }})" || true
-          fi
 
       - name: Upload Output Artifacts
         uses: actions/upload-artifact@v4
