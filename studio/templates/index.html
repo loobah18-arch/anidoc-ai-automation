@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ AniDoc Studio — 4K Phonk & Scene Edit Automation Suite</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-main: #090b10;
+      --bg-card: #11151f;
+      --bg-card-hover: #161c2b;
+      --bg-input: #0d1117;
+      --border-color: #1f2738;
+      --border-glow: rgba(0, 242, 254, 0.25);
+      
+      --accent-cyan: #00f2fe;
+      --accent-purple: #a855f7;
+      --accent-crimson: #ef4444;
+      --accent-gold: #f59e0b;
+      --accent-emerald: #10b981;
+      
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Navbar */
+    header {
+      background: rgba(17, 21, 31, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.85rem 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #000;
+      font-weight: 800;
+      font-family: var(--font-display);
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #9ca3af);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .btn-render-primary {
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      color: #040814;
+      font-weight: 700;
+      font-family: var(--font-display);
+      border: none;
+      padding: 0.55rem 1.25rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+    }
+
+    .btn-render-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+    }
+
+    .btn-render-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Main Workspace Layout */
+    .studio-container {
+      display: grid;
+      grid-template-columns: 360px 1fr 380px;
+      gap: 1.25rem;
+      padding: 1.25rem 1.75rem;
+      flex: 1;
+      max-width: 1800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 1200px) {
+      .studio-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Form Inputs */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input, select, textarea {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px rgba(0, 242, 254, 0.15);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    /* Character Selection Badges */
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    .char-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.6rem 0.5rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .char-btn:hover {
+      background: var(--bg-card-hover);
+      color: #fff;
+      border-color: var(--text-dim);
+    }
+
+    .char-btn.active {
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(168, 85, 247, 0.15));
+      border-color: var(--accent-cyan);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+    }
+
+    /* Audio Selector Row */
+    .audio-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-icon {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.55rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* 9:16 Video Player Column */
+    .player-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .video-viewport {
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      border: 2px solid var(--border-color);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+    }
+
+    .video-empty-state svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Tabs on the Right Panel */
+    .tab-header {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 0.45rem 0.75rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card-hover);
+      color: var(--accent-cyan);
+      box-shadow: inset 0 -2px 0 var(--accent-cyan);
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Clip Item List */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .list-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      transition: all 0.2s;
+    }
+
+    .list-item:hover {
+      border-color: var(--text-dim);
+      background: var(--bg-card-hover);
+    }
+
+    /* Terminal / Render Log */
+    .terminal-box {
+      background: #06080c;
+      border: 1px solid #1a2233;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #38bdf8;
+      max-height: 140px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Progress bar */
+    .progress-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-input);
+      border-radius: 9999px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* Floating Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--accent-cyan);
+      color: #fff;
+      padding: 0.8rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 100;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand-group">
+      <div class="brand-badge">⚡ ANIDOC 4K</div>
+      <div class="brand-title">Phonk / Scene Edit Studio</div>
+    </div>
+    
+    <div class="header-actions">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span id="engineStatus">Ready (Pure FFmpeg & GPU)</span>
+      </div>
+      
+      <button class="btn-render-primary" id="btnMainRender" onclick="startRender()">
+        <span>⚡ Render 4K Short</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Studio Workspace -->
+  <main class="studio-container">
+    
+    <!-- LEFT PANEL: Configurator -->
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">🎬 Edit Director</h2>
+        <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">9:16 Shorts Mode</span>
+      </div>
+
+      <!-- Character Picker -->
+      <div class="form-group">
+        <label>Character & Universe</label>
+        <div class="char-grid" id="charGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Phonk BGM Picker -->
+      <div class="form-group">
+        <label>Popular Phonk Music</label>
+        <div class="audio-row">
+          <select id="phonkSelect" style="flex: 1;">
+            <!-- Populated by JS -->
+          </select>
+          <button class="btn-icon" title="Preview Audio" onclick="toggleAudioPreview()">▶</button>
+        </div>
+      </div>
+
+      <!-- Subtitle Style Picker -->
+      <div class="form-group">
+        <label>Dynamic Subtitle Style</label>
+        <select id="subStyleSelect">
+          <option value="viral_karaoke">🔥 Viral Karaoke Pop (Gold Active Word)</option>
+          <option value="cyber_glow">⚡ Cyber Glow Neon (Cyan / Purple)</option>
+          <option value="anime_shrine">🩸 Anime Shrine (Blood Flame)</option>
+          <option value="cinematic_minimal">✨ Cinematic Minimal (Lower-Third)</option>
+        </select>
+      </div>
+
+      <!-- Dialogue & Quote Input -->
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <label>Dialogue / Monologue Quote</label>
+          <button class="btn-icon" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="generateAiQuote()">✨ AI Quote</button>
+        </div>
+        <textarea id="quoteInput" placeholder="Enter dialogue quote to be animated as kinetic karaoke..."></textarea>
+      </div>
+
+      <!-- 4K HDR Color Grade (CC Preset) -->
+      <div class="form-group">
+        <label>4K HDR Color Correction (CC)</label>
+        <select id="ccPresetSelect">
+          <option value="marvel_hdr">Marvel 4K HDR (Cyan / Gold Punch)</option>
+          <option value="jjk_void">JJK Infinite Void (Hollow Purple Glow)</option>
+          <option value="sukuna_shrine">Malevolent Shrine (Blood Contrast)</option>
+          <option value="cyber_phonk">Cyber Phonk (High-Contrast Neon)</option>
+        </select>
+      </div>
+
+      <!-- Target Duration Slider -->
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between;">
+          <label>Duration (Shorts Length)</label>
+          <span id="durLabel" style="font-size: 0.85rem; font-family: var(--font-mono); color: var(--accent-cyan);">15.0s</span>
+        </div>
+        <input type="range" id="durSlider" min="6" max="30" step="1" value="15" oninput="updateDurationLabel(this.value)">
+      </div>
+    </section>
+
+    <!-- CENTER PANEL: 9:16 Video Player -->
+    <section class="player-column">
+      <div class="video-viewport" id="viewport">
+        <video id="mainVideoPlayer" controls playsinline loop>
+          <source src="/media/output/edit_gojo_jjk_short.mp4" type="video/mp4">
+          Your browser does not support HTML5 video.
+        </video>
+      </div>
+
+      <!-- Render Progress Bar -->
+      <div class="progress-bar-wrap" id="renderProgressWrap">
+        <div class="progress-bar-fill" id="renderProgressBar"></div>
+      </div>
+
+      <!-- Live Terminal / Status -->
+      <div class="card" style="width: 100%; max-width: 480px; padding: 0.85rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <span style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-muted);">RENDER TERMINAL & PIPELINE LOG</span>
+          <span id="renderStatusText" style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">Idle</span>
+        </div>
+        <div class="terminal-box" id="terminalLog">> AniDoc Engine initialized.\n> Ready to generate 4K vertical edits with beat sync.</div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Tabs (Ingest / Publish / History) -->
+    <section class="card">
+      <!-- Tabs Header -->
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('tabPublish')">🚀 Auto-Publish</button>
+        <button class="tab-btn" onclick="switchTab('tabIngest')">🌐 Public Ingest</button>
+        <button class="tab-btn" onclick="switchTab('tabHistory')">📁 Gallery</button>
+      </div>
+
+      <!-- TAB 1: Auto-Publish to YouTube Shorts -->
+      <div class="tab-content active" id="tabPublish">
+        <div class="form-group">
+          <label>Shorts Video Title</label>
+          <input type="text" id="ytTitleInput" placeholder="Gojo Satoru's Hollow Purple Is Pure Art ⚡ #shorts">
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="ytDescInput" placeholder="4K Phonk Edit created with AniDoc Engine..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Privacy Setting</label>
+          <select id="ytPrivacySelect">
+            <option value="public">🌍 Public (Instant Upload)</option>
+            <option value="unlisted">🔗 Unlisted</option>
+            <option value="private">🔒 Private</option>
+          </select>
+        </div>
+
+        <button class="btn-render-primary" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;" onclick="uploadToYouTube()">
+          <span>🚀 Publish to YouTube Shorts</span>
+        </button>
+      </div>
+
+      <!-- TAB 2: Public API & GitHub Repo Clip Ingestion -->
+      <div class="tab-content" id="tabIngest">
+        <div class="form-group">
+          <label>Public GitHub Repository (Clip Dataset)</label>
+          <input type="text" id="githubRepoInput" placeholder="owner/repo (e.g. loobah18-arch/anidoc-ai-automation)">
+          <button class="btn-icon" style="margin-top: 0.4rem;" onclick="fetchFromGitHub()">🐙 Pull Clips from GitHub</button>
+        </div>
+
+        <div class="form-group">
+          <label>Download Scenepack via Public Streamer</label>
+          <input type="text" id="scenepackUrlInput" placeholder="Optional custom URL or leave blank for curated 4K pack">
+          <button class="btn-icon" style="margin-top: 0.4rem;" onclick="fetchScenepack()">📥 Download & Slice Scenepack</button>
+        </div>
+
+        <div class="form-group">
+          <label>Character Cut Clips in Local Storage</label>
+          <div class="item-list" id="clipsList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Rendered Shorts Gallery -->
+      <div class="tab-content" id="tabHistory">
+        <label>Rendered 9:16 Shorts</label>
+        <div class="item-list" id="historyList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Audio Player instance for BGM preview -->
+  <audio id="bgmAudioPlayer"></audio>
+
+  <!-- Toast Element -->
+  <div id="toast">Notification Message</div>
+
+  <script>
+    let appState = {
+      characters: {},
+      selectedChar: "gojo",
+      phonkTracks: [],
+      outputs: []
+    };
+
+    // Initialize Studio on Load
+    window.addEventListener("DOMContentLoaded", async () => {
+      await refreshStudioStatus();
+      setInterval(pollRenderStatus, 2500);
+    });
+
+    async function refreshStudioStatus() {
+      try {
+        const res = await fetch("/api/status");
+        const data = await res.json();
+        appState.characters = data.characters || {};
+        appState.phonkTracks = data.phonk_tracks || [];
+        appState.outputs = data.outputs || [];
+
+        renderCharacterGrid();
+        renderPhonkDropdown();
+        renderOutputsList();
+        renderClipsList();
+
+        // If there's an existing quote for default character, populate it
+        if (appState.characters[appState.selectedChar]) {
+          document.getElementById("quoteInput").value = appState.characters[appState.selectedChar].quote;
+        }
+      } catch (err) {
+        console.error("Failed to load studio status:", err);
+      }
+    }
+
+    function renderCharacterGrid() {
+      const grid = document.getElementById("charGrid");
+      grid.innerHTML = "";
+      for (const [key, char] of Object.entries(appState.characters)) {
+        const btn = document.createElement("button");
+        btn.className = `char-btn ${key === appState.selectedChar ? 'active' : ''}`;
+        btn.innerText = `${char.universe === 'marvel' ? '🦸' : '⚡'} ${char.name.split(' ')[0]}`;
+        btn.onclick = () => selectCharacter(key);
+        grid.appendChild(btn);
+      }
+    }
+
+    function selectCharacter(key) {
+      appState.selectedChar = key;
+      renderCharacterGrid();
+      const char = appState.characters[key];
+      if (char) {
+        document.getElementById("quoteInput").value = char.quote;
+        document.getElementById("ccPresetSelect").value = char.cc_preset;
+        document.getElementById("ytTitleInput").value = `${char.name} In 4K Phonk Edit ⚡ #shorts #${char.universe} #${key}`;
+      }
+      renderClipsList();
+    }
+
+    function renderPhonkDropdown() {
+      const sel = document.getElementById("phonkSelect");
+      sel.innerHTML = "";
+      for (const track of appState.phonkTracks) {
+        const opt = document.createElement("option");
+        opt.value = track.id;
+        opt.innerText = `🎧 ${track.title} (${track.bpm} BPM)`;
+        sel.appendChild(opt);
+      }
+    }
+
+    function updateDurationLabel(val) {
+      document.getElementById("durLabel").innerText = `${val}.0s`;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      event.target.classList.add("active");
+      document.getElementById(tabId).classList.add("active");
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.innerText = msg;
+      t.style.display = "block";
+      setTimeout(() => { t.style.display = "none"; }, 3500);
+    }
+
+    function toggleAudioPreview() {
+      const audio = document.getElementById("bgmAudioPlayer");
+      const selTrackId = document.getElementById("phonkSelect").value;
+      const track = appState.phonkTracks.find(t => t.id === selTrackId);
+      if (!track) return;
+
+      if (!audio.paused) {
+        audio.pause();
+        showToast("⏸️ Audio preview paused");
+      } else {
+        audio.src = `/media/assets/audio/phonk/${track.id}.mp3`;
+        audio.play();
+        showToast(`▶️ Playing: ${track.title}`);
+      }
+    }
+
+    async function generateAiQuote() {
+      showToast("🧠 Generating viral quote with AI...");
+      try {
+        const res = await fetch("/api/generate_quote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ character: appState.selectedChar })
+        });
+        const data = await res.json();
+        document.getElementById("quoteInput").value = data.quote;
+        document.getElementById("ytTitleInput").value = data.title;
+        showToast("✨ AI Quote & Title Generated!");
+      } catch (err) {
+        showToast("⚠️ Failed to generate AI quote");
+      }
+    }
+
+    async function startRender() {
+      const btn = document.getElementById("btnMainRender");
+      btn.disabled = true;
+      btn.innerHTML = "<span>⏳ Rendering Short...</span>";
+
+      document.getElementById("renderProgressWrap").style.display = "block";
+      document.getElementById("renderProgressBar").style.width = "25%";
+      document.getElementById("renderStatusText").innerText = "Rendering in progress...";
+      
+      const payload = {
+        character: appState.selectedChar,
+        duration: parseFloat(document.getElementById("durSlider").value),
+        phonk_track: document.getElementById("phonkSelect").value,
+        subtitle_style: document.getElementById("subStyleSelect").value,
+        custom_quote: document.getElementById("quoteInput").value,
+        custom_title: document.getElementById("ytTitleInput").value,
+        cc_preset: document.getElementById("ccPresetSelect").value,
+        github_repo: document.getElementById("githubRepoInput").value || null
+      };
+
+      try {
+        const res = await fetch("/api/render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        showToast("⚡ Render started! Check pipeline log.");
+      } catch (err) {
+        showToast("❌ Failed to trigger render");
+        btn.disabled = false;
+        btn.innerHTML = "<span>⚡ Render 4K Short</span>";
+      }
+    }
+
+    async function pollRenderStatus() {
+      try {
+        const res = await fetch("/api/status");
+        const data = await res.json();
+        const state = data.render_state;
+
+        if (state.is_rendering) {
+          document.getElementById("renderProgressWrap").style.display = "block";
+          document.getElementById("renderProgressBar").style.width = `${state.progress}%`;
+          document.getElementById("renderStatusText").innerText = state.status_message;
+          document.getElementById("terminalLog").innerText = `> ${state.status_message}\n> Processing video stream & audio onset detection...`;
+        } else {
+          document.getElementById("btnMainRender").disabled = false;
+          document.getElementById("btnMainRender").innerHTML = "<span>⚡ Render 4K Short</span>";
+          document.getElementById("renderProgressBar").style.width = "100%";
+          setTimeout(() => {
+            if (!state.is_rendering) document.getElementById("renderProgressWrap").style.display = "none";
+          }, 1500);
+
+          if (state.last_result) {
+            document.getElementById("renderStatusText").innerText = "Completed";
+            document.getElementById("terminalLog").innerText = `> SUCCESS: ${state.last_result.filename}\n> Duration: ${state.last_result.duration}s | Cuts: ${state.last_result.cuts_count} | Size: ${state.last_result.file_size_kb} KB`;
+            // Update Video Player Source
+            const player = document.getElementById("mainVideoPlayer");
+            const newSrc = `/media/${state.last_result.rel_path}`;
+            if (player.src !== window.location.origin + newSrc) {
+              player.src = newSrc;
+              player.load();
+            }
+          }
+        }
+      } catch (err) {}
+    }
+
+    async function uploadToYouTube() {
+      const title = document.getElementById("ytTitleInput").value;
+      const desc = document.getElementById("ytDescInput").value;
+      const privacy = document.getElementById("ytPrivacySelect").value;
+      
+      const latestVideo = appState.outputs.length > 0 ? appState.outputs[0].filename : `edit_${appState.selectedChar}_short.mp4`;
+      
+      showToast("🚀 Initiating YouTube Shorts Upload...");
+      try {
+        const res = await fetch("/api/upload_youtube", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: latestVideo,
+            title: title || `${appState.selectedChar.toUpperCase()} 4K Short #shorts`,
+            description: desc,
+            privacy: privacy
+          })
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          showToast(`🎉 Uploaded to YouTube! URL: ${data.url}`);
+        } else {
+          showToast(`⚠️ Upload notice: ${data.reason || data.error || 'Check API credentials'}`);
+        }
+      } catch (err) {
+        showToast("⚠️ YouTube upload error");
+      }
+    }
+
+    async function fetchFromGitHub() {
+      const repo = document.getElementById("githubRepoInput").value;
+      if (!repo) {
+        showToast("⚠️ Please enter a GitHub repository URL or slug");
+        return;
+      }
+      showToast(`🐙 Pulling clips from GitHub: ${repo}...`);
+      await fetch("/api/fetch_clips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ character: appState.selectedChar, github_repo: repo })
+      });
+      setTimeout(refreshStudioStatus, 3000);
+    }
+
+    async function fetchScenepack() {
+      const url = document.getElementById("scenepackUrlInput").value;
+      showToast(`📥 Sourcing scenepack for ${appState.selectedChar.toUpperCase()}...`);
+      await fetch("/api/fetch_clips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ character: appState.selectedChar, url: url || null })
+      });
+      setTimeout(refreshStudioStatus, 3000);
+    }
+
+    async function renderClipsList() {
+      const res = await fetch("/api/clips");
+      const data = await res.json();
+      const listEl = document.getElementById("clipsList");
+      listEl.innerHTML = "";
+
+      const clips = data.clips[appState.selectedChar] || [];
+      if (clips.length === 0) {
+        listEl.innerHTML = "<div style='color: var(--text-dim); font-size: 0.8rem; padding: 0.5rem;'>No clips yet. Click download above.</div>";
+        return;
+      }
+
+      for (const c of clips) {
+        const item = document.createElement("div");
+        item.className = "list-item";
+        item.innerHTML = `
+          <span>🎬 ${c.filename}</span>
+          <span style="font-family: var(--font-mono); color: var(--text-dim);">${c.size_kb} KB</span>
+        `;
+        listEl.appendChild(item);
+      }
+    }
+
+    function renderOutputsList() {
+      const listEl = document.getElementById("historyList");
+      listEl.innerHTML = "";
+      if (appState.outputs.length === 0) {
+        listEl.innerHTML = "<div style='color: var(--text-dim); font-size: 0.8rem; padding: 0.5rem;'>No rendered videos yet.</div>";
+        return;
+      }
+      for (const v of appState.outputs) {
+        const item = document.createElement("div");
+        item.className = "list-item";
+        item.innerHTML = `
+          <div>
+            <div style="font-weight: 600;">${v.filename}</div>
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);">${v.size_kb} KB</div>
+          </div>
+          <button class="btn-icon" onclick="playOutputVideo('${v.rel_path}')">▶ Play</button>
+        `;
+        listEl.appendChild(item);
+      }
+    }
+
+    function playOutputVideo(relPath) {
+      const player = document.getElementById("mainVideoPlayer");
+      player.src = `/media/${relPath}`;
+      player.play();
+      showToast(`▶️ Playing ${relPath.split('/').pop()}`);
+    }
+  </script>
+</body>
+</html>
