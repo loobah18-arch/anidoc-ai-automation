@@ -27,6 +27,7 @@ except ImportError:
 from core.clip_manager import CHARACTER_THEMES
 from core.video_assembler import render_cinematic_edit
 from publishers.youtube_publisher import upload_video_to_youtube
+from publishers.gdrive_publisher import upload_video_to_gdrive
 from studio.server import start_studio_server
 
 def main():
@@ -44,8 +45,10 @@ def main():
     parser.add_argument("--github-repo", type=str, default=None, help="GitHub repository URL or slug to fetch video clips from")
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
-    parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts")
+    parser.add_argument("--upload", action="store_true", help="Upload rendered video (use with --upload-to to specify destination)")
+    parser.add_argument("--upload-to", type=str, choices=["youtube", "gdrive", "both"], default="youtube", help="Upload destination: youtube, gdrive, or both (default: youtube)")
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
+    parser.add_argument("--gdrive-upload-folder", type=str, default=None, help="Google Drive folder ID to upload the rendered video to")
     parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
     parser.add_argument("--studio", action="store_true", help="Launch the AniDoc Studio Web Video Editing Software")
     parser.add_argument("--port", type=int, default=7860, help="Port for AniDoc Studio server (default: 7860)")
@@ -100,19 +103,44 @@ def main():
     print(f"🏷️  Title:      {metadata['title']}")
     print("=======================================================\n")
     
-    # Upload to YouTube if requested
+    # Upload to YouTube and/or Google Drive if requested
     if args.upload:
-        upload_res = upload_video_to_youtube(
-            video_path=output_path,
-            title=metadata["title"],
-            description=metadata["description"],
-            tags=metadata["tags"],
-            privacy_status=args.privacy
-        )
-        if upload_res.get("status") == "success":
-            print(f"🌟 Published to YouTube: {upload_res.get('url')}")
-        else:
-            print(f"⚠️ YouTube upload status: {upload_res.get('status')} ({upload_res.get('reason') or upload_res.get('error')})")
+        upload_destinations = []
+
+        # Determine which destinations to upload to
+        if args.upload_to == "youtube" or args.upload_to == "both":
+            upload_destinations.append("youtube")
+        if args.upload_to == "gdrive" or args.upload_to == "both":
+            upload_destinations.append("gdrive")
+
+        # Upload to YouTube
+        if "youtube" in upload_destinations:
+            print("\n📤 Uploading to YouTube...")
+            upload_res = upload_video_to_youtube(
+                video_path=output_path,
+                title=metadata["title"],
+                description=metadata["description"],
+                tags=metadata["tags"],
+                privacy_status=args.privacy
+            )
+            if upload_res.get("status") == "success":
+                print(f"🌟 Published to YouTube: {upload_res.get('url')}")
+            else:
+                print(f"⚠️ YouTube upload status: {upload_res.get('status')} ({upload_res.get('reason') or upload_res.get('error')})")
+
+        # Upload to Google Drive
+        if "gdrive" in upload_destinations:
+            print("\n☁️  Uploading to Google Drive...")
+            gdrive_res = upload_video_to_gdrive(
+                video_path=output_path,
+                title=metadata["title"],
+                description=metadata["description"],
+                folder_id=args.gdrive_upload_folder
+            )
+            if gdrive_res.get("status") == "success":
+                print(f"☁️  Uploaded to Google Drive: {gdrive_res.get('url')}")
+            else:
+                print(f"⚠️ Google Drive upload status: {gdrive_res.get('status')} ({gdrive_res.get('reason') or gdrive_res.get('error')})")
 
 if __name__ == "__main__":
     main()

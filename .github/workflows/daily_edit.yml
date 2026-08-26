@@ -57,10 +57,24 @@ on:
         default: false
         type: boolean
       upload:
-        description: 'Upload rendered Short to YouTube'
+        description: 'Upload rendered Short to YouTube or Google Drive'
         required: true
         default: true
         type: boolean
+      upload_to:
+        description: 'Upload destination (youtube, gdrive, or both)'
+        required: false
+        default: 'youtube'
+        type: choice
+        options:
+          - 'youtube'
+          - 'gdrive'
+          - 'both'
+      gdrive_upload_folder:
+        description: 'Google Drive folder ID to upload rendered video to (optional)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   render_and_publish:
@@ -103,6 +117,9 @@ jobs:
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID || secrets.CLIENT_ID }}
           YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
+          # Google Drive Upload Credentials
+          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+          GDRIVE_UPLOAD_FOLDER_ID: ${{ secrets.GDRIVE_UPLOAD_FOLDER_ID }}
           # Optional stock video APIs (free at pixabay.com & pexels.com)
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
@@ -134,6 +151,16 @@ jobs:
           
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ]; then
             CMD="$CMD --upload"
+
+            # Add upload destination
+            if [ -n "${{ github.event.inputs.upload_to }}" ]; then
+              CMD="$CMD --upload-to ${{ github.event.inputs.upload_to }}"
+            fi
+
+            # Add GDrive upload folder if specified
+            if [ -n "${{ github.event.inputs.gdrive_upload_folder }}" ]; then
+              CMD="$CMD --gdrive-upload-folder '${{ github.event.inputs.gdrive_upload_folder }}'"
+            fi
           fi
           
           echo "Executing: $CMD"
