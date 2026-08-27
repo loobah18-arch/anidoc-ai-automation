@@ -101,7 +101,7 @@ jobs:
           GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
-          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID || secrets.CLIENT_ID }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
           # Optional stock video APIs (free at pixabay.com & pexels.com)
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}

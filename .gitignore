@@ -1,22 +1,19 @@
-# Secrets & environment
 .env
-*.env
-
-# Output & temp directories
-scratch/
-output/
-audit/
 __pycache__/
 *.pyc
-*.pyo
-.pytest_cache/
-.coverage
+output/
+scratch/
+temp/
+.DS_Store
 
-# Node modules & editor data
-node_modules/
-.omo/
-.opencode/
-.claude/
-.claude-flow/
-.swarm/
-.agents/
+# Ignore temporary root video outputs
+/*.mp4
+/*.mkv
+/*.mov
+/*.webm
+/*.jpg
+/*.png
+
+# Ensure assets are tracked
+!assets/
+!assets/**
