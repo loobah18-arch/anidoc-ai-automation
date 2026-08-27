@@ -3,9 +3,56 @@ YouTube Data API v3 Auto-Publisher for 4K Phonk / Scene Edits.
 """
 import os
 import json
+import subprocess
 import requests
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
+
+SHORTS_MAX_DURATION_SECONDS = 180.0
+
+
+def validate_shorts_video(video_path: Path) -> Tuple[bool, str]:
+    """Require a square video no longer than YouTube's Shorts limit."""
+    try:
+        probe = subprocess.run(
+            [
+                "ffprobe", "-v", "error",
+                "-select_streams", "v:0",
+                "-show_entries", "stream=width,height:format=duration",
+                "-of", "json", str(video_path)
+            ],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        info = json.loads(probe.stdout)
+        stream = (info.get("streams") or [{}])[0]
+        width = int(stream.get("width") or 0)
+        height = int(stream.get("height") or 0)
+        duration = float((info.get("format") or {}).get("duration") or 0)
+    except (OSError, subprocess.CalledProcessError, ValueError, json.JSONDecodeError) as exc:
+        return False, f"Could not inspect video for Shorts requirements: {exc}"
+
+    if not width or not height:
+        return False, "Video has no readable video dimensions"
+    if width != height:
+        return False, f"Video must be square (1:1), got {width}x{height}"
+    if duration <= 0:
+        return False, "Video has no readable duration"
+    if duration > SHORTS_MAX_DURATION_SECONDS:
+        return False, f"Video must be 3 minutes or shorter, got {duration:.2f}s"
+
+    return True, f"{width}x{height}, {duration:.2f}s"
+
+
+def _shorts_title(title: str) -> str:
+    """Keep the title within YouTube's limit and mark it as a Short."""
+    clean_title = " ".join(str(title).split()).strip()
+    if "#shorts" not in clean_title.lower():
+        suffix = " #Shorts"
+        clean_title = f"{clean_title[:100 - len(suffix)].rstrip()}{suffix}"
+    return clean_title[:100]
+
 
 def get_valid_access_token() -> Optional[str]:
     """Exchanges refresh token for a fresh access token if available."""
@@ -71,18 +118,25 @@ def upload_video_to_youtube(
     privacy_status: str = "public"
 ) -> Dict[str, Any]:
     """
-    Uploads a video to YouTube using the Data API v3.
+    Uploads a square video to YouTube using the Data API v3.
+
+    YouTube classifies square or vertical videos up to three minutes as Shorts.
     """
+    video_path = Path(video_path)
+    if not video_path.exists():
+        return {"status": "error", "reason": "Video file not found"}
+
+    is_valid, validation_reason = validate_shorts_video(video_path)
+    if not is_valid:
+        print(f"[YouTube] ❌ Shorts validation failed: {validation_reason}")
+        return {"status": "error", "reason": validation_reason}
+
     access_token = get_valid_access_token()
     if not access_token:
         print("[YouTube] ⚠️ YouTube API credentials not configured in environment. Skipping upload.")
         return {"status": "skipped", "reason": "No credentials"}
-        
-    video_path = Path(video_path)
-    if not video_path.exists():
-        return {"status": "error", "reason": "Video file not found"}
-        
-    print(f"🚀 [YouTube] Uploading {video_path.name} to YouTube...")
+
+    print(f"🚀 [YouTube] Uploading square Short {video_path.name} ({validation_reason}) to YouTube...")
     try:
         from googleapiclient.discovery import build
         from googleapiclient.http import MediaFileUpload
@@ -91,7 +145,7 @@ def upload_video_to_youtube(
         creds = Credentials(token=access_token)
         youtube = build("youtube", "v3", credentials=creds)
         
-        clean_title = title[:95]
+        clean_title = _shorts_title(title)
         clean_tags = [t.replace("#", "").strip() for t in tags][:15]
         
         body = {
