@@ -1,0 +1,430 @@
+[
+  {
+    "event_id": "yuji_todo_double_black_flash",
+    "source_file": "Jujutsu Kaisen-S02E21-720p-[HIN-ENG-JAP]-PIKAHD.COM.mkv",
+    "duration_s": 1421.4,
+    "windows": [
+      {
+        "window": [
+          200.0,
+          1300.0
+        ],
+        "frames_extracted": [
+          322.2,
+          444.4,
+          566.7,
+          688.9,
+          811.1,
+          933.3,
+          1055.6,
+          1177.8
+        ],
+        "action": "Yuji & Todo vs Mahito — Black Flash flurry, Boogie Woogie sync"
+      },
+      {
+        "window": [
+          250.0,
+          1300.0
+        ],
+        "frames_extracted": [
+          366.7,
+          483.3,
+          600.0,
+          716.7,
+          833.3,
+          950.0,
+          1066.7,
+          1183.3
+        ],
+        "action": "Todo Boogie Woogie masterpiece vs Mahito"
+      }
+    ]
+  },
+  {
+    "event_id": "yuji_black_flash_hanami",
+    "source_file": "Jujutsu Kaisen S01E19-1080p-[HIN-ENG-JAP]-PIKAHD.COM.mkv",
+    "duration_s": 1526.0,
+    "windows": [
+      {
+        "window": [
+          400.0,
+          1250.0
+        ],
+        "frames_extracted": [
+          494.4,
+          588.9,
+          683.3,
+          777.8,
+          872.2,
+          966.7,
+          1061.1,
+          1155.6
+        ],
+        "action": "Yuji lands consecutive Black Flashes vs Hanami"
+      }
+    ]
+  },
+  {
+    "event_id": "gojo_unlimited_void_shibuya",
+    "source_file": "Jujutsu Kaisen-S02E09-720p-[HIN-ENG-JAP]-PIKAHD.COM.mkv",
+    "duration_s": 1435.1,
+    "windows": [
+      {
+        "window": [
+          300.0,
+          1300.0
+        ],
+        "frames_extracted": [
+          411.1,
+          522.2,
+          633.3,
+          744.4,
+          855.6,
+          1077.8,
+          1188.9
+        ],
+        "action": "Gojo 0.2s Unlimited Void, Hollow Purple tunnel carve"
+      }
+    ]
+  },
+  {
+    "event_id": "gojo_honored_one_vs_toji",
+    "source_file": "Jujutsu Kaisen-S02E05-720p-[HIN-ENG-JAP]-PIKAHD.COM.mkv",
+    "duration_s": 1435.1,
+    "windows": [
+      {
+        "window": [
+          300.0,
+          1200.0
+        ],
+        "frames_extracted": [
+          400.0,
+          500.0,
+          600.0,
+          700.0,
+          800.0,
+          900.0,
+          1000.0,
+          1100.0
+        ],
+        "action": "Awakened Gojo vs Toji — Hollow Purple finisher"
+      },
+      {
+        "window": [
+          300.0,
+          900.0
+        ],
+        "frames_extracted": [
+          366.7,
+          433.3,
+          500.0,
+          566.7,
+          633.3,
+          700.0,
+          766.7,
+          833.3
+        ],
+        "action": "Toji final stand vs awakened Gojo"
+      }
+    ]
+  },
+  {
+    "event_id": "gojo_vs_toji_hidden_inventory",
+    "source_file": "Jujutsu Kaisen-S02E02-720p-[HIN-ENG-JAP]-PIKAHD.COM.mkv",
+    "duration_s": 1435.6,
+    "windows": [
+      {
+        "window": [
+          700.0,
+          1380.0
+        ],
+        "frames_extracted": [
+          775.6,
+          851.1,
+          926.7,
+          1002.2,
+          1077.8,
+          1153.3,
+          1228.9,
+          1304.4
+        ],
+        "action": "Toji speed blitz, Inverted Spear of Heaven"
+      },
+      {
+        "window": [
+          750.0,
+          1380.0
+        ],
+        "frames_extracted": [
+          820.0,
+          890.0,
+          960.0,
+          1030.0,
+          1100.0,
+          1170.0,
+          1240.0,
+          1310.0
+        ],
+        "action": "Wounded Gojo vs Toji, Ten Shadows strike"
+      }
+    ]
+  },
+  {
+    "event_id": "sukuna_fire_arrow_jogo",
+    "source_file": "Jujutsu Kaisen-S02E16-720p-[HIN-ENG-JAP]-PIKAHD.COM.mkv",
+    "duration_s": 1435.1,
+    "windows": [
+      {
+        "window": [
+          300.0,
+          1300.0
+        ],
+        "frames_extracted": [
+          411.1,
+          522.2,
+          744.4,
+          855.6,
+          966.7,
+          1077.8,
+          1188.9
+        ],
+        "action": "Sukuna vs Jogo — 'Stand proud', fire arrow fuga"
+      }
+    ]
+  },
+  {
+    "event_id": "sukuna_vs_mahoraga",
+    "source_file": "Jujutsu Kaisen-S02E17-720p-[HIN-ENG-JAP]-PIKAHD.COM.mkv",
+    "duration_s": 1447.7,
+    "windows": [
+      {
+        "window": [
+          200.0,
+          1300.0
+        ],
+        "frames_extracted": [
+          322.2,
+          444.4,
+          566.7,
+          688.9,
+          811.1,
+          933.3,
+          1055.6,
+          1177.8
+        ],
+        "action": "Sukuna summons Malevolent Shrine full domain vs Mahoraga"
+      }
+    ]
+  },
+  {
+    "event_id": "megumi_mahoraga_summoning",
+    "source_file": "Jujutsu Kaisen-S02E17-720p-[HIN-ENG-JAP]-PIKAHD.COM.mkv",
+    "duration_s": 1447.7,
+    "windows": [
+      {
+        "window": [
+          100.0,
+          500.0
+        ],
+        "frames_extracted": [
+          144.4,
+          188.9,
+          233.3,
+          277.8,
+          322.2,
+          366.7,
+          411.1,
+          455.6
+        ],
+        "action": "Megumi summoning ritual for Mahoraga"
+      }
+    ]
+  },
+  {
+    "event_id": "thor_god_of_thunder_ragnarok",
+    "source_file": "Thor.Ragnarok.2017.720p.BluRay.HIN-ENG.x264.ESub-KatmovieHD.mkv",
+    "duration_s": 7834.0,
+    "windows": [
+      {
+        "window": [
+          4700.0,
+          5000.0
+        ],
+        "frames_extracted": [
+          4733.3,
+          4766.7,
+          4800.0,
+          4833.3,
+          4866.7,
+          4900.0,
+          4933.3,
+          4966.7
+        ],
+        "action": "THE God of Thunder moment — full lightning storm vs Hela's undead army"
+      },
+      {
+        "window": [
+          4750.0,
+          5050.0
+        ],
+        "frames_extracted": [
+          4783.3,
+          4816.7,
+          4850.0,
+          4883.3,
+          4916.7,
+          4950.0,
+          4983.3,
+          5016.7
+        ],
+        "action": "Rainbow Bridge battle — lightning on Hela's berserkers"
+      }
+    ]
+  },
+  {
+    "event_id": "thor_vs_hulk_arena",
+    "source_file": "Thor.Ragnarok.2017.720p.BluRay.HIN-ENG.x264.ESub-KatmovieHD.mkv",
+    "duration_s": 7834.0,
+    "windows": [
+      {
+        "window": [
+          800.0,
+          1100.0
+        ],
+        "frames_extracted": [
+          833.3,
+          866.7,
+          900.0,
+          933.3,
+          966.7,
+          1000.0,
+          1033.3,
+          1066.7
+        ],
+        "action": "Sakaar arena — Thor vs Hulk gladiator fight, thunder awakens"
+      },
+      {
+        "window": [
+          800.0,
+          1100.0
+        ],
+        "frames_extracted": [
+          833.3,
+          866.7,
+          900.0,
+          933.3,
+          966.7,
+          1000.0,
+          1033.3,
+          1066.7
+        ],
+        "action": "Hulk smashing Thor, champion of Sakaar"
+      }
+    ]
+  },
+  {
+    "event_id": "ironman_nuke_portal",
+    "source_file": "The.Avengers.2012.720p.BluRay.HIN-ENG.x264.ESub-KatmovieHD.mkv",
+    "duration_s": 8575.2,
+    "windows": [
+      {
+        "window": [
+          7000.0,
+          7300.0
+        ],
+        "frames_extracted": [
+          7033.3,
+          7066.7,
+          7100.0,
+          7133.3,
+          7166.7,
+          7200.0,
+          7233.3,
+          7266.7
+        ],
+        "action": "Iron Man carries the nuke through the portal — sacrifice flight"
+      }
+    ]
+  },
+  {
+    "event_id": "hulk_puny_god_loki",
+    "source_file": "The.Avengers.2012.720p.BluRay.HIN-ENG.x264.ESub-KatmovieHD.mkv",
+    "duration_s": 8575.2,
+    "windows": [
+      {
+        "window": [
+          6180.0,
+          6280.0
+        ],
+        "frames_extracted": [
+          6191.1,
+          6202.2,
+          6213.3,
+          6224.4,
+          6235.6,
+          6246.7,
+          6257.8,
+          6268.9
+        ],
+        "action": "Hulk punishes Loki — 'puny god' beatdown inside Stark Tower"
+      },
+      {
+        "window": [
+          6100.0,
+          6500.0
+        ],
+        "frames_extracted": [
+          6188.9,
+          6233.3,
+          6277.8,
+          6322.2,
+          6366.7,
+          6411.1,
+          6455.6
+        ],
+        "action": "Hulk smash sequence — Chitauri tosses"
+      }
+    ]
+  },
+  {
+    "event_id": "ironman_vs_thor_forest",
+    "source_file": "The.Avengers.2012.720p.BluRay.HIN-ENG.x264.ESub-KatmovieHD.mkv",
+    "duration_s": 8575.2,
+    "windows": [
+      {
+        "window": [
+          1310.0,
+          1500.0
+        ],
+        "frames_extracted": [
+          1331.1,
+          1352.2,
+          1373.3,
+          1394.4,
+          1415.6,
+          1436.7,
+          1457.8,
+          1478.9
+        ],
+        "action": "Thor vs Iron Man forest battle — lightning vs repulsors"
+      },
+      {
+        "window": [
+          1310.0,
+          1500.0
+        ],
+        "frames_extracted": [
+          1331.1,
+          1352.2,
+          1373.3,
+          1394.4,
+          1415.6,
+          1436.7,
+          1457.8,
+          1478.9
+        ],
+        "action": "Iron Man vs Thor forest fight — repulsor barrage"
+      }
+    ]
+  }
+]

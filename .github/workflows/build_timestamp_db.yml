@@ -1,0 +1,177 @@
+name: Build JJK Timestamp Database
+
+on:
+  workflow_dispatch:
+    inputs:
+      episodes_limit:
+        description: 'Number of episodes to scan (leave empty for all 56)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  scan_episodes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Nn Branch
+        uses: actions/checkout@v4
+        with:
+          ref: Nn
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Setup Google Drive Access
+        run: |
+          # Mount Google Drive folder containing episodes
+          # This will download episodes on-demand during scanning
+          mkdir -p /tmp/footage
+          echo "FOOTAGE_DIR=/tmp/footage" >> $GITHUB_ENV
+
+      - name: Install Python Dependencies
+        run: |
+          pip install gdown requests
+
+      - name: Build Source Manifest
+        env:
+          GDRIVE_FOLDER_URL: ${{ secrets.GDRIVE_FOLDER_URL }}
+        run: |
+          LIMIT_ARG=""
+          if [ -n "${{ github.event.inputs.episodes_limit }}" ]; then
+            LIMIT_ARG="--limit ${{ github.event.inputs.episodes_limit }}"
+          fi
+
+          python scripts/build_gdrive_manifest.py \
+            --gdrive-url "$GDRIVE_FOLDER_URL" \
+            --output data/gdrive_source_manifest.json \
+            $LIMIT_ARG
+
+          echo "✅ Source manifest created"
+          jq '.total_sources' data/gdrive_source_manifest.json
+
+      - name: Download Episodes from Manifest
+        run: |
+          python - <<'PY'
+          import json
+          import gdown
+          from pathlib import Path
+
+          manifest_path = Path("data/gdrive_source_manifest.json")
+          with open(manifest_path) as f:
+              manifest = json.load(f)
+
+          footage_dir = Path("/tmp/footage")
+          footage_dir.mkdir(parents=True, exist_ok=True)
+
+          for i, source in enumerate(manifest["sources"], 1):
+              print(f"\n[{i}/{len(manifest['sources'])}] Downloading: {source['original_filename']}")
+
+              out_path = footage_dir / source["canonical_filename"]
+
+              try:
+                  gdown.download(id=source["drive_file_id"], output=str(out_path), quiet=False)
+                  if out_path.exists():
+                      size_mb = out_path.stat().st_size // (1024*1024)
+                      print(f"  ✅ Downloaded: {size_mb} MB")
+              except Exception as e:
+                  print(f"  ⚠️ Download failed: {e}")
+
+          downloaded_count = len(list(footage_dir.glob("*.mkv"))) + len(list(footage_dir.glob("*.mp4")))
+          print(f"\n✅ Downloaded {downloaded_count}/{len(manifest['sources'])} episodes")
+          PY
+
+      - name: Run Technical Timestamp Scanner
+        run: |
+          LIMIT_ARG=""
+          if [ -n "${{ github.event.inputs.episodes_limit }}" ]; then
+            LIMIT_ARG="--limit ${{ github.event.inputs.episodes_limit }}"
+          fi
+
+          python scripts/build_timestamp_database.py \
+            --footage-dir /tmp/footage \
+            --output data/jjk_timestamp_database.json \
+            --manifest data/gdrive_source_manifest.json \
+            $LIMIT_ARG
+
+          echo "✅ Technical scan complete"
+
+      - name: Validate Database Schema
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          db_path = Path("data/jjk_timestamp_database.json")
+          with open(db_path) as f:
+              db = json.load(f)
+
+          # Validate required fields
+          assert "version" in db
+          assert "episodes" in db
+          assert "events" in db
+
+          # Check episode structure
+          for source_id, ep in db["episodes"].items():
+              if ep.get("scan_status") != "success":
+                  continue
+
+              assert "source_id" in ep
+              assert "canonical_filename" in ep
+              assert "scenes" in ep
+
+              # Check scenes have technical data only
+              for scene in ep["scenes"]:
+                  assert "start" in scene
+                  assert "end" in scene
+                  assert "audio_energy_band" in scene
+                  assert "semantic" in scene
+                  assert scene["semantic"]["status"] in ["unverified", "candidate", "verified", "rejected"]
+
+          print(f"✅ Schema validation passed")
+          print(f"📊 Episodes: {db['total_episodes']}, Scenes: {db['total_scenes']}")
+          PY
+
+      - name: Commit and Push Database
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git add data/jjk_timestamp_database.json
+          git add data/gdrive_source_manifest.json
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            TOTAL_EPS=$(jq '.total_episodes' data/jjk_timestamp_database.json)
+            TOTAL_SCENES=$(jq '.total_scenes' data/jjk_timestamp_database.json)
+
+            git commit -m "Update JJK timestamp database [automated]
+
+Episodes scanned: ${TOTAL_EPS}
+Total technical scenes: ${TOTAL_SCENES}
+Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+🤖 Technical scanner v1.0 - no semantic assumptions"
+
+            git push origin Nn
+            echo "✅ Database pushed to Nn branch"
+          fi
+
+      - name: Upload Database Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jjk-timestamp-database
+          path: |
+            data/jjk_timestamp_database.json
+            data/gdrive_source_manifest.json
+          retention-days: 90

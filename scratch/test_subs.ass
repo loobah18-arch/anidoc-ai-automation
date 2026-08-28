@@ -1,0 +1,25 @@
+[Script Info]
+Title: AniDoc High-Retention Kinetic Subtitles
+ScriptType: v4.00+
+WrapStyle: 1
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.601
+PlayResX: 1080
+PlayResY: 1080
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: BaseText,Arial,58,&H00FFFFFF,&H00000000,&H00000000,&H60000000,-1,0,0,0,100,100,2,0,1,5.0,2.5,2,60,60,85,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:00.50,0:00:01.00,BaseText,,0,0,0,,{\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}THROUGHOUT{\rBaseText} {\c&H00FFFFFF}HEAVEN {\c&H00FFFFFF}AND
+Dialogue: 1,0:00:01.00,0:00:01.50,BaseText,,0,0,0,,{\c&H00FFFFFF}THROUGHOUT {\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}HEAVEN{\rBaseText} {\c&H00FFFFFF}AND
+Dialogue: 1,0:00:01.50,0:00:02.00,BaseText,,0,0,0,,{\c&H00FFFFFF}THROUGHOUT {\c&H00FFFFFF}HEAVEN {\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}AND{\rBaseText}
+Dialogue: 1,0:00:02.00,0:00:02.50,BaseText,,0,0,0,,{\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}EARTH{\rBaseText} {\c&H00FFFFFF}I {\c&H00FFFFFF}ALONE
+Dialogue: 1,0:00:02.50,0:00:03.00,BaseText,,0,0,0,,{\c&H00FFFFFF}EARTH {\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}I{\rBaseText} {\c&H00FFFFFF}ALONE
+Dialogue: 1,0:00:03.00,0:00:03.50,BaseText,,0,0,0,,{\c&H00FFFFFF}EARTH {\c&H00FFFFFF}I {\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}ALONE{\rBaseText}
+Dialogue: 1,0:00:03.50,0:00:04.00,BaseText,,0,0,0,,{\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}AM{\rBaseText} {\c&H00FFFFFF}THE {\c&H00FFFFFF}HONORED
+Dialogue: 1,0:00:04.00,0:00:04.50,BaseText,,0,0,0,,{\c&H00FFFFFF}AM {\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}THE{\rBaseText} {\c&H00FFFFFF}HONORED
+Dialogue: 1,0:00:04.50,0:00:05.00,BaseText,,0,0,0,,{\c&H00FFFFFF}AM {\c&H00FFFFFF}THE {\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}HONORED{\rBaseText}
+Dialogue: 1,0:00:05.00,0:00:05.50,BaseText,,0,0,0,,{\c&H00E0E0E0\t(0,100,\fscx118\fscy118)\t(100,200,\fscx100\fscy100)}ONE{\rBaseText}
