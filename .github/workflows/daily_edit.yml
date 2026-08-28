@@ -1,8 +1,6 @@
 name: Daily 4K Phonk / Scene Edit Generator & YouTube Auto-Upload
 
 on:
-  schedule:
-    - cron: '30 6,18 * * *'  # Runs twice daily at 06:30 UTC & 18:30 UTC
   workflow_dispatch:
     inputs:
       universe:
