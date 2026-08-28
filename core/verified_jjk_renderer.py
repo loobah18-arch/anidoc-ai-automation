@@ -24,7 +24,26 @@ from core.subtitle_stylizer import generate_kinetic_subtitles
 from core.opencut_engine import build_clip_audio_fade
 from core.public_api_fetcher import check_clip_has_audio
 from core.clip_manager import CHARACTER_THEMES
-from core.video_assembler import generate_fallback_phonk_audio
+def generate_fallback_phonk_audio(duration: float, output_path: Path) -> Path:
+    """
+    Generates a punchy synth-bass procedural audio track if no raw mp3 is present.
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    dur_str = f"{duration:.2f}"
+
+    cmd = [
+        "ffmpeg", "-y",
+        "-f", "lavfi", "-i", f"sine=frequency=55:d={dur_str}",
+        "-f", "lavfi", "-i", f"sine=frequency=110:d={dur_str}",
+        "-filter_complex", "[0:a]volume=0.8[b];[1:a]volume=0.4[m];[b][m]amix=inputs=2[a]",
+        "-map", "[a]",
+        "-c:a", "aac",
+        "-b:a", "192k",
+        "-t", dur_str,
+        str(output_path)
+    ]
+    subprocess.run(cmd, capture_output=True, check=True)
+    return output_path
 
 
 def _render_verified_jjk_edit(
