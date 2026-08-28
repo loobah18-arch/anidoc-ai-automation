@@ -1,6 +1,8 @@
 name: Daily 4K Phonk / Scene Edit Generator & YouTube Auto-Upload
 
 on:
+  schedule:
+    - cron: '30 6,18 * * *'  # Runs twice daily at 06:30 UTC & 18:30 UTC
   workflow_dispatch:
     inputs:
       universe:
@@ -106,8 +108,11 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
           CMD="python main.py --duration 38.0"
-          
-          if [ "${{ github.event.inputs.universe }}" != "random" ] && [ -n "${{ github.event.inputs.universe }}" ]; then
+
+          # Scheduled runs: JJK only. Manual runs: respect input or random.
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            CMD="$CMD --universe jjk"
+          elif [ "${{ github.event.inputs.universe }}" != "random" ] && [ -n "${{ github.event.inputs.universe }}" ]; then
             CMD="$CMD --universe ${{ github.event.inputs.universe }}"
           fi
           
