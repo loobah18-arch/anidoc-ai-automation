@@ -1,90 +1,146 @@
 """
-Database-Driven Scene Clip Fetcher
-Fetches clips from exact timestamps in the JJK database.
+Verified Event Clip Fetcher
+Fetches clips from exact verified event timestamps with Drive source resolution.
+NO fallback sources - only cuts verified windows from verified events.
 """
 import subprocess
 from pathlib import Path
-from typing import List, Dict, Any
-from core.scene_database import SceneDatabaseQuery
+from typing import List, Dict, Any, Optional
+from core.gdrive_manager import list_gdrive_folder_items, download_single_gdrive_file, get_english_audio_map
 
 
-def fetch_clips_from_database(
-    title: str,
-    character_key: str,
-    n_clips: int,
-    output_dir: Path,
-    min_intensity: float = 4.0,
-    preferred_type: str = "action"
-) -> List[Path]:
+def resolve_and_download_source(
+    source_id: str,
+    drive_file_id: str,
+    canonical_filename: str,
+    gdrive_folder_url: str,
+    cache_dir: Path
+) -> Optional[Path]:
     """
-    Fetch clips using the timestamp database instead of random episodes.
+    Resolve and download exact source by Drive ID.
 
     Args:
-        title: Video title (used for keyword matching)
-        character_key: Character name (for logging/context)
-        n_clips: Number of clips needed
-        output_dir: Where to save cut clips
-        min_intensity: Minimum audio intensity (0-10)
-        preferred_type: Preferred scene type
+        source_id: Database source_id for validation
+        drive_file_id: Google Drive file ID
+        canonical_filename: Expected filename for validation
+        gdrive_folder_url: Drive folder URL (for listing if needed)
+        cache_dir: Local cache directory
 
     Returns:
-        List of paths to cut video clips
+        Path to downloaded/cached source file
+    """
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    # Check cache first
+    cached = cache_dir / canonical_filename
+    if cached.exists() and cached.stat().st_size > 1_000_000:
+        print(f"⚡ [VerifiedFetcher] Using cached source: {canonical_filename}")
+        return cached
+
+    print(f"📥 [VerifiedFetcher] Downloading verified source: {canonical_filename}")
+    print(f"   Drive ID: {drive_file_id}")
+
+    # Construct file info for downloader
+    file_info = {
+        "id": drive_file_id,
+        "name": canonical_filename,
+        "url": f"https://drive.google.com/uc?id={drive_file_id}"
+    }
+
+    downloaded = download_single_gdrive_file(file_info, cache_dir)
+
+    if not downloaded or not downloaded.exists():
+        raise RuntimeError(f"Failed to download source {canonical_filename} (Drive ID: {drive_file_id})")
+
+    # Validate downloaded file matches expected
+    if downloaded.name != canonical_filename:
+        print(f"⚠️  [VerifiedFetcher] Filename mismatch: {downloaded.name} != {canonical_filename}")
+
+    print(f"✅ [VerifiedFetcher] Source ready: {downloaded.name} ({downloaded.stat().st_size // (1024*1024)} MB)")
+
+    return downloaded
+
+
+def cut_verified_event_clips(
+    event: Dict[str, Any],
+    source_path: Path,
+    output_dir: Path,
+    segment_durations: List[float],
+    character_key: str
+) -> Dict[str, Any]:
+    """
+    Cut clips from verified event windows only.
+
+    Args:
+        event: Verified event with cut_windows
+        source_path: Downloaded source file path
+        output_dir: Output directory for clips
+        segment_durations: Target durations for each beat segment
+        character_key: Character for naming
+
+    Returns:
+        Dict with clip_paths and clip_manifest
     """
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"\n🎯 [DatabaseFetcher] Querying timestamp database for title-coherent scenes...")
-    print(f"📌 Title: {title}")
-    print(f"👤 Character: {character_key}")
+    cut_windows = event.get("cut_windows", [])
+    event_id = event.get("event_id", "unknown")
 
-    # Query database for matching scenes
-    query_engine = SceneDatabaseQuery()
+    if not cut_windows:
+        raise RuntimeError(f"Event {event_id} has no cut_windows")
 
-    try:
-        scenes = query_engine.query_scenes(
-            title=title,
-            n_scenes=n_clips,
-            preferred_type=preferred_type,
-            min_intensity=min_intensity,
-            diversity_factor=0.7  # Spread across different episodes
-        )
-    except Exception as e:
-        print(f"❌ [DatabaseFetcher] Database query failed: {e}")
-        raise RuntimeError(
-            f"Could not find matching scenes in database. "
-            f"Make sure 'Build JJK Timestamp Database' workflow has been run."
-        )
+    print(f"\n✂️  [VerifiedFetcher] Cutting {len(segment_durations)} clips from {len(cut_windows)} verified windows")
+    print(f"   Event: {event_id}")
+    print(f"   Source: {source_path.name}")
 
-    if not scenes:
-        raise RuntimeError(
-            f"No scenes found matching title '{title}' with min_intensity={min_intensity}"
-        )
+    # Get English audio mapping
+    audio_map = get_english_audio_map(source_path)
 
-    # Cut clips from exact timestamps
     clip_paths = []
-    print(f"\n✂️ [DatabaseFetcher] Cutting {len(scenes)} clips from verified timestamps...")
+    clip_manifest = []
 
-    for i, scene in enumerate(scenes):
-        file_path = Path(scene["file_path"])
-        timestamp = scene["timestamp"]
-        duration = min(scene["duration"], 5.0)  # Cap at 5 seconds per clip
+    # Allocate windows to segments
+    # Simple strategy: cycle through windows, prefer longer windows for longer segments
+    window_idx = 0
 
-        # Check if source file exists
-        if not file_path.exists():
-            print(f"  ⚠️ Source file not found: {file_path.name}, skipping...")
+    for seg_idx, target_duration in enumerate(segment_durations):
+        if window_idx >= len(cut_windows):
+            window_idx = 0
+
+        window = cut_windows[window_idx]
+        window_idx += 1
+
+        start = window.get("start")
+        end = window.get("end")
+
+        if start is None or end is None:
+            print(f"  ⚠️  Segment {seg_idx}: window missing start/end, skipping")
             continue
 
-        output_clip = output_dir / f"{character_key}_db_{i:02d}_{scene['id']}.mp4"
+        window_duration = end - start
+        actual_duration = min(target_duration, window_duration)
+
+        # Use middle portion of window if it's longer than needed
+        if window_duration > actual_duration:
+            offset = (window_duration - actual_duration) / 2
+            cut_start = start + offset
+        else:
+            cut_start = start
+
+        cut_end = cut_start + actual_duration
+
+        output_clip = output_dir / f"{character_key}_verified_{event_id}_{seg_idx:02d}.mp4"
 
         cmd = [
             "ffmpeg", "-y",
-            "-ss", str(timestamp),
-            "-t", str(duration),
-            "-i", str(file_path),
-            "-map", "0:v:0", "-map", "0:a:0?",
+            "-ss", str(cut_start),
+            "-t", str(actual_duration),
+            "-i", str(source_path),
+        ] + audio_map + [
             "-vf", (
-                f"crop=in_h:in_h:(in_w-in_h)/2:0,"  # Crop to square
-                f"scale=1080:1080,"
-                f"setsar=1,fps=60"
+                "crop=in_h:in_h:(in_w-in_h)/2:0,"
+                "scale=1080:1080,"
+                "setsar=1,fps=60"
             ),
             "-c:v", "libx264",
             "-preset", "veryfast",
@@ -102,44 +158,105 @@ def fetch_clips_from_database(
             if output_clip.exists() and output_clip.stat().st_size > 50_000:
                 clip_paths.append(output_clip)
 
-                scene_type_emoji = {
-                    "intense_action": "💥",
-                    "action": "⚔️",
-                    "dialogue": "💬",
-                    "ambient": "🌅"
-                }
-                emoji = scene_type_emoji.get(scene["scene_type"], "📹")
+                clip_manifest.append({
+                    "segment_index": seg_idx,
+                    "clip_path": str(output_clip),
+                    "event_id": event_id,
+                    "source_id": event.get("source_id"),
+                    "window_index": window_idx - 1,
+                    "cut_start": round(cut_start, 2),
+                    "cut_end": round(cut_end, 2),
+                    "actual_duration": round(actual_duration, 2),
+                    "semantic_status": window.get("semantic_status"),
+                    "scene_suitability": window.get("scene_suitability", {})
+                })
 
-                print(
-                    f"  {emoji} Clip {i+1:02d}/{len(scenes)}: "
-                    f"{scene['file_name'][:30]}... @ {timestamp:.1f}s "
-                    f"(score: {scene['match_score']:.1f}, "
-                    f"type: {scene['scene_type']}, "
-                    f"intensity: {scene['audio']['intensity']:.1f})"
-                )
+                suitability = window.get("scene_suitability", {})
+                suit_tags = [k for k, v in suitability.items() if v]
+                suit_str = f" [{', '.join(suit_tags)}]" if suit_tags else ""
+
+                print(f"  ✅ Clip {seg_idx+1:02d}: {cut_start:.1f}s-{cut_end:.1f}s{suit_str}")
             else:
-                print(f"  ⚠️ Clip {i+1} failed: output too small")
+                print(f"  ⚠️  Clip {seg_idx+1} failed: output too small")
 
         except subprocess.TimeoutExpired:
-            print(f"  ⚠️ Clip {i+1} timed out")
+            print(f"  ⚠️  Clip {seg_idx+1} timed out")
         except subprocess.CalledProcessError as e:
-            print(f"  ⚠️ Clip {i+1} FFmpeg error: {e}")
+            print(f"  ⚠️  Clip {seg_idx+1} FFmpeg error: {e}")
 
     if not clip_paths:
         raise RuntimeError(
-            "Failed to cut any clips from database timestamps. Check source files exist."
+            f"Failed to cut any clips from event {event_id}. "
+            f"Source: {source_path.name}, Windows: {len(cut_windows)}"
         )
 
-    print(f"\n✅ [DatabaseFetcher] Successfully cut {len(clip_paths)} title-coherent clips")
+    print(f"\n✅ [VerifiedFetcher] Cut {len(clip_paths)} verified clips from event {event_id}")
 
-    # Print episode diversity stats
-    episodes_used = {}
-    for scene in scenes[:len(clip_paths)]:
-        ep_key = f"S{scene['season']:02d}E{scene['episode']:02d}"
-        episodes_used[ep_key] = episodes_used.get(ep_key, 0) + 1
+    return {
+        "clip_paths": clip_paths,
+        "clip_manifest": clip_manifest,
+        "event_id": event_id,
+        "source_id": event.get("source_id"),
+        "source_filename": source_path.name
+    }
 
-    print(f"📊 [DatabaseFetcher] Episode diversity: {len(episodes_used)} different episodes")
-    for ep, count in sorted(episodes_used.items()):
-        print(f"     {ep}: {count} clips")
 
-    return clip_paths
+def fetch_verified_event_clips(
+    event: Dict[str, Any],
+    gdrive_folder_url: str,
+    segment_durations: List[float],
+    character_key: str,
+    output_dir: Path,
+    cache_dir: Optional[Path] = None
+) -> Dict[str, Any]:
+    """
+    Main entry point: Resolve source, download, cut verified windows.
+
+    Args:
+        event: Selected verified event from VerifiedEventDatabase
+        gdrive_folder_url: Google Drive folder URL containing sources
+        segment_durations: Target durations for beat segments
+        character_key: Character for clip naming
+        output_dir: Output directory for clips
+        cache_dir: Cache directory for downloaded sources
+
+    Returns:
+        Dict with clip_paths, clip_manifest, event_id, source_trace
+    """
+    if cache_dir is None:
+        from config.settings import SCRATCH_DIR
+        cache_dir = SCRATCH_DIR / "verified_sources_cache"
+
+    # Validate event structure
+    event_id = event.get("event_id")
+    source_id = event.get("source_id")
+    drive_file_id = event.get("drive_file_id")
+    canonical_filename = event.get("canonical_filename")
+
+    if not all([event_id, source_id, drive_file_id, canonical_filename]):
+        raise ValueError(
+            f"Event missing required fields. "
+            f"event_id: {event_id}, source_id: {source_id}, "
+            f"drive_file_id: {drive_file_id}, canonical_filename: {canonical_filename}"
+        )
+
+    # Resolve and download source
+    source_path = resolve_and_download_source(
+        source_id=source_id,
+        drive_file_id=drive_file_id,
+        canonical_filename=canonical_filename,
+        gdrive_folder_url=gdrive_folder_url,
+        cache_dir=cache_dir
+    )
+
+    # Cut verified clips
+    result = cut_verified_event_clips(
+        event=event,
+        source_path=source_path,
+        output_dir=output_dir,
+        segment_durations=segment_durations,
+        character_key=character_key
+    )
+
+    return result
+

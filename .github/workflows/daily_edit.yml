@@ -103,24 +103,34 @@ jobs:
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
           YOUTUBE_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
-          # Optional stock video APIs (free at pixabay.com & pexels.com)
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
-          CMD="python main.py --duration 38.0"
-          
-          if [ "${{ github.event.inputs.universe }}" != "random" ] && [ -n "${{ github.event.inputs.universe }}" ]; then
-            CMD="$CMD --universe ${{ github.event.inputs.universe }}"
+          # Scheduled runs: Use verified JJK mode (no Marvel, no fallback)
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            CMD="python main.py --duration 38.0 --universe jjk --verified-jjk"
+          else
+            # Manual runs: Allow configuration
+            CMD="python main.py --duration 38.0"
+
+            if [ "${{ github.event.inputs.universe }}" != "random" ] && [ -n "${{ github.event.inputs.universe }}" ]; then
+              CMD="$CMD --universe ${{ github.event.inputs.universe }}"
+            fi
+
+            if [ -n "${{ github.event.inputs.character }}" ]; then
+              CMD="$CMD --character ${{ github.event.inputs.character }}"
+            fi
+
+            # Manual runs can optionally use verified mode
+            if [ "${{ github.event.inputs.universe }}" = "jjk" ]; then
+              CMD="$CMD --verified-jjk"
+            fi
           fi
-          
-          if [ -n "${{ github.event.inputs.character }}" ]; then
-            CMD="$CMD --character ${{ github.event.inputs.character }}"
-          fi
-          
+
           if [ "${{ github.event.inputs.phonk }}" != "random" ] && [ -n "${{ github.event.inputs.phonk }}" ]; then
             CMD="$CMD --phonk ${{ github.event.inputs.phonk }}"
           fi
-          
+
           if [ -n "${{ github.event.inputs.subtitle_style }}" ]; then
             CMD="$CMD --subtitle-style ${{ github.event.inputs.subtitle_style }}"
           fi
@@ -128,14 +138,12 @@ jobs:
           if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
             CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
           fi
-          
-          # Always refresh clips to get diverse sources each run
-          CMD="$CMD --refresh-clips"
-          
+
+          # Only scheduled runs auto-upload (manual must opt-in)
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ]; then
             CMD="$CMD --upload"
           fi
-          
+
           echo "Executing: $CMD"
           eval $CMD
 

@@ -50,6 +50,7 @@ def main():
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
     parser.add_argument("--gdrive-upload-folder", type=str, default=None, help="Google Drive folder ID to upload the rendered video to")
     parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
+    parser.add_argument("--verified-jjk", action="store_true", help="Use verified JJK event database (requires timestamp workflow)")
     parser.add_argument("--studio", action="store_true", help="Launch the AniDoc Studio Web Video Editing Software")
     parser.add_argument("--port", type=int, default=7860, help="Port for AniDoc Studio server (default: 7860)")
     
@@ -86,11 +87,15 @@ def main():
         github_repo=args.github_repo,
         gdrive_folder=args.gdrive_folder,
         auto_fetch_clips=True,
-        force_refresh=args.refresh_clips
+        force_refresh=args.refresh_clips,
+        use_verified_jjk=args.verified_jjk
     )
-    
+
     output_path = result["output_path"]
     metadata = result["metadata"]
+    event_verified = result.get("event_verified", False)
+    event_id = result.get("event_id")
+    source_trace = result.get("source_trace")
     
     print("\n=======================================================")
     print("🎉 4K Phonk / Scene Edit Short Rendered Successfully!")
@@ -115,6 +120,18 @@ def main():
 
         # Upload to YouTube
         if "youtube" in upload_destinations:
+            # VERIFIED JJK UPLOAD GATE
+            if args.verified_jjk and not event_verified:
+                print("\n❌ [UploadGuard] Cannot upload: event not verified")
+                print("   Verified JJK mode requires event_verified=True")
+                print("   This render did not come from a verified event.")
+                sys.exit(1)
+
+            if event_verified:
+                print(f"\n✅ [UploadGuard] Upload approved - verified event {event_id}")
+                print(f"   Source: {source_trace.get('source_filename')}")
+                print(f"   Event: {event_id}")
+
             print("\n📤 Uploading to YouTube...")
             upload_res = upload_video_to_youtube(
                 video_path=output_path,
@@ -123,8 +140,18 @@ def main():
                 tags=metadata["tags"],
                 privacy_status=args.privacy
             )
+
             if upload_res.get("status") == "success":
                 print(f"🌟 Published to YouTube: {upload_res.get('url')}")
+
+                # Mark uploaded in history
+                if event_verified and event_id:
+                    try:
+                        from core.scene_database import VerifiedEventDatabase
+                        event_db = VerifiedEventDatabase()
+                        event_db.mark_event_uploaded(event_id, upload_res)
+                    except Exception as e:
+                        print(f"⚠️  Could not update upload history: {e}")
             else:
                 print(f"⚠️ YouTube upload status: {upload_res.get('status')} ({upload_res.get('reason') or upload_res.get('error')})")
 

@@ -1,200 +1,223 @@
 """
-Scene Database Query Engine
-Queries the JJK timestamp database to find scenes matching a given title/keywords.
+JJK Verified Event Database Query Engine
+Loads verified events from timestamp database and provides event-first selection.
+NO keyword/intensity guessing - only returns events with verified semantic evidence.
 """
 import json
-import re
+import random
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Set
+from typing import List, Dict, Any, Optional
 
 
-class SceneDatabaseQuery:
-    """Query engine for the JJK timestamp database."""
+class VerifiedEventDatabase:
+    """Query engine for verified JJK events only."""
 
-    def __init__(self, db_path: Optional[Path] = None):
+    def __init__(self, db_path: Optional[Path] = None, history_path: Optional[Path] = None):
         if db_path is None:
             db_path = Path(__file__).parent.parent / "data" / "jjk_timestamp_database.json"
+        if history_path is None:
+            history_path = Path(__file__).parent.parent / "data" / "jjk_render_history.json"
 
         self.db_path = db_path
+        self.history_path = history_path
         self.database = self._load_database()
+        self.history = self._load_history()
 
     def _load_database(self) -> Dict[str, Any]:
-        """Load the timestamp database."""
+        """Load timestamp database."""
         if not self.db_path.exists():
             raise FileNotFoundError(
                 f"Timestamp database not found at {self.db_path}. "
-                f"Run 'python scripts/build_timestamp_database.py' first or trigger the "
-                f"'Build JJK Timestamp Database' workflow."
+                f"Run 'Build JJK Timestamp Database' workflow first."
             )
 
         with open(self.db_path, "r") as f:
             return json.load(f)
 
-    def extract_keywords(self, title: str) -> Set[str]:
-        """
-        Extract meaningful keywords from a title.
-        Removes common words and extracts character names, techniques, themes.
-        """
-        # Common stop words to ignore
-        stop_words = {
-            "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
-            "of", "with", "by", "from", "up", "about", "into", "through", "during",
-            "is", "are", "was", "were", "be", "been", "being", "have", "has", "had",
-            "do", "does", "did", "will", "would", "could", "should", "may", "might",
-            "must", "can", "vs", "vs.", "jjk", "shorts", "short", "edit", "amv", "4k"
-        }
-
-        # Remove hashtags, emojis, and special chars
-        clean_title = re.sub(r'[#️⚡🔥💀⚔️✨💥🌟👑]', '', title.lower())
-        clean_title = re.sub(r'[^\w\s]', ' ', clean_title)
-
-        # Extract words
-        words = clean_title.split()
-
-        # Filter out stop words and short words
-        keywords = {w for w in words if len(w) > 2 and w not in stop_words}
-
-        return keywords
-
-    def score_scene(self, scene: Dict[str, Any], keywords: Set[str],
-                    preferred_intensity: str = "action") -> float:
-        """
-        Score a scene based on keyword match and preferred intensity.
-        Returns score 0-100.
-        """
-        score = 0.0
-
-        # Base score from scene type match
-        scene_type = scene.get("scene_type", "ambient")
-        intensity_scores = {
-            "intense_action": {"intense_action": 50, "action": 30, "dialogue": 10, "ambient": 5},
-            "action": {"intense_action": 40, "action": 50, "dialogue": 20, "ambient": 10},
-            "dialogue": {"intense_action": 10, "action": 20, "dialogue": 50, "ambient": 30},
-            "ambient": {"intense_action": 5, "action": 10, "dialogue": 30, "ambient": 50}
-        }
-        score += intensity_scores.get(preferred_intensity, {}).get(scene_type, 0)
-
-        # Audio intensity bonus (0-30 points)
-        audio_intensity = scene.get("audio", {}).get("intensity", 0)
-        score += audio_intensity * 3
-
-        # Duration bonus (prefer scenes 3-8 seconds)
-        duration = scene.get("duration", 0)
-        if 3.0 <= duration <= 8.0:
-            score += 10
-        elif 2.0 <= duration <= 10.0:
-            score += 5
-
-        return score
-
-    def query_scenes(
-        self,
-        title: str,
-        n_scenes: int = 15,
-        preferred_type: str = "action",
-        min_intensity: float = 3.0,
-        diversity_factor: float = 0.7
-    ) -> List[Dict[str, Any]]:
-        """
-        Query database for scenes matching the title.
-
-        Args:
-            title: Video title to match against
-            n_scenes: Number of scenes to return
-            preferred_type: Preferred scene type (intense_action, action, dialogue, ambient)
-            min_intensity: Minimum audio intensity (0-10)
-            diversity_factor: 0-1, how much to spread scenes across episodes (1=max diversity)
-
-        Returns:
-            List of scene dictionaries with file_path, timestamp, duration, etc.
-        """
-        keywords = self.extract_keywords(title)
-        print(f"🔍 [SceneQuery] Title: {title}")
-        print(f"🔍 [SceneQuery] Keywords: {', '.join(sorted(keywords))}")
-
-        # Collect all scenes from all episodes
-        all_scenes = []
-        for episode_key, episode_data in self.database.get("episodes", {}).items():
-            for scene in episode_data.get("scenes", []):
-                # Filter by minimum intensity
-                if scene.get("audio", {}).get("intensity", 0) < min_intensity:
-                    continue
-
-                # Calculate match score
-                score = self.score_scene(scene, keywords, preferred_type)
-
-                # Add episode context
-                scene_with_context = {
-                    **scene,
-                    "episode_key": episode_key,
-                    "file_path": episode_data.get("file_path"),
-                    "file_name": episode_data.get("file_name"),
-                    "season": episode_data.get("season"),
-                    "episode": episode_data.get("episode"),
-                    "match_score": score
-                }
-                all_scenes.append(scene_with_context)
-
-        # Sort by score
-        all_scenes.sort(key=lambda x: x["match_score"], reverse=True)
-
-        print(f"📊 [SceneQuery] Found {len(all_scenes)} candidate scenes (after intensity filter)")
-
-        if not all_scenes:
-            raise RuntimeError(
-                f"No scenes found matching criteria. "
-                f"Title: '{title}', min_intensity: {min_intensity}, type: {preferred_type}"
-            )
-
-        # Select scenes with diversity
-        selected_scenes = []
-        used_episodes = set()
-        remaining_scenes = all_scenes.copy()
-
-        # First pass: spread across different episodes
-        for scene in remaining_scenes[:]:
-            if len(selected_scenes) >= n_scenes:
-                break
-
-            episode_key = scene["episode_key"]
-
-            # If we want diversity, skip if we already used this episode too much
-            episode_usage = sum(1 for s in selected_scenes if s["episode_key"] == episode_key)
-            max_per_episode = max(1, int(n_scenes * (1 - diversity_factor) + 1))
-
-            if episode_usage >= max_per_episode:
-                continue
-
-            selected_scenes.append(scene)
-            used_episodes.add(episode_key)
-            remaining_scenes.remove(scene)
-
-        # Second pass: fill remaining slots with best-scoring scenes
-        while len(selected_scenes) < n_scenes and remaining_scenes:
-            selected_scenes.append(remaining_scenes.pop(0))
-
-        # Sort selected scenes by timestamp for smooth narrative flow
-        selected_scenes.sort(key=lambda x: (x["season"], x["episode"], x["timestamp"]))
-
-        print(f"✅ [SceneQuery] Selected {len(selected_scenes)} scenes from {len(used_episodes)} episodes")
-        print(f"📊 [SceneQuery] Score range: {selected_scenes[-1]['match_score']:.1f} - {selected_scenes[0]['match_score']:.1f}")
-
-        return selected_scenes
-
-    def get_database_stats(self) -> Dict[str, Any]:
-        """Get statistics about the database."""
-        total_episodes = self.database.get("total_episodes", 0)
-        total_scenes = self.database.get("total_scenes", 0)
-
-        scene_types = {"intense_action": 0, "action": 0, "dialogue": 0, "ambient": 0}
-        for episode_data in self.database.get("episodes", {}).values():
-            for scene in episode_data.get("scenes", []):
-                scene_type = scene.get("scene_type", "ambient")
-                scene_types[scene_type] = scene_types.get(scene_type, 0) + 1
+    def _load_history(self) -> Dict[str, Any]:
+        """Load render history."""
+        if self.history_path.exists():
+            try:
+                with open(self.history_path, "r") as f:
+                    return json.load(f)
+            except Exception:
+                pass
 
         return {
-            "total_episodes": total_episodes,
-            "total_scenes": total_scenes,
-            "scenes_by_type": scene_types,
-            "generated_at": self.database.get("generated_at")
+            "version": "1.0.0",
+            "last_updated": None,
+            "events_rendered": {},
+            "events_uploaded": {}
+        }
+
+    def _save_history(self):
+        """Persist history."""
+        try:
+            self.history_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.history_path, "w") as f:
+                json.dump(self.history, f, indent=2)
+        except Exception as e:
+            print(f"⚠️ [EventDB] Failed to save history: {e}")
+
+    def get_eligible_events(self) -> List[Dict[str, Any]]:
+        """
+        Return only verified upload-eligible events.
+        Filters by:
+        - event.eligible_for_upload == True
+        - All cut_windows verified
+        - Has stable Drive source_id
+        """
+        eligible = []
+
+        for event in self.database.get("events", []):
+            if not event.get("eligible_for_upload"):
+                continue
+
+            # Validate event structure
+            if not event.get("event_id") or not event.get("source_id"):
+                continue
+
+            if not event.get("cut_windows"):
+                continue
+
+            # Check all windows verified
+            all_verified = all(
+                w.get("semantic_status") == "verified"
+                for w in event.get("cut_windows", [])
+            )
+
+            if not all_verified:
+                continue
+
+            # Check source has Drive ID
+            source_id = event.get("source_id")
+            episode = self.database.get("episodes", {}).get(source_id)
+            if not episode or not episode.get("drive_file_id"):
+                continue
+
+            eligible.append(event)
+
+        return eligible
+
+    def select_event_for_render(
+        self,
+        custom_title: Optional[str] = None,
+        prefer_unused: bool = True
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Select one verified event for rendering.
+
+        If custom_title provided:
+        - Must exactly match an eligible event's title_metadata.title
+        - Returns matched event or raises ValueError
+
+        Otherwise:
+        - Randomly selects from eligible events
+        - Prefers events not in render history (if prefer_unused)
+        - Returns selected event
+        """
+        eligible = self.get_eligible_events()
+
+        if not eligible:
+            raise RuntimeError(
+                "No verified eligible events found. "
+                "Run semantic verification workflow to create events."
+            )
+
+        # Custom title resolution
+        if custom_title:
+            matches = [
+                e for e in eligible
+                if e.get("title_metadata", {}).get("title") == custom_title
+            ]
+
+            if not matches:
+                raise ValueError(
+                    f"Custom title '{custom_title}' does not match any verified event. "
+                    f"Available verified titles: {[e.get('title_metadata', {}).get('title') for e in eligible[:5]]}"
+                )
+
+            return matches[0]
+
+        # Random selection with history preference
+        rendered_events = set(self.history.get("events_rendered", {}).keys())
+
+        if prefer_unused:
+            unused = [e for e in eligible if e.get("event_id") not in rendered_events]
+
+            if unused:
+                eligible = unused
+                print(f"🎯 [EventDB] {len(unused)} unused verified events available")
+            else:
+                print(f"🔄 [EventDB] All {len(eligible)} verified events used, rotating")
+
+        # Prefer episode diversity
+        episode_counts = {}
+        for event_id in rendered_events:
+            event = next((e for e in self.database.get("events", []) if e.get("event_id") == event_id), None)
+            if event:
+                ep = event.get("episode")
+                episode_counts[ep] = episode_counts.get(ep, 0) + 1
+
+        # Sort by least-used episode
+        eligible_sorted = sorted(
+            eligible,
+            key=lambda e: episode_counts.get(e.get("episode"), 0)
+        )
+
+        selected = random.choice(eligible_sorted[:max(1, len(eligible_sorted) // 2)])
+
+        print(f"✅ [EventDB] Selected event: {selected.get('event_id')}")
+        print(f"   Title: {selected.get('title_metadata', {}).get('title')}")
+        print(f"   Source: S{selected.get('season'):02d}E{selected.get('episode'):02d}")
+        print(f"   Windows: {len(selected.get('cut_windows', []))}")
+
+        return selected
+
+    def mark_event_rendered(self, event_id: str, render_metadata: Dict[str, Any]):
+        """Record successful render."""
+        from datetime import datetime
+
+        self.history["events_rendered"][event_id] = {
+            "rendered_at": datetime.utcnow().isoformat() + "Z",
+            "output_path": str(render_metadata.get("output_path", "")),
+            "duration": render_metadata.get("duration"),
+            "clips_count": render_metadata.get("cuts_count")
+        }
+
+        self.history["last_updated"] = datetime.utcnow().isoformat() + "Z"
+        self._save_history()
+
+        print(f"📝 [EventDB] Marked event {event_id} as rendered")
+
+    def mark_event_uploaded(self, event_id: str, upload_result: Dict[str, Any]):
+        """Record successful upload."""
+        from datetime import datetime
+
+        self.history["events_uploaded"][event_id] = {
+            "uploaded_at": datetime.utcnow().isoformat() + "Z",
+            "video_url": upload_result.get("url", ""),
+            "video_id": upload_result.get("video_id", ""),
+            "platform": upload_result.get("platform", "youtube")
+        }
+
+        self.history["last_updated"] = datetime.utcnow().isoformat() + "Z"
+        self._save_history()
+
+        print(f"📤 [EventDB] Marked event {event_id} as uploaded")
+
+    def get_database_stats(self) -> Dict[str, Any]:
+        """Get statistics."""
+        episodes = self.database.get("episodes", {})
+        events = self.database.get("events", [])
+        eligible = self.get_eligible_events()
+
+        return {
+            "total_episodes": len([e for e in episodes.values() if e.get("scan_status") == "success"]),
+            "total_scenes": self.database.get("total_scenes", 0),
+            "total_events": len(events),
+            "eligible_events": len(eligible),
+            "events_rendered": len(self.history.get("events_rendered", {})),
+            "events_uploaded": len(self.history.get("events_uploaded", {})),
+            "last_updated": self.database.get("generated_at")
         }

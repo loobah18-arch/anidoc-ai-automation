@@ -43,6 +43,7 @@ from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PR
 from core.quote_ai import generate_edit_metadata
 from core.opencut_engine import build_clip_audio_fade
 from core.smart_downloader import smart_fetch_clips
+from core.verified_jjk_renderer import _render_verified_jjk_edit
 
 
 def generate_fallback_phonk_audio(duration: float, output_path: Path) -> Path:
@@ -81,26 +82,51 @@ def render_cinematic_edit(
     github_repo: Optional[str] = None,
     gdrive_folder: Optional[str] = None,
     auto_fetch_clips: bool = True,
-    force_refresh: bool = False
+    force_refresh: bool = False,
+    use_verified_jjk: bool = False
 ) -> Dict[str, Any]:
     """
-    Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
+    Renders an automated 4K Phonk / Scene Edit Short (1:1 Square, 1080x1080).
     Features genuine character dialogue, low-pass intro, explosive Phonk drop, and commercial mastering.
-    
-    OpenCut-inspired edits: xfade transitions, speed ramps, cinematic bars, audio clip fades.
-    Smart downloader: yt-dlp → Archive.org → Pixabay/Pexels fallback chain.
+
+    Args:
+        use_verified_jjk: If True, uses verified JJK event database instead of fallback sources.
+                         Requires verified events in timestamp database.
+
+    Legacy mode: yt-dlp → Archive.org → Pixabay/Pexels fallback chain.
+    Verified JJK mode: Event-first selection → Drive source → exact verified windows only.
     """
     if not character_key or character_key not in CHARACTER_THEMES:
         character_key = random.choice(list(CHARACTER_THEMES.keys()))
-        
+
     theme = CHARACTER_THEMES[character_key]
     if not output_path:
         output_path = OUTPUT_DIR / f"edit_{character_key}_{theme['universe']}_short.mp4"
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     print(f"\n🎬 [VideoAssembler] Starting 4K Edit for: {theme['name']} ({theme['universe'].upper()})")
-    
+
+    # Verified JJK mode: Event-first workflow
+    if use_verified_jjk and theme['universe'] == 'jjk':
+        print("🔒 [VideoAssembler] Using VERIFIED JJK event-first mode")
+        return _render_verified_jjk_edit(
+            character_key=character_key,
+            audio_path=audio_path,
+            phonk_track=phonk_track,
+            output_path=output_path,
+            target_duration=target_duration,
+            subtitle_style=subtitle_style,
+            burn_subtitles=burn_subtitles,
+            custom_quote=custom_quote,
+            custom_title=custom_title,
+            cc_preset=cc_preset,
+            gdrive_folder=gdrive_folder
+        )
+
+    # Legacy mode: Character-first with multi-source fallback
+    print("⚠️  [VideoAssembler] Using legacy multi-source fallback mode")
+
     # 1. Generate Metadata & Quotes
     metadata = generate_edit_metadata(character_key)
     quote_text = custom_quote or metadata["quote"]
@@ -109,7 +135,7 @@ def render_cinematic_edit(
     metadata["title"] = title_text
     print(f"💬 Quote: \"{quote_text}\"")
     print(f"📌 Title: {title_text}")
-    
+
     # 2. Audio Sourcing & Beat Analysis
     if not audio_path or not Path(audio_path).exists():
         chosen_audio = get_random_or_specified_phonk(phonk_track)
