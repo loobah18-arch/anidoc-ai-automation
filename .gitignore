@@ -17,3 +17,6 @@ temp/
 # Ensure assets are tracked
 !assets/
 !assets/**
+
+# Dynamic runtime state files
+rotation_state.json
