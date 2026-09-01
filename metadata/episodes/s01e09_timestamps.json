@@ -1,0 +1,1869 @@
+{
+  "episode_code": "S01E09",
+  "characters": [
+    {
+      "name": "Gojo",
+      "role": "Main",
+      "key_moments": [
+        "Fighting Jogo",
+        "Domain Expansion: Infinite Void",
+        "Hanami confrontation"
+      ]
+    },
+    {
+      "name": "Sukuna",
+      "role": "Unknown",
+      "key_moments": []
+    }
+  ],
+  "total_duration": 1440.0,
+  "scene_count": 180,
+  "source": "Google Drive - JJK Collection",
+  "season": 1,
+  "episode": 9,
+  "scenes": [
+    {
+      "start": 0.0,
+      "end": 8.0,
+      "action_score": 0.5874018839652901,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 8.0,
+      "end": 16.0,
+      "action_score": 0.3548296224697142,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 16.0,
+      "end": 24.0,
+      "action_score": 0.32438333259782065,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 24.0,
+      "end": 32.0,
+      "action_score": 0.4075030481893434,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 32.0,
+      "end": 40.0,
+      "action_score": 0.35323218733013684,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 40.0,
+      "end": 48.0,
+      "action_score": 0.414895583938903,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 48.0,
+      "end": 56.0,
+      "action_score": 0.3228473340631843,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 56.0,
+      "end": 64.0,
+      "action_score": 0.36596610907382787,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 64.0,
+      "end": 72.0,
+      "action_score": 0.3523091055247661,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 72.0,
+      "end": 80.0,
+      "action_score": 0.3148901791123262,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 80.0,
+      "end": 88.0,
+      "action_score": 0.48165297416275693,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 88.0,
+      "end": 96.0,
+      "action_score": 0.6576731159695874,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 96.0,
+      "end": 104.0,
+      "action_score": 0.5815505158420039,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 104.0,
+      "end": 112.0,
+      "action_score": 0.7269893565641103,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 112.0,
+      "end": 120.0,
+      "action_score": 0.44782572845929436,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 120.0,
+      "end": 128.0,
+      "action_score": 0.3696891965610199,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 128.0,
+      "end": 136.0,
+      "action_score": 0.7102076485649865,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 136.0,
+      "end": 144.0,
+      "action_score": 0.30959476755440085,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 144.0,
+      "end": 152.0,
+      "action_score": 0.32599123113032785,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 152.0,
+      "end": 160.0,
+      "action_score": 0.4361836725620752,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 160.0,
+      "end": 168.0,
+      "action_score": 0.5038617906976777,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 168.0,
+      "end": 176.0,
+      "action_score": 0.7704204335227152,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": []
+    },
+    {
+      "start": 176.0,
+      "end": 184.0,
+      "action_score": 0.4774950154980668,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 184.0,
+      "end": 192.0,
+      "action_score": 0.6381285622802788,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 192.0,
+      "end": 200.0,
+      "action_score": 0.3704750339546706,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 200.0,
+      "end": 208.0,
+      "action_score": 0.5626136419339312,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 208.0,
+      "end": 216.0,
+      "action_score": 0.6770264939009504,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 216.0,
+      "end": 224.0,
+      "action_score": 0.3740928310831656,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 224.0,
+      "end": 232.0,
+      "action_score": 0.3882082587393828,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": []
+    },
+    {
+      "start": 232.0,
+      "end": 240.0,
+      "action_score": 0.40577672323873426,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 240.0,
+      "end": 248.0,
+      "action_score": 0.5152966213832403,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 248.0,
+      "end": 256.0,
+      "action_score": 0.4690106892071639,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 256.0,
+      "end": 264.0,
+      "action_score": 0.49793764522771305,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 264.0,
+      "end": 272.0,
+      "action_score": 0.44414513915991055,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 272.0,
+      "end": 280.0,
+      "action_score": 0.7240189449837144,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 280.0,
+      "end": 288.0,
+      "action_score": 0.45431175214781977,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 288.0,
+      "end": 296.0,
+      "action_score": 0.516334778776233,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 296.0,
+      "end": 304.0,
+      "action_score": 0.45030001493024935,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 304.0,
+      "end": 312.0,
+      "action_score": 0.5146016141428081,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 312.0,
+      "end": 320.0,
+      "action_score": 0.7141128140201671,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 320.0,
+      "end": 328.0,
+      "action_score": 0.3227665037557206,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 328.0,
+      "end": 336.0,
+      "action_score": 0.3877988278343745,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 336.0,
+      "end": 344.0,
+      "action_score": 0.3178421213226022,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 344.0,
+      "end": 352.0,
+      "action_score": 0.7709502959359522,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 352.0,
+      "end": 360.0,
+      "action_score": 0.45748810067352674,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 360.0,
+      "end": 368.0,
+      "action_score": 0.49911383906453677,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 368.0,
+      "end": 376.0,
+      "action_score": 0.5989930846739184,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 376.0,
+      "end": 384.0,
+      "action_score": 0.7595683763660176,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 384.0,
+      "end": 392.0,
+      "action_score": 0.5231100698727689,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 392.0,
+      "end": 400.0,
+      "action_score": 0.5720386493167566,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 400.0,
+      "end": 408.0,
+      "action_score": 0.6359864622530744,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 408.0,
+      "end": 416.0,
+      "action_score": 0.31485453754370996,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 416.0,
+      "end": 424.0,
+      "action_score": 0.7559652116524334,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 424.0,
+      "end": 432.0,
+      "action_score": 0.6751816042974408,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 432.0,
+      "end": 440.0,
+      "action_score": 0.3115814111666285,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": []
+    },
+    {
+      "start": 440.0,
+      "end": 448.0,
+      "action_score": 0.5030680043236648,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 448.0,
+      "end": 456.0,
+      "action_score": 0.5921846463634656,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 456.0,
+      "end": 464.0,
+      "action_score": 0.6082617894440929,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 464.0,
+      "end": 472.0,
+      "action_score": 0.4597228622686922,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 472.0,
+      "end": 480.0,
+      "action_score": 0.46379944232733683,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 480.0,
+      "end": 488.0,
+      "action_score": 0.6069208206779125,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 488.0,
+      "end": 496.0,
+      "action_score": 0.7453664789932039,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 496.0,
+      "end": 504.0,
+      "action_score": 0.6444490724174388,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 504.0,
+      "end": 512.0,
+      "action_score": 0.7425636899312793,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 512.0,
+      "end": 520.0,
+      "action_score": 0.7761789944615403,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 520.0,
+      "end": 528.0,
+      "action_score": 0.6717387651862043,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 528.0,
+      "end": 536.0,
+      "action_score": 0.7308427920973006,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 536.0,
+      "end": 544.0,
+      "action_score": 0.5684194672654239,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 544.0,
+      "end": 552.0,
+      "action_score": 0.7665280076886953,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 552.0,
+      "end": 560.0,
+      "action_score": 0.689157046030158,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 560.0,
+      "end": 568.0,
+      "action_score": 0.5208898167558977,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 568.0,
+      "end": 576.0,
+      "action_score": 0.534599092102241,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 576.0,
+      "end": 584.0,
+      "action_score": 0.5507126625386197,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 584.0,
+      "end": 592.0,
+      "action_score": 0.4889283171909751,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 592.0,
+      "end": 600.0,
+      "action_score": 0.7979288059142509,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 600.0,
+      "end": 608.0,
+      "action_score": 0.7122757651870749,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 608.0,
+      "end": 616.0,
+      "action_score": 0.3548478788559286,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 616.0,
+      "end": 624.0,
+      "action_score": 0.5947426312354144,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 624.0,
+      "end": 632.0,
+      "action_score": 0.4433158103076714,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 632.0,
+      "end": 640.0,
+      "action_score": 0.6100883549523982,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 640.0,
+      "end": 648.0,
+      "action_score": 0.5207035949320808,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 648.0,
+      "end": 656.0,
+      "action_score": 0.30638349778886154,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 656.0,
+      "end": 664.0,
+      "action_score": 0.6445139147938681,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 664.0,
+      "end": 672.0,
+      "action_score": 0.6554934141309408,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 672.0,
+      "end": 680.0,
+      "action_score": 0.5531605936668492,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 680.0,
+      "end": 688.0,
+      "action_score": 0.5057315059107386,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 688.0,
+      "end": 696.0,
+      "action_score": 0.6773837926366566,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 696.0,
+      "end": 704.0,
+      "action_score": 0.47790025138973896,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 704.0,
+      "end": 712.0,
+      "action_score": 0.40595212723397245,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 712.0,
+      "end": 720.0,
+      "action_score": 0.6091077532124507,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 720.0,
+      "end": 728.0,
+      "action_score": 0.7054717975764435,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 728.0,
+      "end": 736.0,
+      "action_score": 0.7280271226634899,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 736.0,
+      "end": 744.0,
+      "action_score": 0.5186957042195901,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 744.0,
+      "end": 752.0,
+      "action_score": 0.47241811768380004,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 752.0,
+      "end": 760.0,
+      "action_score": 0.6107150886000661,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 760.0,
+      "end": 768.0,
+      "action_score": 0.5025074117262094,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 768.0,
+      "end": 776.0,
+      "action_score": 0.3937619612942094,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 776.0,
+      "end": 784.0,
+      "action_score": 0.38890823942179925,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 784.0,
+      "end": 792.0,
+      "action_score": 0.6246245604114697,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 792.0,
+      "end": 800.0,
+      "action_score": 0.5998677870807789,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 800.0,
+      "end": 808.0,
+      "action_score": 0.33861070365575957,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 808.0,
+      "end": 816.0,
+      "action_score": 0.6427721667785387,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 816.0,
+      "end": 824.0,
+      "action_score": 0.613913987126669,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 824.0,
+      "end": 832.0,
+      "action_score": 0.47895830727675875,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 832.0,
+      "end": 840.0,
+      "action_score": 0.30351730983126723,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 840.0,
+      "end": 848.0,
+      "action_score": 0.5902152543511725,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 848.0,
+      "end": 856.0,
+      "action_score": 0.5093200496287162,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 856.0,
+      "end": 864.0,
+      "action_score": 0.33014147663890153,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 864.0,
+      "end": 872.0,
+      "action_score": 0.6071397891518131,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 872.0,
+      "end": 880.0,
+      "action_score": 0.3209642452605123,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 880.0,
+      "end": 888.0,
+      "action_score": 0.5211806570155794,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 888.0,
+      "end": 896.0,
+      "action_score": 0.6914302741606762,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 896.0,
+      "end": 904.0,
+      "action_score": 0.4229859688806496,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 904.0,
+      "end": 912.0,
+      "action_score": 0.30406840500937954,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 912.0,
+      "end": 920.0,
+      "action_score": 0.7222540113765651,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 920.0,
+      "end": 928.0,
+      "action_score": 0.6769109212101082,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 928.0,
+      "end": 936.0,
+      "action_score": 0.42307110035201184,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 936.0,
+      "end": 944.0,
+      "action_score": 0.4579488211782382,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 944.0,
+      "end": 952.0,
+      "action_score": 0.40674004488357185,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 952.0,
+      "end": 960.0,
+      "action_score": 0.5202265684833898,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 960.0,
+      "end": 968.0,
+      "action_score": 0.5614444727386367,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 968.0,
+      "end": 976.0,
+      "action_score": 0.3562569612456215,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 976.0,
+      "end": 984.0,
+      "action_score": 0.34509125399208,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 984.0,
+      "end": 992.0,
+      "action_score": 0.5726019786808435,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 992.0,
+      "end": 1000.0,
+      "action_score": 0.397281636900051,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1000.0,
+      "end": 1008.0,
+      "action_score": 0.7047644555350914,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1008.0,
+      "end": 1016.0,
+      "action_score": 0.44441017615231365,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1016.0,
+      "end": 1024.0,
+      "action_score": 0.31259062893711653,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1024.0,
+      "end": 1032.0,
+      "action_score": 0.5318472968714324,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1032.0,
+      "end": 1040.0,
+      "action_score": 0.40606586210217477,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1040.0,
+      "end": 1048.0,
+      "action_score": 0.7660643141788395,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": []
+    },
+    {
+      "start": 1048.0,
+      "end": 1056.0,
+      "action_score": 0.46502726283393464,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1056.0,
+      "end": 1064.0,
+      "action_score": 0.3435164721658929,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1064.0,
+      "end": 1072.0,
+      "action_score": 0.6366099631882043,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1072.0,
+      "end": 1080.0,
+      "action_score": 0.7712999658279973,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1080.0,
+      "end": 1088.0,
+      "action_score": 0.30179986191160074,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1088.0,
+      "end": 1096.0,
+      "action_score": 0.7804581876194684,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1096.0,
+      "end": 1104.0,
+      "action_score": 0.3712461941903674,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1104.0,
+      "end": 1112.0,
+      "action_score": 0.7997501376046238,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1112.0,
+      "end": 1120.0,
+      "action_score": 0.468147001704724,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1120.0,
+      "end": 1128.0,
+      "action_score": 0.3319894822022846,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1128.0,
+      "end": 1136.0,
+      "action_score": 0.5039277106107898,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1136.0,
+      "end": 1144.0,
+      "action_score": 0.4464357625820315,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1144.0,
+      "end": 1152.0,
+      "action_score": 0.3862263864408432,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1152.0,
+      "end": 1160.0,
+      "action_score": 0.6751087260990676,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1160.0,
+      "end": 1168.0,
+      "action_score": 0.7931681983026779,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1168.0,
+      "end": 1176.0,
+      "action_score": 0.46511116308191214,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1176.0,
+      "end": 1184.0,
+      "action_score": 0.6110301089997856,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1184.0,
+      "end": 1192.0,
+      "action_score": 0.3577035200581126,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1192.0,
+      "end": 1200.0,
+      "action_score": 0.6888723795446634,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1200.0,
+      "end": 1208.0,
+      "action_score": 0.43394143251683676,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1208.0,
+      "end": 1216.0,
+      "action_score": 0.7828338901974201,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1216.0,
+      "end": 1224.0,
+      "action_score": 0.3373424137658582,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1224.0,
+      "end": 1232.0,
+      "action_score": 0.3418585589592049,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1232.0,
+      "end": 1240.0,
+      "action_score": 0.3914238603419888,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1240.0,
+      "end": 1248.0,
+      "action_score": 0.49613303152471083,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1248.0,
+      "end": 1256.0,
+      "action_score": 0.436943125896106,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 1256.0,
+      "end": 1264.0,
+      "action_score": 0.6384546782877931,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 1264.0,
+      "end": 1272.0,
+      "action_score": 0.6042121034569834,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": []
+    },
+    {
+      "start": 1272.0,
+      "end": 1280.0,
+      "action_score": 0.3707175848186922,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1280.0,
+      "end": 1288.0,
+      "action_score": 0.6625446994713021,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1288.0,
+      "end": 1296.0,
+      "action_score": 0.46438560573831134,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1296.0,
+      "end": 1304.0,
+      "action_score": 0.3350636076262836,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": []
+    },
+    {
+      "start": 1304.0,
+      "end": 1312.0,
+      "action_score": 0.5838322567747763,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1312.0,
+      "end": 1320.0,
+      "action_score": 0.6150580251985474,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1320.0,
+      "end": 1328.0,
+      "action_score": 0.7961764798502213,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1328.0,
+      "end": 1336.0,
+      "action_score": 0.7553315764912432,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1336.0,
+      "end": 1344.0,
+      "action_score": 0.30433283631903385,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1344.0,
+      "end": 1352.0,
+      "action_score": 0.5898747795199855,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1352.0,
+      "end": 1360.0,
+      "action_score": 0.6922160664689334,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1360.0,
+      "end": 1368.0,
+      "action_score": 0.79706801593317,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1368.0,
+      "end": 1376.0,
+      "action_score": 0.7217557747186716,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": []
+    },
+    {
+      "start": 1376.0,
+      "end": 1384.0,
+      "action_score": 0.34064221757156027,
+      "action_level": "MODERATE",
+      "priority": "low",
+      "characters_present": [
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1384.0,
+      "end": 1392.0,
+      "action_score": 0.7373251707577777,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo"
+      ]
+    },
+    {
+      "start": 1392.0,
+      "end": 1400.0,
+      "action_score": 0.43022385715046474,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1400.0,
+      "end": 1408.0,
+      "action_score": 0.4117214079413642,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1408.0,
+      "end": 1416.0,
+      "action_score": 0.5560069584429829,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1416.0,
+      "end": 1424.0,
+      "action_score": 0.6552159389779588,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1424.0,
+      "end": 1432.0,
+      "action_score": 0.7454855917889451,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    },
+    {
+      "start": 1432.0,
+      "end": 1440.0,
+      "action_score": 0.7109643072539309,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "characters_present": [
+        "gojo",
+        "sukuna"
+      ]
+    }
+  ],
+  "notes": "Gojo vs Jogo - Domain Expansion showcase"
+}
