@@ -40,32 +40,40 @@ class BeatGrid:
                 continue
             raw_segments.append({"start": s, "end": e})
 
-        # Phase 2: subdivide segments > 0.50s into two parts + flash insert
-        # The reference edit splits long holds into 2 shots with a 1-2 frame flash between them.
+        # Phase 2: subdivide to match reference density (~120 cuts in 38s)
+        # Reference has avg 0.26s cut gap — threshold at 0.42s balances density vs overshoot.
+        # Flash inserts are PAIRED (two back-to-back) matching the reference's strobe pattern.
         subdivided = []
         for seg in raw_segments:
             dur = seg["end"] - seg["start"]
-            if dur > 0.50 and dur < 1.6:
-                # Split at ~60% through the segment (not exact midpoint for asymmetric energy)
+            if dur > 0.42 and dur < 0.90:
+                # Split at ~60% through the segment (asymmetric energy)
                 split_t = seg["start"] + dur * 0.60
-                flash_dur = 0.03  # 1-2 frames at 60fps
+                flash_pair_dur = 0.050  # paired flashes: 33ms + ~17ms gap
                 # Part A: 60% of segment
                 subdivided.append({"start": seg["start"], "end": round(split_t, 3)})
-                # Micro-flash insert (bright flash frame between cuts)
-                subdivided.append({"start": round(split_t, 3), "end": round(split_t + flash_dur, 3), "is_flash": True})
+                # Paired micro-flash (2 back-to-back flashes like reference)
+                subdivided.append({"start": round(split_t, 3), "end": round(split_t + flash_pair_dur, 3), "is_flash": True})
                 # Part B: remaining 40%
-                subdivided.append({"start": round(split_t + flash_dur, 3), "end": seg["end"]})
-            elif dur >= 1.6:
-                # For very long segments, split into 3 parts with 2 flash inserts
+                subdivided.append({"start": round(split_t + flash_pair_dur, 3), "end": seg["end"]})
+            elif dur >= 0.90 and dur < 1.8:
+                # Medium segments: split into 2 parts with paired flash
+                split_t = seg["start"] + dur * 0.55
+                flash_pair_dur = 0.050
+                subdivided.append({"start": seg["start"], "end": round(split_t, 3)})
+                subdivided.append({"start": round(split_t, 3), "end": round(split_t + flash_pair_dur, 3), "is_flash": True})
+                subdivided.append({"start": round(split_t + flash_pair_dur, 3), "end": seg["end"]})
+            elif dur >= 1.8:
+                # Very long segments: split into 3 parts with 2 paired flash inserts
                 third = dur / 3.0
-                flash_dur = 0.03
+                flash_pair_dur = 0.050
                 t1 = seg["start"] + third
                 t2 = seg["start"] + 2 * third
                 subdivided.append({"start": seg["start"], "end": round(t1, 3)})
-                subdivided.append({"start": round(t1, 3), "end": round(t1 + flash_dur, 3), "is_flash": True})
-                subdivided.append({"start": round(t1 + flash_dur, 3), "end": round(t2, 3)})
-                subdivided.append({"start": round(t2, 3), "end": round(t2 + flash_dur, 3), "is_flash": True})
-                subdivided.append({"start": round(t2 + flash_dur, 3), "end": seg["end"]})
+                subdivided.append({"start": round(t1, 3), "end": round(t1 + flash_pair_dur, 3), "is_flash": True})
+                subdivided.append({"start": round(t1 + flash_pair_dur, 3), "end": round(t2, 3)})
+                subdivided.append({"start": round(t2, 3), "end": round(t2 + flash_pair_dur, 3), "is_flash": True})
+                subdivided.append({"start": round(t2 + flash_pair_dur, 3), "end": seg["end"]})
             else:
                 subdivided.append(seg)
 

@@ -146,8 +146,8 @@ def build_cc_filter(preset_name: str = "marvel_hdr") -> str:
     vignette_part = f"vignette={cfg['vignette']}"
     # Colorlevels expansion for crushed blacks and crisp highlight contrast
     levels_part = "colorlevels=rimin=0.03:gimin=0.03:bimin=0.03:rimax=0.98:gimax=0.98:bimax=0.98"
-    # Film grain texture (matching viral reference edit look)
-    grain_part = "noise=c0s=12:allf=t+u"
+    # Film grain texture — heavy like reference (c0s=18 for visible grain)
+    grain_part = "noise=c0s=18:allf=t+u"
     return f"{eq_part},{levels_part},{unsharp_part},{vignette_part},{grain_part}"
 
 

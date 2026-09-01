@@ -35,6 +35,7 @@ from core.gdrive_manager import fetch_and_prepare_gdrive_footage
 from core.public_api_fetcher import check_clip_has_audio
 from core.effects_engine import (
     build_cc_filter,
+    build_monochrome_cc_filter,
     build_beat_flash_filters,
     get_segment_velocity_profile,
     build_velocity_clip_filter
@@ -288,13 +289,18 @@ def render_cinematic_edit(
     filter_chains = []
     concat_v_inputs = []
     concat_a_inputs = []
-    
-    # Build per-clip video filters with velocity curves & slow-mo
+
+    # Color grading alternation: cycle through presets to match reference
+    # Reference alternates: blue tint → warm/sepia → monochrome → blue → warm → etc.
+    cc_preset_cycle = [active_cc, "sukuna_shrine", active_cc]
+    mono_preset = "jjk_void"  # monochrome preset for near-B&W segments
+
+    # Build per-clip video filters with velocity curves & per-segment color grading
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         is_flash = seg.get("is_flash", False)
 
         if is_flash:
-            # Flash insert: simple white solid — no velocity/zoom processing
+            # Flash insert: simple white solid — no velocity/zoom/CC processing
             clip_vf = (
                 f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},"
                 f"fps={FPS},setsar=1,"
@@ -312,6 +318,16 @@ def render_cinematic_edit(
                 fps=FPS,
                 add_bars=vel_profile.get("add_bars", False)
             )
+            # Per-segment color grading alternation
+            # Every 4th segment gets monochrome, odd/even cycle between main and warm preset
+            non_flash_idx = sum(1 for s in segments[:idx+1] if not s.get("is_flash"))
+            if non_flash_idx % 7 == 0:
+                clip_cc = build_monochrome_cc_filter(mono_preset)
+            elif non_flash_idx % 2 == 0:
+                clip_cc = build_cc_filter(cc_preset_cycle[1])  # warm/sukuna
+            else:
+                clip_cc = build_cc_filter(cc_preset_cycle[0])  # main/jjk_void
+            clip_vf = f"{clip_vf},{clip_cc}"
 
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
@@ -357,14 +373,15 @@ def render_cinematic_edit(
     else:
         sub_filter = ""
     
-    # Video Post-processing (Concatenated + Flash + CC + Letterbox bars)
+    # Video Post-processing (Concatenated + Flash + Letterbox bars)
+    # CC is already applied per-clip above — only flash overlays + letterbox remain here
     # Letterbox: 60px black bars top + bottom for cinematic reference edit look
     letterbox_filter = (
         "drawbox=x=0:y=0:w=iw:h=60:color=black:t=fill,"
         "drawbox=x=0:y=ih-60:w=iw:h=60:color=black:t=fill"
     )
     filter_chains.append(
-        f"[concatenated_v]{flash_str},{cc_filter},{letterbox_filter}{sub_filter}[vout]"
+        f"[concatenated_v]{flash_str},{letterbox_filter}{sub_filter}[vout]"
     )
     
     # Audio Dynamic Structure:
@@ -396,6 +413,7 @@ def render_cinematic_edit(
         "-c:v", "libx264",
         "-preset", "veryfast",
         "-crf", "15",
+        "-x264-params", "bframes=5:ref=5",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "192k",
