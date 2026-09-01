@@ -12,41 +12,41 @@ from config.settings import MARVEL_DIR, JJK_DIR, SCRATCH_DIR, VIDEO_WIDTH, VIDEO
 from core.public_api_fetcher import fetch_character_scenepack
 
 CHARACTER_THEMES = {
-    # Marvel Universe
-    "spiderman": {
-        "universe": "marvel",
-        "name": "Spider-Man (Peter Parker)",
-        "colors": ["#e11d48", "#1e3a8a", "#0f172a"],
-        "cc_preset": "marvel_hdr",
-        "quote": "Mr. Stark, it smells like a new car in here!"
+    # JJK Universe Only (Marvel disabled for now)
+    "gojo": {
+        "universe": "jjk",
+        "name": "Gojo Satoru",
+        "colors": ["#4f46e5", "#8b5cf6", "#0f172a"],
+        "cc_preset": "jjk_void",
+        "quote": "Throughout heaven and earth, I alone am the honored one."
     },
-    "ironman": {
-        "universe": "marvel",
-        "name": "Iron Man (Tony Stark)",
-        "colors": ["#eab308", "#991b1b", "#1c1917"],
-        "cc_preset": "marvel_hdr",
-        "quote": "And I... am... Iron Man."
+    "sukuna": {
+        "universe": "jjk",
+        "name": "Ryomen Sukuna",
+        "colors": ["#dc2626", "#7f1d1d", "#000000"],
+        "cc_preset": "sukuna_shrine",
+        "quote": "I'll slaughter the weak to weed them out."
     },
-    "thor": {
-        "universe": "marvel",
-        "name": "Thor (God of Thunder)",
-        "colors": ["#0284c7", "#38bdf8", "#030712"],
-        "cc_preset": "marvel_hdr",
-        "quote": "Bring me Thanos!"
+    "yuji": {
+        "universe": "jjk",
+        "name": "Yuji Itadori",
+        "colors": ["#ea580c", "#f97316", "#1e293b"],
+        "cc_preset": "jjk_void",
+        "quote": "I'm a cog. And my role is to destroy curses like you."
     },
-    "thanos": {
-        "universe": "marvel",
-        "name": "Thanos (The Mad Titan)",
-        "colors": ["#7e22ce", "#3b0764", "#09090b"],
-        "cc_preset": "marvel_hdr",
-        "quote": "I am inevitable."
+    "megumi": {
+        "universe": "jjk",
+        "name": "Megumi Fushiguro",
+        "colors": ["#3b82f6", "#1e40af", "#0f172a"],
+        "cc_preset": "jjk_void",
+        "quote": "I don't understand the meaning of life."
     },
-    "wolverine": {
-        "universe": "marvel",
-        "name": "Wolverine (Logan)",
-        "colors": ["#ca8a04", "#1e293b", "#0f172a"],
-        "cc_preset": "marvel_hdr",
-        "quote": "I'm the best there is at what I do."
+    "toji": {
+        "universe": "jjk",
+        "name": "Toji Zen'in",
+        "colors": ["#6b7280", "#374151", "#000000"],
+        "cc_preset": "cyber_phonk",
+        "quote": "I have no cursed energy."
     },
     "loki": {
         "universe": "marvel",
@@ -55,7 +55,7 @@ CHARACTER_THEMES = {
         "cc_preset": "cyber_phonk",
         "quote": "I know what kind of god I need to be."
     },
-    # Jujutsu Kaisen Universe
+    # Jujutsu Kaisen Universe ONLY
     "gojo": {
         "universe": "jjk",
         "name": "Gojo Satoru",
@@ -90,7 +90,28 @@ CHARACTER_THEMES = {
         "colors": ["#1e293b", "#38bdf8", "#0f172a"],
         "cc_preset": "jjk_void",
         "quote": "With this treasure, I summon... Mahoraga."
-    }
+    },
+    "nobara": {
+        "universe": "jjk",
+        "name": "Nobara Kugisaki",
+        "colors": ["#dc2626", "#fbbf24", "#0f172a"],
+        "cc_preset": "jjk_void",
+        "quote": "I'm going to be the greatest curse user!"
+    },
+    "todo": {
+        "universe": "jjk",
+        "name": "Aoi Todo",
+        "colors": ["#84cc16", "#365314", "#0f172a"],
+        "cc_preset": "cyber_phonk",
+        "quote": "What's your type of woman?"
+    },
+    "mahito": {
+        "universe": "jjk",
+        "name": "Mahito",
+        "colors": ["#a855f7", "#581c87", "#000000"],
+        "cc_preset": "sukuna_shrine",
+        "quote": "Humans are so fun to play with!"
+    },
 }
 
 
