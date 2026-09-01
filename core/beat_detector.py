@@ -22,26 +22,69 @@ class BeatGrid:
         self.bpm = bpm
 
     def get_cut_segments(self) -> List[Dict[str, Any]]:
-        """Returns list of segments with start, end, duration, is_drop, and prev_is_drop flags."""
-        segments = []
+        """Returns list of segments with start, end, duration, is_drop, and prev_is_drop flags.
+        Subdivides longer segments to match reference edit density (~100+ cuts in 38s).
+        Inserts 0.03s micro-flash inserts between subdivided segments.
+        """
+        # Phase 1: build raw segments from beat points
+        raw_segments = []
         all_points = [0.0] + self.beat_times
         if self.duration not in all_points:
             all_points.append(self.duration)
         all_points = sorted(list(set(all_points)))
-        
+
         for i in range(len(all_points) - 1):
             s = all_points[i]
             e = all_points[i+1]
             if e - s < 0.22:
                 continue
+            raw_segments.append({"start": s, "end": e})
+
+        # Phase 2: subdivide segments > 0.50s into two parts + flash insert
+        # The reference edit splits long holds into 2 shots with a 1-2 frame flash between them.
+        subdivided = []
+        for seg in raw_segments:
+            dur = seg["end"] - seg["start"]
+            if dur > 0.50 and dur < 1.6:
+                # Split at ~60% through the segment (not exact midpoint for asymmetric energy)
+                split_t = seg["start"] + dur * 0.60
+                flash_dur = 0.03  # 1-2 frames at 60fps
+                # Part A: 60% of segment
+                subdivided.append({"start": seg["start"], "end": round(split_t, 3)})
+                # Micro-flash insert (bright flash frame between cuts)
+                subdivided.append({"start": round(split_t, 3), "end": round(split_t + flash_dur, 3), "is_flash": True})
+                # Part B: remaining 40%
+                subdivided.append({"start": round(split_t + flash_dur, 3), "end": seg["end"]})
+            elif dur >= 1.6:
+                # For very long segments, split into 3 parts with 2 flash inserts
+                third = dur / 3.0
+                flash_dur = 0.03
+                t1 = seg["start"] + third
+                t2 = seg["start"] + 2 * third
+                subdivided.append({"start": seg["start"], "end": round(t1, 3)})
+                subdivided.append({"start": round(t1, 3), "end": round(t1 + flash_dur, 3), "is_flash": True})
+                subdivided.append({"start": round(t1 + flash_dur, 3), "end": round(t2, 3)})
+                subdivided.append({"start": round(t2, 3), "end": round(t2 + flash_dur, 3), "is_flash": True})
+                subdivided.append({"start": round(t2 + flash_dur, 3), "end": seg["end"]})
+            else:
+                subdivided.append(seg)
+
+        # Phase 3: convert to final segment list with is_drop/prev_is_drop flags
+        segments = []
+        for seg in subdivided:
+            s, e = seg["start"], seg["end"]
+            if e - s < 0.015:
+                continue  # skip sub-frame segments
             is_d = s >= self.drop_time
+            is_flash = seg.get("is_flash", False)
             prev_d = segments[-1]["is_drop"] if segments else False
             segments.append({
                 "start": s,
                 "end": e,
-                "duration": round(e - s, 2),
+                "duration": round(e - s, 3),
                 "is_drop": is_d,
                 "prev_is_drop": prev_d,
+                "is_flash": is_flash,
                 "index": len(segments)
             })
         return segments

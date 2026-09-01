@@ -146,18 +146,36 @@ def build_cc_filter(preset_name: str = "marvel_hdr") -> str:
     vignette_part = f"vignette={cfg['vignette']}"
     # Colorlevels expansion for crushed blacks and crisp highlight contrast
     levels_part = "colorlevels=rimin=0.03:gimin=0.03:bimin=0.03:rimax=0.98:gimax=0.98:bimax=0.98"
-    return f"{eq_part},{levels_part},{unsharp_part},{vignette_part}"
+    # Film grain texture (matching viral reference edit look)
+    grain_part = "noise=c0s=12:allf=t+u"
+    return f"{eq_part},{levels_part},{unsharp_part},{vignette_part},{grain_part}"
 
 
-def build_beat_flash_filters(beat_timestamps: List[float], flash_duration: float = 0.07, opacity: float = 0.85) -> List[str]:
+def build_monochrome_cc_filter(preset_name: str = "jjk_void") -> str:
+    """
+    Builds a heavy-desaturation / near-monochrome grade with selective color pop.
+    Matches the viral Gojo reference style: almost B&W with a hint of character color in shadows.
+    """
+    cfg = CC_PRESETS.get(preset_name, CC_PRESETS["jjk_void"])
+    # Desaturate heavily (0.18 = 18% of original saturation)
+    eq_part = f"eq=contrast={cfg['contrast'] + 0.12}:brightness={cfg['brightness'] - 0.01}:saturation=0.18:gamma={cfg['gamma'] - 0.04}"
+    levels_part = "colorlevels=rimin=0.05:gimin=0.05:bimin=0.05:rimax=0.96:gimax=0.96:bimax=0.96"
+    unsharp_part = f"unsharp={cfg['unsharp']}"
+    vignette_part = f"vignette=PI/3.2"
+    grain_part = "noise=c0s=18:allf=t+u"
+    return f"{eq_part},{levels_part},{unsharp_part},{vignette_part},{grain_part}"
+
+
+def build_beat_flash_filters(beat_timestamps: List[float], flash_duration: float = 0.09, opacity: float = 0.60) -> List[str]:
     """
     Builds energetic white screen burst flash overlays timed to heavy bass drops.
+    Reference edit uses frequent strobe flashes at 0.35s minimum spacing.
     """
     flash_filters = []
-    # Add flashes on downbeats (spaced by at least 0.60s to prevent strobe overload)
+    # Add flashes on downbeats (spaced by at least 0.35s to match viral reference edit strobe density)
     last_flash = -10.0
     for t in beat_timestamps:
-        if t - last_flash >= 0.60:
+        if t - last_flash >= 0.35:
             cond = f"between(t,{t:.2f},{t+flash_duration:.2f})"
             flash_filters.append(f"drawbox=x=0:y=0:w=iw:h=ih:color=white@{opacity}:t=fill:enable='{cond}'")
             last_flash = t

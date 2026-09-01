@@ -66,11 +66,11 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("trim=duration=1.200", vf)
 
     def test_04_quote_ai_metadata(self):
-        spidey = generate_edit_metadata("spiderman")
-        self.assertEqual(spidey["universe"], "marvel")
-        self.assertTrue(len(spidey["quote"]) > 5)
-        self.assertTrue(len(spidey["title"]) > 10)
-        self.assertTrue(len(spidey["tags"]) >= 4)
+        yuji = generate_edit_metadata("yuji")
+        self.assertEqual(yuji["universe"], "jjk")
+        self.assertTrue(len(yuji["quote"]) > 5)
+        self.assertTrue(len(yuji["title"]) > 10)
+        self.assertTrue(len(yuji["tags"]) >= 4)
 
         gojo = generate_edit_metadata("gojo")
         self.assertEqual(gojo["universe"], "jjk")
