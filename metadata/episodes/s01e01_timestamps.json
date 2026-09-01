@@ -1,0 +1,131 @@
+{
+  "episode_code": "S01E01",
+  "title": "Ryoumen Sukuna",
+  "duration": 1440.0,
+  "characters": [
+    {
+      "name": "Yuji",
+      "role": "Protagonist",
+      "key_moments": [
+        "Track and field record breaking",
+        "Encounters cursed spirit at school",
+        "Swallows Sukuna's finger",
+        "First transformation"
+      ]
+    },
+    {
+      "name": "Megumi",
+      "role": "Deuteragonist",
+      "key_moments": [
+        "Retrieves cursed object",
+        "Fights low-grade curses",
+        "Witnesses Yuji's transformation"
+      ]
+    },
+    {
+      "name": "Sukuna",
+      "role": "Antagonist (Host)",
+      "key_moments": [
+        "First awakening",
+        "Destroys cursed spirit instantly"
+      ]
+    }
+  ],
+  "scene_count": 7,
+  "source": "Google Drive - JJK Collection",
+  "season": 1,
+  "episode": 1,
+  "notes": "JJK episode",
+  "scenes": [
+    {
+      "start": 0.0,
+      "end": 120.0,
+      "action_level": "CALM",
+      "priority": "low",
+      "description": "Opening - Yuji at school, occult club",
+      "characters_present": [
+        "yuji"
+      ],
+      "action_score": 0.3,
+      "duration": 120.0
+    },
+    {
+      "start": 180.0,
+      "end": 240.0,
+      "action_level": "MODERATE",
+      "priority": "medium",
+      "description": "Megumi encounters low-grade curses at school",
+      "characters_present": [
+        "megumi"
+      ],
+      "action_score": 0.5,
+      "duration": 60.0
+    },
+    {
+      "start": 420.0,
+      "end": 480.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Yuji's superhuman strength - track field record",
+      "characters_present": [
+        "yuji"
+      ],
+      "action_score": 0.7,
+      "duration": 60.0
+    },
+    {
+      "start": 720.0,
+      "end": 840.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Cursed spirit attacks school - Yuji fights bare-handed",
+      "characters_present": [
+        "yuji",
+        "megumi"
+      ],
+      "action_score": 0.7,
+      "duration": 120.0
+    },
+    {
+      "start": 1020.0,
+      "end": 1140.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Yuji swallows Sukuna's finger - transformation begins",
+      "characters_present": [
+        "yuji",
+        "megumi",
+        "sukuna"
+      ],
+      "action_score": 0.9,
+      "duration": 120.0
+    },
+    {
+      "start": 1140.0,
+      "end": 1260.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Sukuna awakens - destroys cursed spirit instantly",
+      "characters_present": [
+        "sukuna",
+        "megumi"
+      ],
+      "action_score": 0.9,
+      "duration": 120.0
+    },
+    {
+      "start": 1260.0,
+      "end": 1380.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Sukuna vs Megumi standoff - Yuji regains control",
+      "characters_present": [
+        "yuji",
+        "sukuna",
+        "megumi"
+      ],
+      "action_score": 0.7,
+      "duration": 120.0
+    }
+  ]
+}

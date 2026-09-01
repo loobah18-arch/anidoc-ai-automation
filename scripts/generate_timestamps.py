@@ -251,45 +251,46 @@ def save_episode_metadata(episode_code: str, metadata: Dict[str, Any]):
 
 
 def process_test_episodes():
-    """Process a few test episodes to demonstrate timestamp generation."""
-    test_episodes = [
-        {
-            "code": "S01E09",
-            "characters": ["gojo", "sukuna"],
-            "description": "Gojo vs Jogo - Domain Expansion showcase"
-        },
-        {
-            "code": "S01E20",
-            "characters": ["yuji", "todo", "mahito"],
-            "description": "Todo & Yuji vs Mahito - Black Flash barrage"
-        },
-        {
-            "code": "S02E16",
-            "characters": ["gojo", "sukuna", "megumi"],
-            "description": "Shibuya Station - Gojo's last stand"
+    """Generate accurate timestamp metadata from curated episode database."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+    # Load curated detailed timestamps
+    from metadata.jjk_episodes_detailed import ALL_EPISODES
+
+    print("\n🎬 Generating Accurate Timestamp Metadata from Curated Database\n")
+
+    for ep_code, ep_data in ALL_EPISODES.items():
+        print(f"\n{ep_code}: {ep_data.get('title', 'Unknown')}")
+
+        # Use curated scenes with descriptions instead of random
+        metadata = {
+            "episode_code": ep_code,
+            "title": ep_data.get("title", ""),
+            "duration": ep_data.get("duration", 1440.0),
+            "characters": ep_data.get("characters", []),
+            "scene_count": len(ep_data.get("scenes", [])),
+            "source": "Google Drive - JJK Collection",
+            "season": int(ep_code[1:3]) if len(ep_code) >= 5 else 0,
+            "episode": int(ep_code[4:6]) if len(ep_code) >= 5 else 0,
+            "notes": ep_data.get("description", "JJK episode"),
+            "scenes": []
         }
-    ]
 
-    print("\n🎬 Generating Timestamp Metadata for Test Episodes\n")
-
-    for ep in test_episodes:
-        print(f"\n{ep['code']}: {ep['description']}")
-        print(f"  Characters: {', '.join(ep['characters'])}")
-
-        # Generate default scenes (lightweight, no video processing)
-        scenes = generate_default_scenes(1440)  # ~24min episodes
-
-        # Create metadata
-        metadata = create_episode_metadata(ep['code'], scenes, ep['characters'])
-
-        # Add notes
-        metadata["notes"] = ep['description']
+        # Add scenes with action scores based on level
+        for scene in ep_data.get("scenes", []):
+            level = scene.get("action_level", "MODERATE")
+            score_map = {"EXPLOSIVE": 0.9, "INTENSE": 0.7, "MODERATE": 0.5, "CALM": 0.3}
+            scene_copy = dict(scene)
+            scene_copy["action_score"] = score_map.get(level, 0.5)
+            scene_copy["duration"] = scene["end"] - scene["start"]
+            metadata["scenes"].append(scene_copy)
 
         # Save
-        filepath = save_episode_metadata(ep['code'], metadata)
-        print(f"  Scenes: {len(scenes)} | Characters: {len(ep['characters'])}")
+        filepath = save_episode_metadata(ep_code, metadata)
+        print(f"  ✅ {len(metadata['scenes'])} scenes | {len(metadata['characters'])} characters")
 
-    print(f"\n✅ Test metadata saved to: {METADATA_DIR}")
+    print(f"\n✅ Accurate metadata saved to: {METADATA_DIR}")
 
 
 def scan_google_drive_episodes():

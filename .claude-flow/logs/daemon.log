@@ -1,0 +1,153 @@
+[2026-08-21T04:05:37.840Z] [WARN] Found /data/data/com.termux/files/home/anidoc-ai-automation/.claude-flow/config.yaml but yaml parser unavailable. Install `yaml` or convert to JSON. Falling back to defaults.
+[2026-08-21T04:05:37.843Z] [INFO] AI workers disabled (default) - all workers run local-only. Enable with `daemon start --headless`, daemon.aiWorkers.enabled=true, or RUFLO_DAEMON_AI_WORKERS=1 (#2661)
+[2026-08-21T04:05:37.846Z] [INFO] Scheduled map (interval: 900s, first run in 0s)
+[2026-08-21T04:05:37.847Z] [INFO] Scheduled audit (interval: 600s, first run in 120s)
+[2026-08-21T04:05:37.847Z] [INFO] Scheduled optimize (interval: 900s, first run in 240s)
+[2026-08-21T04:05:37.847Z] [INFO] Scheduled consolidate (interval: 1800s, first run in 360s)
+[2026-08-21T04:05:37.847Z] [INFO] Scheduled testgaps (interval: 1200s, first run in 480s)
+[2026-08-21T04:05:37.847Z] [INFO] Scheduled backup (interval: 86400s, first run in 600s)
+[2026-08-21T04:05:37.848Z] [INFO] Scheduled harness (interval: 21600s, first run in 720s)
+[2026-08-21T04:05:37.848Z] [INFO] Lifecycle monitor active (workspace-removal, ttl=43200s, idle=1800s)
+[2026-08-21T04:05:37.872Z] [INFO] Daemon started (PID: 17307, CPUs: 0, workers: 7, maxCpuLoad: 2, minFreeMemoryPercent: 10%)
+[2026-08-21T04:05:37.885Z] [INFO] Worker map deferred: CPU load too high: 4.32
+[2026-08-21T04:07:37.847Z] [INFO] Worker audit deferred: CPU load too high: 9.13
+[2026-08-21T04:09:37.879Z] [INFO] Worker optimize deferred: CPU load too high: 3.63
+[2026-08-21T04:11:37.852Z] [INFO] Worker consolidate deferred: CPU load too high: 3.57
+[2026-08-21T04:13:37.857Z] [INFO] Worker testgaps deferred: CPU load too high: 3.95
+[2026-08-21T04:15:37.859Z] [INFO] Worker backup deferred: CPU load too high: 3.80
+[2026-08-21T04:17:37.857Z] [INFO] Worker harness deferred: CPU load too high: 3.51
+[2026-08-21T04:17:37.867Z] [INFO] Worker audit deferred: CPU load too high: 3.51
+[2026-08-21T04:20:37.920Z] [INFO] Worker map deferred: CPU load too high: 4.84
+[2026-08-21T04:24:37.917Z] [INFO] Worker optimize deferred: CPU load too high: 3.21
+[2026-08-21T04:27:37.886Z] [INFO] Worker audit deferred: CPU load too high: 2.61
+[2026-08-21T04:33:37.898Z] [INFO] Worker testgaps deferred: CPU load too high: 3.79
+[2026-08-21T04:35:37.978Z] [INFO] Worker map deferred: CPU load too high: 3.42
+[2026-08-21T04:35:37.993Z] [INFO] Daemon self-shutdown: idle for 1800s (no worker activity)
+[2026-08-21T04:35:38.002Z] [INFO] Stopped worker: map
+[2026-08-21T04:35:38.003Z] [INFO] Stopped worker: audit
+[2026-08-21T04:35:38.004Z] [INFO] Stopped worker: optimize
+[2026-08-21T04:35:38.004Z] [INFO] Stopped worker: consolidate
+[2026-08-21T04:35:38.004Z] [INFO] Stopped worker: testgaps
+[2026-08-21T04:35:38.004Z] [INFO] Stopped worker: backup
+[2026-08-21T04:35:38.004Z] [INFO] Stopped worker: harness
+[2026-08-21T04:35:38.030Z] [INFO] Daemon stopped
+[2026-08-21T05:04:30.232Z] [WARN] Found /data/data/com.termux/files/home/anidoc-ai-automation/.claude-flow/config.yaml but yaml parser unavailable. Install `yaml` or convert to JSON. Falling back to defaults.
+[2026-08-21T05:04:30.235Z] [INFO] AI workers disabled (default) - all workers run local-only. Enable with `daemon start --headless`, daemon.aiWorkers.enabled=true, or RUFLO_DAEMON_AI_WORKERS=1 (#2661)
+[2026-08-21T05:04:30.237Z] [INFO] Scheduled map (interval: 900s, first run in 0s)
+[2026-08-21T05:04:30.237Z] [INFO] Scheduled audit (interval: 600s, first run in 120s)
+[2026-08-21T05:04:30.237Z] [INFO] Scheduled optimize (interval: 900s, first run in 240s)
+[2026-08-21T05:04:30.237Z] [INFO] Scheduled consolidate (interval: 1800s, first run in 360s)
+[2026-08-21T05:04:30.237Z] [INFO] Scheduled testgaps (interval: 1200s, first run in 480s)
+[2026-08-21T05:04:30.237Z] [INFO] Scheduled backup (interval: 86400s, first run in 600s)
+[2026-08-21T05:04:30.237Z] [INFO] Scheduled harness (interval: 21600s, first run in 720s)
+[2026-08-21T05:04:30.238Z] [INFO] Lifecycle monitor active (workspace-removal, ttl=43200s, idle=1800s)
+[2026-08-21T05:04:30.279Z] [INFO] Daemon started (PID: 27711, CPUs: 0, workers: 7, maxCpuLoad: 2, minFreeMemoryPercent: 10%)
+[2026-08-21T05:04:30.285Z] [INFO] Worker map deferred: CPU load too high: 26.33
+[2026-08-21T05:06:30.248Z] [INFO] Worker audit deferred: CPU load too high: 7.95
+[2026-08-21T05:08:30.258Z] [INFO] Worker optimize deferred: CPU load too high: 10.86
+[2026-08-21T05:10:30.261Z] [INFO] Worker consolidate deferred: CPU load too high: 11.45
+[2026-08-21T05:12:30.244Z] [INFO] Worker testgaps deferred: CPU load too high: 11.81
+[2026-08-21T05:14:30.244Z] [INFO] Worker backup deferred: CPU load too high: 8.09
+[2026-08-21T05:16:30.248Z] [INFO] Worker harness deferred: CPU load too high: 7.72
+[2026-08-21T05:16:30.258Z] [INFO] Worker audit deferred: CPU load too high: 7.72
+[2026-08-21T05:19:30.299Z] [INFO] Worker map deferred: CPU load too high: 5.50
+[2026-08-21T05:23:30.275Z] [INFO] Worker optimize deferred: CPU load too high: 7.23
+[2026-08-21T05:26:30.280Z] [INFO] Worker audit deferred: CPU load too high: 6.22
+[2026-08-21T05:32:30.268Z] [INFO] Worker testgaps deferred: CPU load too high: 4.78
+[2026-08-21T05:34:30.315Z] [INFO] Worker map deferred: CPU load too high: 7.27
+[2026-08-21T05:34:30.351Z] [INFO] Daemon self-shutdown: idle for 1800s (no worker activity)
+[2026-08-21T05:34:30.360Z] [INFO] Stopped worker: map
+[2026-08-21T05:34:30.362Z] [INFO] Stopped worker: audit
+[2026-08-21T05:34:30.362Z] [INFO] Stopped worker: optimize
+[2026-08-21T05:34:30.363Z] [INFO] Stopped worker: consolidate
+[2026-08-21T05:34:30.363Z] [INFO] Stopped worker: testgaps
+[2026-08-21T05:34:30.363Z] [INFO] Stopped worker: backup
+[2026-08-21T05:34:30.364Z] [INFO] Stopped worker: harness
+[2026-08-21T05:34:30.389Z] [INFO] Daemon stopped
+[2026-08-21T11:35:08.493Z] [WARN] Found /data/data/com.termux/files/home/anidoc-ai-automation/.claude-flow/config.yaml but yaml parser unavailable. Install `yaml` or convert to JSON. Falling back to defaults.
+[2026-08-21T11:35:08.515Z] [INFO] AI workers disabled (default) - all workers run local-only. Enable with `daemon start --headless`, daemon.aiWorkers.enabled=true, or RUFLO_DAEMON_AI_WORKERS=1 (#2661)
+[2026-08-21T11:35:08.520Z] [INFO] Scheduled map (interval: 900s, first run in 0s)
+[2026-08-21T11:35:08.521Z] [INFO] Scheduled audit (interval: 600s, first run in 120s)
+[2026-08-21T11:35:08.523Z] [INFO] Scheduled optimize (interval: 900s, first run in 240s)
+[2026-08-21T11:35:08.524Z] [INFO] Scheduled consolidate (interval: 1800s, first run in 360s)
+[2026-08-21T11:35:08.525Z] [INFO] Scheduled testgaps (interval: 1200s, first run in 480s)
+[2026-08-21T11:35:08.528Z] [INFO] Scheduled backup (interval: 86400s, first run in 600s)
+[2026-08-21T11:35:08.528Z] [INFO] Scheduled harness (interval: 21600s, first run in 720s)
+[2026-08-21T11:35:08.529Z] [INFO] Lifecycle monitor active (workspace-removal, ttl=43200s, idle=1800s)
+[2026-08-21T11:35:08.543Z] [INFO] Daemon started (PID: 21169, CPUs: 0, workers: 7, maxCpuLoad: 2, minFreeMemoryPercent: 10%)
+[2026-08-21T11:35:08.552Z] [INFO] Worker map deferred: CPU load too high: 7.54
+[2026-08-21T11:37:08.523Z] [INFO] Worker audit deferred: CPU load too high: 6.20
+[2026-08-21T11:39:08.523Z] [INFO] Worker optimize deferred: CPU load too high: 6.97
+[2026-08-21T11:41:08.543Z] [INFO] Worker consolidate deferred: CPU load too high: 10.08
+[2026-08-21T11:43:08.556Z] [INFO] Worker testgaps deferred: CPU load too high: 34.81
+[2026-08-21T11:45:08.544Z] [INFO] Worker backup deferred: CPU load too high: 9.41
+[2026-08-21T11:47:08.557Z] [INFO] Worker audit deferred: CPU load too high: 6.11
+[2026-08-21T11:47:08.571Z] [INFO] Worker harness deferred: CPU load too high: 6.11
+[2026-08-21T11:50:08.577Z] [INFO] Worker map deferred: CPU load too high: 6.49
+[2026-08-21T11:54:08.577Z] [INFO] Worker optimize deferred: CPU load too high: 70.91
+[2026-08-21T13:27:16.677Z] [WARN] Found /data/data/com.termux/files/home/anidoc-ai-automation/.claude-flow/config.yaml but yaml parser unavailable. Install `yaml` or convert to JSON. Falling back to defaults.
+[2026-08-21T13:27:16.680Z] [INFO] AI workers disabled (default) - all workers run local-only. Enable with `daemon start --headless`, daemon.aiWorkers.enabled=true, or RUFLO_DAEMON_AI_WORKERS=1 (#2661)
+[2026-08-21T13:27:16.683Z] [INFO] Scheduled map (interval: 900s, first run in 0s)
+[2026-08-21T13:27:16.683Z] [INFO] Scheduled audit (interval: 600s, first run in 120s)
+[2026-08-21T13:27:16.683Z] [INFO] Scheduled optimize (interval: 900s, first run in 240s)
+[2026-08-21T13:27:16.683Z] [INFO] Scheduled consolidate (interval: 1800s, first run in 360s)
+[2026-08-21T13:27:16.683Z] [INFO] Scheduled testgaps (interval: 1200s, first run in 480s)
+[2026-08-21T13:27:16.683Z] [INFO] Scheduled backup (interval: 86400s, first run in 600s)
+[2026-08-21T13:27:16.684Z] [INFO] Scheduled harness (interval: 21600s, first run in 720s)
+[2026-08-21T13:27:16.684Z] [INFO] Lifecycle monitor active (workspace-removal, ttl=43200s, idle=1800s)
+[2026-08-21T13:27:16.719Z] [INFO] Daemon started (PID: 12151, CPUs: 0, workers: 7, maxCpuLoad: 2, minFreeMemoryPercent: 10%)
+[2026-08-21T13:27:16.727Z] [INFO] Worker map deferred: CPU load too high: 4.87
+[2026-08-21T13:29:16.687Z] [INFO] Worker audit deferred: CPU load too high: 4.93
+[2026-08-21T13:31:16.698Z] [INFO] Worker optimize deferred: CPU load too high: 8.74
+[2026-08-21T13:33:16.703Z] [INFO] Worker consolidate deferred: CPU load too high: 9.55
+[2026-08-21T13:35:16.700Z] [INFO] Worker testgaps deferred: CPU load too high: 8.56
+[2026-08-21T13:37:16.723Z] [INFO] Worker backup deferred: CPU load too high: 5.44
+[2026-08-21T13:39:16.729Z] [INFO] Worker harness deferred: CPU load too high: 6.78
+[2026-08-21T13:39:16.739Z] [INFO] Worker audit deferred: CPU load too high: 6.78
+[2026-08-21T13:42:16.747Z] [INFO] Worker map deferred: CPU load too high: 9.38
+[2026-08-21T13:46:16.728Z] [INFO] Worker optimize deferred: CPU load too high: 4.41
+[2026-08-21T13:49:16.794Z] [INFO] Worker audit deferred: CPU load too high: 3.04
+[2026-08-21T13:55:16.713Z] [INFO] Worker testgaps deferred: CPU load too high: 16.05
+[2026-08-21T13:57:16.804Z] [INFO] Worker map deferred: CPU load too high: 5.80
+[2026-08-21T13:57:16.845Z] [INFO] Daemon self-shutdown: idle for 1800s (no worker activity)
+[2026-08-21T13:57:16.862Z] [INFO] Stopped worker: map
+[2026-08-21T13:57:16.864Z] [INFO] Stopped worker: audit
+[2026-08-21T13:57:16.864Z] [INFO] Stopped worker: optimize
+[2026-08-21T13:57:16.865Z] [INFO] Stopped worker: consolidate
+[2026-08-21T13:57:16.865Z] [INFO] Stopped worker: testgaps
+[2026-08-21T13:57:16.865Z] [INFO] Stopped worker: backup
+[2026-08-21T13:57:16.865Z] [INFO] Stopped worker: harness
+[2026-08-21T13:57:16.904Z] [INFO] Daemon stopped
+[2026-08-21T14:08:15.614Z] [WARN] Found /data/data/com.termux/files/home/anidoc-ai-automation/.claude-flow/config.yaml but yaml parser unavailable. Install `yaml` or convert to JSON. Falling back to defaults.
+[2026-08-21T14:08:15.617Z] [INFO] AI workers disabled (default) - all workers run local-only. Enable with `daemon start --headless`, daemon.aiWorkers.enabled=true, or RUFLO_DAEMON_AI_WORKERS=1 (#2661)
+[2026-08-21T14:08:15.619Z] [INFO] Scheduled map (interval: 900s, first run in 0s)
+[2026-08-21T14:08:15.619Z] [INFO] Scheduled audit (interval: 600s, first run in 120s)
+[2026-08-21T14:08:15.619Z] [INFO] Scheduled optimize (interval: 900s, first run in 240s)
+[2026-08-21T14:08:15.619Z] [INFO] Scheduled consolidate (interval: 1800s, first run in 360s)
+[2026-08-21T14:08:15.619Z] [INFO] Scheduled testgaps (interval: 1200s, first run in 480s)
+[2026-08-21T14:08:15.620Z] [INFO] Scheduled backup (interval: 86400s, first run in 600s)
+[2026-08-21T14:08:15.620Z] [INFO] Scheduled harness (interval: 21600s, first run in 720s)
+[2026-08-21T14:08:15.620Z] [INFO] Lifecycle monitor active (workspace-removal, ttl=43200s, idle=1800s)
+[2026-08-21T14:08:15.637Z] [INFO] Daemon started (PID: 27051, CPUs: 0, workers: 7, maxCpuLoad: 2, minFreeMemoryPercent: 10%)
+[2026-08-21T14:08:15.640Z] [INFO] Worker map deferred: CPU load too high: 4.63
+[2026-08-21T14:10:15.646Z] [INFO] Worker audit deferred: CPU load too high: 5.83
+[2026-08-21T14:12:15.646Z] [INFO] Worker optimize deferred: CPU load too high: 3.75
+[2026-08-21T14:14:15.641Z] [INFO] Worker consolidate deferred: CPU load too high: 2.92
+[2026-08-21T14:16:15.631Z] [INFO] Worker testgaps deferred: CPU load too high: 3.04
+[2026-08-21T14:18:15.664Z] [INFO] Worker backup deferred: CPU load too high: 3.16
+[2026-08-21T14:20:15.641Z] [INFO] Worker harness deferred: CPU load too high: 3.15
+[2026-08-21T14:20:15.655Z] [INFO] Worker audit deferred: CPU load too high: 3.15
+[2026-08-21T14:23:15.675Z] [INFO] Worker map deferred: CPU load too high: 2.51
+[2026-08-21T14:27:15.665Z] [INFO] Worker optimize deferred: CPU load too high: 3.62
+[2026-08-21T14:30:15.709Z] [INFO] Worker audit deferred: CPU load too high: 5.12
+[2026-08-21T14:36:15.672Z] [INFO] Worker testgaps deferred: CPU load too high: 4.33
+[2026-08-21T14:38:15.728Z] [INFO] Worker map deferred: CPU load too high: 2.81
+[2026-08-21T14:38:15.754Z] [INFO] Daemon self-shutdown: idle for 1800s (no worker activity)
+[2026-08-21T14:38:15.764Z] [INFO] Stopped worker: map
+[2026-08-21T14:38:15.766Z] [INFO] Stopped worker: audit
+[2026-08-21T14:38:15.766Z] [INFO] Stopped worker: optimize
+[2026-08-21T14:38:15.766Z] [INFO] Stopped worker: consolidate
+[2026-08-21T14:38:15.767Z] [INFO] Stopped worker: testgaps
+[2026-08-21T14:38:15.767Z] [INFO] Stopped worker: backup
+[2026-08-21T14:38:15.767Z] [INFO] Stopped worker: harness
+[2026-08-21T14:38:15.786Z] [INFO] Daemon stopped

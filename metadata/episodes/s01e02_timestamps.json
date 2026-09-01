@@ -1,0 +1,93 @@
+{
+  "episode_code": "S01E02",
+  "title": "For Myself",
+  "duration": 1440.0,
+  "characters": [
+    {
+      "name": "Yuji",
+      "role": "Protagonist",
+      "key_moments": [
+        "Sentenced to death",
+        "Decides to postpone death",
+        "Eats second Sukuna finger"
+      ]
+    },
+    {
+      "name": "Gojo",
+      "role": "Mentor",
+      "key_moments": [
+        "Introduces Jujutsu High",
+        "Tests Yuji's control",
+        "Demonstrates overwhelming power"
+      ]
+    },
+    {
+      "name": "Sukuna",
+      "role": "Antagonist",
+      "key_moments": [
+        "Second awakening",
+        "Fights curse"
+      ]
+    }
+  ],
+  "scene_count": 4,
+  "source": "Google Drive - JJK Collection",
+  "season": 1,
+  "episode": 2,
+  "notes": "JJK episode",
+  "scenes": [
+    {
+      "start": 180.0,
+      "end": 300.0,
+      "action_level": "MODERATE",
+      "priority": "medium",
+      "description": "Gojo arrives - demonstrates Six Eyes",
+      "characters_present": [
+        "gojo",
+        "yuji",
+        "megumi"
+      ],
+      "action_score": 0.5,
+      "duration": 120.0
+    },
+    {
+      "start": 420.0,
+      "end": 540.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Yuji vs cursed spirit in morgue",
+      "characters_present": [
+        "yuji",
+        "sukuna"
+      ],
+      "action_score": 0.7,
+      "duration": 120.0
+    },
+    {
+      "start": 720.0,
+      "end": 900.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Sukuna awakens - brutal curse fight",
+      "characters_present": [
+        "sukuna",
+        "gojo"
+      ],
+      "action_score": 0.9,
+      "duration": 180.0
+    },
+    {
+      "start": 1080.0,
+      "end": 1200.0,
+      "action_level": "MODERATE",
+      "priority": "medium",
+      "description": "Yuji decides to join Jujutsu High",
+      "characters_present": [
+        "yuji",
+        "gojo"
+      ],
+      "action_score": 0.5,
+      "duration": 120.0
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "episode_code": "S01E13",
+  "title": "Tomorrow",
+  "duration": 1440.0,
+  "characters": [
+    {
+      "name": "Yuji",
+      "role": "Protagonist",
+      "key_moments": [
+        "Goodwill event",
+        "Encounters Todo",
+        "Fights special grade",
+        "Black Flash awakening"
+      ]
+    },
+    {
+      "name": "Todo",
+      "role": "Ally",
+      "key_moments": [
+        "Becomes Yuji's best friend",
+        "Teaches Yuji combat",
+        "Boogie Woogie demonstration"
+      ]
+    },
+    {
+      "name": "Megumi",
+      "role": "Support",
+      "key_moments": [
+        "Vs Finger Bearer",
+        "Incomplete Domain"
+      ]
+    }
+  ],
+  "scene_count": 4,
+  "source": "Google Drive - JJK Collection",
+  "season": 1,
+  "episode": 13,
+  "notes": "JJK episode",
+  "scenes": [
+    {
+      "start": 180.0,
+      "end": 360.0,
+      "action_level": "MODERATE",
+      "priority": "medium",
+      "description": "Goodwill event - teams split up",
+      "characters_present": [
+        "yuji",
+        "megumi",
+        "nobara"
+      ],
+      "action_score": 0.5,
+      "duration": 180.0
+    },
+    {
+      "start": 540.0,
+      "end": 780.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Megumi vs Finger Bearer - incomplete Domain",
+      "characters_present": [
+        "megumi"
+      ],
+      "action_score": 0.9,
+      "duration": 240.0
+    },
+    {
+      "start": 900.0,
+      "end": 1080.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Yuji meets Todo - instant best friends",
+      "characters_present": [
+        "yuji",
+        "todo"
+      ],
+      "action_score": 0.7,
+      "duration": 180.0
+    },
+    {
+      "start": 1200.0,
+      "end": 1380.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Sukuna awakens briefly - kills curse",
+      "characters_present": [
+        "yuji",
+        "sukuna"
+      ],
+      "action_score": 0.9,
+      "duration": 180.0
+    }
+  ]
+}

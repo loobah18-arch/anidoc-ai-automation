@@ -1,0 +1,79 @@
+{
+  "episode_code": "S01E07",
+  "title": "Assault",
+  "duration": 1440.0,
+  "characters": [
+    {
+      "name": "Yuji",
+      "role": "Protagonist",
+      "key_moments": [
+        "Returns from death",
+        "Reunites with Megumi and Nobara",
+        "Surprise reveal"
+      ]
+    },
+    {
+      "name": "Todo",
+      "role": "Ally",
+      "key_moments": [
+        "Goodwill event preparation",
+        "Questions about 'type of woman'"
+      ]
+    },
+    {
+      "name": "Gojo",
+      "role": "Mentor",
+      "key_moments": [
+        "Reveals Yuji is alive",
+        "Explains resurrection plan"
+      ]
+    }
+  ],
+  "scene_count": 3,
+  "source": "Google Drive - JJK Collection",
+  "season": 1,
+  "episode": 7,
+  "notes": "JJK episode",
+  "scenes": [
+    {
+      "start": 240.0,
+      "end": 360.0,
+      "action_level": "MODERATE",
+      "priority": "medium",
+      "description": "Goodwill event intro - other schools arrive",
+      "characters_present": [
+        "todo",
+        "gojo"
+      ],
+      "action_score": 0.5,
+      "duration": 120.0
+    },
+    {
+      "start": 900.0,
+      "end": 1080.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Todo confronts Megumi - type of woman question",
+      "characters_present": [
+        "todo",
+        "megumi"
+      ],
+      "action_score": 0.7,
+      "duration": 180.0
+    },
+    {
+      "start": 1200.0,
+      "end": 1380.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Yuji revealed alive - surprise return",
+      "characters_present": [
+        "yuji",
+        "megumi",
+        "nobara"
+      ],
+      "action_score": 0.9,
+      "duration": 180.0
+    }
+  ]
+}
