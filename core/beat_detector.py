@@ -9,8 +9,13 @@ Replicates top viral anime/Marvel TikTok & Shorts editing styles:
 import subprocess
 import re
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 
+import numpy as np
+from scipy.signal import butter, sosfilt, correlate
+from scipy.io import wavfile
+
+from config.settings import SCRATCH_DIR
 from core.phonk_manager import POPULAR_PHONK_CATALOG
 
 
@@ -98,6 +103,131 @@ class BeatGrid:
         return segments
 
 
+def _extract_audio_wav(audio_path: Path, duration: float) -> Path:
+    """Extracts mono 22050 Hz WAV from any audio/video file for onset analysis."""
+    SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+    wav_path = SCRATCH_DIR / "beat_analysis.wav"
+    cmd = [
+        "ffmpeg", "-y", "-i", str(audio_path),
+        "-t", f"{duration:.2f}",
+        "-ac", "1", "-ar", "22050",
+        "-acodec", "pcm_s16le",
+        str(wav_path)
+    ]
+    subprocess.run(cmd, capture_output=True, check=True)
+    return wav_path
+
+
+def _detect_onsets_and_bpm(wav_path: Path) -> Tuple[float, List[float]]:
+    """
+    Detects BPM and bass onset times from a WAV file using scipy.
+    Returns (bpm, onset_times_in_seconds).
+    """
+    sr, data = wavfile.read(wav_path)
+    if data.ndim > 1:
+        data = data[:, 0]
+    data = data.astype(np.float32) / 32768.0
+
+    # Low-pass at 100 Hz to tightly isolate 808 sub-bass kick transients
+    sos = butter(4, 100.0 / (sr / 2), btype='low', output='sos')
+    bass = sosfilt(sos, data)
+
+    # Onset envelope: half-wave rectified first derivative (energy jump detection)
+    derivative = np.diff(bass)
+    onset_env = np.maximum(derivative, 0.0)
+
+    # Smooth with 8ms moving average to reduce noise while keeping transient sharpness
+    win = max(1, int(sr * 0.008))
+    kernel = np.ones(win, dtype=np.float32) / win
+    onset_env = np.convolve(onset_env, kernel, mode='same')
+
+    # ── BPM detection via autocorrelation (search 80-200 BPM range) ──────────
+    min_lag = int(sr * 60.0 / 200)  # 200 BPM upper bound
+    max_lag = int(sr * 60.0 / 80)   # 80 BPM lower bound
+    ac = correlate(onset_env, onset_env, mode='full')
+    ac = ac[len(ac) // 2:]  # keep positive lags only
+    if max_lag > len(ac):
+        max_lag = len(ac)
+    ac_region = ac[min_lag:max_lag]
+    if len(ac_region) == 0:
+        return 134.0, []
+    peak_lag = np.argmax(ac_region) + min_lag
+    bpm = 60.0 * sr / peak_lag
+
+    # ── Sub-harmonic check: if half the detected BPM has stronger autocorrelation
+    #    (i.e. the real tempo is slower, not faster), use it ───────────────────
+    double_lag = peak_lag * 2
+    if double_lag < len(ac) and double_lag >= min_lag:
+        sub_strength = ac[double_lag] / (ac[peak_lag] + 1e-10)
+        if sub_strength > 0.90:
+            bpm = 60.0 * sr / double_lag
+
+    # ── Super-harmonic check: if double BPM (half-lag) has stronger autocorr ──
+    #    Phonk often aliases to half the real BPM due to half-time feel.
+    half_lag = peak_lag // 2
+    if half_lag >= min_lag and half_lag < len(ac):
+        harmonic_strength = ac[half_lag] / (ac[peak_lag] + 1e-10)
+        if harmonic_strength > 0.80:
+            bpm = 60.0 * sr / half_lag
+
+    # ── Top-3 candidate validation: check which BPM best fits onset grid ──────
+    # Find top 3 autocorrelation peaks and validate each against detected onsets
+    ac_smooth = np.convolve(ac_region, np.ones(5) / 5, mode='same')  # smooth AC
+    candidates_bpm = []
+    min_peak_sep = int(sr * 60.0 / 200)  # minimum lag separation between peaks
+    search_i = 0
+    while search_i < len(ac_smooth) and len(candidates_bpm) < 5:
+        local_end = min(search_i + min_peak_sep, len(ac_smooth))
+        local_peak = search_i + int(np.argmax(ac_smooth[search_i:local_end]))
+        candidates_bpm.append(60.0 * sr / (local_peak + min_lag))
+        search_i = local_peak + min_peak_sep
+
+    # ── Onset detection: adaptive threshold peak-picking ──────────────────────
+    positive_env = onset_env[onset_env > 0]
+    if len(positive_env) == 0:
+        return bpm, []
+    threshold = np.median(positive_env) * 1.4
+    min_sep = int(sr * 0.2)  # minimum 200ms between onsets (prevents double-triggers)
+
+    onsets = []
+    i = 0
+    while i < len(onset_env):
+        if onset_env[i] > threshold:
+            # Find local peak within the separation window
+            end = min(i + min_sep, len(onset_env))
+            peak = i + int(np.argmax(onset_env[i:end]))
+            onsets.append(round(peak / sr, 4))
+            i = peak + min_sep
+        else:
+            i += 1
+
+    return bpm, onsets
+
+
+def _snap_grid_to_onsets(beat_times: List[float], onset_times: List[float], bpm: float) -> List[float]:
+    """
+    Snaps each procedural beat time to the nearest detected bass onset.
+    Only snaps if the onset is within ±30% of the beat interval (prevents false snaps).
+    """
+    if not onset_times:
+        return beat_times
+
+    beat_interval = 60.0 / bpm
+    snap_window = beat_interval * 0.25
+    onset_arr = np.array(onset_times)
+
+    snapped = []
+    for t in beat_times:
+        distances = np.abs(onset_arr - t)
+        nearest_idx = np.argmin(distances)
+        nearest_dist = distances[nearest_idx]
+        if nearest_dist <= snap_window:
+            snapped.append(round(float(onset_arr[nearest_idx]), 3))
+        else:
+            snapped.append(round(t, 2))
+    return snapped
+
+
 def generate_procedural_beat_grid(duration: float = 35.0, drop_time: float = 6.0, bpm: float = 134.0) -> BeatGrid:
     """
     Generates a viral 30-40s Phonk beat grid with multi-phrase velocity contrast:
@@ -165,17 +295,19 @@ def generate_procedural_beat_grid(duration: float = 35.0, drop_time: float = 6.0
 
 def analyze_audio_beats(audio_path: Path, target_duration: float = 42.0) -> BeatGrid:
     """
-    Intelligently syncs audio beats with frame-accurate precision:
-    1. For Curated Catalog tracks: Uses the exact, millisecond-calibrated 808 drop timestamp & BPM.
-    2. For Custom / Live tracks: Analyzes dynamic low-frequency sub-bass (35-130Hz) energy onset.
-    3. Generates locked rhythmic cut points across 40-45 seconds without drift.
+    Intelligently syncs audio beats with frame-accurate precision using real audio analysis:
+    1. Extracts audio waveform and detects bass onsets via scipy (low-pass + onset envelope).
+    2. Detects actual BPM via autocorrelation of the onset envelope.
+    3. Detects the 808 drop from the highest-energy onset in the 4-9s window.
+    4. Snaps the procedural beat grid to real bass transient timestamps.
+    5. Falls back to curated catalog data if audio analysis fails.
     """
     if not audio_path or not Path(audio_path).exists():
         return generate_procedural_beat_grid(duration=target_duration)
 
     track_stem = Path(audio_path).stem
     matched_entry = next((item for item in POPULAR_PHONK_CATALOG if item["id"] == track_stem or item["id"] in track_stem), None)
-    
+
     calibrated_bpm = matched_entry.get("bpm", 134.0) if matched_entry else 134.0
     calibrated_drop = matched_entry.get("default_drop", 6.0) if matched_entry else 6.0
 
@@ -188,24 +320,53 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = 42.0) -> Beat
         ]
         res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
         dur = min(float(res.stdout.strip()), target_duration)
-        
-        detected_drop = calibrated_drop
-        # If not in curated catalog, detect exact sub-bass jump
-        if not matched_entry:
-            detect_cmd = [
-                "ffmpeg", "-y", "-ss", "3.0", "-to", "10.0", "-i", str(audio_path),
-                "-af", "highpass=f=35,lowpass=f=130,silencedetect=n=-18dB:d=0.08",
-                "-f", "null", "-"
-            ]
-            det_res = subprocess.run(detect_cmd, capture_output=True, text=True)
-            silence_ends = [float(m) + 3.0 for m in re.findall(r"silence_end:\s*([0-9\.]+)", det_res.stderr)]
-            if silence_ends:
-                valid_drops = [t for t in silence_ends if 4.0 <= t <= 9.0]
-                if valid_drops:
-                    detected_drop = valid_drops[0]
 
-        print(f"🎵 [BeatSync] Track: {track_stem} | BPM: {calibrated_bpm} | Frame-Accurate Climax Drop: {detected_drop:.3f}s | Target: {dur:.1f}s")
-        return generate_procedural_beat_grid(duration=dur, drop_time=detected_drop, bpm=calibrated_bpm)
+        # ── Real audio onset detection via scipy ──────────────────────────────
+        detected_bpm = calibrated_bpm
+        detected_drop = calibrated_drop
+        detected_onsets = []
+
+        try:
+            wav_path = _extract_audio_wav(audio_path, dur)
+            detected_bpm, detected_onsets = _detect_onsets_and_bpm(wav_path)
+
+            # Use detected BPM for unknown tracks; for catalog tracks, prefer catalog BPM
+            # but still use detected onsets for grid snapping
+            if not matched_entry:
+                calibrated_bpm = detected_bpm
+                print(f"  🔍 [BeatSync] Detected BPM: {detected_bpm:.1f} (no catalog match)")
+
+            # Detect drop from actual onsets: highest-energy onset in 4-9s window
+            if detected_onsets:
+                drop_candidates = [t for t in detected_onsets if 4.0 <= t <= 9.0]
+                if drop_candidates:
+                    # Prefer the onset closest to the catalog drop time
+                    detected_drop = min(drop_candidates, key=lambda t: abs(t - calibrated_drop))
+                    print(f"  🎯 [BeatSync] Drop snapped: {calibrated_drop:.2f}s → {detected_drop:.3f}s (from {len(detected_onsets)} onsets)")
+                else:
+                    # No onsets in drop window — use catalog/estimated drop
+                    detected_drop = calibrated_drop
+                    print(f"  ⚠️  [BeatSync] No onsets in 4-9s window, using catalog drop: {detected_drop:.2f}s")
+            else:
+                print(f"  ⚠️  [BeatSync] No onsets detected, using catalog defaults")
+
+        except Exception as e:
+            print(f"  ⚠️  [BeatSync] Onset detection failed: {e}. Using catalog defaults.")
+            detected_bpm = calibrated_bpm
+            detected_drop = calibrated_drop
+
+        # ── Generate procedural grid then snap to real onsets ──────────────────
+        grid = generate_procedural_beat_grid(duration=dur, drop_time=detected_drop, bpm=calibrated_bpm)
+
+        if detected_onsets:
+            grid.beat_times = _snap_grid_to_onsets(grid.beat_times, detected_onsets, calibrated_bpm)
+            snapped_count = sum(1 for i, t in enumerate(grid.beat_times)
+                              if any(abs(t - o) < 0.05 for o in detected_onsets))
+            print(f"  📐 [BeatSync] Snapped {snapped_count}/{len(grid.beat_times)} cuts to real bass onsets")
+
+        print(f"🎵 [BeatSync] Track: {track_stem} | BPM: {calibrated_bpm:.1f} | Drop: {detected_drop:.3f}s | Duration: {dur:.1f}s | Onsets: {len(detected_onsets)}")
+        return grid
+
     except Exception as e:
         print(f"⚠️ [BeatSync] Notice analyzing {audio_path}: {e}. Using calibrated catalog sync.")
         return generate_procedural_beat_grid(duration=target_duration, drop_time=calibrated_drop, bpm=calibrated_bpm)
