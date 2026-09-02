@@ -26,7 +26,8 @@ CHARACTER_VOICES = {
 
 
 async def _synthesize_edge_tts(text: str, voice_cfg: Dict[str, str], output_path: Path) -> Path:
-    """Synthesizes text using edge-tts async API."""
+    """Synthesizes text using edge-tts async API. Streams MP3 → pipes to FFmpeg → writes WAV.
+    No intermediate MP3 file on disk."""
     import edge_tts
     communicate = edge_tts.Communicate(
         text=text,
@@ -34,7 +35,22 @@ async def _synthesize_edge_tts(text: str, voice_cfg: Dict[str, str], output_path
         rate=voice_cfg.get("rate", "+0%"),
         pitch=voice_cfg.get("pitch", "+0Hz")
     )
-    await communicate.save(str(output_path))
+
+    # Collect MP3 chunks in memory
+    mp3_chunks = []
+    async for chunk in communicate.stream():
+        if chunk["type"] == "audio":
+            mp3_chunks.append(chunk["data"])
+    mp3_data = b"".join(mp3_chunks)
+
+    # Pipe MP3 → WAV via FFmpeg (no temp MP3 on disk)
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", "pipe:0",
+        "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "1",
+        str(output_path)
+    ]
+    proc = subprocess.run(cmd, input=mp3_data, capture_output=True, check=True)
     return output_path
 
 

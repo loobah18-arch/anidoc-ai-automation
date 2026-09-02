@@ -13,7 +13,6 @@ from typing import List, Dict, Any, Optional, Tuple
 
 import numpy as np
 from scipy.signal import butter, sosfilt, correlate
-from scipy.io import wavfile
 
 from config.settings import SCRATCH_DIR
 from core.phonk_manager import POPULAR_PHONK_CATALOG
@@ -103,34 +102,30 @@ class BeatGrid:
         return segments
 
 
-def _extract_audio_wav(audio_path: Path, duration: float) -> Path:
-    """Extracts mono 22050 Hz WAV from any audio/video file for onset analysis."""
-    SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-    wav_path = SCRATCH_DIR / "beat_analysis.wav"
+def _stream_wav_from_ffmpeg(audio_path: Path, duration: float) -> Tuple[np.ndarray, int]:
+    """Extracts mono 22050 Hz PCM via FFmpeg pipe (no temp file / no WAV header)."""
+    SR = 22050
     cmd = [
-        "ffmpeg", "-y", "-i", str(audio_path),
+        "ffmpeg", "-y",
+        "-i", str(audio_path),
         "-t", f"{duration:.2f}",
-        "-ac", "1", "-ar", "22050",
+        "-ac", "1", "-ar", str(SR),
         "-acodec", "pcm_s16le",
-        str(wav_path)
+        "-f", "s16le", "pipe:1"
     ]
-    subprocess.run(cmd, capture_output=True, check=True)
-    return wav_path
+    proc = subprocess.run(cmd, capture_output=True, check=True)
+    data = np.frombuffer(proc.stdout, dtype=np.int16).astype(np.float32) / 32768.0
+    return data, SR
 
 
-def _detect_onsets_and_bpm(wav_path: Path) -> Tuple[float, List[float]]:
+def _detect_onsets_and_bpm(audio_data: np.ndarray, sr: int) -> Tuple[float, List[float]]:
     """
-    Detects BPM and bass onset times from a WAV file using scipy.
+    Detects BPM and bass onset times from audio data using scipy.
     Returns (bpm, onset_times_in_seconds).
     """
-    sr, data = wavfile.read(wav_path)
-    if data.ndim > 1:
-        data = data[:, 0]
-    data = data.astype(np.float32) / 32768.0
-
     # Low-pass at 100 Hz to tightly isolate 808 sub-bass kick transients
     sos = butter(4, 100.0 / (sr / 2), btype='low', output='sos')
-    bass = sosfilt(sos, data)
+    bass = sosfilt(sos, audio_data)
 
     # Onset envelope: half-wave rectified first derivative (energy jump detection)
     derivative = np.diff(bass)
@@ -327,8 +322,8 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = 42.0) -> Beat
         detected_onsets = []
 
         try:
-            wav_path = _extract_audio_wav(audio_path, dur)
-            detected_bpm, detected_onsets = _detect_onsets_and_bpm(wav_path)
+            audio_data, sr = _stream_wav_from_ffmpeg(audio_path, dur)
+            detected_bpm, detected_onsets = _detect_onsets_and_bpm(audio_data, sr)
 
             # Use detected BPM for unknown tracks; for catalog tracks, prefer catalog BPM
             # but still use detected onsets for grid snapping
