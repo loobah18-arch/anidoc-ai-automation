@@ -1,10 +1,15 @@
 """
 Audio Beat & Onset Detection Engine for Phonk and Cinematic Sync.
-Replicates top viral anime/Marvel TikTok & Shorts editing styles:
-- Phase 1 (0s - 5.5s): Atmospheric slow-building tension cuts (1.5s - 1.8s) leading into dialogue.
-- Phase 2 (5.5s - 18s): Explosive 808 drop snap with velocity contrast (sixteenth notes + power shot holds).
-- Phase 3 (18s - 28s): Secondary escalation & technique charges leading into the second drop.
-- Phase 4 (28s - 35s+): Final devastation climax impact with slow-burn outro.
+Replicates NARRATIVE-DRIVEN dramatic AMV editing style:
+- Phase 1 (0s - 6s): Atmospheric dialogue build — ONE continuous monologue shot.
+- Phase 2 (6s - 18s): First drop — aggressive cuts at musically significant moments (NOT every beat).
+- Phase 3 (18s - 24s): Bridge — held emotional shots, technique charge breather.
+- Phase 4 (24s - 31s): Second drop — rapid but narrative-driven cuts.
+- Phase 5 (31s - 38s): Final climax — powerful held finish with slow-burn outro.
+
+Reference video has ~20 major segments in 23s (0.87 cuts/sec). This module targets
+15-20 major segments for a 38s edit, with each segment 1.5-3.0s average.
+NO micro-flash inserts. Flash is rare punctuation only (2-3 per edit).
 """
 import subprocess
 import re
@@ -27,10 +32,12 @@ class BeatGrid:
 
     def get_cut_segments(self) -> List[Dict[str, Any]]:
         """Returns list of segments with start, end, duration, is_drop, and prev_is_drop flags.
-        Subdivides longer segments to match reference edit density (~100+ cuts in 38s).
-        Inserts 0.03s micro-flash inserts between subdivided segments.
+
+        Reference video has ~20 major segments in 23s (avg ~1.15s each).
+        This targets 15-20 major segments for a 38s edit. Each segment is a
+        held shot — no micro-subdivision, no flash inserts between segments.
+        Flash moments are identified separately (2-3 per edit) at the biggest drops.
         """
-        # Phase 1: build raw segments from beat points
         raw_segments = []
         all_points = [0.0] + self.beat_times
         if self.duration not in all_points:
@@ -40,55 +47,18 @@ class BeatGrid:
         for i in range(len(all_points) - 1):
             s = all_points[i]
             e = all_points[i+1]
-            if e - s < 0.22:
-                continue
+            dur = e - s
+            if dur < 0.5:
+                continue  # skip sub-half-second fragments (noise)
             raw_segments.append({"start": s, "end": e})
 
-        # Phase 2: subdivide to match reference density (~120 cuts in 38s)
-        # Reference has avg 0.26s cut gap — threshold at 0.42s balances density vs overshoot.
-        # Flash inserts are PAIRED (two back-to-back) matching the reference's strobe pattern.
-        subdivided = []
-        for seg in raw_segments:
-            dur = seg["end"] - seg["start"]
-            if dur > 0.42 and dur < 0.90:
-                # Split at ~60% through the segment (asymmetric energy)
-                split_t = seg["start"] + dur * 0.60
-                flash_pair_dur = 0.050  # paired flashes: 33ms + ~17ms gap
-                # Part A: 60% of segment
-                subdivided.append({"start": seg["start"], "end": round(split_t, 3)})
-                # Paired micro-flash (2 back-to-back flashes like reference)
-                subdivided.append({"start": round(split_t, 3), "end": round(split_t + flash_pair_dur, 3), "is_flash": True})
-                # Part B: remaining 40%
-                subdivided.append({"start": round(split_t + flash_pair_dur, 3), "end": seg["end"]})
-            elif dur >= 0.90 and dur < 1.8:
-                # Medium segments: split into 2 parts with paired flash
-                split_t = seg["start"] + dur * 0.55
-                flash_pair_dur = 0.050
-                subdivided.append({"start": seg["start"], "end": round(split_t, 3)})
-                subdivided.append({"start": round(split_t, 3), "end": round(split_t + flash_pair_dur, 3), "is_flash": True})
-                subdivided.append({"start": round(split_t + flash_pair_dur, 3), "end": seg["end"]})
-            elif dur >= 1.8:
-                # Very long segments: split into 3 parts with 2 paired flash inserts
-                third = dur / 3.0
-                flash_pair_dur = 0.050
-                t1 = seg["start"] + third
-                t2 = seg["start"] + 2 * third
-                subdivided.append({"start": seg["start"], "end": round(t1, 3)})
-                subdivided.append({"start": round(t1, 3), "end": round(t1 + flash_pair_dur, 3), "is_flash": True})
-                subdivided.append({"start": round(t1 + flash_pair_dur, 3), "end": round(t2, 3)})
-                subdivided.append({"start": round(t2, 3), "end": round(t2 + flash_pair_dur, 3), "is_flash": True})
-                subdivided.append({"start": round(t2 + flash_pair_dur, 3), "end": seg["end"]})
-            else:
-                subdivided.append(seg)
+        # No subdivision — each beat-to-beat interval is one held shot.
+        # This matches the reference's narrative pacing where scenes are 1.0-2.0s.
 
-        # Phase 3: convert to final segment list with is_drop/prev_is_drop flags
         segments = []
-        for seg in subdivided:
+        for seg in raw_segments:
             s, e = seg["start"], seg["end"]
-            if e - s < 0.015:
-                continue  # skip sub-frame segments
             is_d = s >= self.drop_time
-            is_flash = seg.get("is_flash", False)
             prev_d = segments[-1]["is_drop"] if segments else False
             segments.append({
                 "start": s,
@@ -96,10 +66,28 @@ class BeatGrid:
                 "duration": round(e - s, 3),
                 "is_drop": is_d,
                 "prev_is_drop": prev_d,
-                "is_flash": is_flash,
+                "is_flash": False,  # Flash is handled separately, not as segments
                 "index": len(segments)
             })
         return segments
+
+    def get_flash_timestamps(self, max_flashes: int = 3) -> List[float]:
+        """Returns timestamps for white flash overlays — only at the biggest beat drops.
+        Reference uses 2-3 total flashes across the entire edit, NOT constant micro-flashes.
+        Flashes are placed at the first drop hit and 1-2 major energy peaks."""
+        if not self.beat_times:
+            return []
+        # The biggest flash moment is the drop itself
+        flash_times = [self.drop_time]
+        # Add 1-2 more at musically significant intervals after the drop
+        post_drop = [t for t in self.beat_times if t > self.drop_time + 0.5]
+        if len(post_drop) >= 4:
+            # Every ~4th beat after the drop (roughly every bar)
+            for i in range(4, len(post_drop), 4):
+                if len(flash_times) >= max_flashes:
+                    break
+                flash_times.append(post_drop[i])
+        return flash_times[:max_flashes]
 
 
 def _stream_wav_from_ffmpeg(audio_path: Path, duration: float) -> Tuple[np.ndarray, int]:
@@ -225,64 +213,55 @@ def _snap_grid_to_onsets(beat_times: List[float], onset_times: List[float], bpm:
 
 def generate_procedural_beat_grid(duration: float = 35.0, drop_time: float = 6.0, bpm: float = 134.0) -> BeatGrid:
     """
-    Generates a viral 30-40s Phonk beat grid with multi-phrase velocity contrast:
-    - Buildup (0.0s to drop_time): Atmospheric cuts (1.6s - 2.0s) matching intro phrasing.
-    - First Drop (drop_time to 18.0s): High-speed sync cuts alternating between rapid 16th beats and held quarter beats.
-    - Secondary Bridge (18.0s to 22.0s): 1.2s technique charge-up breather.
-    - Second Drop / Frenzy (22.0s to 31.0s): Ultra-fast combat flashes (0.35s - 0.50s).
-    - Final Climax Outro (31.0s to duration): Powerful held finish (1.8s - 2.5s).
+    Generates a NARRATIVE-DRIVEN beat grid matching reference AMV editing style.
+
+    Reference: ~20 major segments in 23s (avg 1.15s each, range 0.5-2.0s).
+    Target: 15-20 major segments for 38s edit.
+
+    Structure:
+    - Buildup (0.0s to drop_time): ONE continuous shot (no cuts — complete dialogue).
+    - First Drop (drop_time to 18.0s): ~8 cuts at musically significant moments (every 1.5-2.0s).
+    - Bridge (18.0s to 24.0s): ~3 held emotional shots (2.0s each).
+    - Second Drop (24.0s to 32.0s): ~5 cuts (1.5s average).
+    - Final Outro (32.0s to duration): 1-2 powerful held shots (2.0-3.0s).
     """
     beat_times = []
-    beat_interval = 60.0 / bpm
-    
-    # ── Phase 1: Intro Atmospheric Dialogue Buildup ───────────────────────────
-    # In viral anime edits, the character delivers their COMPLETE iconic dialogue line
-    # (e.g. "Honored One", "Stand proud", "Hello Peter") without mid-sentence chops.
-    # We maintain ONE continuous monologue shot (or max 2 if drop_time > 6.2s).
-    if drop_time > 6.2:
-        beat_times.append(round(drop_time / 2.0, 2))
+
+    # ── Phase 1: Intro — ONE continuous monologue shot ─────────────────────────
+    # The character delivers their full iconic line without mid-sentence chops.
+    # No cuts during buildup — just one held shot until the drop.
     beat_times.append(round(drop_time, 2))
-    
-    # ── Phase 2: First Drop Frenzy (Drop to 18.0s) ────────────────────────────
+
+    # ── Phase 2: First Drop — narrative-driven cuts (~8 segments) ──────────────
+    # Cuts at every ~2nd beat (every bar), NOT every beat. ~1.8s average.
+    bar_duration = 4 * (60.0 / bpm)  # 4 beats per bar
     curr = drop_time
-    # Velocity contrast pattern: 2 fast sixteenths -> 1 held power beat -> 2 fast sixteenths -> 1 quarter beat
-    phrase2_pattern = [1.0, 1.0, 2.0, 1.0, 1.0, 1.5]
-    p_idx = 0
-    phase2_limit = min(duration - 4.0, 18.0)
-    
+    phase2_limit = min(duration - 8.0, 18.0)
     while curr < phase2_limit:
-        step_mult = phrase2_pattern[p_idx % len(phrase2_pattern)]
-        step = max(0.35, beat_interval * step_mult)
-        curr += step
-        p_idx += 1
+        curr += bar_duration * 0.9  # slightly less than a full bar for energy
         if curr < phase2_limit:
             beat_times.append(round(curr, 2))
-            
-    # ── Phase 3: Secondary Bridge & Second Drop (18.0s to 30.0s) ─────────────
+
+    # ── Phase 3: Bridge — held emotional shots (~3 segments) ───────────────────
     if duration > 24.0:
-        # Technique charge breather (1.2s - 1.5s)
-        bridge_anchor = round(min(duration - 6.0, 19.5), 2)
-        beat_times.append(bridge_anchor)
-        curr = bridge_anchor
-        
-        # Second Drop frenzy
-        phrase3_pattern = [0.8, 1.0, 0.8, 1.5, 1.0, 1.2]
-        p3_idx = 0
-        phase3_limit = min(duration - 2.5, 31.0)
-        
-        while curr < phase3_limit:
-            step_mult = phrase3_pattern[p3_idx % len(phrase3_pattern)]
-            step = max(0.32, beat_interval * step_mult)
-            curr += step
-            p3_idx += 1
-            if curr < phase3_limit:
+        bridge_start = round(min(duration - 10.0, 18.5), 2)
+        beat_times.append(bridge_start)
+        beat_times.append(round(bridge_start + 2.2, 2))  # 2.2s held shot
+        beat_times.append(round(bridge_start + 4.0, 2))  # 1.8s shot
+
+    # ── Phase 4: Second Drop — rapid but narrative cuts (~5 segments) ──────────
+    if duration > 28.0:
+        curr = beat_times[-1] if beat_times else 24.0
+        phase4_limit = min(duration - 3.0, 32.0)
+        while curr < phase4_limit:
+            curr += bar_duration * 0.75  # slightly tighter than first drop
+            if curr < phase4_limit:
                 beat_times.append(round(curr, 2))
 
-    # ── Phase 4: Final Devastation Climax Outro ──────────────────────────────
-    # Hold the ultimate final impact shot for the final 1.8s - 2.5s
-    if duration > 10.0:
-        final_cut = round(duration - 2.2, 2)
-        if final_cut > (beat_times[-1] if beat_times else 0.0) + 0.8:
+    # ── Phase 5: Final Outro — powerful held finish ────────────────────────────
+    if duration > 30.0:
+        final_cut = round(duration - 2.5, 2)
+        if final_cut > (beat_times[-1] if beat_times else 0.0) + 1.0:
             beat_times.append(final_cut)
 
     return BeatGrid(duration=duration, drop_time=drop_time, beat_times=beat_times, bpm=bpm)

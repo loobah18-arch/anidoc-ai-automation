@@ -10,6 +10,7 @@ from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, CC_PRESETS, 
 from core.beat_detector import generate_procedural_beat_grid, analyze_audio_beats
 from core.effects_engine import (
     build_cc_filter,
+    build_monochrome_cc_filter,
     build_beat_flash_filters,
     get_segment_velocity_profile,
     build_velocity_clip_filter
@@ -36,13 +37,22 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(Path(phonk_audio).exists())
 
     def test_02_beat_grid_generation(self):
-        grid = generate_procedural_beat_grid(duration=20.0, drop_time=6.0, bpm=130.0)
-        self.assertEqual(grid.duration, 20.0)
+        # Narrative pacing: a 35s edit should produce ~15-20 cuts, NOT 100+
+        grid = generate_procedural_beat_grid(duration=35.0, drop_time=6.0, bpm=130.0)
+        self.assertEqual(grid.duration, 35.0)
         self.assertEqual(grid.drop_time, 6.0)
         self.assertTrue(len(grid.beat_times) >= 10)
+        self.assertLess(len(grid.beat_times), 40, "Narrative pacing: should be ~20 cuts, not 100+")
         segments = grid.get_cut_segments()
         self.assertTrue(len(segments) >= 10)
+        self.assertLess(len(segments), 40)
         self.assertTrue(any(s["is_drop"] for s in segments))
+        # No micro-flash segments in narrative pacing
+        self.assertTrue(all(not s.get("is_flash", False) for s in segments))
+
+        # Flash timestamps are rare (max 3), not constant strobe
+        flash_times = grid.get_flash_timestamps()
+        self.assertLessEqual(len(flash_times), 3)
 
     def test_03_effects_filter_builders(self):
         marvel_cc = build_cc_filter("marvel_hdr")
@@ -53,17 +63,33 @@ class TestAniDocPipeline(unittest.TestCase):
         jjk_cc = build_cc_filter("jjk_void")
         self.assertIn("eq=contrast=", jjk_cc)
 
+        # Monochromatic modes exist and desaturate heavily
+        mono = build_monochrome_cc_filter("mono_bw")
+        self.assertIn("eq=contrast=", mono)
+
         flashes = build_beat_flash_filters([6.0, 7.5, 9.0])
         self.assertEqual(len(flashes), 3)
         self.assertIn("drawbox=", flashes[0])
 
+        # Reference style: NO velocity ramps on drop segments (straight cuts)
         vel = get_segment_velocity_profile({"is_drop": True, "duration": 1.2}, 0, 10)
-        self.assertEqual(vel["role"], "power_slowmo")
-        self.assertAlmostEqual(vel["speed"], 0.50)
+        self.assertEqual(vel["role"], "straight_cut")
+        self.assertAlmostEqual(vel["speed"], 1.0)
 
-        vf = build_velocity_clip_filter(0, 1.2, speed=vel["speed"], scale_factor=vel["scale_factor"])
-        self.assertIn("setpts=", vf)
+        # Intro (non-drop) segment gets slight slow-mo for cinematic weight
+        intro_vel = get_segment_velocity_profile({"is_drop": False, "duration": 1.2}, 0, 10)
+        self.assertEqual(intro_vel["role"], "intro_slowmo")
+        self.assertAlmostEqual(intro_vel["speed"], 0.85)
+
+        # Straight cuts should NOT have speed ramping (no *PTS multiplier)
+        vf = build_velocity_clip_filter(0, 1.2, speed=1.0, scale_factor=1.0)
+        self.assertNotIn("*PTS", vf)
+        self.assertIn("setpts=PTS-STARTPTS", vf)
         self.assertIn("trim=duration=1.200", vf)
+
+        # Slow-mo clip SHOULD have speed ramping (setpts multiplier)
+        vf_slowmo = build_velocity_clip_filter(0, 1.2, speed=0.85, scale_factor=1.02)
+        self.assertIn("*PTS", vf_slowmo)
 
     def test_04_quote_ai_metadata(self):
         yuji = generate_edit_metadata("yuji")

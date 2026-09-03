@@ -13,66 +13,45 @@ from config.settings import CC_PRESETS, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
 
 def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: int) -> Dict[str, Any]:
     """
-    Determines the musical velocity curve, slow-motion factor, zoom punch, and visual FX for a clip segment:
-    - 'intro_slowmo': 0.65x slow motion for cinematic tension & dialogue (0.0s to Drop)
-    - 'drop_snap': 1.30x explosive impact on the 808 kick + 1.18x punch zoom + white flash
-    - 'power_slowmo': 0.50x dramatic slow motion during held strikes/energy releases (dur > 0.8s)
-    - 'fast_strike': 1.25x aggressive clash on fast 16th beats (dur <= 0.5s)
-    - 'bridge_slowmo': 0.55x technique charge breather
-    - 'climax_outro': 0.60x devastating slow-mo hold into black fade
+    Determines the visual profile for a clip segment.
+
+    Reference video uses NO velocity ramps — straight hard cuts are the standard.
+    Motion comes from source footage, not speed manipulation.
+    Only two exceptions: slight intro slow-mo and held outro.
+
+    Returns speed=1.0 for all drop segments (no speed ramping).
     """
     is_drop = seg.get("is_drop", False)
     duration = seg.get("duration", 1.0)
-    
+
     if not is_drop:
-        # Phase 1: Intro Atmospheric Slow-Mo & Dialogue
+        # Phase 1: Intro — slight slow-mo for cinematic weight (reference does hold intro shots)
         return {
             "role": "intro_slowmo",
-            "speed": 0.65,
-            "scale_factor": 1.04,
+            "speed": 0.85,
+            "scale_factor": 1.02,
             "add_bars": True,
             "add_flash": False
         }
-        
+
     if seg_idx == total_segs - 1:
-        # Final Climax Outro Finisher
+        # Final Outro — held shot, slight slow-mo for dramatic weight
         return {
             "role": "climax_outro",
-            "speed": 0.60,
-            "scale_factor": 1.06,
+            "speed": 0.80,
+            "scale_factor": 1.03,
             "add_bars": False,
             "add_flash": False
         }
-        
-    # Check if this is the first drop trigger segment
-    if seg_idx > 0 and not seg.get("prev_is_drop", True):
-        return {
-            "role": "drop_snap",
-            "speed": 1.30,
-            "scale_factor": 1.18,
-            "add_bars": False,
-            "add_flash": True
-        }
-        
-    # Drop Frenzy Segments
-    if duration > 0.80:
-        # Held power attack swing / technique explosion in dramatic slow motion
-        return {
-            "role": "power_slowmo",
-            "speed": 0.50,
-            "scale_factor": 1.14,
-            "add_bars": False,
-            "add_flash": False
-        }
-    else:
-        # Fast rhythmic clash
-        return {
-            "role": "fast_strike",
-            "speed": 1.25,
-            "scale_factor": 1.08,
-            "add_bars": False,
-            "add_flash": (seg_idx % 6 == 0)
-        }
+
+    # ALL drop segments: straight cuts, no velocity ramping, no zoom punch
+    return {
+        "role": "straight_cut",
+        "speed": 1.0,
+        "scale_factor": 1.0,
+        "add_bars": False,
+        "add_flash": False
+    }
 
 
 def build_velocity_clip_filter(
@@ -86,98 +65,124 @@ def build_velocity_clip_filter(
     add_bars: bool = False
 ) -> str:
     """
-    Builds the agency-grade per-clip video filter for 60FPS viral anime edits:
-    1. Edge crop to remove potential broadcast watermarks.
-    2. Aspect ratio fit & center crop for 1080x1080 1:1 square canvas.
-    3. Twixtor-style speed ramp with frame-blending motion blur on slow-mo (speed < 0.8x).
-    4. Continuous animated dynamic zoom punch (zooms in to 1.25x and eases down on impact).
-    5. 60 FPS & SAR normalization.
-    6. Exact duration trimming to lock zero-drift beat sync.
+    Builds the per-clip video filter chain for portrait 9:16 anime edits.
+    Reference style: straight hard cuts, no velocity ramps, no zoom punches.
+    Motion comes from source footage, not speed manipulation.
+
+    Only exceptions: slight slow-mo on intro/outro (speed 0.80-0.85x) with
+    light frame blending. All drop segments use speed=1.0.
     """
-    pts_mult = 1.0 / max(0.2, speed)
     filters = [
-        # Watermark-free edge crop
-        "crop=in_w-24:in_h-24:12:12",
-        # Fit to 1:1 square canvas
+        # Scale to 9:16 portrait canvas
         f"scale={video_width}:{video_height}:force_original_aspect_ratio=increase",
         f"crop={video_width}:{video_height}",
-        # Velocity speed ramp
-        f"setpts={pts_mult:.4f}*PTS",
+        f"fps={fps}",
+        "setsar=1",
     ]
 
-    # Apply frame blending motion blur on slow-motion clips (Twixtor-style)
-    if speed < 0.80:
-        filters.append("tblend=all_mode=average")
+    # Only apply speed ramp for intro/outro slow-mo (not for drop segments)
+    if speed < 0.95:
+        pts_mult = 1.0 / max(0.2, speed)
+        filters.append(f"setpts={pts_mult:.4f}*PTS")
+        # Light frame blending for slow-mo smoothness
+        if speed < 0.82:
+            filters.append("tblend=all_mode=average")
 
-    # Animated Dynamic Zoom Punch (Continuous ease-down from punch scale to 1.0x over first 14 frames @ 60fps)
-    if scale_factor > 1.05:
+    # Subtle zoom for intro (1.02x, barely noticeable but adds weight)
+    if scale_factor > 1.01 and scale_factor <= 1.05:
         punch_delta = scale_factor - 1.0
-        punch_frames = 14 if fps >= 50 else 8
-        zoom_expr = f"if(lte(in,{punch_frames}),{scale_factor:.2f}-{punch_delta:.2f}*(in/{punch_frames}),1.0)"
+        punch_frames = 20
+        zoom_expr = f"if(lte(in,{punch_frames}),{scale_factor:.3f}-{punch_delta:.3f}*(in/{punch_frames}),1.0)"
         filters.append(
             f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
         )
-    else:
-        filters.append(f"fps={fps}")
 
     filters.extend([
-        "setsar=1",
         f"trim=duration={duration:.3f}",
         "setpts=PTS-STARTPTS"
     ])
 
     if add_bars:
-        # Cinematic 2.39:1 letterbox bars on intro (100px top and bottom on 1080x1080)
-        bar_h = 100
+        # Cinematic letterbox bars — 12.5% of frame height (matching reference ~80px on 640h)
+        bar_h = max(60, int(video_height * 0.125))
         filters.append(f"drawbox=x=0:y=0:w=iw:h={bar_h}:color=black:t=fill")
         filters.append(f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black:t=fill")
 
     return ",".join(filters)
 
 
-def build_cc_filter(preset_name: str = "marvel_hdr") -> str:
+def build_cc_filter(preset_name: str = "cool_blue") -> str:
     """
-    Builds the 4K HDR Color Grade filtergraph snippet.
-    Includes contrast expansion, saturation boost, unsharp masking, and cinematic vignette.
+    Builds the dark, moody color grade filtergraph snippet.
+    Targets mean luma ~25-40 (reference style) — very dark with muted saturation.
+
+    Now supports colorbalance field for dual-tone blue/red alternation.
     """
-    cfg = CC_PRESETS.get(preset_name, CC_PRESETS["marvel_hdr"])
+    cfg = CC_PRESETS.get(preset_name, CC_PRESETS["cool_blue"])
     eq_part = f"eq=contrast={cfg['contrast']}:brightness={cfg['brightness']}:saturation={cfg['saturation']}:gamma={cfg['gamma']}"
     unsharp_part = f"unsharp={cfg['unsharp']}"
     vignette_part = f"vignette={cfg['vignette']}"
-    # Colorlevels expansion for crushed blacks and crisp highlight contrast
-    levels_part = "colorlevels=rimin=0.03:gimin=0.03:bimin=0.03:rimax=0.98:gimax=0.98:bimax=0.98"
-    # Film grain texture — heavy like reference (c0s=18 for visible grain)
-    grain_part = "noise=c0s=18:allf=t+u"
-    return f"{eq_part},{levels_part},{unsharp_part},{vignette_part},{grain_part}"
+    # Crushed blacks + clipped highlights for high-contrast moody look
+    levels_part = "colorlevels=rimin=0.05:gimin=0.05:bimin=0.05:rimax=0.96:gimax=0.96:bimax=0.96"
+    # Lighter grain (c0s=12) — visible but not heavy
+    grain_part = "noise=c0s=12:allf=t+u"
+
+    parts = [eq_part, levels_part]
+    if cfg.get("colorbalance"):
+        parts.append(f"colorbalance={cfg['colorbalance']}")
+    parts.extend([unsharp_part, vignette_part, grain_part])
+    return ",".join(parts)
 
 
-def build_monochrome_cc_filter(preset_name: str = "jjk_void") -> str:
+def build_monochrome_cc_filter(preset_name: str = "mono_bw") -> str:
     """
-    Builds a heavy-desaturation / near-monochrome grade with selective color pop.
-    Matches the viral Gojo reference style: almost B&W with a hint of character color in shadows.
+    Builds extreme monochromatic treatments matching the reference's 3 modes:
+    - 'mono_blue': Cold blue desaturation (character moments)
+    - 'mono_white': High-key washed-out pale (dreamlike transitions)
+    - 'mono_bw': High-contrast B&W (manga-panel power moments)
+
+    Each mode uses the full CC_PRESETS config for that monochrome variant.
     """
-    cfg = CC_PRESETS.get(preset_name, CC_PRESETS["jjk_void"])
-    # Desaturate heavily (0.18 = 18% of original saturation)
-    eq_part = f"eq=contrast={cfg['contrast'] + 0.12}:brightness={cfg['brightness'] - 0.01}:saturation=0.18:gamma={cfg['gamma'] - 0.04}"
+    cfg = CC_PRESETS.get(preset_name, CC_PRESETS["mono_bw"])
+
+    eq_part = f"eq=contrast={cfg['contrast']}:brightness={cfg['brightness']}:saturation={cfg['saturation']}:gamma={cfg['gamma']}"
     levels_part = "colorlevels=rimin=0.05:gimin=0.05:bimin=0.05:rimax=0.96:gimax=0.96:bimax=0.96"
     unsharp_part = f"unsharp={cfg['unsharp']}"
-    vignette_part = f"vignette=PI/3.2"
-    grain_part = "noise=c0s=18:allf=t+u"
-    return f"{eq_part},{levels_part},{unsharp_part},{vignette_part},{grain_part}"
+    vignette_part = f"vignette={cfg['vignette']}"
+    grain_part = "noise=c0s=14:allf=t+u"
+
+    parts = [eq_part, levels_part]
+    if cfg.get("colorbalance"):
+        parts.append(f"colorbalance={cfg['colorbalance']}")
+    parts.extend([unsharp_part, vignette_part, grain_part])
+    return ",".join(parts)
 
 
-def build_beat_flash_filters(beat_timestamps: List[float], flash_duration: float = 0.09, opacity: float = 0.60) -> List[str]:
+def build_beat_flash_filters(beat_timestamps: List[float], flash_duration: float = 0.12, opacity: float = 0.70) -> List[str]:
     """
-    Builds energetic white screen burst flash overlays timed to heavy bass drops.
-    Reference edit uses frequent strobe flashes at 0.35s minimum spacing.
+    Builds white flash overlays — ONLY at the 2-3 biggest drop moments.
+    Reference edit has 2-3 total flashes across the entire video.
+    Uses the FIRST and LAST few beat timestamps as the major energy peaks.
     """
+    if not beat_timestamps:
+        return []
+
     flash_filters = []
-    # Add flashes on downbeats (spaced by at least 0.35s to match viral reference edit strobe density)
-    last_flash = -10.0
-    for t in beat_timestamps:
-        if t - last_flash >= 0.35:
-            cond = f"between(t,{t:.2f},{t+flash_duration:.2f})"
-            flash_filters.append(f"drawbox=x=0:y=0:w=iw:h=ih:color=white@{opacity}:t=fill:enable='{cond}'")
-            last_flash = t
+    # Pick only2-3 timestamps: the first drop moment, one mid-point, one near the end
+    n = len(beat_timestamps)
+    if n <= 3:
+        flash_times = beat_timestamps
+    else:
+        flash_times = [
+            beat_timestamps[0],                    # First drop hit
+            beat_timestamps[n // 2],               # Mid-energy peak
+            beat_timestamps[min(n - 2, n * 3 // 4)]  # Late climax
+        ]
+
+    for t in flash_times:
+        cond = f"between(t,{t:.2f},{t + flash_duration:.2f})"
+        flash_filters.append(
+            f"drawbox=x=0:y=0:w=iw:h=ih:color=white@{opacity}:t=fill:enable='{cond}'"
+        )
     return flash_filters
 

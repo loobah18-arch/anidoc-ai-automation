@@ -24,7 +24,8 @@ from typing import Dict, Any, List, Optional
 
 from config.settings import (
     OUTPUT_DIR, SCRATCH_DIR, PHONK_DIR,
-    VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS
+    VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS,
+    LETTERBOX_BAR_HEIGHT, CHARACTER_COLOR_MAP
 )
 from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
@@ -44,6 +45,7 @@ from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PR
 from core.quote_ai import generate_edit_metadata
 from core.opencut_engine import build_clip_audio_fade
 from core.smart_downloader import smart_fetch_clips
+from core.text_overlay import generate_edit_text_overlays
 
 
 def generate_fallback_phonk_audio(duration: float, output_path: Path) -> Path:
@@ -62,27 +64,6 @@ def generate_fallback_phonk_audio(duration: float, output_path: Path) -> Path:
         "-c:a", "aac",
         "-b:a", "192k",
         "-t", dur_str,
-        str(output_path)
-    ]
-    subprocess.run(cmd, capture_output=True, check=True)
-    return output_path
-
-
-def _generate_white_flash_clip(duration: float, output_path: Path) -> Path:
-    """
-    Generates a 1-2 frame solid white video clip with silent audio for micro-flash inserts.
-    Used between subdivided segments to replicate the strobe flash-cut style.
-    """
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    dur_str = f"{duration:.3f}"
-    cmd = [
-        "ffmpeg", "-y",
-        "-f", "lavfi", "-i", f"color=c=white:s={VIDEO_WIDTH}x{VIDEO_HEIGHT}:r={FPS}:d={dur_str}",
-        "-f", "lavfi", "-i", f"anullsrc=r=48000:cl=stereo",
-        "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
-        "-c:a", "aac", "-b:a", "128k",
-        "-t", dur_str,
-        "-shortest",
         str(output_path)
     ]
     subprocess.run(cmd, capture_output=True, check=True)
@@ -243,19 +224,9 @@ def render_cinematic_edit(
     if not clip_paths:
         raise RuntimeError("No clips available after all download attempts.")
 
-    # ── Insert micro-flash clips for flash segments ──────────────────────────
-    flash_clip_dir = SCRATCH_DIR / "flash_inserts"
-    flash_clip_dir.mkdir(parents=True, exist_ok=True)
-    for idx, seg in enumerate(segments):
-        if seg.get("is_flash", False):
-            flash_path = flash_clip_dir / f"flash_{idx:03d}_{seg['duration']:.3f}s.mp4"
-            _generate_white_flash_clip(seg["duration"], flash_path)
-            if idx < len(clip_paths):
-                clip_paths[idx] = flash_path
-            else:
-                clip_paths.append(flash_path)
-    print(f"⚡ Flash inserts: {sum(1 for s in segments if s.get('is_flash'))} micro-flash cuts added")
-    
+    # Micro-flash inserts REMOVED — reference uses rare flashes as overlays, not segments.
+    # Flashes are handled via build_beat_flash_filters (2-3 total per edit) as overlays.
+
     # 5. Optional Kinetic Karaoke Subtitles (Safe-Zone Alignment)
     ass_path = None
     active_cc = cc_preset or theme["cc_preset"]
@@ -290,64 +261,57 @@ def render_cinematic_edit(
     concat_v_inputs = []
     concat_a_inputs = []
 
-    # Color grading alternation: cycle through presets to match reference
-    # Reference alternates: blue tint → warm/sepia → monochrome → blue → warm → etc.
-    cc_preset_cycle = [active_cc, "sukuna_shrine", active_cc]
-    mono_preset = "jjk_void"  # monochrome preset for near-B&W segments
+    # Character-driven dual-tone color grading (matches reference's emotion-based
+    # cool-blue ↔ warm-red alternation + 3 monochromatic modes).
+    # Each character has a primary tone + energy color (from CHARACTER_COLOR_MAP).
+    char_colors = CHARACTER_COLOR_MAP.get(character_key, CHARACTER_COLOR_MAP["gojo"])
+    primary_tone = char_colors["primary"]           # e.g. "cool_blue"
+    energy_tone = char_colors["energy"]             # e.g. "yuji_cyan"
+    secondary_tone = "warm_red" if primary_tone == "cool_blue" else "cool_blue"
+    mono_modes = ["mono_bw", "mono_blue", "mono_white"]
 
     # Build per-clip video filters with velocity curves & per-segment color grading
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
-        is_flash = seg.get("is_flash", False)
+        vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
+        clip_vf = build_velocity_clip_filter(
+            seg_idx=idx,
+            duration=seg["duration"],
+            speed=vel_profile["speed"],
+            scale_factor=vel_profile["scale_factor"],
+            video_width=VIDEO_WIDTH,
+            video_height=VIDEO_HEIGHT,
+            fps=FPS,
+            add_bars=vel_profile.get("add_bars", False)
+        )
 
-        if is_flash:
-            # Flash insert: simple white solid — no velocity/zoom/CC processing
-            clip_vf = (
-                f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},"
-                f"fps={FPS},setsar=1,"
-                f"trim=duration={seg['duration']:.3f},setpts=PTS-STARTPTS"
-            )
+        # ── Emotion-based dual-tone grading ──
+        # Every 7th segment gets a monochromatic mode (blue/white/B&W dramatic break).
+        # Odd/even segments alternate primary ↔ secondary dual-tone.
+        # The drop segment gets the character's energy color.
+        if idx % 7 == 0:
+            clip_cc = build_monochrome_cc_filter(mono_modes[(idx // 7) % len(mono_modes)])
+        elif seg.get("is_drop") and idx > 0 and not seg.get("prev_is_drop"):
+            # First drop hit — character energy color for intensity
+            clip_cc = build_cc_filter(energy_tone)
+        elif idx % 2 == 0:
+            clip_cc = build_cc_filter(primary_tone)
         else:
-            vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
-            clip_vf = build_velocity_clip_filter(
-                seg_idx=idx,
-                duration=seg["duration"],
-                speed=vel_profile["speed"],
-                scale_factor=vel_profile["scale_factor"],
-                video_width=VIDEO_WIDTH,
-                video_height=VIDEO_HEIGHT,
-                fps=FPS,
-                add_bars=vel_profile.get("add_bars", False)
-            )
-            # Per-segment color grading alternation
-            # Every 4th segment gets monochrome, odd/even cycle between main and warm preset
-            non_flash_idx = sum(1 for s in segments[:idx+1] if not s.get("is_flash"))
-            if non_flash_idx % 7 == 0:
-                clip_cc = build_monochrome_cc_filter(mono_preset)
-            elif non_flash_idx % 2 == 0:
-                clip_cc = build_cc_filter(cc_preset_cycle[1])  # warm/sukuna
-            else:
-                clip_cc = build_cc_filter(cc_preset_cycle[0])  # main/jjk_void
-            clip_vf = f"{clip_vf},{clip_cc}"
+            clip_cc = build_cc_filter(secondary_tone)
+        clip_vf = f"{clip_vf},{clip_cc}"
 
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
 
-        # Clip audio fades + extraction (flash segments get near-silent audio)
-        if is_flash:
+        # Clip audio fades + extraction (all segments use source audio)
+        audio_fade = build_clip_audio_fade(seg["duration"])
+        if has_aud:
             a_chain = (
                 f"[{idx}:a]atrim=duration={seg['duration']:.3f},asetpts=PTS-STARTPTS,"
-                f"volume=0.08,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+                f"{audio_fade},volume=1.60,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
             )
         else:
-            audio_fade = build_clip_audio_fade(seg["duration"])
-            if has_aud:
-                a_chain = (
-                    f"[{idx}:a]atrim=duration={seg['duration']:.3f},asetpts=PTS-STARTPTS,"
-                    f"{audio_fade},volume=1.60,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
-                )
-            else:
-                a_chain = f"aevalsrc=0:d={seg['duration']:.3f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+            a_chain = f"aevalsrc=0:d={seg['duration']:.3f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
 
@@ -373,15 +337,30 @@ def render_cinematic_edit(
     else:
         sub_filter = ""
     
-    # Video Post-processing (Concatenated + Flash + Letterbox bars)
-    # CC is already applied per-clip above — only flash overlays + letterbox remain here
-    # Letterbox: 60px black bars top + bottom for cinematic reference edit look
+    # Video Post-processing (Concatenated + Flash + Letterbox bars + Text overlays)
+    # CC is already applied per-clip above — flash overlays + letterbox + text remain here.
+    # Letterbox: 12.5% bars top + bottom for cinematic reference edit look.
     letterbox_filter = (
-        "drawbox=x=0:y=0:w=iw:h=60:color=black:t=fill,"
-        "drawbox=x=0:y=ih-60:w=iw:h=60:color=black:t=fill"
+        f"drawbox=x=0:y=0:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill,"
+        f"drawbox=x=0:y=ih-{LETTERBOX_BAR_HEIGHT}:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill"
     )
+
+    # Multi-style text overlays (title cards, dialogue, Roman numerals, bg text)
+    text_overlay_str = generate_edit_text_overlays(
+        character_key=character_key,
+        quote_text=quote_text,
+        beat_times=beat_grid.beat_times,
+        drop_time=drop_t,
+        total_duration=beat_grid.duration,
+        character_colors=char_colors
+    )
+    if text_overlay_str and text_overlay_str != "null":
+        text_chain = f",{text_overlay_str}"
+    else:
+        text_chain = ""
+
     filter_chains.append(
-        f"[concatenated_v]{flash_str},{letterbox_filter}{sub_filter}[vout]"
+        f"[concatenated_v]{flash_str},{letterbox_filter}{sub_filter}{text_chain}[vout]"
     )
     
     # Audio Dynamic Structure:
