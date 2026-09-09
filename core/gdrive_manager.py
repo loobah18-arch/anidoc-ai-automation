@@ -463,8 +463,8 @@ def slice_action_moments_from_source(
             "-i", str(video_path),
         ] + eng_audio_map + [
             "-vf", (
-                f"crop=in_h:in_h:(in_w-in_h)/2:0,"
-                f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT},"
+                f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=decrease:flags=lanczos,"
+                f"pad={VIDEO_WIDTH}:{VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2:color=black,"
                 f"setsar=1,fps={FPS}"
             ),
             "-c:v", "libx264",

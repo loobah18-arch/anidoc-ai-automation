@@ -20,3 +20,8 @@ temp/
 
 # Dynamic runtime state files
 rotation_state.json
+
+# Local agent session runs and goals
+.omo/
+.opencode/
+

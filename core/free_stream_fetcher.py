@@ -175,7 +175,7 @@ def _try_ytdlp_download(
     url: str,
     output_path: Path,
     max_duration: int = 300,
-    timeout: int = 120
+    timeout: int = 15
 ) -> Optional[Path]:
     """
     Attempt to download a video URL with yt-dlp.

@@ -73,9 +73,10 @@ def build_velocity_clip_filter(
     light frame blending. All drop segments use speed=1.0.
     """
     filters = [
-        # Scale to 9:16 portrait canvas
-        f"scale={video_width}:{video_height}:force_original_aspect_ratio=increase",
-        f"crop={video_width}:{video_height}",
+        # Scale preserving original aspect ratio (16:9 or square) without cropping,
+        # then center in 1080x1920 portrait canvas with deep black letterbox bars (matches lX7bIlY_KEE & MRurnn3AxyA)
+        f"scale={video_width}:{video_height}:force_original_aspect_ratio=decrease:flags=lanczos",
+        f"pad={video_width}:{video_height}:(ow-iw)/2:(oh-ih)/2:color=black",
         f"fps={fps}",
         "setsar=1",
     ]

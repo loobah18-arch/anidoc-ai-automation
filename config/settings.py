@@ -23,14 +23,53 @@ SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 VIDEO_WIDTH = 1080
 VIDEO_HEIGHT = 1920
 FPS = 24  # Source anime is 24fps — no need to upscale framerate
-DEFAULT_DURATION = 38.0  # Optimal high-retention 35-40s range matching reference edits
+DEFAULT_DURATION = 18.0  # Optimal high-retention 15-22s range matching reference edits (16.8s, 14.6s, 23.3s)
 
-# Cinematic letterbox: ~12.5% of frame height per bar (reference uses ~80px on 640h = 12.5%)
-LETTERBOX_BAR_HEIGHT = 240  # 240px on 1920h = 12.5%
+# Cinematic letterbox: 16:9 widescreen centered in 9:16 vertical canvas (matches lX7bIlY_KEE & MRurnn3AxyA)
+# Active 16:9 video is 1080x608, top bar 656px, bottom bar 656px (34.1% of frame height each)
+FRAMING_MODE = "cinematic_widescreen"  # "cinematic_widescreen" (16:9 centered) or "square_centered" (1:1 centered)
+LETTERBOX_TOP_BAR = 656
+LETTERBOX_BOT_BAR = 656
+ACTIVE_FRAME_HEIGHT = 608
+LETTERBOX_BAR_HEIGHT = 656  # Backwards compatibility
 
 # Color Grading (CC) Presets — DARK, moody, reference-matched (mean luma ~25-40)
 # Reference style: muted saturation (0.10-0.40), crushed blacks, high contrast
 CC_PRESETS = {
+    # ── Reference-Matched Unified Cinematic Presets ──
+    "jjk_cinematic_dark": {
+        "contrast": 1.35,
+        "brightness": -0.06,
+        "saturation": 0.70,
+        "gamma": 0.85,
+        "colorbalance": "rs=-0.12:gs=0.04:bs=0.18:rm=-0.06:gm=0.02:bm=0.12",
+        "unsharp": "5:5:1.2:5:5:0.0",
+        "vignette": "PI/3.8",
+        "primary_color": "&H00D2FF00",  # Cyan
+        "accent_color": "#00D2FF"
+    },
+    "daylight_glow": {
+        "contrast": 1.32,
+        "brightness": -0.03,
+        "saturation": 0.80,
+        "gamma": 0.90,
+        "colorbalance": "rs=0.05:gs=-0.02:bs=0.10:rm=0.03:gm=-0.01:bm=0.08",
+        "unsharp": "5:5:1.1:5:5:0.0",
+        "vignette": "PI/4.2",
+        "primary_color": "&H00FFFFFF",
+        "accent_color": "#FFFFFF"
+    },
+    "sukuna_crimson": {
+        "contrast": 1.38,
+        "brightness": -0.07,
+        "saturation": 0.75,
+        "gamma": 0.84,
+        "colorbalance": "rs=0.22:gs=-0.06:bs=-0.14:rm=0.15:gm=-0.04:bm=-0.08",
+        "unsharp": "5:5:1.3:5:5:0.0",
+        "vignette": "PI/3.6",
+        "primary_color": "&H003333FF",
+        "accent_color": "#FF2233"
+    },
     # ── Primary dual-tone presets (cool blue ↔ warm red alternation) ──
     "cool_blue": {
         "contrast": 1.40,

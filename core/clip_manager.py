@@ -216,46 +216,43 @@ def get_character_scene_clips(
             clip_paths.append(out_p)
         return clip_paths
     
-    # Split into intro (calm) and action (drop) pools
-    intro_pool = [c for c in raw_clips if raw_clips.index(c) < min(4, len(raw_clips))]
-    action_pool = raw_clips[min(3, len(raw_clips) - 1):] if len(raw_clips) > 3 else raw_clips[:]
-    
-    # Shuffle both pools independently for max variety
-    random.shuffle(intro_pool)
-    random.shuffle(action_pool)
-    
-    if not intro_pool:
-        intro_pool = raw_clips[:]
-    if not action_pool:
-        action_pool = raw_clips[:]
+    # ── Thematic Narrative Arc Sequencing (matches reference edit storytelling) ──
+    # Act 1: Intro shots (setup, walking, stare, dialogue) from early clips
+    # Act 2: Combat cuts (escalating clashes, technique trades) from middle clips
+    # Act 3: Climax Finisher (ultimate strike, domain expansion, finishing hit) from peak clip
+    n_intro = sum(1 for f in is_drop_flags if not f)
+
+    if len(raw_clips) >= n_segs:
+        intro_clips = raw_clips[:n_intro]
+        action_clips = raw_clips[n_intro:n_segs - 1] if n_segs > n_intro + 1 else raw_clips[n_intro:]
+        finisher_clip = raw_clips[-1]
+    else:
+        intro_split = max(1, min(len(raw_clips) // 3, n_intro))
+        intro_clips = raw_clips[:intro_split]
+        action_clips = raw_clips[intro_split:] if len(raw_clips) > intro_split else raw_clips[:]
+        finisher_clip = raw_clips[-1]
+
+    if not intro_clips:
+        intro_clips = raw_clips[:]
+    if not action_clips:
+        action_clips = raw_clips[:]
 
     clip_paths = []
-    action_idx = 0
-    intro_idx = 0
-    last_clip = None
+    action_i = 0
+    intro_i = 0
 
     for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):
         if not is_drop:
-            # Intro shots: pick from intro pool, no consecutive repeats
-            pool = intro_pool
-            candidate = pool[intro_idx % len(pool)]
-            intro_idx += 1
-            # Skip if same as last clip and we have options
-            if candidate == last_clip and len(pool) > 1:
-                candidate = pool[intro_idx % len(pool)]
-                intro_idx += 1
+            clip = intro_clips[intro_i % len(intro_clips)]
+            intro_i += 1
+        elif idx == n_segs - 1:
+            clip = finisher_clip
         else:
-            # Drop/action shots: pick from action pool
-            pool = action_pool
-            candidate = pool[action_idx % len(pool)]
-            action_idx += 1
-            if candidate == last_clip and len(pool) > 1:
-                candidate = pool[action_idx % len(pool)]
-                action_idx += 1
+            clip = action_clips[action_i % len(action_clips)]
+            action_i += 1
 
-        clip_paths.append(candidate)
-        last_clip = candidate
-            
+        clip_paths.append(clip)
+
     return clip_paths
 
 

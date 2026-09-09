@@ -25,7 +25,7 @@ from typing import Dict, Any, List, Optional
 from config.settings import (
     OUTPUT_DIR, SCRATCH_DIR, PHONK_DIR,
     VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS,
-    LETTERBOX_BAR_HEIGHT, CHARACTER_COLOR_MAP
+    LETTERBOX_BAR_HEIGHT, CHARACTER_COLOR_MAP, DEFAULT_DURATION
 )
 from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
@@ -75,7 +75,7 @@ def render_cinematic_edit(
     audio_path: Optional[Path] = None,
     phonk_track: Optional[str] = None,
     output_path: Optional[Path] = None,
-    target_duration: float = 38.0,
+    target_duration: float = DEFAULT_DURATION,
     subtitle_style: str = "viral_karaoke",
     burn_subtitles: bool = False,
     custom_quote: Optional[str] = None,
@@ -137,9 +137,24 @@ def render_cinematic_edit(
     universe_dir.mkdir(parents=True, exist_ok=True)
     clip_paths = []
 
-    # ── TIER 0: Google Drive Personal Uploads (Raw 1080p/4K Movies & Series) ──
+    # ── TIER 0: Local Footage (already downloaded/sliced in scratch or assets) ──
+    if not force_refresh:
+        assets_char_dir = Path("assets/video") / theme.get("universe", "jjk")
+        local_cand = (
+            sorted(list(universe_dir.glob(f"*{character_key}*.mp4")), key=lambda p: p.name) +
+            sorted(list(assets_char_dir.glob(f"*{character_key}*.mp4")), key=lambda p: p.name)
+        )
+        seen_loc = set()
+        for lp in local_cand:
+            if lp.exists() and lp.stat().st_size > 20_000 and str(lp) not in seen_loc:
+                seen_loc.add(str(lp))
+                clip_paths.append(lp)
+        if len(clip_paths) >= n_clips:
+            print(f"🎬 [LocalClips] Using {len(clip_paths)} high-definition action clips locally for '{character_key}'.")
+
+    # ── TIER 1: Google Drive Personal Uploads (Raw 1080p/4K Movies & Series) ──
     gdrive_target = gdrive_folder or os.environ.get("GDRIVE_FOLDER_URL") or os.environ.get("GDRIVE_URL")
-    if gdrive_target:
+    if gdrive_target and len(clip_paths) < n_clips:
         print(f"📥 [GoogleDrive] Fetching uncompressed footage from Google Drive for '{character_key}'...")
         try:
             gdrive_clips = fetch_and_prepare_gdrive_footage(
@@ -154,9 +169,8 @@ def render_cinematic_edit(
         except Exception as e:
             print(f"⚠️  [GoogleDrive] Extraction failed: {e}")
 
-    # ── TIER 1: Free stream fetcher (anime sites + VidSrc movies) ──────────
-    # Used if Google Drive is not provided or didn't yield enough clips
-    if len(clip_paths) < n_clips:
+    # ── TIER 2: Free stream fetcher (anime sites + VidSrc movies) ──────────
+    if len(clip_paths) < n_clips and auto_fetch_clips and force_refresh:
         print(f"🌐 [FreeStream] Fetching real footage for '{character_key}'...")
         try:
             stream_clips = fetch_free_stream_clips(
@@ -170,7 +184,7 @@ def render_cinematic_edit(
         except Exception as e:
             print(f"⚠️  [FreeStream] Failed: {e}")
 
-    # ── TIER 2: BestMoments (YouTube scenepack download) ───────────────────
+    # ── TIER 3: BestMoments (YouTube scenepack download) ───────────────────
     if len(clip_paths) < n_clips and force_refresh:
         print(f"📺 [BestMoments] Trying YouTube scenepack for '{character_key}'...")
         try:
@@ -185,23 +199,8 @@ def render_cinematic_edit(
         except Exception as e:
             print(f"⚠️  [BestMoments] Failed: {e}")
 
-    # ── TIER 3: SmartDownloader + ClipManager (archive / procedural) ───────
+    # ── TIER 4: SmartDownloader + ClipManager (archive / procedural fallback) ──
     if len(clip_paths) < n_clips:
-        existing_count = len(list(universe_dir.glob(f"{character_key}*.mp4")))
-        if force_refresh or existing_count < 4:
-            print(f"🗂️  [SmartDownloader] Last-resort fallback for '{character_key}'...")
-            try:
-                smart_fetch_clips(
-                    character_key=character_key,
-                    universe_dir=universe_dir,
-                    max_clips=n_clips + 4,
-                    use_archive=True,
-                    use_pixabay=True,
-                    use_pexels=True
-                )
-            except Exception as e:
-                print(f"⚠️  [SmartDownloader] Failed: {e}")
-
         remaining = n_clips - len(clip_paths)
         if remaining > 0:
             extra = get_character_scene_clips(
@@ -214,10 +213,34 @@ def render_cinematic_edit(
             )
             clip_paths.extend(extra)
 
-    # ── Normalise clip list to exactly n_clips ──────────────────────────────
-    if len(clip_paths) > n_clips:
-        clip_paths = clip_paths[:n_clips]
-    elif clip_paths and len(clip_paths) < n_clips:
+    # ── Thematic Narrative Arc Sequencing (Storytelling flow) ──
+    # Sort and map clips according to the 3-act structure:
+    # 1. Setup / Monologue intro (first clip)
+    # 2. Escalating combat exchanges (middle clips in chronological order)
+    # 3. Ultimate technique climax finisher (highest energy / final clip)
+    if len(clip_paths) >= n_clips:
+        n_intro = sum(1 for f in drop_flags if not f)
+        intro_c = clip_paths[:n_intro] if n_intro > 0 else [clip_paths[0]]
+        combat_c = clip_paths[n_intro:n_clips - 1] if n_clips > n_intro + 1 else clip_paths[n_intro:]
+        finisher_c = clip_paths[-1]
+
+        if not combat_c:
+            combat_c = clip_paths[:]
+
+        ordered_clips = []
+        c_i = 0
+        in_i = 0
+        for idx, (dur, is_d) in enumerate(zip(durations, drop_flags)):
+            if not is_d:
+                ordered_clips.append(intro_c[in_i % len(intro_c)])
+                in_i += 1
+            elif idx == n_clips - 1:
+                ordered_clips.append(finisher_c)
+            else:
+                ordered_clips.append(combat_c[c_i % len(combat_c)])
+                c_i += 1
+        clip_paths = ordered_clips
+    elif clip_paths:
         while len(clip_paths) < n_clips:
             clip_paths.append(clip_paths[len(clip_paths) % len(clip_paths)])
 
@@ -284,19 +307,14 @@ def render_cinematic_edit(
             add_bars=vel_profile.get("add_bars", False)
         )
 
-        # ── Emotion-based dual-tone grading ──
-        # Every 7th segment gets a monochromatic mode (blue/white/B&W dramatic break).
-        # Odd/even segments alternate primary ↔ secondary dual-tone.
-        # The drop segment gets the character's energy color.
-        if idx % 7 == 0:
-            clip_cc = build_monochrome_cc_filter(mono_modes[(idx // 7) % len(mono_modes)])
-        elif seg.get("is_drop") and idx > 0 and not seg.get("prev_is_drop"):
-            # First drop hit — character energy color for intensity
-            clip_cc = build_cc_filter(energy_tone)
-        elif idx % 2 == 0:
-            clip_cc = build_cc_filter(primary_tone)
+        # ── Unified Cinematic Color Grade (matches reference edits lX7bIlY_KEE & MRurnn3AxyA) ──
+        # Single cohesive grade across the entire edit prevents disorienting color-switching.
+        # Rare dramatic monochromatic B&W accent only at high-energy power climax (e.g. Black Flash).
+        is_climax_moment = (idx == len(segments) - 2 and seg.get("is_drop") and len(segments) > 4)
+        if is_climax_moment and character_key in ["yuji", "sukuna"]:
+            clip_cc = build_monochrome_cc_filter("mono_bw")
         else:
-            clip_cc = build_cc_filter(secondary_tone)
+            clip_cc = build_cc_filter(active_cc)
         clip_vf = f"{clip_vf},{clip_cc}"
 
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
@@ -308,7 +326,7 @@ def render_cinematic_edit(
         if has_aud:
             a_chain = (
                 f"[{idx}:a]atrim=duration={seg['duration']:.3f},asetpts=PTS-STARTPTS,"
-                f"{audio_fade},volume=1.60,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+                f"{audio_fade},volume=1.00,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
             )
         else:
             a_chain = f"aevalsrc=0:d={seg['duration']:.3f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
@@ -324,7 +342,7 @@ def render_cinematic_edit(
     filter_chains.append(concat_a_str)
     
     # Impact White Flashes on Beat Drops
-    flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.09, opacity=0.60)
+    flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.08, opacity=0.75)
     flash_str = ",".join(flash_filters) if flash_filters else "null"
     
     # 4K HDR Color Grade (CC Preset with S-curve colorlevels)
@@ -365,17 +383,17 @@ def render_cinematic_edit(
     
     # Audio Dynamic Structure:
     # 70% Phonk BGM / 30% Original Anime/Movie Voice & SFX
-    # Track 1: Real clip audio (Voice/SFX) — 30% weight
-    # Track 2: Phonk BGM (Aura Phonk) — 70% weight
+    # Track 1: Real clip audio (Voice/SFX) — clear dialogue in intro, punchy combat SFX in drop
+    # Track 2: Music BGM — atmospheric lowpass in intro, explosive drop at full volume
     # Master: loudnorm to -12 dB (commercial streaming loudness)
     filter_chains.append(
         f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in];"
-        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=0.30[csfx_intro];"
-        f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.50[csfx_drop];"
+        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=0.85[csfx_intro];"
+        f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.45[csfx_drop];"
         f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full];"
         f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
-        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=1000,volume=0.45[p_intro];"
-        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.35[p_drop];"
+        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=800,volume=0.35[p_intro];"
+        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.30[p_drop];"
         f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
         f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:weights=7 3:dropout_transition=2,"
         f"volume=1.30,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"

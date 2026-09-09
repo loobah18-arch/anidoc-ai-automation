@@ -19,7 +19,7 @@ from typing import List, Dict, Any, Optional, Tuple
 import numpy as np
 from scipy.signal import butter, sosfilt, correlate
 
-from config.settings import SCRATCH_DIR
+from config.settings import SCRATCH_DIR, DEFAULT_DURATION
 from core.phonk_manager import POPULAR_PHONK_CATALOG
 
 
@@ -211,63 +211,48 @@ def _snap_grid_to_onsets(beat_times: List[float], onset_times: List[float], bpm:
     return snapped
 
 
-def generate_procedural_beat_grid(duration: float = 35.0, drop_time: float = 6.0, bpm: float = 134.0) -> BeatGrid:
+def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time: float = 5.5, bpm: float = 134.0) -> BeatGrid:
     """
-    Generates a NARRATIVE-DRIVEN beat grid matching reference AMV editing style.
+    Generates a NARRATIVE-DRIVEN beat grid matching reference AMV editing style (15-24s):
+    - Act 1: Atmospheric Hook / Dialogue Build (0.0s to drop_time): 1-2 held shots, complete monologue.
+    - Act 2: Beat Drop / Impact Rush (drop_time to ~70% remaining): 4-8 snappy combat cuts on the beat.
+    - Act 3: Climax Finisher & Outro: Held ultimate technique / Black Flash finisher (2.5s - 4.5s).
 
-    Reference: ~20 major segments in 23s (avg 1.15s each, range 0.5-2.0s).
-    Target: 15-20 major segments for 38s edit.
-
-    Structure:
-    - Buildup (0.0s to drop_time): ONE continuous shot (no cuts — complete dialogue).
-    - First Drop (drop_time to 18.0s): ~8 cuts at musically significant moments (every 1.5-2.0s).
-    - Bridge (18.0s to 24.0s): ~3 held emotional shots (2.0s each).
-    - Second Drop (24.0s to 32.0s): ~5 cuts (1.5s average).
-    - Final Outro (32.0s to duration): 1-2 powerful held shots (2.0-3.0s).
+    Total segments: 8-15 cuts across the edit (pacing of lX7bIlY_KEE, xT4qeJwVnDI, MRurnn3AxyA).
     """
     beat_times = []
 
-    # ── Phase 1: Intro — ONE continuous monologue shot ─────────────────────────
-    # The character delivers their full iconic line without mid-sentence chops.
-    # No cuts during buildup — just one held shot until the drop.
-    beat_times.append(round(drop_time, 2))
+    # ── Act 1: Atmospheric Hook / Dialogue Build ──
+    effective_drop = min(drop_time, max(1.5, duration - 4.0))
+    if effective_drop > 6.0:
+        beat_times.append(round(effective_drop * 0.45, 2))
+    beat_times.append(round(effective_drop, 2))
 
-    # ── Phase 2: First Drop — narrative-driven cuts (~8 segments) ──────────────
-    # Cuts at every ~2nd beat (every bar), NOT every beat. ~1.8s average.
-    bar_duration = 4 * (60.0 / bpm)  # 4 beats per bar
-    curr = drop_time
-    phase2_limit = min(duration - 8.0, 18.0)
-    while curr < phase2_limit:
-        curr += bar_duration * 0.9  # slightly less than a full bar for energy
-        if curr < phase2_limit:
-            beat_times.append(round(curr, 2))
+    # ── Act 2: The Beat Drop / Combat Impact Burst ──
+    remaining_time = max(2.0, duration - effective_drop)
+    combat_end = effective_drop + remaining_time * 0.70
 
-    # ── Phase 3: Bridge — held emotional shots (~3 segments) ───────────────────
-    if duration > 24.0:
-        bridge_start = round(min(duration - 10.0, 18.5), 2)
-        beat_times.append(bridge_start)
-        beat_times.append(round(bridge_start + 2.2, 2))  # 2.2s held shot
-        beat_times.append(round(bridge_start + 4.0, 2))  # 1.8s shot
+    beat_interval = 60.0 / bpm
+    cut_step = beat_interval * 2 if bpm < 140 else beat_interval * 4
+    if cut_step < 0.65:
+        cut_step = beat_interval * 4
+    if cut_step > 2.0:
+        cut_step = beat_interval * 2
 
-    # ── Phase 4: Second Drop — rapid but narrative cuts (~5 segments) ──────────
-    if duration > 28.0:
-        curr = beat_times[-1] if beat_times else 24.0
-        phase4_limit = min(duration - 3.0, 32.0)
-        while curr < phase4_limit:
-            curr += bar_duration * 0.75  # slightly tighter than first drop
-            if curr < phase4_limit:
-                beat_times.append(round(curr, 2))
+    curr = effective_drop
+    while curr + cut_step < combat_end:
+        curr += cut_step
+        beat_times.append(round(curr, 2))
 
-    # ── Phase 5: Final Outro — powerful held finish ────────────────────────────
-    if duration > 30.0:
-        final_cut = round(duration - 2.5, 2)
-        if final_cut > (beat_times[-1] if beat_times else 0.0) + 1.0:
-            beat_times.append(final_cut)
+    # ── Act 3: Climax Finisher & Outro Ringout ──
+    climax_strike = round(duration - min(3.5, max(1.8, remaining_time * 0.35)), 2)
+    if climax_strike > (beat_times[-1] if beat_times else 0.0) + 0.8 and climax_strike < duration - 1.0:
+        beat_times.append(climax_strike)
 
-    return BeatGrid(duration=duration, drop_time=drop_time, beat_times=beat_times, bpm=bpm)
+    return BeatGrid(duration=duration, drop_time=effective_drop, beat_times=beat_times, bpm=bpm)
 
 
-def analyze_audio_beats(audio_path: Path, target_duration: float = 42.0) -> BeatGrid:
+def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURATION) -> BeatGrid:
     """
     Intelligently syncs audio beats with frame-accurate precision using real audio analysis:
     1. Extracts audio waveform and detects bass onsets via scipy (low-pass + onset envelope).
