@@ -35,14 +35,15 @@ def validate_shorts_video(video_path: Path) -> Tuple[bool, str]:
 
     if not width or not height:
         return False, "Video has no readable video dimensions"
-    if width != height:
-        return False, f"Video must be square (1:1), got {width}x{height}"
+    if width > height:
+        return False, f"Video must be vertical (9:16) or square (1:1) for YouTube Shorts, got {width}x{height}"
     if duration <= 0:
         return False, "Video has no readable duration"
     if duration > SHORTS_MAX_DURATION_SECONDS:
         return False, f"Video must be 3 minutes or shorter, got {duration:.2f}s"
 
     return True, f"{width}x{height}, {duration:.2f}s"
+
 
 
 def _shorts_title(title: str) -> str:
