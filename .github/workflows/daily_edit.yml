@@ -138,11 +138,17 @@ jobs:
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
           
-          # Safety guard: Never upload to YouTube on experimental or feature branches
-          if [ "${{ github.ref_name }}" = "main" ] && { [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ]; }; then
+          # During testing, uploads are disabled by default (default: false).
+          # Upload only occurs if explicitly enabled via input (upload == 'true'),
+          # or on scheduled daily runs on the main branch.
+          if [ "${{ github.event.inputs.upload }}" = "true" ]; then
+            echo "🚀 [Publish] Manual YouTube upload requested."
+            CMD="$CMD --upload"
+          elif [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.ref_name }}" = "main" ]; then
+            echo "🚀 [Publish] Scheduled daily upload on main."
             CMD="$CMD --upload"
           else
-            echo "🔒 [Safety Guard] Skipping YouTube upload on branch '${{ github.ref_name }}' (uploads disabled on this branch)"
+            echo "🔒 [Testing Mode] Skipping YouTube upload for this run (upload disabled by default while testing)."
           fi
           
           echo "Executing: $CMD"
