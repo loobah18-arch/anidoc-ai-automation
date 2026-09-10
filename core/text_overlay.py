@@ -435,34 +435,20 @@ def generate_edit_text_overlays(
 
     filters = []
 
-    # ── 1. Clean Dialogue Subtitle during Intro (0.3s to drop) ──
-    # Placed in the lower letterbox area (y=1320), crisp white with outline
+    # ── 1. Clean Dialogue Subtitle during Intro (0.4s to drop) ──
+    # Placed in the lower letterbox area (y=1360), crisp white with outline
     words = quote_text.strip().split() if quote_text else []
     if words and drop_time > 1.5:
-        # If quote is long, split into 2 natural halves; otherwise single phrase
-        if len(words) > 7:
-            mid = len(words) // 2
-            half1 = " ".join(words[:mid])
-            half2 = " ".join(words[mid:])
-            t_mid = 0.4 + (drop_time - 0.8) * 0.5
-            filters.append(build_dialogue_subtitle_filter(half1, 0.4, t_mid - 0.1, fontsize=38, y_offset=560))
-            filters.append(build_dialogue_subtitle_filter(half2, t_mid, drop_time - 0.2, fontsize=38, y_offset=560))
-        else:
-            filters.append(build_dialogue_subtitle_filter(quote_text, 0.5, drop_time - 0.2, fontsize=40, y_offset=560))
+        # Split into readable chunks of max 5 words each for mobile viewports
+        chunk_size = 5 if len(words) >= 6 else len(words)
+        chunks = [" ".join(words[i:i + chunk_size]) for i in range(0, len(words), chunk_size)]
+        t_avail = max(1.0, drop_time - 0.6)
+        dt_chunk = t_avail / len(chunks)
+        for i, chunk in enumerate(chunks):
+            t_start = 0.4 + i * dt_chunk
+            t_end = min(drop_time - 0.2, t_start + dt_chunk - 0.1)
+            filters.append(build_dialogue_subtitle_filter(chunk, t_start, t_end, fontsize=38, y_offset=560))
 
-    # ── 2. Subtle Cinematic Header in Top Letterbox Bar ──
-    # Clean, subtle anime label (e.g. "JUJUTSU KAISEN") in upper bar (y=580), low opacity
-    header_text = _escape_drawtext(f"JUJUTSU KAISEN // {character_key.upper()}")
-    header_alpha = _fade_alpha_expr(0.3, min(total_duration - 0.5, drop_time + 4.0), fade_in=0.5, fade_out=0.5)
-    header_filter = (
-        f"drawtext=text='{header_text}'"
-        f":fontfile={FONT_PATH}"
-        f":fontsize=24"
-        f":fontcolor=white@0.35"
-        f":x=(w-text_w)/2"
-        f":y=580"
-        f":alpha='{header_alpha}'"
-    )
-    filters.append(header_filter)
-
+    # Clean, pristine letterbox bars matching lX7bIlY_KEE (no distracting top bar clutter)
     return ",".join(filters) if filters else "null"
+

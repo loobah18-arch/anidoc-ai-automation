@@ -388,12 +388,12 @@ def render_cinematic_edit(
     # Master: loudnorm to -12 dB (commercial streaming loudness)
     filter_chains.append(
         f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in];"
-        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,volume=0.85[csfx_intro];"
+        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,highpass=f=100,volume=1.00[csfx_intro];"
         f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.45[csfx_drop];"
         f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full];"
         f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
         f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=800,volume=0.35[p_intro];"
-        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=1.30[p_drop];"
+        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,afade=t=in:st=0:d=0.04,volume=1.30[p_drop];"
         f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
         f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:weights=7 3:dropout_transition=2,"
         f"volume=1.30,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"

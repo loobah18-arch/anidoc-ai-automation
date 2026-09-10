@@ -211,7 +211,10 @@ CHARACTER_COLOR_MAP = {
     "thanos":  {"primary": "mahito_purple", "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
     "wolverine": {"primary": "warm_red", "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
     "mahito":  {"primary": "mahito_purple", "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
+    "todo":    {"primary": "cool_blue",  "energy": "yuji_cyan",     "text_color": "&H00FFFF00", "energy_hex": "#00FFFF"},
+    "nobara":  {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
 }
+
 
 # API Keys & Secrets
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")

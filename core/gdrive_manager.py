@@ -41,6 +41,9 @@ CHARACTER_EPISODE_PREFERENCES = {
     "thanos": ["infinity war", "endgame", "thanos"],
     "wolverine": ["wolverine", "logan", "deadpool"],
     "loki": ["loki", "thor"],
+    "mahito": ["e20", "e21", "e19", "e18", "e22", "e13", "e12", "e07"], # Yuji & Todo vs Mahito, Nanami vs Mahito
+    "todo": ["e20", "e21", "e19", "e18", "e15"],                         # Double Black Flash, Boogie Woogie
+    "nobara": ["e19", "e24", "e03"],                                     # Resonance vs Mahito, Death Painting
 }
 
 
@@ -133,7 +136,7 @@ def pick_best_file_for_character(
 
     # Universe fallback if no exact character preference matched
     if not eligible_files:
-        if character_key in {"gojo", "sukuna", "toji", "yuji", "megumi"}:
+        if character_key in {"gojo", "sukuna", "toji", "yuji", "megumi", "mahito", "todo", "nobara"}:
             eligible_files = [f for f in files if "jujutsu" in f["name"].lower() or "jjk" in f["name"].lower()]
         else:
             eligible_files = [f for f in files if any(k in f["name"].lower() for k in ["spider", "thor", "iron", "marvel"])]

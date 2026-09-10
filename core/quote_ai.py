@@ -158,6 +158,52 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "tags": ["megumi", "domainexpansion", "jjk", "jujutsukaisen", "shorts"]
         },
     ],
+    "mahito": [
+        {
+            "quote": "Humans are made of souls. The body is merely an imitation.",
+            "title": "Mahito's True Soul Nature Is Pure Evil 💀 #mahito #jjk #animeedit #shorts",
+            "tags": ["mahito", "jjk", "jujutsukaisen", "animeedit", "4kedit", "shorts"]
+        },
+        {
+            "quote": "Domain Expansion: Self-Embodiment of Perfection.",
+            "title": "Mahito 0.2s Domain Expansion Shibuya Cinema ✋ #mahito #domainexpansion #jjk #shorts",
+            "tags": ["mahito", "domainexpansion", "jjk", "jujutsukaisen", "4kedit", "shorts"]
+        },
+        {
+            "quote": "I am born from human hatred. You and I are the same, Yuji Itadori.",
+            "title": "The True Essence Of Curses — Mahito Awakened 🩸 #mahito #jjk #shorts",
+            "tags": ["mahito", "yuji", "jjk", "jujutsukaisen", "animeedit", "shorts"]
+        },
+        {
+            "quote": "This is the true shape of my soul! Instant Spirit Body of Distorted Killing!",
+            "title": "Mahito Final Form vs Yuji & Todo ⚔️ #mahito #yuji #todo #jjk #shorts",
+            "tags": ["mahito", "jjk", "jujutsukaisen", "blackflash", "shorts"]
+        }
+    ],
+    "todo": [
+        {
+            "quote": "We are the exception! Let's show this curse what brotherhood means.",
+            "title": "Aoi Todo & Yuji 120% Potential Awakened 🔥 #todo #yuji #jjk #shorts",
+            "tags": ["todo", "aoitodo", "yuji", "jjk", "jujutsukaisen", "blackflash", "shorts"]
+        },
+        {
+            "quote": "My Boogie Woogie is already dead... but my soul will never lose.",
+            "title": "Aoi Todo's 530,000 IQ Boogie Woogie Climax 👏 #todo #mahito #jjk #shorts",
+            "tags": ["todo", "boogiewoogie", "jjk", "jujutsukaisen", "animeedit", "shorts"]
+        }
+    ],
+    "nobara": [
+        {
+            "quote": "Resonance! Feel the nails piercing your cursed soul!",
+            "title": "Nobara Kugisaki Hairpin & Resonance Climax 🔨 #nobara #jjk #shorts",
+            "tags": ["nobara", "kugisaki", "jjk", "jujutsukaisen", "animeedit", "shorts"]
+        },
+        {
+            "quote": "Tell everyone... that life wasn't so bad.",
+            "title": "Nobara's Final Smile In Shibuya Broke Everyone 💔 #nobara #jjk #shorts",
+            "tags": ["nobara", "shibuya", "jjk", "jujutsukaisen", "animeedit", "shorts"]
+        }
+    ],
     "spiderman": [
         {
             "quote": "With great power comes great responsibility.",
@@ -372,7 +418,15 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
         chosen_concept = ai_meta
     else:
         # 3. Non-repeating rotation from curated rich viral concept catalog
-        catalog = CHARACTER_VIRAL_CONCEPTS.get(character_key, CHARACTER_VIRAL_CONCEPTS["gojo"])
+        catalog = CHARACTER_VIRAL_CONCEPTS.get(character_key)
+        if not catalog:
+            catalog = [
+                {
+                    "quote": theme.get("quote", "I alone determine my destiny."),
+                    "title": f"{theme['name']} Unleashed Pure Cinema 🔥 #{character_key} #{theme['universe']} #shorts",
+                    "tags": [character_key, theme["universe"], "animeedit", "4kedit", "shorts"]
+                }
+            ]
         unused_concepts = [c for c in catalog if c["title"] not in used_titles]
         
         if not unused_concepts:

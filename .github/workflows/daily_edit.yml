@@ -57,9 +57,9 @@ on:
         default: false
         type: boolean
       upload:
-        description: 'Upload rendered Short to YouTube'
-        required: true
-        default: true
+        description: 'Upload rendered Short to YouTube (disabled by default on feature branches)'
+        required: false
+        default: false
         type: boolean
 
 jobs:
@@ -138,8 +138,11 @@ jobs:
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
           
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ]; then
+          # Safety guard: Never upload to YouTube on experimental or feature branches
+          if [ "${{ github.ref_name }}" = "main" ] && { [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ]; }; then
             CMD="$CMD --upload"
+          else
+            echo "🔒 [Safety Guard] Skipping YouTube upload on branch '${{ github.ref_name }}' (uploads disabled on this branch)"
           fi
           
           echo "Executing: $CMD"
