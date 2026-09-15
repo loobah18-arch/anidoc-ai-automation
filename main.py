@@ -37,6 +37,7 @@ def main():
     parser.add_argument("--duration", type=float, default=DEFAULT_DURATION, help=f"Target video duration in seconds (default: {DEFAULT_DURATION})")
     parser.add_argument("--phonk", type=str, default=None, help="Phonk track name or ID from library (e.g. tokyo_drift_phonk, brazilian_phonk_montagem, dark_shadow_phonk, cyber_phonk_beat, gigachad_phonk)")
     parser.add_argument("--subtitle-style", type=str, choices=["viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"], default="viral_karaoke", help="Dynamic kinetic subtitle preset")
+    parser.add_argument("--subtitles", action="store_true", default=False, help="Overlay dialogue subtitles / text on video (default: False for 100% clean video)")
     parser.add_argument("--burn-subtitles", action="store_true", default=False, help="Burn kinetic subtitles onto the video (default: False for clean pure video)")
     parser.add_argument("--quote", type=str, default=None, help="Custom dialogue monologue quote")
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
@@ -78,6 +79,7 @@ def main():
         target_duration=args.duration,
         subtitle_style=args.subtitle_style,
         burn_subtitles=args.burn_subtitles,
+        enable_subtitles=args.subtitles,
         custom_quote=args.quote,
         custom_title=args.title,
         cc_preset=args.cc,

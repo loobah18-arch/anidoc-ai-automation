@@ -213,43 +213,74 @@ def _snap_grid_to_onsets(beat_times: List[float], onset_times: List[float], bpm:
 
 def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time: float = 5.5, bpm: float = 134.0) -> BeatGrid:
     """
-    Generates a NARRATIVE-DRIVEN beat grid matching reference AMV editing style (15-24s):
-    - Act 1: Atmospheric Hook / Dialogue Build (0.0s to drop_time): 1-2 held shots, complete monologue.
-    - Act 2: Beat Drop / Impact Rush (drop_time to ~70% remaining): 4-8 snappy combat cuts on the beat.
-    - Act 3: Climax Finisher & Outro: Held ultimate technique / Black Flash finisher (2.5s - 4.5s).
-
-    Total segments: 8-15 cuts across the edit (pacing of lX7bIlY_KEE, xT4qeJwVnDI, MRurnn3AxyA).
+    Generates a NARRATIVE-DRIVEN beat grid matching reference AMV editing style:
+    - For short edits (<30s): 3-Act Arc (Intro -> Combat Drop -> Held Finisher).
+    - For 1-minute edits (>=30s): 5-Act Narrative Symphony:
+      * Act 1: Atmospheric Hook / Dialogue Build (0.0s to drop_time, ~5-7s)
+      * Act 2: Wave 1 Combat Clash (drop_time to ~42% duration, ~1.6-1.9s cuts)
+      * Act 3: Mid-Song Emotional Bridge / Standoff (~42% to ~62%, ~2.5-3.2s held shots)
+      * Act 4: Climax Overdrive Combat Rush (~62% to ~92%, ~1.2-1.5s snappy cuts)
+      * Act 5: Climax Finisher & Outro Ringout (held 3.5-5.0s ultimate technique)
     """
     beat_times = []
+    beat_interval = 60.0 / bpm
+    bar = beat_interval * 4
 
     # ── Act 1: Atmospheric Hook / Dialogue Build ──
-    effective_drop = min(drop_time, max(1.5, duration - 4.0))
-    if effective_drop > 6.0:
-        beat_times.append(round(effective_drop * 0.45, 2))
+    effective_drop = min(drop_time, max(1.5, min(8.0, duration - 4.0)))
+    if effective_drop > 4.5:
+        beat_times.append(round(effective_drop * 0.5, 2))
     beat_times.append(round(effective_drop, 2))
 
-    # ── Act 2: The Beat Drop / Combat Impact Burst ──
-    remaining_time = max(2.0, duration - effective_drop)
-    combat_end = effective_drop + remaining_time * 0.70
+    if duration < 30.0:
+        # 3-act for short edits
+        remaining_time = max(2.0, duration - effective_drop)
+        combat_end = effective_drop + remaining_time * 0.70
+        cut_step = beat_interval * 2 if bpm < 140 else beat_interval * 4
+        if cut_step < 0.65:
+            cut_step = beat_interval * 4
+        if cut_step > 2.0:
+            cut_step = beat_interval * 2
 
-    beat_interval = 60.0 / bpm
-    cut_step = beat_interval * 2 if bpm < 140 else beat_interval * 4
-    if cut_step < 0.65:
-        cut_step = beat_interval * 4
-    if cut_step > 2.0:
-        cut_step = beat_interval * 2
+        curr = effective_drop
+        while curr + cut_step < combat_end:
+            curr += cut_step
+            beat_times.append(round(curr, 2))
 
-    curr = effective_drop
-    while curr + cut_step < combat_end:
-        curr += cut_step
-        beat_times.append(round(curr, 2))
+        climax_strike = round(duration - min(3.5, max(1.8, remaining_time * 0.35)), 2)
+        if climax_strike > (beat_times[-1] if beat_times else 0.0) + 0.8 and climax_strike < duration - 1.0:
+            beat_times.append(climax_strike)
+    else:
+        # 5-act for 1-minute / longer edits
+        # Act 2: Wave 1 Combat (drop to ~42% duration)
+        wave1_end = duration * 0.42
+        curr = effective_drop
+        step = bar
+        while curr + step < wave1_end:
+            curr += step
+            beat_times.append(round(curr, 2))
 
-    # ── Act 3: Climax Finisher & Outro Ringout ──
-    climax_strike = round(duration - min(3.5, max(1.8, remaining_time * 0.35)), 2)
-    if climax_strike > (beat_times[-1] if beat_times else 0.0) + 0.8 and climax_strike < duration - 1.0:
-        beat_times.append(climax_strike)
+        # Act 3: Mid-Song Emotional Bridge (~42% to ~62% duration)
+        bridge_end = duration * 0.62
+        bridge_step = bar * 1.5
+        while curr + bridge_step < bridge_end:
+            curr += bridge_step
+            beat_times.append(round(curr, 2))
+
+        # Act 4: Climax Overdrive Combat Rush (~62% to ~92% duration)
+        rush_end = duration * 0.92
+        rush_step = bar * 0.75
+        while curr + rush_step < rush_end:
+            curr += rush_step
+            beat_times.append(round(curr, 2))
+
+        # Act 5: Climax Finisher & Outro Ringout (held 3.5-5.0s)
+        finisher_time = round(duration - min(5.0, max(2.5, (duration - effective_drop) * 0.08)), 2)
+        if finisher_time > (beat_times[-1] if beat_times else 0.0) + 1.2 and finisher_time < duration - 1.0:
+            beat_times.append(finisher_time)
 
     return BeatGrid(duration=duration, drop_time=effective_drop, beat_times=beat_times, bpm=bpm)
+
 
 
 def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURATION) -> BeatGrid:

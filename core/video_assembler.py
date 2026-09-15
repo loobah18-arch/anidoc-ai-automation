@@ -78,6 +78,7 @@ def render_cinematic_edit(
     target_duration: float = DEFAULT_DURATION,
     subtitle_style: str = "viral_karaoke",
     burn_subtitles: bool = False,
+    enable_subtitles: bool = False,
     custom_quote: Optional[str] = None,
     custom_title: Optional[str] = None,
     cc_preset: Optional[str] = None,
@@ -363,19 +364,23 @@ def render_cinematic_edit(
         f"drawbox=x=0:y=ih-{LETTERBOX_BAR_HEIGHT}:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill"
     )
 
-    # Multi-style text overlays (title cards, dialogue, Roman numerals, bg text)
-    text_overlay_str = generate_edit_text_overlays(
-        character_key=character_key,
-        quote_text=quote_text,
-        beat_times=beat_grid.beat_times,
-        drop_time=drop_t,
-        total_duration=beat_grid.duration,
-        character_colors=char_colors
-    )
-    if text_overlay_str and text_overlay_str != "null":
-        text_chain = f",{text_overlay_str}"
+    # Multi-style text overlays (disabled by default to ensure clean video without inaccurate subtitles)
+    if enable_subtitles:
+        text_overlay_str = generate_edit_text_overlays(
+            character_key=character_key,
+            quote_text=quote_text,
+            beat_times=beat_grid.beat_times,
+            drop_time=drop_t,
+            total_duration=beat_grid.duration,
+            character_colors=char_colors
+        )
+        if text_overlay_str and text_overlay_str != "null":
+            text_chain = f",{text_overlay_str}"
+        else:
+            text_chain = ""
     else:
         text_chain = ""
+
 
     filter_chains.append(
         f"[concatenated_v]{flash_str},{letterbox_filter}{sub_filter}{text_chain}[vout]"

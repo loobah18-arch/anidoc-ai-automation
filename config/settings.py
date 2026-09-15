@@ -23,7 +23,7 @@ SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 VIDEO_WIDTH = 1080
 VIDEO_HEIGHT = 1920
 FPS = 24  # Source anime is 24fps — no need to upscale framerate
-DEFAULT_DURATION = 18.0  # Optimal high-retention 15-22s range matching reference edits (16.8s, 14.6s, 23.3s)
+DEFAULT_DURATION = 60.0  # Full-length 1-minute cinematic AMV (60.0s)
 
 # Cinematic letterbox: 16:9 widescreen centered in 9:16 vertical canvas (matches lX7bIlY_KEE & MRurnn3AxyA)
 # Active 16:9 video is 1080x608, top bar 656px, bottom bar 656px (34.1% of frame height each)
