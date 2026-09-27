@@ -31,10 +31,15 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(len(tracks) >= 2, "Should have at least 2 phonk tracks downloaded in library")
         self.assertTrue(len(POPULAR_PHONK_CATALOG) >= 5)
         
-        # Test retrieval
-        phonk_audio = get_random_or_specified_phonk("tokyo_drift_phonk")
+        # Test retrieval of specific existing track
+        phonk_audio = get_random_or_specified_phonk(tracks[0]["id"])
         self.assertIsNotNone(phonk_audio)
         self.assertTrue(Path(phonk_audio).exists())
+
+        # Test random phonk selection
+        random_audio = get_random_or_specified_phonk("random")
+        self.assertIsNotNone(random_audio)
+        self.assertTrue(Path(random_audio).exists())
 
     def test_02_beat_grid_generation(self):
         # Narrative pacing: a 35s edit should produce ~15-20 cuts, NOT 100+

@@ -272,26 +272,24 @@ def get_random_or_specified_phonk(track_id: Optional[str] = None) -> Optional[Pa
             if track_id in f.stem:
                 return f
 
-    # 2. Sequential Non-Repeating Rotation across 10 Curated Tracks
+    # 2. Random Selection across Curated Tracks (anti-repeat aware)
     if curated_tracks:
         state = _load_phonk_state()
-        last_idx = state.get("last_index", -1)
-        next_idx = (last_idx + 1) % len(curated_tracks)
-        
-        chosen = curated_tracks[next_idx]
-        state["last_index"] = next_idx
+        last_track = state.get("last_track")
+        candidates = [t for t in curated_tracks if t.stem != last_track] if (len(curated_tracks) > 1 and last_track) else curated_tracks
+        chosen = random.choice(candidates)
+
         state["last_track"] = chosen.stem
+        state["last_index"] = curated_tracks.index(chosen)
         _save_phonk_state(state)
-        
-        print(f"🎧 [Phonk] Selected rotated Aura track ({next_idx + 1}/{len(curated_tracks)}): {chosen.stem}")
+
+        print(f"🎧 [Phonk] Selected track ({state['last_index'] + 1}/{len(curated_tracks)}): {chosen.stem}")
         return chosen
 
     # 3. Live trending fallback
     live = fetch_trending_phonk_2026(n=1)
     if live:
         return live[0]
-
-    return None
 
     return None
 
