@@ -8,54 +8,11 @@ import subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-from config.settings import MARVEL_DIR, JJK_DIR, SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
+from config.settings import MARVEL_DIR, JJK_DIR, DEMONSLAYER_DIR, SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
 from core.public_api_fetcher import fetch_character_scenepack
 
 CHARACTER_THEMES = {
-    # JJK Universe Only (Marvel disabled for now)
-    "gojo": {
-        "universe": "jjk",
-        "name": "Gojo Satoru",
-        "colors": ["#4f46e5", "#8b5cf6", "#0f172a"],
-        "cc_preset": "jjk_void",
-        "quote": "Throughout heaven and earth, I alone am the honored one."
-    },
-    "sukuna": {
-        "universe": "jjk",
-        "name": "Ryomen Sukuna",
-        "colors": ["#dc2626", "#7f1d1d", "#000000"],
-        "cc_preset": "sukuna_shrine",
-        "quote": "I'll slaughter the weak to weed them out."
-    },
-    "yuji": {
-        "universe": "jjk",
-        "name": "Yuji Itadori",
-        "colors": ["#ea580c", "#f97316", "#1e293b"],
-        "cc_preset": "jjk_void",
-        "quote": "I'm a cog. And my role is to destroy curses like you."
-    },
-    "megumi": {
-        "universe": "jjk",
-        "name": "Megumi Fushiguro",
-        "colors": ["#3b82f6", "#1e40af", "#0f172a"],
-        "cc_preset": "jjk_void",
-        "quote": "I don't understand the meaning of life."
-    },
-    "toji": {
-        "universe": "jjk",
-        "name": "Toji Zen'in",
-        "colors": ["#6b7280", "#374151", "#000000"],
-        "cc_preset": "cyber_phonk",
-        "quote": "I have no cursed energy."
-    },
-    "loki": {
-        "universe": "marvel",
-        "name": "Loki (God of Stories)",
-        "colors": ["#15803d", "#22c55e", "#052e16"],
-        "cc_preset": "cyber_phonk",
-        "quote": "I know what kind of god I need to be."
-    },
-    # Jujutsu Kaisen Universe ONLY
+    # ── Jujutsu Kaisen Universe ──
     "gojo": {
         "universe": "jjk",
         "name": "Gojo Satoru",
@@ -82,7 +39,7 @@ CHARACTER_THEMES = {
         "name": "Yuji Itadori",
         "colors": ["#b91c1c", "#fbbf24", "#1a0b0b"],
         "cc_preset": "sukuna_shrine",
-        "quote": "I'm going to save everyone I can."
+        "quote": "I'm a cog. And my role is to destroy curses like you."
     },
     "megumi": {
         "universe": "jjk",
@@ -111,6 +68,129 @@ CHARACTER_THEMES = {
         "colors": ["#a855f7", "#581c87", "#000000"],
         "cc_preset": "sukuna_shrine",
         "quote": "Humans are so fun to play with!"
+    },
+
+    # ── Demon Slayer (Kimetsu no Yaiba) Universe ──
+    "tanjiro": {
+        "universe": "demonslayer",
+        "name": "Tanjiro Kamado",
+        "colors": ["#b91c1c", "#15803d", "#0f172a"],
+        "cc_preset": "hinokami_flame",
+        "quote": "No matter how many people you may lose, you have no choice but to go on living."
+    },
+    "rengoku": {
+        "universe": "demonslayer",
+        "name": "Kyojuro Rengoku",
+        "colors": ["#ea580c", "#dc2626", "#7f1d1d"],
+        "cc_preset": "flame_hashira",
+        "quote": "Set your heart ablaze. Go beyond your limits."
+    },
+    "zenitsu": {
+        "universe": "demonslayer",
+        "name": "Zenitsu Agatsuma",
+        "colors": ["#eab308", "#ca8a04", "#1e293b"],
+        "cc_preset": "thunder_gold",
+        "quote": "Thunder Breathing, First Form: Thunderclap and Flash — Sixfold!"
+    },
+    "akaza": {
+        "universe": "demonslayer",
+        "name": "Akaza",
+        "colors": ["#ec4899", "#3b82f6", "#0f172a"],
+        "cc_preset": "akaza_compass",
+        "quote": "Become a demon, Kyojuro! If you don't, you will die!"
+    },
+    "giyu": {
+        "universe": "demonslayer",
+        "name": "Giyu Tomioka",
+        "colors": ["#0284c7", "#0369a1", "#082f49"],
+        "cc_preset": "water_breathing",
+        "quote": "Water Breathing, Eleventh Form: Dead Calm."
+    },
+    "tengen": {
+        "universe": "demonslayer",
+        "name": "Tengen Uzui",
+        "colors": ["#f59e0b", "#ec4899", "#18181b"],
+        "cc_preset": "thunder_gold",
+        "quote": "From here on out, things are gonna get flashy!"
+    },
+    "inosuke": {
+        "universe": "demonslayer",
+        "name": "Inosuke Hashibira",
+        "colors": ["#0ea5e9", "#475569", "#0f172a"],
+        "cc_preset": "beast_breathing",
+        "quote": "Coming through! Pig assault! Beast Breathing!"
+    },
+    "muzan": {
+        "universe": "demonslayer",
+        "name": "Muzan Kibutsuji",
+        "colors": ["#991b1b", "#18181b", "#000000"],
+        "cc_preset": "sukuna_crimson",
+        "quote": "Do I look pale to you? Does my face look sickly?"
+    },
+    "nezuko": {
+        "universe": "demonslayer",
+        "name": "Nezuko Kamado",
+        "colors": ["#f43f5e", "#fda4af", "#18181b"],
+        "cc_preset": "hinokami_flame",
+        "quote": "Blood Demon Art: Exploding Blood!"
+    },
+    "muichiro": {
+        "universe": "demonslayer",
+        "name": "Muichiro Tokito",
+        "colors": ["#06b6d4", "#0891b2", "#0f172a"],
+        "cc_preset": "cool_blue",
+        "quote": "Mist Breathing, Seventh Form: Obscuring Clouds."
+    },
+    "gyutaro": {
+        "universe": "demonslayer",
+        "name": "Gyutaro",
+        "colors": ["#22c55e", "#dc2626", "#09090b"],
+        "cc_preset": "sukuna_crimson",
+        "quote": "You've got a nice face, man... envy eats me alive!"
+    },
+
+    # ── Marvel Universe (Legacy compatibility) ──
+    "spiderman": {
+        "universe": "marvel",
+        "name": "Spider-Man",
+        "colors": ["#dc2626", "#2563eb", "#0f172a"],
+        "cc_preset": "marvel_hdr",
+        "quote": "With great power comes great responsibility."
+    },
+    "loki": {
+        "universe": "marvel",
+        "name": "Loki (God of Stories)",
+        "colors": ["#15803d", "#22c55e", "#052e16"],
+        "cc_preset": "cyber_phonk",
+        "quote": "I know what kind of god I need to be."
+    },
+    "ironman": {
+        "universe": "marvel",
+        "name": "Iron Man",
+        "colors": ["#b91c1c", "#f59e0b", "#1e1b4b"],
+        "cc_preset": "marvel_hdr",
+        "quote": "I am Iron Man."
+    },
+    "thor": {
+        "universe": "marvel",
+        "name": "Thor Odinson",
+        "colors": ["#0284c7", "#38bdf8", "#0f172a"],
+        "cc_preset": "cyber_phonk",
+        "quote": "Bring me Thanos!"
+    },
+    "thanos": {
+        "universe": "marvel",
+        "name": "Thanos",
+        "colors": ["#7c3aed", "#a855f7", "#090514"],
+        "cc_preset": "jjk_void",
+        "quote": "I am inevitable."
+    },
+    "wolverine": {
+        "universe": "marvel",
+        "name": "Wolverine",
+        "colors": ["#eab308", "#1e3a8a", "#0f172a"],
+        "cc_preset": "cyber_phonk",
+        "quote": "I'm the best there is at what I do."
     },
 }
 
@@ -173,11 +253,16 @@ def get_character_scene_clips(
     - Wrong-character clips are filtered out by filename keyword matching
     """
     theme = CHARACTER_THEMES.get(character_key, CHARACTER_THEMES["gojo"])
-    universe_dir = MARVEL_DIR if theme["universe"] == "marvel" else JJK_DIR
+    if theme["universe"] == "demonslayer":
+        universe_dir = DEMONSLAYER_DIR
+    elif theme["universe"] == "marvel":
+        universe_dir = MARVEL_DIR
+    else:
+        universe_dir = JJK_DIR
     universe_dir.mkdir(parents=True, exist_ok=True)
     
     # Search for character-specific clips in both dirs (including scratch)
-    scratch_char_dir = SCRATCH_DIR / theme.get("universe", "marvel")
+    scratch_char_dir = SCRATCH_DIR / theme.get("universe", "jjk")
     scratch_char_dir.mkdir(parents=True, exist_ok=True)
     
     raw_clips = (
@@ -260,10 +345,12 @@ def list_available_character_clips(universe: Optional[str] = None) -> Dict[str, 
     """Lists all available downloaded clips categorized by character and universe."""
     result = {}
     dirs = []
-    if universe == "marvel" or not universe:
-        dirs.append(("marvel", MARVEL_DIR))
+    if universe == "demonslayer" or not universe:
+        dirs.append(("demonslayer", DEMONSLAYER_DIR))
     if universe == "jjk" or not universe:
         dirs.append(("jjk", JJK_DIR))
+    if universe == "marvel" or not universe:
+        dirs.append(("marvel", MARVEL_DIR))
         
     for univ_name, udir in dirs:
         udir.mkdir(parents=True, exist_ok=True)

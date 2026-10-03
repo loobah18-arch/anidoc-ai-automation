@@ -28,22 +28,35 @@ SUPPORTED_ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".7z", ".rar"}
 
 HISTORY_FILE = SCRATCH_DIR / "gdrive_edit_history.json"
 
-# Strict High-Octane Combat Episodes (ordered by pure action density)
 CHARACTER_EPISODE_PREFERENCES = {
+    # JJK Combat Preferences
     "gojo": ["e09", "e04", "e03", "e08", "e05", "e07", "e01"],       # Shibuya Curses, Awakened vs Toji, Subway Brawl
     "sukuna": ["e17", "e16", "e15", "e18", "e20"],                   # Sukuna vs Mahoraga, Sukuna vs Jogo Meteor, Shibuya Climax
     "toji": ["e04", "e03", "e14", "e15", "e02"],                     # Toji vs Gojo Awakened, Toji vs Dagon, Toji vs Megumi
     "yuji": ["e20", "e21", "e13", "e19", "e22", "e18"],             # Yuji & Todo vs Mahito (Black Flash), Yuji vs Choso Brawl
     "megumi": ["e15", "e16", "e14", "e17", "e12"],                   # Mahoraga Summon & Domain Clashes
+    "mahito": ["e20", "e21", "e19", "e18", "e22", "e13", "e12", "e07"], # Yuji & Todo vs Mahito, Nanami vs Mahito
+    "todo": ["e20", "e21", "e19", "e18", "e15"],                         # Double Black Flash, Boogie Woogie
+    "nobara": ["e19", "e24", "e03"],                                     # Resonance vs Mahito, Death Painting
+    # Demon Slayer (Kimetsu no Yaiba) Preferences
+    "tanjiro": ["entertainment", "mugen", "swordsmith", "hashira", "hinokami", "e19", "e10", "e11", "e08", "e01"],
+    "rengoku": ["mugen", "train", "akaza", "rengoku", "e07", "e06", "e05"],
+    "akaza": ["mugen", "train", "akaza", "rengoku", "e06", "e07", "hashira"],
+    "zenitsu": ["thunder", "zenitsu", "e12", "e17", "entertainment", "e10", "spider"],
+    "tengen": ["entertainment", "uzui", "tengen", "gyutaro", "e08", "e09", "e10"],
+    "gyutaro": ["entertainment", "gyutaro", "daki", "e08", "e09", "e10"],
+    "giyu": ["rui", "spider", "e19", "e20", "e21", "giyu", "water", "hashira", "e01"],
+    "inosuke": ["inosuke", "beast", "entertainment", "train", "spider"],
+    "muzan": ["muzan", "infinity", "castle", "hashira", "e08"],
+    "nezuko": ["nezuko", "blood", "awakened", "entertainment", "swordsmith", "e19"],
+    "muichiro": ["swordsmith", "gyokko", "mist", "muichiro", "e08", "e09"],
+    # Marvel Legacy Preferences
     "spiderman": ["spider", "no way home", "far from home", "peter"], # Bridge Fight & Final Climax
     "thor": ["ragnarok", "thor", "odinson"],                          # Arena Fight & Bridge Lightning Battle
     "ironman": ["iron", "stark", "avengers"],
     "thanos": ["infinity war", "endgame", "thanos"],
     "wolverine": ["wolverine", "logan", "deadpool"],
     "loki": ["loki", "thor"],
-    "mahito": ["e20", "e21", "e19", "e18", "e22", "e13", "e12", "e07"], # Yuji & Todo vs Mahito, Nanami vs Mahito
-    "todo": ["e20", "e21", "e19", "e18", "e15"],                         # Double Black Flash, Boogie Woogie
-    "nobara": ["e19", "e24", "e03"],                                     # Resonance vs Mahito, Death Painting
 }
 
 
@@ -136,7 +149,9 @@ def pick_best_file_for_character(
 
     # Universe fallback if no exact character preference matched
     if not eligible_files:
-        if character_key in {"gojo", "sukuna", "toji", "yuji", "megumi", "mahito", "todo", "nobara"}:
+        if character_key in {"tanjiro", "rengoku", "akaza", "zenitsu", "tengen", "gyutaro", "giyu", "inosuke", "muzan", "nezuko", "muichiro"}:
+            eligible_files = [f for f in files if any(k in f["name"].lower() for k in ["demon", "slayer", "kimetsu", "yaiba", "kny", "mugen", "hashira", "entertainment", "swordsmith"])]
+        elif character_key in {"gojo", "sukuna", "toji", "yuji", "megumi", "mahito", "todo", "nobara"}:
             eligible_files = [f for f in files if "jujutsu" in f["name"].lower() or "jjk" in f["name"].lower()]
         else:
             eligible_files = [f for f in files if any(k in f["name"].lower() for k in ["spider", "thor", "iron", "marvel"])]

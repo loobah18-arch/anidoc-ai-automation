@@ -204,6 +204,139 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "tags": ["nobara", "shibuya", "jjk", "jujutsukaisen", "animeedit", "shorts"]
         }
     ],
+    # ── Demon Slayer (Kimetsu no Yaiba) Universe ──
+    "tanjiro": [
+        {
+            "quote": "Hinokami Kagura! Dance of the Fire God!",
+            "title": "Tanjiro Awakens Sun Breathing Hinokami Kagura 🔥 #tanjiro #demonslayer #shorts",
+            "tags": ["tanjiro", "demonslayer", "kimetsunoyaiba", "hinokamikagura", "animeedit", "4kedit", "shorts"]
+        },
+        {
+            "quote": "No matter how many people you lose, you have no choice but to go on living!",
+            "title": "Tanjiro vs Gyutaro Climax Was Pure Cinema 🥶⚔️ #tanjiro #gyutaro #demonslayer #shorts",
+            "tags": ["tanjiro", "gyutaro", "demonslayer", "kimetsunoyaiba", "animeedit", "shorts"]
+        },
+        {
+            "quote": "Don't stop! Keep running! Protect Nezuko at all costs!",
+            "title": "Tanjiro's Demon Slayer Mark Awakening Gave Chills ⚡ #tanjiro #demonslayer #shorts",
+            "tags": ["tanjiro", "slayermark", "demonslayer", "kimetsunoyaiba", "4kedit", "shorts"]
+        },
+        {
+            "quote": "I swear I'll turn Nezuko back into a human, no matter what!",
+            "title": "The Determination of Tanjiro Kamado 👑 #tanjiro #demonslayer #animeedit #shorts",
+            "tags": ["tanjiro", "nezuko", "demonslayer", "kimetsunoyaiba", "shorts"]
+        }
+    ],
+    "rengoku": [
+        {
+            "quote": "Set your heart ablaze! Go beyond your limits!",
+            "title": "Rengoku's Legendary Words Will Never Die ❤️‍🔥 #rengoku #demonslayer #shorts",
+            "tags": ["rengoku", "kyojurorengoku", "demonslayer", "kimetsunoyaiba", "mugentrain", "animeedit", "shorts"]
+        },
+        {
+            "quote": "Ninth Form: Rengoku! I will fulfill my duty as a Hashira!",
+            "title": "Rengoku vs Akaza Final Ninth Form Clash 🔥💥 #rengoku #akaza #demonslayer #shorts",
+            "tags": ["rengoku", "akaza", "demonslayer", "mugentrain", "animeedit", "4kedit", "shorts"]
+        },
+        {
+            "quote": "Growing old and dying is what gives meaning to human life.",
+            "title": "Why Kyojuro Rengoku Refused To Become A Demon 👑 #rengoku #demonslayer #shorts",
+            "tags": ["rengoku", "flamehashira", "demonslayer", "kimetsunoyaiba", "shorts"]
+        }
+    ],
+    "zenitsu": [
+        {
+            "quote": "Thunder Breathing, First Form: Thunderclap and Flash — Sixfold!",
+            "title": "When Zenitsu Falls Asleep It's Game Over ⚡💀 #zenitsu #demonslayer #shorts",
+            "tags": ["zenitsu", "thunderclapandflash", "demonslayer", "kimetsunoyaiba", "animeedit", "4kedit", "shorts"]
+        },
+        {
+            "quote": "Thunder Breathing, First Form: Thunderclap and Flash — God Speed!",
+            "title": "Zenitsu's God Speed Broke The Sound Barrier ⚡💨 #zenitsu #demonslayer #shorts",
+            "tags": ["zenitsu", "godspeed", "demonslayer", "kimetsunoyaiba", "animeedit", "shorts"]
+        },
+        {
+            "quote": "If you can only do one thing, hone it to perfection!",
+            "title": "Zenitsu Locked In Is A Whole Different Demon Slayer 🥶 #zenitsu #demonslayer #shorts",
+            "tags": ["zenitsu", "zenitsuagatsuma", "demonslayer", "animeedit", "shorts"]
+        }
+    ],
+    "akaza": [
+        {
+            "quote": "Technique Development: Destructive Death Compass Needle!",
+            "title": "Akaza's Compass Needle Martial Arts In 4K ❄️🥋 #akaza #demonslayer #shorts",
+            "tags": ["akaza", "compassneedle", "demonslayer", "kimetsunoyaiba", "animeedit", "4kedit", "shorts"]
+        },
+        {
+            "quote": "Become a demon, Kyojuro! Let's battle for all eternity!",
+            "title": "Upper Moon 3 Akaza vs Rengoku Full Power 🩸 #akaza #rengoku #demonslayer #shorts",
+            "tags": ["akaza", "uppermoon3", "rengoku", "demonslayer", "shorts"]
+        },
+        {
+            "quote": "I only want to fight the strong. The weak disgust me!",
+            "title": "Why Akaza Is The Most Respected Upper Moon 💀 #akaza #demonslayer #shorts",
+            "tags": ["akaza", "demonslayer", "kimetsunoyaiba", "animeedit", "shorts"]
+        }
+    ],
+    "giyu": [
+        {
+            "quote": "Water Breathing, Eleventh Form: Dead Calm.",
+            "title": "Giyu Tomioka's Eleventh Form Dead Calm Is Untouchable 🌊 #giyu #demonslayer #shorts",
+            "tags": ["giyu", "giyutomioka", "deadcalm", "demonslayer", "kimetsunoyaiba", "4kedit", "shorts"]
+        },
+        {
+            "quote": "Don't cry. Don't despair. Stand up and fight for your sister!",
+            "title": "The Coldest Hashira Giyu Tomioka 🥶🌊 #giyu #demonslayer #animeedit #shorts",
+            "tags": ["giyu", "waterhashira", "demonslayer", "kimetsunoyaiba", "shorts"]
+        }
+    ],
+    "tengen": [
+        {
+            "quote": "From here on out, things are gonna get flashy!",
+            "title": "Tengen Uzui Musical Score Technique Was Pure Cinema 💎 #tengen #demonslayer #shorts",
+            "tags": ["tengen", "tengenuzui", "soundhashira", "demonslayer", "kimetsunoyaiba", "4kedit", "shorts"]
+        },
+        {
+            "quote": "We're going for the win! Sound Breathing, Fifth Form: String Performance!",
+            "title": "Tengen vs Gyutaro Best Fight In Anime History ⚔️🔥 #tengen #gyutaro #demonslayer #shorts",
+            "tags": ["tengen", "gyutaro", "entertainmentdistrict", "demonslayer", "shorts"]
+        }
+    ],
+    "inosuke": [
+        {
+            "quote": "Coming through! Coming through! Pig assault!",
+            "title": "Lord Inosuke Unhinged Beast Breathing Energy 🐗⚔️ #inosuke #demonslayer #shorts",
+            "tags": ["inosuke", "beastbreathing", "demonslayer", "kimetsunoyaiba", "shorts"]
+        }
+    ],
+    "muzan": [
+        {
+            "quote": "Do I look pale to you? Does my face look sickly?",
+            "title": "Muzan Kibutsuji Showed What True Fear Means 💀🌑 #muzan #demonslayer #shorts",
+            "tags": ["muzan", "muzankibutsuji", "demonking", "demonslayer", "4kedit", "shorts"]
+        }
+    ],
+    "nezuko": [
+        {
+            "quote": "Blood Demon Art: Exploding Blood!",
+            "title": "Nezuko Awakened Full Demon Form Blood Art 🩸🔥 #nezuko #demonslayer #shorts",
+            "tags": ["nezuko", "nezukokamado", "blooddemonart", "demonslayer", "shorts"]
+        }
+    ],
+    "muichiro": [
+        {
+            "quote": "Mist Breathing, Seventh Form: Obscuring Clouds.",
+            "title": "Muichiro Tokito Disrespected Gyokko So Badly 🌫️💀 #muichiro #demonslayer #shorts",
+            "tags": ["muichiro", "misthashira", "demonslayer", "swordsmithvillage", "shorts"]
+        }
+    ],
+    "gyutaro": [
+        {
+            "quote": "Blood Demon Art: Flying Blood Sickles!",
+            "title": "Gyutaro's Blood Sickles Pure Terror 🩸⚔️ #gyutaro #demonslayer #shorts",
+            "tags": ["gyutaro", "uppermoon6", "demonslayer", "entertainmentdistrict", "shorts"]
+        }
+    ],
     "spiderman": [
         {
             "quote": "With great power comes great responsibility.",

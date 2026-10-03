@@ -12,12 +12,14 @@ DIALOGUE_DIR = AUDIO_DIR / "dialogue"
 VIDEO_DIR = ASSETS_DIR / "video"
 MARVEL_DIR = VIDEO_DIR / "marvel"
 JJK_DIR = VIDEO_DIR / "jjk"
+DEMONSLAYER_DIR = VIDEO_DIR / "demonslayer"
 FONTS_DIR = ASSETS_DIR / "fonts"
 OUTPUT_DIR = BASE_DIR / "output"
 SCRATCH_DIR = BASE_DIR / "scratch"
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+DEMONSLAYER_DIR.mkdir(parents=True, exist_ok=True)
 
 # Video Rendering Config (9:16 Portrait, matching reference viral AMV format)
 VIDEO_WIDTH = 1080
@@ -194,25 +196,106 @@ CC_PRESETS = {
         "vignette": "PI/4.0",
         "primary_color": "&H00FFFF00",
         "accent_color": "#00FFFF"
+    },
+    # ── Demon Slayer (Kimetsu no Yaiba) Presets ──
+    "hinokami_flame": {
+        "contrast": 1.42,
+        "brightness": -0.06,
+        "saturation": 0.80,
+        "gamma": 0.82,
+        "colorbalance": "rs=0.25:gs=0.02:bs=-0.16:rm=0.18:gm=0.01:bm=-0.10",
+        "unsharp": "5:5:1.4:5:5:0.0",
+        "vignette": "PI/3.6",
+        "primary_color": "&H001166FF",  # Sun Breathing Orange-Flame
+        "accent_color": "#FF6611"
+    },
+    "thunder_gold": {
+        "contrast": 1.45,
+        "brightness": -0.05,
+        "saturation": 0.75,
+        "gamma": 0.85,
+        "colorbalance": "rs=0.18:gs=0.15:bs=-0.20:rm=0.12:gm=0.10:bm=-0.14",
+        "unsharp": "5:5:1.4:5:5:0.0",
+        "vignette": "PI/3.8",
+        "primary_color": "&H0000D7FF",  # Electric Golden Amber
+        "accent_color": "#FFD700"
+    },
+    "water_breathing": {
+        "contrast": 1.38,
+        "brightness": -0.07,
+        "saturation": 0.72,
+        "gamma": 0.84,
+        "colorbalance": "rs=-0.16:gs=0.06:bs=0.24:rm=-0.10:gm=0.04:bm=0.16",
+        "unsharp": "5:5:1.3:5:5:0.0",
+        "vignette": "PI/3.8",
+        "primary_color": "&H00FFFF00",  # Oceanic Cyan / Aqua
+        "accent_color": "#00FFFF"
+    },
+    "flame_hashira": {
+        "contrast": 1.44,
+        "brightness": -0.06,
+        "saturation": 0.82,
+        "gamma": 0.80,
+        "colorbalance": "rs=0.28:gs=-0.04:bs=-0.18:rm=0.20:gm=-0.02:bm=-0.12",
+        "unsharp": "5:5:1.4:5:5:0.0",
+        "vignette": "PI/3.5",
+        "primary_color": "&H001133FF",  # Fiery Crimson Flame
+        "accent_color": "#FF3311"
+    },
+    "akaza_compass": {
+        "contrast": 1.40,
+        "brightness": -0.08,
+        "saturation": 0.65,
+        "gamma": 0.82,
+        "colorbalance": "rs=0.08:gs=-0.06:bs=0.22:rm=0.05:gm=-0.04:bm=0.16",
+        "unsharp": "5:5:1.3:5:5:0.0",
+        "vignette": "PI/3.8",
+        "primary_color": "&H00E020D0",  # Snowflake Cyan / Magenta
+        "accent_color": "#D020E0"
+    },
+    "beast_breathing": {
+        "contrast": 1.40,
+        "brightness": -0.07,
+        "saturation": 0.65,
+        "gamma": 0.83,
+        "colorbalance": "rs=-0.12:gs=0.04:bs=0.18:rm=-0.08:gm=0.02:bm=0.12",
+        "unsharp": "5:5:1.3:5:5:0.0",
+        "vignette": "PI/3.8",
+        "primary_color": "&H00D2FF00",  # Wild Beast Indigo/Cyan
+        "accent_color": "#00FFD2"
     }
 }
 
 # Character-specific color mapping (used by dual-tone grading system)
 CHARACTER_COLOR_MAP = {
-    "yuji":    {"primary": "cool_blue",  "energy": "yuji_cyan",     "text_color": "&H00FFFF00", "energy_hex": "#00FFFF"},
-    "gojo":    {"primary": "cool_blue",  "energy": "cool_blue",     "text_color": "&H00D2FF00", "energy_hex": "#00D2FF"},
-    "sukuna":  {"primary": "warm_red",   "energy": "sukuna_shrine", "text_color": "&H003333FF", "energy_hex": "#FF2233"},
-    "toji":    {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
-    "megumi":  {"primary": "cool_blue",  "energy": "cool_blue",     "text_color": "&H00D2FF00", "energy_hex": "#00D2FF"},
-    "loki":    {"primary": "cool_blue",  "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
-    "spiderman": {"primary": "warm_red", "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
-    "ironman": {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
-    "thor":    {"primary": "cool_blue",  "energy": "cool_blue",     "text_color": "&H00D2FF00", "energy_hex": "#00D2FF"},
-    "thanos":  {"primary": "mahito_purple", "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
-    "wolverine": {"primary": "warm_red", "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
-    "mahito":  {"primary": "mahito_purple", "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
-    "todo":    {"primary": "cool_blue",  "energy": "yuji_cyan",     "text_color": "&H00FFFF00", "energy_hex": "#00FFFF"},
-    "nobara":  {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
+    # JJK Characters
+    "yuji":      {"primary": "cool_blue",  "energy": "yuji_cyan",     "text_color": "&H00FFFF00", "energy_hex": "#00FFFF"},
+    "gojo":      {"primary": "cool_blue",  "energy": "cool_blue",     "text_color": "&H00D2FF00", "energy_hex": "#00D2FF"},
+    "sukuna":    {"primary": "warm_red",   "energy": "sukuna_shrine", "text_color": "&H003333FF", "energy_hex": "#FF2233"},
+    "toji":      {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
+    "megumi":    {"primary": "cool_blue",  "energy": "cool_blue",     "text_color": "&H00D2FF00", "energy_hex": "#00D2FF"},
+    "mahito":    {"primary": "mahito_purple", "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
+    "todo":      {"primary": "cool_blue",  "energy": "yuji_cyan",     "text_color": "&H00FFFF00", "energy_hex": "#00FFFF"},
+    "nobara":    {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
+    # Demon Slayer Characters
+    "tanjiro":   {"primary": "warm_red",   "energy": "hinokami_flame", "text_color": "&H001166FF", "energy_hex": "#FF6611"},
+    "rengoku":   {"primary": "warm_red",   "energy": "flame_hashira",  "text_color": "&H001133FF", "energy_hex": "#FF3311"},
+    "zenitsu":   {"primary": "cool_blue",  "energy": "thunder_gold",   "text_color": "&H0000D7FF", "energy_hex": "#FFD700"},
+    "akaza":     {"primary": "cool_blue",  "energy": "akaza_compass",  "text_color": "&H00E020D0", "energy_hex": "#D020E0"},
+    "giyu":      {"primary": "cool_blue",  "energy": "water_breathing","text_color": "&H00FFFF00", "energy_hex": "#00FFFF"},
+    "tengen":    {"primary": "warm_red",   "energy": "thunder_gold",   "text_color": "&H0000D7FF", "energy_hex": "#FFD700"},
+    "inosuke":   {"primary": "cool_blue",  "energy": "beast_breathing","text_color": "&H00D2FF00", "energy_hex": "#00FFD2"},
+    "muzan":     {"primary": "warm_red",   "energy": "sukuna_crimson", "text_color": "&H003333FF", "energy_hex": "#FF2233"},
+    "nezuko":    {"primary": "warm_red",   "energy": "hinokami_flame", "text_color": "&H008833FF", "energy_hex": "#FF3388"},
+    "muichiro":  {"primary": "cool_blue",  "energy": "cool_blue",      "text_color": "&H00D2FF00", "energy_hex": "#00D2FF"},
+    "gyutaro":   {"primary": "warm_red",   "energy": "sukuna_crimson", "text_color": "&H0033FF33", "energy_hex": "#33FF33"},
+    # Marvel Characters (legacy)
+    "loki":      {"primary": "cool_blue",  "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
+    "spiderman": {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
+    "ironman":   {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
+    "thor":      {"primary": "cool_blue",  "energy": "cool_blue",     "text_color": "&H00D2FF00", "energy_hex": "#00D2FF"},
+    "thanos":    {"primary": "mahito_purple", "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
+    "wolverine": {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
 }
 
 
@@ -226,6 +309,7 @@ YOUTUBE_ACCESS_TOKEN = os.environ.get("YOUTUBE_ACCESS_TOKEN", "")
 
 # Channel Branding & SEO
 CHANNEL_TAGS = [
-    "marvel", "spiderman", "avengers", "ironman", "infinitywar", "4kedit", "shorts",
-    "jjk", "gojo", "sukuna", "jujutsukaisen", "animeedit", "phonk", "velocity"
+    "jjk", "gojo", "sukuna", "jujutsukaisen", "animeedit", "phonk", "velocity",
+    "demonslayer", "kimetsunoyaiba", "tanjiro", "rengoku", "zenitsu", "akaza", "giyu", "tengen",
+    "marvel", "spiderman", "avengers", "ironman", "infinitywar", "4kedit", "shorts"
 ]

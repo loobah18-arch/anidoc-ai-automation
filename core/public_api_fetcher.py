@@ -71,6 +71,37 @@ MULTI_CLIP_CATALOG = {
     "megumi": [
         "Megumi Fushiguro Mahoraga Summon Shibuya 4K 60FPS Scenepack logless",
         "Megumi Chimera Shadow Garden Domain Expansion 4K scenepack logless"
+    ],
+    # Demon Slayer (Kimetsu no Yaiba)
+    "tanjiro": [
+        "Tanjiro Hinokami Kagura vs Rui 4K 60FPS scenepack logless",
+        "Tanjiro vs Gyutaro Entertainment District 4K 60FPS scenepack logless",
+        "Tanjiro Sun Breathing 4K 60FPS scenepack logless no watermark",
+        "Tanjiro vs Hantengu Swordsmith Village 4K scenepack logless"
+    ],
+    "rengoku": [
+        "Rengoku vs Akaza Mugen Train 4K 60FPS scenepack logless",
+        "Rengoku Ninth Form Flame Tiger 4K 60FPS scenepack logless"
+    ],
+    "zenitsu": [
+        "Zenitsu Thunderclap and Flash Sixfold 4K 60FPS scenepack logless",
+        "Zenitsu God Speed Entertainment District 4K 60FPS scenepack logless"
+    ],
+    "akaza": [
+        "Akaza vs Rengoku Destructive Death 4K 60FPS scenepack logless",
+        "Akaza Compass Needle 4K 60FPS scenepack logless"
+    ],
+    "giyu": [
+        "Giyu Tomioka Dead Calm vs Rui 4K 60FPS scenepack logless",
+        "Giyu Tomioka Water Breathing 4K 60FPS scenepack logless"
+    ],
+    "tengen": [
+        "Tengen Uzui vs Gyutaro Musical Score 4K 60FPS scenepack logless",
+        "Tengen Uzui Flashy Dual Blades 4K 60FPS scenepack logless"
+    ],
+    "inosuke": [
+        "Inosuke Beast Breathing Entertainment District 4K 60FPS scenepack logless",
+        "Inosuke Hashibira Pig Assault 4K 60FPS scenepack logless"
     ]
 }
 

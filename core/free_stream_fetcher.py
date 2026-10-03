@@ -83,6 +83,62 @@ ANIME_SOURCES = {
             "megumi fushiguro vs toji shibuya incident audio",
         ],
     },
+    # Demon Slayer (Kimetsu no Yaiba)
+    "tanjiro": {
+        "show_slug": "demon-slayer-kimetsu-no-yaiba",
+        "show_title": "Demon Slayer",
+        "key_episodes": [19, 33, 44],
+        "search_queries": [
+            "tanjiro hinokami kagura dance of the fire god original audio",
+            "tanjiro vs gyutaro entertainment district climax fight audio",
+            "tanjiro awakened mark sun breathing 1080p",
+        ],
+    },
+    "rengoku": {
+        "show_slug": "demon-slayer-kimetsu-no-yaiba-mugen-train-arc",
+        "show_title": "Demon Slayer Mugen Train",
+        "key_episodes": [6, 7],
+        "search_queries": [
+            "rengoku vs akaza set your heart ablaze ninth form audio",
+            "rengoku flame breathing ninth form rengoku original audio",
+        ],
+    },
+    "zenitsu": {
+        "show_slug": "demon-slayer-kimetsu-no-yaiba",
+        "show_title": "Demon Slayer",
+        "key_episodes": [12, 17, 34],
+        "search_queries": [
+            "zenitsu thunderclap and flash sixfold original audio",
+            "zenitsu god speed entertainment district audio 1080p",
+        ],
+    },
+    "akaza": {
+        "show_slug": "demon-slayer-kimetsu-no-yaiba-mugen-train-arc",
+        "show_title": "Demon Slayer Mugen Train",
+        "key_episodes": [6, 7],
+        "search_queries": [
+            "akaza destructive death compass needle original audio",
+            "akaza vs rengoku full battle original dialogue sfx",
+        ],
+    },
+    "giyu": {
+        "show_slug": "demon-slayer-kimetsu-no-yaiba",
+        "show_title": "Demon Slayer",
+        "key_episodes": [20, 21],
+        "search_queries": [
+            "giyu tomioka eleventh form dead calm original audio",
+            "giyu water breathing dead calm vs rui 1080p",
+        ],
+    },
+    "tengen": {
+        "show_slug": "demon-slayer-kimetsu-no-yaiba-entertainment-district-arc",
+        "show_title": "Demon Slayer Entertainment District",
+        "key_episodes": [8, 9, 10],
+        "search_queries": [
+            "tengen uzui musical score vs gyutaro original audio",
+            "tengen uzui vs gyutaro fight scene 1080p audio",
+        ],
+    },
 }
 
 MOVIE_SOURCES = {

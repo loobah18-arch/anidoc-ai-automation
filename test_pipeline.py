@@ -68,6 +68,9 @@ class TestAniDocPipeline(unittest.TestCase):
         jjk_cc = build_cc_filter("jjk_void")
         self.assertIn("eq=contrast=", jjk_cc)
 
+        hinokami_cc = build_cc_filter("hinokami_flame")
+        self.assertIn("eq=contrast=", hinokami_cc)
+
         # Monochromatic modes exist and desaturate heavily
         mono = build_monochrome_cc_filter("mono_bw")
         self.assertIn("eq=contrast=", mono)
@@ -106,6 +109,16 @@ class TestAniDocPipeline(unittest.TestCase):
         gojo = generate_edit_metadata("gojo")
         self.assertEqual(gojo["universe"], "jjk")
         self.assertTrue(len(gojo["quote"]) > 5)
+
+        tanjiro = generate_edit_metadata("tanjiro")
+        self.assertEqual(tanjiro["universe"], "demonslayer")
+        self.assertTrue(len(tanjiro["quote"]) > 5)
+        self.assertTrue(len(tanjiro["title"]) > 10)
+        self.assertTrue(len(tanjiro["tags"]) >= 4)
+
+        rengoku = generate_edit_metadata("rengoku")
+        self.assertEqual(rengoku["universe"], "demonslayer")
+        self.assertTrue(len(rengoku["quote"]) > 5)
 
     def test_05_word_by_word_karaoke_subtitles(self):
         ass_out = SCRATCH_DIR / "test_subs.ass"

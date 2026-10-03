@@ -31,17 +31,17 @@ from publishers.youtube_publisher import upload_video_to_youtube
 from studio.server import start_studio_server
 
 def main():
-    parser = argparse.ArgumentParser(description="AniDoc 4K Phonk / Scene Edit Automation Engine (Marvel & JJK)")
-    parser.add_argument("--character", type=str, default=None, help="Character key (e.g. spiderman, gojo, sukuna, ironman, thor, toji, wolverine, loki, megumi)")
-    parser.add_argument("--universe", type=str, choices=["marvel", "jjk"], default=None, help="Universe filter (marvel or jjk)")
+    parser = argparse.ArgumentParser(description="AniDoc 4K Phonk / Scene Edit Automation Engine (Jujutsu Kaisen & Demon Slayer)")
+    parser.add_argument("--character", type=str, default=None, help="Character key (e.g. gojo, sukuna, yuji, toji, tanjiro, rengoku, zenitsu, akaza, giyu, tengen)")
+    parser.add_argument("--universe", type=str, choices=["jjk", "demonslayer", "demon_slayer", "marvel"], default=None, help="Universe filter (jjk, demonslayer, or marvel)")
     parser.add_argument("--duration", type=float, default=DEFAULT_DURATION, help=f"Target video duration in seconds (default: {DEFAULT_DURATION})")
     parser.add_argument("--phonk", type=str, default=None, help="Phonk track name or ID from library (e.g. tokyo_drift_phonk, brazilian_phonk_montagem, dark_shadow_phonk, cyber_phonk_beat, gigachad_phonk)")
     parser.add_argument("--subtitle-style", type=str, choices=["viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"], default="viral_karaoke", help="Dynamic kinetic subtitle preset")
-    parser.add_argument("--subtitles", action="store_true", default=False, help="Overlay dialogue subtitles / text on video (default: False for 100% clean video)")
+    parser.add_argument("--subtitles", action="store_true", default=False, help="Overlay dialogue subtitles / text on video (default: False for 100%% clean video)")
     parser.add_argument("--burn-subtitles", action="store_true", default=False, help="Burn kinetic subtitles onto the video (default: False for clean pure video)")
     parser.add_argument("--quote", type=str, default=None, help="Custom dialogue monologue quote")
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
-    parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (marvel_hdr, jjk_void, sukuna_shrine, cyber_phonk)")
+    parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (jjk_void, sukuna_shrine, hinokami_flame, thunder_gold, water_breathing, flame_hashira, akaza_compass, cyber_phonk)")
     parser.add_argument("--gdrive-folder", type=str, default=None, help="Google Drive folder URL or ID to pull movie/episode footage from")
     parser.add_argument("--github-repo", type=str, default=None, help="GitHub repository URL or slug to fetch video clips from")
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
@@ -60,13 +60,21 @@ def main():
         return
         
     # Resolve character selection
+    target_universe = args.universe
+    if target_universe == "demon_slayer":
+        target_universe = "demonslayer"
+
     chosen_char = args.character
     if not chosen_char:
-        if args.universe:
-            eligible = [k for k, v in CHARACTER_THEMES.items() if v["universe"] == args.universe]
+        if target_universe:
+            eligible = [k for k, v in CHARACTER_THEMES.items() if v["universe"] == target_universe]
+            if not eligible:
+                raise ValueError(f"No characters found for universe '{target_universe}'")
             chosen_char = random.choice(eligible)
         else:
-            chosen_char = random.choice(list(CHARACTER_THEMES.keys()))
+            # Default to anime characters (JJK and Demon Slayer)
+            anime_chars = [k for k, v in CHARACTER_THEMES.items() if v["universe"] in {"jjk", "demonslayer"}]
+            chosen_char = random.choice(anime_chars if anime_chars else list(CHARACTER_THEMES.keys()))
             
     print(f"🔥 [AniDoc 4K Edit] Selected Character: {chosen_char} ({CHARACTER_THEMES[chosen_char]['universe'].upper()})")
     
