@@ -1,0 +1,83 @@
+{
+  "episode_code": "DS_S01E17",
+  "title": "You Must Master a Single Thing",
+  "duration": 1440.0,
+  "universe": "demonslayer",
+  "characters": [
+    {
+      "name": "Zenitsu",
+      "role": "Protagonist",
+      "key_moments": [
+        "Poisoned by Spider Demon",
+        "Flashback with Gramps",
+        "Hone it to perfection",
+        "Thunder Breathing First Form: Thunderclap and Flash Sixfold"
+      ]
+    }
+  ],
+  "scene_count": 5,
+  "source": "Google Drive - Demon Slayer Collection",
+  "notes": "DEMONSLAYER combat episode",
+  "scenes": [
+    {
+      "start": 120.0,
+      "end": 260.0,
+      "action_level": "MODERATE",
+      "priority": "medium",
+      "description": "Zenitsu runs through Natagumo forest, discovers spider poison",
+      "characters_present": [
+        "zenitsu"
+      ],
+      "action_score": 0.55,
+      "duration": 140.0
+    },
+    {
+      "start": 480.0,
+      "end": 660.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Zenitsu passes out on tree branch, asleep mode awakens",
+      "characters_present": [
+        "zenitsu"
+      ],
+      "action_score": 0.75,
+      "duration": 180.0
+    },
+    {
+      "start": 780.0,
+      "end": 920.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Gramps flashback: Hone a single strike to absolute perfection",
+      "characters_present": [
+        "zenitsu"
+      ],
+      "action_score": 0.95,
+      "duration": 140.0
+    },
+    {
+      "start": 960.0,
+      "end": 1050.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Thunder Breathing First Form: Thunderclap and Flash Sixfold lightning blitz",
+      "characters_present": [
+        "zenitsu"
+      ],
+      "action_score": 0.95,
+      "duration": 90.0
+    },
+    {
+      "start": 1050.0,
+      "end": 1200.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Spider Demon decapitation shockwave and moon silhouette",
+      "characters_present": [
+        "zenitsu"
+      ],
+      "action_score": 0.75,
+      "duration": 150.0
+    }
+  ]
+}

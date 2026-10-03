@@ -251,42 +251,46 @@ def save_episode_metadata(episode_code: str, metadata: Dict[str, Any]):
 
 
 def process_test_episodes():
-    """Generate accurate timestamp metadata from curated episode database."""
+    """Generate accurate timestamp metadata from curated episode database for JJK and Demon Slayer."""
     import sys
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-    # Load curated detailed timestamps
-    from metadata.jjk_episodes_detailed import ALL_EPISODES
+    # Load curated detailed timestamps for both universes
+    from metadata.jjk_episodes_detailed import ALL_EPISODES as JJK_EPISODES
+    from metadata.demonslayer_episodes_detailed import ALL_DS_EPISODES as DS_EPISODES
 
-    print("\n🎬 Generating Accurate Timestamp Metadata from Curated Database\n")
+    print("\n🎬 Generating Accurate Timestamp Metadata from Curated Database (JJK & Demon Slayer)\n")
 
-    for ep_code, ep_data in ALL_EPISODES.items():
-        print(f"\n{ep_code}: {ep_data.get('title', 'Unknown')}")
+    combined_episodes = {}
+    for k, v in JJK_EPISODES.items():
+        combined_episodes[k] = (v, "jjk", "Google Drive - JJK Collection")
+    for k, v in DS_EPISODES.items():
+        combined_episodes[k] = (v, "demonslayer", "Google Drive - Demon Slayer Collection")
 
-        # Use curated scenes with descriptions instead of random
+    for ep_code, (ep_data, universe, source_name) in combined_episodes.items():
+        print(f"\n[{universe.upper()}] {ep_code}: {ep_data.get('title', 'Unknown')}")
+
         metadata = {
             "episode_code": ep_code,
             "title": ep_data.get("title", ""),
             "duration": ep_data.get("duration", 1440.0),
+            "universe": universe,
             "characters": ep_data.get("characters", []),
             "scene_count": len(ep_data.get("scenes", [])),
-            "source": "Google Drive - JJK Collection",
-            "season": int(ep_code[1:3]) if len(ep_code) >= 5 else 0,
-            "episode": int(ep_code[4:6]) if len(ep_code) >= 5 else 0,
-            "notes": ep_data.get("description", "JJK episode"),
+            "source": source_name,
+            "notes": f"{universe.upper()} combat episode",
             "scenes": []
         }
 
         # Add scenes with action scores based on level
         for scene in ep_data.get("scenes", []):
             level = scene.get("action_level", "MODERATE")
-            score_map = {"EXPLOSIVE": 0.9, "INTENSE": 0.7, "MODERATE": 0.5, "CALM": 0.3}
+            score_map = {"EXPLOSIVE": 0.95, "INTENSE": 0.75, "MODERATE": 0.55, "CALM": 0.3}
             scene_copy = dict(scene)
-            scene_copy["action_score"] = score_map.get(level, 0.5)
+            scene_copy["action_score"] = scene.get("action_score") or score_map.get(level, 0.55)
             scene_copy["duration"] = scene["end"] - scene["start"]
             metadata["scenes"].append(scene_copy)
 
-        # Save
         filepath = save_episode_metadata(ep_code, metadata)
         print(f"  ✅ {len(metadata['scenes'])} scenes | {len(metadata['characters'])} characters")
 

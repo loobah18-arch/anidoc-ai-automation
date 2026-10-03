@@ -11,54 +11,131 @@ from core.timestamp_loader import load_episode_metadata, get_character_clips
 
 # Title keyword mappings to scene types
 TITLE_KEYWORDS = {
+    # ── Jujutsu Kaisen ────────────────────────────────────────────────────────
     "black flash": {
         "keywords": ["black flash", "blackflash", "divergent fist"],
-        "action_keywords": ["black flash", "consecutive", "zone", "barrage"],
+        "action_keywords": ["black flash", "consecutive", "zone", "barrage", "spark"],
         "min_action_score": 0.85,
-        "preferred_episodes": ["S01E20", "S01E13"],
+        "preferred_episodes": ["S02E21", "S01E24", "S01E20", "S01E13"],
     },
     "domain expansion": {
-        "keywords": ["domain expansion", "domain", "infinite void", "malevolent shrine"],
-        "action_keywords": ["domain", "expansion", "void", "shrine", "coffin"],
+        "keywords": ["domain expansion", "domain", "infinite void", "malevolent shrine", "chimera shadow"],
+        "action_keywords": ["domain", "expansion", "void", "shrine", "coffin", "shadow garden", "horizon"],
         "min_action_score": 0.9,
-        "preferred_episodes": ["S01E09", "S02E16"],
+        "preferred_episodes": ["S02E09", "S02E17", "S02E14", "S01E09", "S02E16"],
     },
     "mahoraga": {
         "keywords": ["mahoraga", "eight-handled", "summon", "shikigami"],
-        "action_keywords": ["summon", "mahoraga", "treasure", "adapt"],
+        "action_keywords": ["summon", "mahoraga", "treasure", "adapt", "wheel"],
         "min_action_score": 0.85,
-        "preferred_episodes": ["S02E16", "S01E15"],
+        "preferred_episodes": ["S02E17", "S02E16", "S01E15"],
     },
     "sukuna": {
-        "keywords": ["sukuna", "king of curses", "cleave", "dismantle"],
-        "action_keywords": ["sukuna", "cleave", "dismantle", "fire", "jogo"],
+        "keywords": ["sukuna", "king of curses", "cleave", "dismantle", "fuga", "open"],
+        "action_keywords": ["sukuna", "cleave", "dismantle", "fire", "arrow", "mahoraga", "shrine"],
         "min_action_score": 0.8,
-        "preferred_episodes": ["S02E16", "S01E17", "S01E15"],
+        "preferred_episodes": ["S02E17", "S02E16", "S01E04"],
     },
     "gojo": {
-        "keywords": ["gojo", "satoru", "six eyes", "limitless"],
-        "action_keywords": ["gojo", "void", "hollow", "purple", "red", "blue"],
+        "keywords": ["gojo", "satoru", "six eyes", "limitless", "hollow purple", "purple", "honored one"],
+        "action_keywords": ["gojo", "void", "hollow", "purple", "red", "blue", "awakened"],
         "min_action_score": 0.8,
-        "preferred_episodes": ["S01E09", "S02E16"],
+        "preferred_episodes": ["S02E04", "S02E09", "S01E09", "S01E07"],
+    },
+    "yuji": {
+        "keywords": ["yuji", "itadori", "i am you", "divergent fist"],
+        "action_keywords": ["yuji", "itadori", "black flash", "choso", "mahito", "combo"],
+        "min_action_score": 0.8,
+        "preferred_episodes": ["S02E21", "S02E13", "S01E24", "S01E20"],
     },
     "todo": {
-        "keywords": ["todo", "aoi", "boogie woogie", "best friend"],
-        "action_keywords": ["todo", "boogie", "swap", "clap"],
+        "keywords": ["todo", "aoi", "boogie woogie", "best friend", "brother"],
+        "action_keywords": ["todo", "boogie", "swap", "clap", "takada"],
         "min_action_score": 0.75,
-        "preferred_episodes": ["S01E20", "S01E13"],
+        "preferred_episodes": ["S02E21", "S01E20", "S01E13"],
     },
     "toji": {
         "keywords": ["toji", "fushiguro", "heavenly restriction", "sorcerer killer"],
-        "action_keywords": ["toji", "dagon", "awakening"],
+        "action_keywords": ["toji", "dagon", "awakening", "playful cloud", "inverted spear"],
         "min_action_score": 0.8,
-        "preferred_episodes": ["S01E04", "S02E10"],
+        "preferred_episodes": ["S02E04", "S02E14", "S01E04"],
     },
     "mahito": {
-        "keywords": ["mahito", "idle transfiguration", "curse"],
-        "action_keywords": ["mahito", "transfiguration", "soul", "polymorphic"],
+        "keywords": ["mahito", "idle transfiguration", "instant spirit body", "curse"],
+        "action_keywords": ["mahito", "transfiguration", "soul", "polymorphic", "distorted"],
         "min_action_score": 0.75,
-        "preferred_episodes": ["S01E20", "S02E13", "S02E18"],
+        "preferred_episodes": ["S02E21", "S02E19", "S01E20", "S02E13"],
     },
+    "nobara": {
+        "keywords": ["nobara", "kugisaki", "resonance", "hairpin", "straw doll"],
+        "action_keywords": ["nobara", "resonance", "hairpin", "nail", "mahito", "eso"],
+        "min_action_score": 0.8,
+        "preferred_episodes": ["S02E19", "S01E24"],
+    },
+    "choso": {
+        "keywords": ["choso", "blood manipulation", "piercing blood", "supernova"],
+        "action_keywords": ["choso", "blood", "piercing", "supernova", "bathroom"],
+        "min_action_score": 0.8,
+        "preferred_episodes": ["S02E13", "S01E24"],
+    },
+
+    # ── Demon Slayer (Kimetsu no Yaiba) ───────────────────────────────────────
+    "hinokami kagura": {
+        "keywords": ["hinokami", "kagura", "sun breathing", "dance of the fire god", "enbu"],
+        "action_keywords": ["hinokami", "kagura", "sun", "flame", "dance", "fire god", "rui", "decapitation"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S01E19", "DS_S02E10"],
+    },
+    "thunder breathing": {
+        "keywords": ["thunderclap", "thunder breathing", "godspeed", "sixfold", "zenitsu", "thunder"],
+        "action_keywords": ["thunder", "thunderclap", "sixfold", "godspeed", "lightning", "flash", "dismember"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S01E17", "DS_S02E10"],
+    },
+    "flame breathing": {
+        "keywords": ["flame breathing", "rengoku", "ninth form", "esoterica", "set your heart ablaze"],
+        "action_keywords": ["flame", "ninth", "annihilation", "rengoku", "akaza", "blaze", "tiger"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S02E06", "DS_S02E07"],
+    },
+    "akaza destructive death": {
+        "keywords": ["akaza", "compass needle", "destructive death", "upper three", "annihilation"],
+        "action_keywords": ["akaza", "compass", "destructive", "annihilation", "air type", "disorder"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S02E06", "DS_S02E07"],
+    },
+    "musical score": {
+        "keywords": ["musical score", "sound breathing", "tengen", "uzui", "flashy", "score technique"],
+        "action_keywords": ["musical score", "score", "uzui", "tengen", "gyutaro", "sound", "cleaver", "decapitation"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S02E08", "DS_S02E09", "DS_S02E10"],
+    },
+    "gyutaro blood art": {
+        "keywords": ["gyutaro", "blood sickles", "rotating circular slashes", "upper six"],
+        "action_keywords": ["gyutaro", "sickle", "slashes", "blood", "poison", "daki"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S02E08", "DS_S02E09", "DS_S02E10"],
+    },
+    "dead calm": {
+        "keywords": ["dead calm", "lull", "water breathing", "eleventh form", "giyu", "tomioka"],
+        "action_keywords": ["dead calm", "lull", "eleventh", "water", "rui", "giyu", "calm"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S01E20"],
+    },
+    "obscuring clouds": {
+        "keywords": ["obscuring clouds", "mist breathing", "seventh form", "muichiro", "tokito"],
+        "action_keywords": ["obscuring", "clouds", "mist", "seventh", "gyokko", "tokito"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S03E08", "DS_S03E09"],
+    },
+    "demon slayer mark": {
+        "keywords": ["demon slayer mark", "slayer mark", "awakened mark", "mark"],
+        "action_keywords": ["mark", "awakening", "tanjiro", "muichiro", "decapitation"],
+        "min_action_score": 0.85,
+        "preferred_episodes": ["DS_S02E10", "DS_S03E08", "DS_S03E09"],
+    },
+
+    # ── General Clashes ───────────────────────────────────────────────────────
     "fight": {
         "keywords": ["vs", "fight", "battle", "combat", "clash"],
         "action_keywords": ["fight", "battle", "vs", "combat", "clash", "punch", "kick"],
@@ -96,6 +173,7 @@ def parse_title_intent(title: str) -> Dict[str, Any]:
     # Extract characters mentioned
     characters = []
     char_names = {
+        # JJK
         "yuji": ["yuji", "itadori"],
         "gojo": ["gojo", "satoru"],
         "sukuna": ["sukuna", "ryomen"],
@@ -104,6 +182,19 @@ def parse_title_intent(title: str) -> Dict[str, Any]:
         "nobara": ["nobara", "kugisaki"],
         "toji": ["toji"],
         "mahito": ["mahito"],
+        "choso": ["choso"],
+        # Demon Slayer
+        "tanjiro": ["tanjiro", "kamado"],
+        "rengoku": ["rengoku", "kyojuro"],
+        "zenitsu": ["zenitsu", "agatsuma"],
+        "akaza": ["akaza", "hakuji"],
+        "giyu": ["giyu", "tomioka"],
+        "tengen": ["tengen", "uzui"],
+        "gyutaro": ["gyutaro"],
+        "inosuke": ["inosuke", "hashibira"],
+        "muzan": ["muzan", "kibutsuji"],
+        "nezuko": ["nezuko"],
+        "muichiro": ["muichiro", "tokito"],
     }
 
     for char_key, aliases in char_names.items():

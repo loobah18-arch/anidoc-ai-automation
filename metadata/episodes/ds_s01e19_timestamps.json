@@ -1,0 +1,106 @@
+{
+  "episode_code": "DS_S01E19",
+  "title": "Hinokami",
+  "duration": 1440.0,
+  "universe": "demonslayer",
+  "characters": [
+    {
+      "name": "Tanjiro",
+      "role": "Protagonist",
+      "key_moments": [
+        "Broken Nichirin blade vs Rui",
+        "Tanjuro Kamado Kagura dance memory",
+        "Sun Breathing / Hinokami Kagura awakening",
+        "Combined slash with Nezuko Exploding Blood"
+      ]
+    },
+    {
+      "name": "Nezuko",
+      "role": "Deuteragonist",
+      "key_moments": [
+        "Suspended in Rui's cutting threads",
+        "Mother's voice awakens Blood Demon Art",
+        "Exploding Blood ignites Rui's threads"
+      ]
+    }
+  ],
+  "scene_count": 6,
+  "source": "Google Drive - Demon Slayer Collection",
+  "notes": "DEMONSLAYER combat episode",
+  "scenes": [
+    {
+      "start": 180.0,
+      "end": 360.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Tanjiro fights Rui with Water Breathing Tenth Form Constant Flux",
+      "characters_present": [
+        "tanjiro"
+      ],
+      "action_score": 0.75,
+      "duration": 180.0
+    },
+    {
+      "start": 420.0,
+      "end": 600.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Rui's Blood Demon Art Cutting Thread Cage traps Tanjiro",
+      "characters_present": [
+        "tanjiro"
+      ],
+      "action_score": 0.75,
+      "duration": 180.0
+    },
+    {
+      "start": 780.0,
+      "end": 960.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Tanjuro Kagura memory: Breath properly and dance without fatigue",
+      "characters_present": [
+        "tanjiro"
+      ],
+      "action_score": 0.95,
+      "duration": 180.0
+    },
+    {
+      "start": 960.0,
+      "end": 1100.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Hinokami Kagura Dance of the Fire God flame sword transformation",
+      "characters_present": [
+        "tanjiro"
+      ],
+      "action_score": 0.95,
+      "duration": 140.0
+    },
+    {
+      "start": 1100.0,
+      "end": 1220.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Nezuko Blood Demon Art Exploding Blood ignites the threads into crimson fire",
+      "characters_present": [
+        "tanjiro",
+        "nezuko"
+      ],
+      "action_score": 0.95,
+      "duration": 120.0
+    },
+    {
+      "start": 1220.0,
+      "end": 1320.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Tanjiro cleaves through Rui's flaming neck with Kamado song climax",
+      "characters_present": [
+        "tanjiro",
+        "nezuko"
+      ],
+      "action_score": 0.95,
+      "duration": 100.0
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "episode_code": "DS_S03E08",
+  "title": "The Mu in Muichiro",
+  "duration": 1440.0,
+  "universe": "demonslayer",
+  "characters": [
+    {
+      "name": "Muichiro",
+      "role": "Mist Hashira",
+      "key_moments": [
+        "Escapes Gyokko's Water Prison Pot with Kotetsu's breath",
+        "Awakens red Demon Slayer Mark on face",
+        "Receives new Nichirin sword forged by Kanamori",
+        "Mist Breathing forms 1 to 6"
+      ]
+    }
+  ],
+  "scene_count": 3,
+  "source": "Google Drive - Demon Slayer Collection",
+  "notes": "DEMONSLAYER combat episode",
+  "scenes": [
+    {
+      "start": 240.0,
+      "end": 480.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Muichiro breaks water prison pot with Second Form Eight Layered Mist",
+      "characters_present": [
+        "muichiro"
+      ],
+      "action_score": 0.75,
+      "duration": 240.0
+    },
+    {
+      "start": 600.0,
+      "end": 840.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Mist Hashira awakens facial Demon Slayer Mark with blazing blue eyes",
+      "characters_present": [
+        "muichiro"
+      ],
+      "action_score": 0.95,
+      "duration": 240.0
+    },
+    {
+      "start": 960.0,
+      "end": 1200.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Muichiro slices Gyokko's thousand slime fish with Fourth Form Shifting Flow",
+      "characters_present": [
+        "muichiro"
+      ],
+      "action_score": 0.95,
+      "duration": 240.0
+    }
+  ]
+}

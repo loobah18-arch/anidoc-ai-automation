@@ -162,7 +162,8 @@ def render_cinematic_edit(
                 gdrive_url_or_id=gdrive_target,
                 target_character=character_key,
                 output_dir=universe_dir,
-                n_clips=n_clips + 4
+                n_clips=n_clips + 4,
+                title=title_text
             )
             if gdrive_clips:
                 clip_paths = gdrive_clips

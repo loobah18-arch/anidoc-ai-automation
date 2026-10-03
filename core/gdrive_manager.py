@@ -22,6 +22,12 @@ from pathlib import Path
 from typing import List, Dict, Optional, Tuple, Any
 
 from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
+from core.timestamp_loader import (
+    match_episode_code_from_filename,
+    load_episode_metadata,
+    get_character_clips
+)
+from core.title_driven_selector import parse_title_intent, get_title_driven_clips
 
 SUPPORTED_VIDEO_EXTS = {".mp4", ".mkv", ".mov", ".avi", ".webm", ".ts", ".m4v"}
 SUPPORTED_ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".7z", ".rar"}
@@ -38,6 +44,7 @@ CHARACTER_EPISODE_PREFERENCES = {
     "mahito": ["e20", "e21", "e19", "e18", "e22", "e13", "e12", "e07"], # Yuji & Todo vs Mahito, Nanami vs Mahito
     "todo": ["e20", "e21", "e19", "e18", "e15"],                         # Double Black Flash, Boogie Woogie
     "nobara": ["e19", "e24", "e03"],                                     # Resonance vs Mahito, Death Painting
+    "choso": ["e13", "e24", "choso", "shibuya"],                         # Choso vs Yuji bathroom brawl, Death Painting
     # Demon Slayer (Kimetsu no Yaiba) Preferences
     "tanjiro": ["entertainment", "mugen", "swordsmith", "hashira", "hinokami", "e19", "e10", "e11", "e08", "e01"],
     "rengoku": ["mugen", "train", "akaza", "rengoku", "e07", "e06", "e05"],
@@ -125,17 +132,41 @@ def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
 
 def pick_best_file_for_character(
     files: List[Dict[str, str]],
-    character_key: str
+    character_key: str,
+    title: Optional[str] = None
 ) -> Optional[Dict[str, str]]:
     """
     Selects a DIVERSE, non-repetitive episode or movie for the target character.
     Tracks history so the same episode is not reused until the entire pool has been rotated through.
+    Prioritizes episodes matching the specific technique or fight named in the title.
     """
     if not files:
         return None
 
     history = _load_history()
     used_files = set(history.get("used_files", []))
+
+    # 0. Check if title prefers specific episodes (e.g., Black Flash -> S02E21, Hinokami -> DS_S01E19)
+    if title:
+        try:
+            intent = parse_title_intent(title)
+            preferred_eps = intent.get("preferred_episodes") or []
+            if preferred_eps:
+                title_matches = []
+                for f in files:
+                    code = match_episode_code_from_filename(f["name"])
+                    if code and code in preferred_eps:
+                        title_matches.append(f)
+                if title_matches:
+                    unused_title = [f for f in title_matches if f["name"] not in used_files]
+                    cand_pool = unused_title if unused_title else title_matches
+                    chosen = random.choice(cand_pool)
+                    print(f"🎯 [GoogleDrive] Selected title-optimized episode ({intent['scene_type']}) for '{character_key}': {chosen['name']}")
+                    history["used_files"].append(chosen["name"])
+                    _save_history(history)
+                    return chosen
+        except Exception as e:
+            print(f"⚠️ [GoogleDrive] Title-based file matching error: {e}")
 
     # 1. Collect all matching eligible files for this character/universe
     prefs = CHARACTER_EPISODE_PREFERENCES.get(character_key, [character_key])
@@ -151,7 +182,7 @@ def pick_best_file_for_character(
     if not eligible_files:
         if character_key in {"tanjiro", "rengoku", "akaza", "zenitsu", "tengen", "gyutaro", "giyu", "inosuke", "muzan", "nezuko", "muichiro"}:
             eligible_files = [f for f in files if any(k in f["name"].lower() for k in ["demon", "slayer", "kimetsu", "yaiba", "kny", "mugen", "hashira", "entertainment", "swordsmith"])]
-        elif character_key in {"gojo", "sukuna", "toji", "yuji", "megumi", "mahito", "todo", "nobara"}:
+        elif character_key in {"gojo", "sukuna", "toji", "yuji", "megumi", "mahito", "todo", "nobara", "choso"}:
             eligible_files = [f for f in files if "jujutsu" in f["name"].lower() or "jjk" in f["name"].lower()]
         else:
             eligible_files = [f for f in files if any(k in f["name"].lower() for k in ["spider", "thor", "iron", "marvel"])]
@@ -318,13 +349,19 @@ def slice_action_moments_from_source(
     character_key: str,
     output_dir: Path,
     n_clips: int = 15,
-    clip_duration: float = 3.2
+    clip_duration: float = 3.2,
+    title: Optional[str] = None
 ) -> List[Path]:
     """
-    Scans a raw episode/movie using FFmpeg audio energy analysis with:
-    1. Randomized time jitter so scans never hit the exact same timestamps.
-    2. Exclusion of previously used timestamps for this episode.
-    3. Temperature-based sampling from the top 40 loudest moments.
+    Hybrid Action Slicer: Combines curated iconic/epic episode timestamps from metadata analysis
+    (e.g. Hinokami Kagura, Malevolent Shrine, Sixfold Lightning, Musical Score, Black Flash)
+    with dynamic FFmpeg high-frequency audio energy clashing moments from the rest of the episode.
+    
+    Guarantees:
+    1. Inclusion of newly analyzed iconic anime climax scenes.
+    2. Dynamic variety from unscripted combat audio analysis.
+    3. Non-repetitive rotation across multiple edits.
+    4. Intelligent beat drop synchronization (#1 climax placed at Beat Drop).
     """
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -346,7 +383,7 @@ def slice_action_moments_from_source(
     except Exception:
         total_duration = 120.0
 
-    print(f"🔍 [ActionSlicer] Scanning '{video_path.name}' ({total_duration:.1f}s) for fresh action scenes...")
+    print(f"🔍 [ActionSlicer] Analyzing '{video_path.name}' ({total_duration:.1f}s) for epic combat scenes...")
 
     # Load previously used timestamps for this video
     history = _load_history()
@@ -356,16 +393,92 @@ def slice_action_moments_from_source(
     start_bound = 90.0 if total_duration > 300 else 10.0
     end_bound = (total_duration - 90.0) if total_duration > 300 else (total_duration - 10.0)
 
-    # Add randomized start offset so every scan samples different frames
+    # ── Phase 1: Curated Episode Climax & Scene Extraction from Metadata ───────
+    matched_ep_code = match_episode_code_from_filename(video_path.name)
+    curated_candidates = []
+
+    if matched_ep_code:
+        print(f"📖 [ActionSlicer] Matched episode code: {matched_ep_code} for '{video_path.name}'")
+
+        # 1. Title-matched scenes
+        title_scenes = []
+        if title:
+            try:
+                tc = get_title_driven_clips(title, character_key, max_clips=n_clips)
+                title_scenes = [c for c in tc if c.get("episode") == matched_ep_code]
+            except Exception:
+                pass
+
+        # 2. Character-specific curated scenes from episode metadata
+        char_scenes = get_character_clips(matched_ep_code, character_key, min_action_score=0.55, max_clips=25)
+
+        # 3. General high-action scenes from episode metadata
+        ep_meta = load_episode_metadata(matched_ep_code)
+        general_scenes = []
+        if ep_meta:
+            general_scenes = [
+                s for s in ep_meta.get("scenes", [])
+                if float(s.get("action_score", 0.0)) >= 0.70
+            ]
+
+        seen_ranges = set()
+
+        def _add_curated_scene(s: Dict[str, Any], bonus: float, tag_prefix: str):
+            st = float(s.get("start", 0.0))
+            en = float(s.get("end", st + 10.0))
+            desc = s.get("description", "Curated epic scene")
+            base_score = float(s.get("action_score", 0.8)) * 100.0 + bonus
+            if s.get("priority") == "high":
+                base_score += 15.0
+
+            key = (int(st), int(en))
+            if key in seen_ranges:
+                return
+            seen_ranges.add(key)
+
+            scene_len = max(clip_duration, en - st)
+            if scene_len <= clip_duration * 1.5:
+                pts = [st]
+            elif scene_len <= 15.0:
+                mid = st + (scene_len - clip_duration) * 0.45
+                pts = [mid]
+            else:
+                pts = [
+                    st + 1.0,
+                    st + (scene_len - clip_duration) * 0.65
+                ]
+
+            for p in pts:
+                # Clamp within video bounds
+                if p < start_bound or p + clip_duration > end_bound:
+                    continue
+                # Skip if timestamp was recently used
+                if not any(abs(p - prev) < 5.0 for prev in file_used_ts):
+                    curated_candidates.append({
+                        "start": p,
+                        "score": base_score,
+                        "description": desc,
+                        "tag": f"💎 {tag_prefix}: {desc[:42]}",
+                        "is_curated": True
+                    })
+
+        for s in title_scenes:
+            _add_curated_scene(s, bonus=20.0, tag_prefix="TITLE-MATCH")
+        for s in char_scenes:
+            _add_curated_scene(s, bonus=10.0, tag_prefix="CURATED-CHAR")
+        for s in general_scenes:
+            _add_curated_scene(s, bonus=0.0, tag_prefix="EPIC-SCENE")
+
+        print(f"✨ [ActionSlicer] Extracted {len(curated_candidates)} curated epic moments from metadata for {matched_ep_code}.")
+
+    # ── Phase 2: Dynamic FFmpeg Audio Volume Scan across the Episode ─────────
     rand_offset = random.uniform(0.0, 2.5)
     step = 4.0 if total_duration > 600 else 2.0
     t = start_bound + rand_offset
+    audio_candidates = []
 
-    candidates = []
     while t + clip_duration <= end_bound:
-        # Skip if timestamp was recently used
         if not any(abs(t - prev) < 6.0 for prev in file_used_ts):
-            # Phase 1: High-frequency combat detection (swords, punches, energy blasts, technique impacts)
             cmd_h = [
                 "ffmpeg", "-ss", str(t), "-t", str(clip_duration),
                 "-i", str(video_path),
@@ -381,7 +494,7 @@ def slice_action_moments_from_source(
                             h_vol = float(line.split(":")[1].strip().split(" ")[0])
                         except Exception:
                             pass
-                
+
                 # Only analyze sub-bass if high-frequency clash meets fight threshold (> -40.0 dB)
                 if h_vol > -40.0:
                     cmd_s = [
@@ -398,73 +511,102 @@ def slice_action_moments_from_source(
                                 s_vol = float(line.split(":")[1].strip().split(" ")[0])
                             except Exception:
                                 pass
-                    
-                    # Strict Pure Fight Filter: requires both combat clashes and bass impact
+
                     if s_vol > -40.0:
                         fight_score = (h_vol + 60.0) * 1.6 + (s_vol + 60.0) * 1.2
-                        candidates.append((t, fight_score, h_vol, s_vol))
+                        audio_candidates.append({
+                            "start": t,
+                            "score": fight_score,
+                            "description": "Dynamic Audio Clashing Scene",
+                            "tag": "⚔️ Dynamic Combat Clash",
+                            "is_curated": False
+                        })
             except Exception:
                 pass
         t += step
 
-    # Fallback if too few fight scenes met strict threshold
-    if len(candidates) < n_clips:
-        print(f"⚠️ [ActionSlicer] Strict fight filter found {len(candidates)} cuts, loosening threshold...")
+    audio_candidates.sort(key=lambda x: x["score"], reverse=True)
+    print(f"⚔️ [ActionSlicer] Discovered {len(audio_candidates)} dynamic audio combat moments.")
+
+    # ── Phase 3: Hybrid Merge (Curated Climax + Dynamic Audio Variety) ────────
+    curated_candidates.sort(key=lambda x: x["score"], reverse=True)
+    final_candidates = []
+
+    # Allocate up to 60-70% to curated scenes if available
+    curated_quota = min(len(curated_candidates), max(4, int(n_clips * 0.65))) if curated_candidates else 0
+    for c in curated_candidates[:curated_quota]:
+        if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+            final_candidates.append(c)
+
+    # Fill with top dynamic audio combat scenes
+    for a in audio_candidates:
+        if len(final_candidates) >= n_clips + 8:
+            break
+        if not any(abs(a["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+            final_candidates.append(a)
+
+    # Fill any remaining quota with extra curated scenes
+    for c in curated_candidates[curated_quota:]:
+        if len(final_candidates) >= n_clips + 8:
+            break
+        if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+            final_candidates.append(c)
+
+    # Safe fallback if too few candidates met strict thresholds
+    if len(final_candidates) < n_clips:
+        print(f"⚠️ [ActionSlicer] Found {len(final_candidates)} candidates, adding paced scene fallback...")
         t = start_bound
-        while t + clip_duration <= end_bound and len(candidates) < n_clips * 2:
-            candidates.append((t, 50.0, -35.0, -35.0))
+        while t + clip_duration <= end_bound and len(final_candidates) < n_clips * 2:
+            if not any(abs(t - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+                final_candidates.append({
+                    "start": t,
+                    "score": 50.0,
+                    "description": "Paced Scene",
+                    "tag": "🎬 Paced Scene",
+                    "is_curated": False
+                })
             t += 15.0
 
-    candidates.sort(key=lambda x: x[1], reverse=True)
-    print(f"⚔️ [ActionSlicer] Discovered {len(candidates)} genuine fight/combat moments.")
+    final_candidates.sort(key=lambda x: x["score"], reverse=True)
+    print(f"🎬 [ActionSlicer] Total hybrid candidate pool: {len(final_candidates)} scenes (Curated + Dynamic Audio).")
 
-    unique_candidates = []
-    for start, score, h_v, s_v in candidates:
-        if not any(abs(start - s[0]) < (clip_duration * 1.5) for s in unique_candidates):
-            unique_candidates.append((start, score))
-        if len(unique_candidates) >= n_clips + 8:
-            break
-
-    if not unique_candidates:
-        unique_candidates = [(start_bound + i * 5.0, 50.0) for i in range(n_clips)]
-
-    # ── Intelligent Scene Orchestration for Beat Drops ───────────────────────
-    # The #1 loudest explosion / blast is specifically mapped to the Beat Drop (index 4)
-    # The #2 blast is mapped to the Bridge Drop (~index 22)
-    # The #3 impact is mapped to the Climax Outro Finisher (last clip)
+    # ── Phase 4: Intelligent Scene Orchestration for Beat Drops ───────────────
+    # The #1 loudest / most epic climax scene is mapped to the Beat Drop (index 4)
+    # The #2 scene is mapped to the Bridge Drop (~index 22 or 12)
+    # The #3 scene is mapped to the Climax Outro Finisher (last clip)
     # The lowest energy scenes are mapped to the Intro (clips 00-03)
     drop_idx = min(4, max(0, n_clips - 1))
     bridge_idx = min(22, max(0, n_clips - 2)) if n_clips > 24 else min(12, max(0, n_clips - 2))
     last_idx = n_clips - 1
 
-    drop_climax = unique_candidates[0]
-    sec_drop = unique_candidates[1] if len(unique_candidates) > 1 else unique_candidates[0]
-    finisher = unique_candidates[2] if len(unique_candidates) > 2 else unique_candidates[0]
-    remaining_cand = unique_candidates[3:] if len(unique_candidates) > 3 else unique_candidates
+    drop_climax = final_candidates[0]
+    sec_drop = final_candidates[1] if len(final_candidates) > 1 else final_candidates[0]
+    finisher = final_candidates[2] if len(final_candidates) > 2 else final_candidates[0]
+    remaining_cand = final_candidates[3:] if len(final_candidates) > 3 else final_candidates
 
     # Sort remaining into intro (lowest score dialogue/walk) and combat (high energy clashes)
-    sorted_by_energy = sorted(remaining_cand, key=lambda x: x[1])
+    sorted_by_energy = sorted(remaining_cand, key=lambda x: x["score"])
     intro_pool = sorted_by_energy[:drop_idx]
     combat_pool = sorted_by_energy[drop_idx:] if len(sorted_by_energy) > drop_idx else sorted_by_energy
 
-    selected_starts = [None] * n_clips
+    selected = [None] * n_clips
     for i in range(min(drop_idx, len(intro_pool))):
-        selected_starts[i] = intro_pool[i][0]
+        selected[i] = intro_pool[i]
 
-    selected_starts[drop_idx] = drop_climax[0]
-    selected_starts[bridge_idx] = sec_drop[0]
-    selected_starts[last_idx] = finisher[0]
+    selected[drop_idx] = drop_climax
+    selected[bridge_idx] = sec_drop
+    selected[last_idx] = finisher
 
     c_idx = 0
     for i in range(n_clips):
-        if selected_starts[i] is None:
+        if selected[i] is None:
             if combat_pool:
-                selected_starts[i] = combat_pool[c_idx % len(combat_pool)][0]
+                selected[i] = combat_pool[c_idx % len(combat_pool)]
             else:
-                selected_starts[i] = unique_candidates[c_idx % len(unique_candidates)][0]
+                selected[i] = final_candidates[c_idx % len(final_candidates)]
             c_idx += 1
 
-    print(f"💥 [ActionSlicer] Mapped #1 EXPLOSION scene ({drop_climax[0]:.1f}s, score: {drop_climax[1]:.1f}) directly to Beat Drop (Clip {drop_idx+1})!")
+    print(f"💥 [ActionSlicer] Mapped #1 CLIMAX scene ({drop_climax['start']:.1f}s, {drop_climax['tag']}) directly to Beat Drop (Clip {drop_idx+1})!")
 
     # Probe English Dub audio stream mapping
     eng_audio_map = get_english_audio_map(video_path)
@@ -472,7 +614,8 @@ def slice_action_moments_from_source(
     generated_clips = []
     new_used_ts = []
 
-    for idx, start in enumerate(selected_starts):
+    for idx, cand in enumerate(selected):
+        start = cand["start"]
         out_clip = output_dir / f"{character_key}_gdrive_{idx:02d}_{int(start)}s.mp4"
         cmd = [
             "ffmpeg", "-y",
@@ -499,8 +642,13 @@ def slice_action_moments_from_source(
             if out_clip.exists() and out_clip.stat().st_size > 40_000:
                 generated_clips.append(out_clip)
                 new_used_ts.append(start)
-                tag = "💥 BEAT DROP EXPLOSION" if idx == drop_idx else ("⚡ SECONDARY DROP" if idx == bridge_idx else ("🔥 FINISHER" if idx == last_idx else "⚔️ Action"))
-                print(f"  ✂️ Clip {idx+1:02d}/{len(selected_starts)} sliced ({start:.1f}s - {start+clip_duration:.1f}s) [{tag}]")
+                role_tag = (
+                    "💥 BEAT DROP" if idx == drop_idx
+                    else ("⚡ SECONDARY DROP" if idx == bridge_idx
+                    else ("🔥 FINISHER" if idx == last_idx
+                    else "⚔️ Scene"))
+                )
+                print(f"  ✂️ Clip {idx+1:02d}/{len(selected)} sliced ({start:.1f}s - {start+clip_duration:.1f}s) [{role_tag}] {cand.get('tag', '')}")
         except Exception as e:
             print(f"  ⚠️ Error cutting clip at {start}s: {e}")
 
@@ -522,14 +670,15 @@ def fetch_and_prepare_gdrive_footage(
     gdrive_url_or_id: str,
     target_character: str,
     output_dir: Path,
-    n_clips: int = 15
+    n_clips: int = 15,
+    title: Optional[str] = None
 ) -> List[Path]:
     """
     Lightning-Fast Non-Repetitive Google Drive Ingestion:
     1. Parses Google Drive folder index in 1s.
-    2. Rotates to a DIFFERENT episode/movie for the character that hasn't been used yet.
+    2. Rotates to a DIFFERENT episode/movie for the character that hasn't been used yet (or title-matched).
     3. Downloads only that 1 video (~10s).
-    4. Slices fresh non-repetitive action moments into 9:16 portrait clips.
+    4. Slices hybrid curated epic climax scenes + dynamic audio moments into 9:16 portrait clips.
     """
     gdrive_workdir = SCRATCH_DIR / "gdrive_workspace"
     gdrive_workdir.mkdir(parents=True, exist_ok=True)
@@ -539,7 +688,7 @@ def fetch_and_prepare_gdrive_footage(
         print("⚠️ [GoogleDrive] No files retrieved from Google Drive folder index.")
         return []
 
-    best_file = pick_best_file_for_character(items, target_character)
+    best_file = pick_best_file_for_character(items, target_character, title=title)
     if not best_file:
         print(f"⚠️ [GoogleDrive] No matching file found for '{target_character}'.")
         return []
@@ -553,7 +702,9 @@ def fetch_and_prepare_gdrive_footage(
         video_path=raw_video,
         character_key=target_character,
         output_dir=output_dir,
-        n_clips=n_clips
+        n_clips=n_clips,
+        title=title
     )
 
     return sliced_clips
+

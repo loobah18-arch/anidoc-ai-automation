@@ -1,0 +1,82 @@
+{
+  "episode_code": "S01E24",
+  "title": "Accomplices",
+  "duration": 1440.0,
+  "universe": "jjk",
+  "characters": [
+    {
+      "name": "Yuji",
+      "role": "Protagonist",
+      "key_moments": [
+        "Black Flash sync with Nobara",
+        "Vs Eso & Kechizu",
+        "Superhuman speed run"
+      ]
+    },
+    {
+      "name": "Nobara",
+      "role": "Protagonist",
+      "key_moments": [
+        "Straw Doll Technique: Resonance on self",
+        "Black Flash awakening",
+        "Hairpin explosion"
+      ]
+    }
+  ],
+  "scene_count": 4,
+  "source": "Google Drive - JJK Collection",
+  "notes": "JJK combat episode",
+  "scenes": [
+    {
+      "start": 240.0,
+      "end": 480.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Rot technique poisons Yuji and Nobara, Kechizu blood spray",
+      "characters_present": [
+        "yuji",
+        "nobara"
+      ],
+      "action_score": 0.75,
+      "duration": 240.0
+    },
+    {
+      "start": 480.0,
+      "end": 720.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Nobara nails her own arm with Resonance: Let's play a game of chicken!",
+      "characters_present": [
+        "nobara"
+      ],
+      "action_score": 0.95,
+      "duration": 240.0
+    },
+    {
+      "start": 720.0,
+      "end": 960.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Simultaneous Double Black Flash: Yuji strikes Eso, Nobara obliterates Kechizu",
+      "characters_present": [
+        "yuji",
+        "nobara"
+      ],
+      "action_score": 0.95,
+      "duration": 240.0
+    },
+    {
+      "start": 960.0,
+      "end": 1140.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Nobara Hairpin detonates the blood nails in Eso's heart",
+      "characters_present": [
+        "nobara",
+        "yuji"
+      ],
+      "action_score": 0.95,
+      "duration": 180.0
+    }
+  ]
+}

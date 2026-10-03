@@ -2,6 +2,7 @@
   "episode_code": "S01E09",
   "title": "Small Fry and Reverse Retribution",
   "duration": 1440.0,
+  "universe": "jjk",
   "characters": [
     {
       "name": "Gojo",
@@ -25,9 +26,7 @@
   ],
   "scene_count": 6,
   "source": "Google Drive - JJK Collection",
-  "season": 1,
-  "episode": 9,
-  "notes": "JJK episode",
+  "notes": "JJK combat episode",
   "scenes": [
     {
       "start": 0.0,
@@ -51,7 +50,7 @@
         "gojo",
         "jogo"
       ],
-      "action_score": 0.7,
+      "action_score": 0.75,
       "duration": 180.0
     },
     {
@@ -64,7 +63,7 @@
         "gojo",
         "jogo"
       ],
-      "action_score": 0.9,
+      "action_score": 0.95,
       "duration": 180.0
     },
     {
@@ -77,7 +76,7 @@
         "gojo",
         "jogo"
       ],
-      "action_score": 0.9,
+      "action_score": 0.95,
       "duration": 180.0
     },
     {
@@ -90,7 +89,7 @@
         "gojo",
         "jogo"
       ],
-      "action_score": 0.9,
+      "action_score": 0.95,
       "duration": 180.0
     },
     {
@@ -103,7 +102,7 @@
         "gojo",
         "jogo"
       ],
-      "action_score": 0.7,
+      "action_score": 0.75,
       "duration": 180.0
     }
   ]

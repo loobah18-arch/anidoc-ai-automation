@@ -2,6 +2,7 @@
   "episode_code": "S01E07",
   "title": "Assault",
   "duration": 1440.0,
+  "universe": "jjk",
   "characters": [
     {
       "name": "Yuji",
@@ -31,9 +32,7 @@
   ],
   "scene_count": 3,
   "source": "Google Drive - JJK Collection",
-  "season": 1,
-  "episode": 7,
-  "notes": "JJK episode",
+  "notes": "JJK combat episode",
   "scenes": [
     {
       "start": 240.0,
@@ -45,7 +44,7 @@
         "todo",
         "gojo"
       ],
-      "action_score": 0.5,
+      "action_score": 0.55,
       "duration": 120.0
     },
     {
@@ -58,7 +57,7 @@
         "todo",
         "megumi"
       ],
-      "action_score": 0.7,
+      "action_score": 0.75,
       "duration": 180.0
     },
     {
@@ -72,7 +71,7 @@
         "megumi",
         "nobara"
       ],
-      "action_score": 0.9,
+      "action_score": 0.95,
       "duration": 180.0
     }
   ]

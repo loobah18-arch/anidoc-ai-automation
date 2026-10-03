@@ -1,0 +1,59 @@
+{
+  "episode_code": "DS_S03E09",
+  "title": "Mist Hashira Muichiro Tokito",
+  "duration": 1440.0,
+  "universe": "demonslayer",
+  "characters": [
+    {
+      "name": "Muichiro",
+      "role": "Mist Hashira",
+      "key_moments": [
+        "Verbally dismantles Upper Moon 5 Gyokko",
+        "Mist Breathing Seventh Form: Obscuring Clouds (Hazy)",
+        "Disappears into thick mist with turtle pace to lightning speed changes",
+        "Effortless clean decapitation of Gyokko"
+      ]
+    }
+  ],
+  "scene_count": 3,
+  "source": "Google Drive - Demon Slayer Collection",
+  "notes": "DEMONSLAYER combat episode",
+  "scenes": [
+    {
+      "start": 180.0,
+      "end": 420.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Gyokko reveals true molted form, Muichiro completely unimpressed",
+      "characters_present": [
+        "muichiro"
+      ],
+      "action_score": 0.75,
+      "duration": 240.0
+    },
+    {
+      "start": 540.0,
+      "end": 780.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Mist Breathing Seventh Form Obscuring Clouds: Thick haze envelops the forest",
+      "characters_present": [
+        "muichiro"
+      ],
+      "action_score": 0.95,
+      "duration": 240.0
+    },
+    {
+      "start": 780.0,
+      "end": 960.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Muichiro blinks behind Gyokko and cleanly severs his head in mid-air",
+      "characters_present": [
+        "muichiro"
+      ],
+      "action_score": 0.95,
+      "duration": 180.0
+    }
+  ]
+}

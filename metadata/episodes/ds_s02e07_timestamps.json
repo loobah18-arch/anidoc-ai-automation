@@ -1,0 +1,109 @@
+{
+  "episode_code": "DS_S02E07",
+  "title": "Set Your Heart Ablaze",
+  "duration": 1440.0,
+  "universe": "demonslayer",
+  "characters": [
+    {
+      "name": "Rengoku",
+      "role": "Flame Hashira",
+      "key_moments": [
+        "Severely wounded eye and ribs",
+        "Ignites flaming battle aura: Set your heart ablaze",
+        "Esoteric Art Ninth Form: Rengoku dragon charge",
+        "Locks Akaza's arm with pure muscle and grips blade with neck"
+      ]
+    },
+    {
+      "name": "Akaza",
+      "role": "Upper Moon 3",
+      "key_moments": [
+        "Destructive Death: Annihilation Type",
+        "Fierce struggle to rip arms free before sunrise",
+        "Flees into the forest while Tanjiro throws Nichirin sword"
+      ]
+    }
+  ],
+  "scene_count": 6,
+  "source": "Google Drive - Demon Slayer Collection",
+  "notes": "DEMONSLAYER combat episode",
+  "scenes": [
+    {
+      "start": 60.0,
+      "end": 300.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Rengoku stands back up battered, Akaza praises his fighting spirit",
+      "characters_present": [
+        "rengoku",
+        "akaza"
+      ],
+      "action_score": 0.75,
+      "duration": 240.0
+    },
+    {
+      "start": 300.0,
+      "end": 480.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Set your heart ablaze monologue: I will fulfill my duty as a Hashira!",
+      "characters_present": [
+        "rengoku"
+      ],
+      "action_score": 0.95,
+      "duration": 180.0
+    },
+    {
+      "start": 480.0,
+      "end": 720.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Ninth Form Rengoku dragon flame aura ignites the entire plain",
+      "characters_present": [
+        "rengoku",
+        "akaza"
+      ],
+      "action_score": 0.95,
+      "duration": 240.0
+    },
+    {
+      "start": 720.0,
+      "end": 960.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Supreme clash: Ninth Form Rengoku vs Destructive Death Annihilation Type",
+      "characters_present": [
+        "rengoku",
+        "akaza"
+      ],
+      "action_score": 0.95,
+      "duration": 240.0
+    },
+    {
+      "start": 960.0,
+      "end": 1140.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Rengoku grips Akaza's fists inside his torso as the sun begins rising",
+      "characters_present": [
+        "rengoku",
+        "akaza"
+      ],
+      "action_score": 0.95,
+      "duration": 180.0
+    },
+    {
+      "start": 1140.0,
+      "end": 1320.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Tanjiro throws sword through fleeing Akaza: Don't run away coward!",
+      "characters_present": [
+        "tanjiro",
+        "akaza"
+      ],
+      "action_score": 0.95,
+      "duration": 180.0
+    }
+  ]
+}

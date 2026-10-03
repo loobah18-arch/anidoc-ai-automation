@@ -1,0 +1,71 @@
+{
+  "episode_code": "DS_S01E20",
+  "title": "Pretence of Family",
+  "duration": 1440.0,
+  "universe": "demonslayer",
+  "characters": [
+    {
+      "name": "Giyu",
+      "role": "Hashira",
+      "key_moments": [
+        "Arrives at Natagumo Mountain",
+        "Water Breathing Eleventh Form: Dead Calm (Lull)",
+        "Nullifies Rui's strongest Blood Demon Art effortlessly",
+        "One-shot decapitation"
+      ]
+    }
+  ],
+  "scene_count": 4,
+  "source": "Google Drive - Demon Slayer Collection",
+  "notes": "DEMONSLAYER combat episode",
+  "scenes": [
+    {
+      "start": 240.0,
+      "end": 420.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Rui reattaches head, prepares Cutting Thread Wheel to execute Tanjiro",
+      "characters_present": [
+        "tanjiro"
+      ],
+      "action_score": 0.75,
+      "duration": 180.0
+    },
+    {
+      "start": 480.0,
+      "end": 660.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Giyu Tomioka steps in and activates Eleventh Form Dead Calm",
+      "characters_present": [
+        "giyu"
+      ],
+      "action_score": 0.95,
+      "duration": 180.0
+    },
+    {
+      "start": 660.0,
+      "end": 800.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Rui's razor threads dissolve into water ripples around Giyu",
+      "characters_present": [
+        "giyu"
+      ],
+      "action_score": 0.95,
+      "duration": 140.0
+    },
+    {
+      "start": 800.0,
+      "end": 960.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Giyu glides forward and instantly severs Rui's neck",
+      "characters_present": [
+        "giyu"
+      ],
+      "action_score": 0.95,
+      "duration": 160.0
+    }
+  ]
+}

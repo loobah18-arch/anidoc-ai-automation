@@ -2,6 +2,7 @@
   "episode_code": "S01E04",
   "title": "Curse Womb Must Die",
   "duration": 1440.0,
+  "universe": "jjk",
   "characters": [
     {
       "name": "Yuji",
@@ -40,9 +41,7 @@
   ],
   "scene_count": 4,
   "source": "Google Drive - JJK Collection",
-  "season": 1,
-  "episode": 4,
-  "notes": "JJK episode",
+  "notes": "JJK combat episode",
   "scenes": [
     {
       "start": 120.0,
@@ -55,7 +54,7 @@
         "megumi",
         "nobara"
       ],
-      "action_score": 0.5,
+      "action_score": 0.55,
       "duration": 180.0
     },
     {
@@ -69,7 +68,7 @@
         "megumi",
         "nobara"
       ],
-      "action_score": 0.7,
+      "action_score": 0.75,
       "duration": 180.0
     },
     {
@@ -82,7 +81,7 @@
         "yuji",
         "sukuna"
       ],
-      "action_score": 0.9,
+      "action_score": 0.95,
       "duration": 180.0
     },
     {
@@ -95,7 +94,7 @@
         "yuji",
         "sukuna"
       ],
-      "action_score": 0.9,
+      "action_score": 0.95,
       "duration": 180.0
     }
   ]
