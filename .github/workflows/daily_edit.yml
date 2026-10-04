@@ -38,16 +38,6 @@ on:
           - 'nxght_blue_horizon_funk'
           - 'trashxrl_deus_do_olimpo'
           - 'irokz_funk_universo_slowed'
-      subtitle_style:
-        description: 'Kinetic Subtitle Style Preset'
-        required: false
-        default: 'viral_karaoke'
-        type: choice
-        options:
-          - 'viral_karaoke'
-          - 'cyber_glow'
-          - 'anime_shrine'
-          - 'cinematic_minimal'
       gdrive_folder:
         description: 'Google Drive folder link or ID containing raw movies/episodes (optional)'
         required: false
@@ -145,10 +135,6 @@ jobs:
             CMD="$CMD --phonk ${{ github.event.inputs.phonk }}"
           fi
           
-          if [ -n "${{ github.event.inputs.subtitle_style }}" ]; then
-            CMD="$CMD --subtitle-style ${{ github.event.inputs.subtitle_style }}"
-          fi
-
           if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
             CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
           fi
@@ -179,5 +165,4 @@ jobs:
           name: 4k-phonk-edits
           path: |
             output/*.mp4
-            scratch/*.ass
           retention-days: 7

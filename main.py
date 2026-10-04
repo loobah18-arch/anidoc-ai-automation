@@ -36,9 +36,9 @@ def main():
     parser.add_argument("--universe", type=str, choices=["jjk", "demonslayer", "demon_slayer", "marvel"], default=None, help="Universe filter (jjk, demonslayer, or marvel)")
     parser.add_argument("--duration", type=float, default=DEFAULT_DURATION, help=f"Target video duration in seconds (default: {DEFAULT_DURATION})")
     parser.add_argument("--phonk", type=str, default=None, help="Phonk track name or ID from library (e.g. tokyo_drift_phonk, brazilian_phonk_montagem, dark_shadow_phonk, cyber_phonk_beat, gigachad_phonk)")
-    parser.add_argument("--subtitle-style", type=str, choices=["viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"], default="viral_karaoke", help="Dynamic kinetic subtitle preset")
-    parser.add_argument("--subtitles", action="store_true", default=False, help="Overlay dialogue subtitles / text on video (default: False for 100%% clean video)")
-    parser.add_argument("--burn-subtitles", action="store_true", default=False, help="Burn kinetic subtitles onto the video (default: False for clean pure video)")
+    parser.add_argument("--subtitle-style", type=str, default=None, help="Deprecated (subtitles disabled for 100%% clean video)")
+    parser.add_argument("--subtitles", action="store_true", default=False, help="Deprecated (subtitles disabled for 100%% clean video)")
+    parser.add_argument("--burn-subtitles", action="store_true", default=False, help="Deprecated (subtitles disabled for 100%% clean video)")
     parser.add_argument("--quote", type=str, default=None, help="Custom dialogue monologue quote")
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
     parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (jjk_void, sukuna_shrine, hinokami_flame, thunder_gold, water_breathing, flame_hashira, akaza_compass, cyber_phonk)")
@@ -83,16 +83,16 @@ def main():
             
     print(f"🔥 [AniDoc 4K Edit] Selected Character: {chosen_char} ({CHARACTER_THEMES[chosen_char]['universe'].upper()})")
     
-    # Render Video
+    # Render Video (100% Clean Pure Video, Zero Subtitles)
     result = render_cinematic_edit(
         character_key=chosen_char,
         audio_path=Path(args.audio) if args.audio else None,
         phonk_track=args.phonk,
         output_path=Path(args.output) if args.output else None,
         target_duration=args.duration,
-        subtitle_style=args.subtitle_style,
-        burn_subtitles=args.burn_subtitles,
-        enable_subtitles=args.subtitles,
+        subtitle_style="viral_karaoke",
+        burn_subtitles=False,
+        enable_subtitles=False,
         custom_quote=args.quote,
         custom_title=args.title,
         cc_preset=args.cc,

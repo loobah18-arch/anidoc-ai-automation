@@ -259,24 +259,12 @@ def render_cinematic_edit(
     # Micro-flash inserts REMOVED — reference uses rare flashes as overlays, not segments.
     # Flashes are handled via build_beat_flash_filters (2-3 total per edit) as overlays.
 
-    # 5. Optional Kinetic Karaoke Subtitles (Safe-Zone Alignment)
+    # 5. Pure 100% Clean Video (Zero Subtitles or Awkward Dialogue Burning)
+    # Subtitles and text overlays are completely disabled to ensure visual purity,
+    # avoiding awkward mid-sentence dialogue cutoffs or forced text on the screen.
     ass_path = None
     active_cc = cc_preset or theme["cc_preset"]
     cc_cfg = CC_PRESETS.get(active_cc, CC_PRESETS["marvel_hdr"])
-    
-    if burn_subtitles:
-        ass_path = SCRATCH_DIR / f"subs_{character_key}.ass"
-        generate_kinetic_subtitles(
-            quote_text=quote_text,
-            start_time=0.2,
-            end_time=min(beat_grid.duration, max(4.0, drop_t)),
-            output_ass_path=ass_path,
-            style_preset=subtitle_style,
-            primary_color="&H00FFFFFF",
-            active_color=cc_cfg.get("primary_color", "&H002BF5FF"),
-            glow_color=None,
-            character_name=theme["name"].split()[0]
-        )
     
     # 6. Build Multi-Layer FFmpeg Filtergraph (OpenCut-Inspired)
     cmd_inputs = []
@@ -357,59 +345,27 @@ def render_cinematic_edit(
     # 4K HDR Color Grade (CC Preset with S-curve colorlevels)
     cc_filter = build_cc_filter(active_cc)
     
-    # Subtitle Burn-in (Disabled by default to keep edit 100% pure video)
-    if burn_subtitles and ass_path and ass_path.exists():
-        ass_escaped = str(ass_path).replace(":", "\\:").replace("\\", "/")
-        sub_filter = f",ass={ass_escaped}"
-    else:
-        sub_filter = ""
-    
-    # Video Post-processing (Concatenated + Flash + Letterbox bars + Text overlays)
-    # CC is already applied per-clip above — flash overlays + letterbox + text remain here.
-    # Letterbox: 12.5% bars top + bottom for cinematic reference edit look.
+    # 100% Clean Video: Zero subtitles or text overlays
+    # Letterbox: 16:9 widescreen active frame with black bars top and bottom
     letterbox_filter = (
         f"drawbox=x=0:y=0:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill,"
         f"drawbox=x=0:y=ih-{LETTERBOX_BAR_HEIGHT}:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill"
     )
 
-    # Multi-style text overlays (disabled by default to ensure clean video without inaccurate subtitles)
-    if enable_subtitles:
-        text_overlay_str = generate_edit_text_overlays(
-            character_key=character_key,
-            quote_text=quote_text,
-            beat_times=beat_grid.beat_times,
-            drop_time=drop_t,
-            total_duration=beat_grid.duration,
-            character_colors=char_colors
-        )
-        if text_overlay_str and text_overlay_str != "null":
-            text_chain = f",{text_overlay_str}"
-        else:
-            text_chain = ""
-    else:
-        text_chain = ""
-
-
     filter_chains.append(
-        f"[concatenated_v]{flash_str},{letterbox_filter}{sub_filter}{text_chain}[vout]"
+        f"[concatenated_v]{flash_str},{letterbox_filter}[vout]"
     )
     
     # Audio Dynamic Structure:
-    # 70% Phonk BGM / 30% Original Anime/Movie Voice & SFX
-    # Track 1: Real clip audio (Voice/SFX) — clear dialogue in intro, punchy combat SFX in drop
-    # Track 2: Music BGM — atmospheric lowpass in intro, explosive drop at full volume
+    # 85% Dominant Phonk BGM / 15% Subtle Anime Combat SFX
+    # Eliminates awkward mid-sentence dialogue cuts by keeping the Phonk track clean and driving throughout.
+    # Clip combat SFX (swords, punches, energy impacts) are mixed in gently without cutting characters off.
     # Master: loudnorm to -12 dB (commercial streaming loudness)
     filter_chains.append(
-        f"[clip_sfx_raw]asplit=2[csfx_intro_in][csfx_drop_in];"
-        f"[csfx_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,highpass=f=100,volume=1.00[csfx_intro];"
-        f"[csfx_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,volume=0.45[csfx_drop];"
-        f"[csfx_intro][csfx_drop]concat=n=2:v=0:a=1[clip_audio_full];"
-        f"[{phonk_inp_idx}:a]asplit=2[p_intro_in][p_drop_in];"
-        f"[p_intro_in]atrim=0:{drop_t:.2f},asetpts=PTS-STARTPTS,lowpass=f=800,volume=0.35[p_intro];"
-        f"[p_drop_in]atrim={drop_t:.2f}:{beat_grid.duration:.2f},asetpts=PTS-STARTPTS,afade=t=in:st=0:d=0.04,volume=1.30[p_drop];"
-        f"[p_intro][p_drop]concat=n=2:v=0:a=1[phonk_dynamic];"
-        f"[phonk_dynamic][clip_audio_full]amix=inputs=2:duration=first:weights=7 3:dropout_transition=2,"
-        f"volume=1.30,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"
+        f"[clip_sfx_raw]volume=0.30,highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
+        f"[{phonk_inp_idx}:a]volume=1.25[phonk_full];"
+        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=85 15:dropout_transition=2,"
+        f"volume=1.20,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"
     )
     
     full_filter_complex = ";".join(filter_chains)
