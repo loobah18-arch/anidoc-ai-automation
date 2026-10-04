@@ -1,0 +1,27 @@
+{
+  "channel_name": "@jazzcreates",
+  "channel_id": "UC_jazzcreates",
+  "niche": "4K HDR Phonk Anime Scene Edits (Jujutsu Kaisen & Demon Slayer)",
+  "schedule": {
+    "morning_slot_utc": "06:30 UTC",
+    "morning_franchise": "Demon Slayer (Kimetsu no Yaiba)",
+    "evening_slot_utc": "18:30 UTC",
+    "evening_franchise": "Jujutsu Kaisen (JJK)"
+  },
+  "video_specifications": {
+    "resolution": "1080x1920 (9:16 Portrait Canvas)",
+    "active_video": "1080x608 (16:9 Widescreen centered)",
+    "letterbox_top_px": 656,
+    "letterbox_bottom_px": 656,
+    "fps": 24,
+    "target_duration_seconds": 60.0,
+    "video_codec": "libx264 (CRF 18-20, preset veryfast)",
+    "audio_codec": "aac (320kbps, 48000Hz)"
+  },
+  "content_rules": {
+    "universe_isolation": "STRICT. Demon Slayer edits must NEVER reference, show, or tag JJK. JJK edits must NEVER reference, show, or tag Demon Slayer.",
+    "titles": "High-CTR with emoji, 2-3 franchise hashtags, and #shorts. Under 70 characters.",
+    "descriptions": "Professional YouTube description with canonical Japanese/English anime title, character name, quote, and ufotable/MAPPA copyright disclaimer.",
+    "tags": "Clean universe-quarantined tags (max 12), no cross-franchise tags."
+  }
+}
