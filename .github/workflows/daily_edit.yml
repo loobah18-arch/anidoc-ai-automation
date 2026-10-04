@@ -7,17 +7,17 @@ on:
   workflow_dispatch:
     inputs:
       universe:
-        description: 'Universe (jjk, demonslayer, marvel, or random)'
+        description: 'Universe (demonslayer, jjk, marvel, or random)'
         required: false
-        default: 'random'
+        default: 'demonslayer'
         type: choice
         options:
-          - 'random'
-          - 'jjk'
           - 'demonslayer'
+          - 'jjk'
+          - 'random'
           - 'marvel'
       character:
-        description: 'Specific character (gojo, sukuna, yuji, toji, tanjiro, rengoku, zenitsu, akaza, giyu, tengen)'
+        description: 'Specific character (tanjiro, rengoku, zenitsu, akaza, giyu, tengen, inosuke, muzan, nezuko, muichiro, gyutaro, gojo, sukuna, yuji, toji, megumi)'
         required: false
         default: ''
         type: string
@@ -127,8 +127,14 @@ jobs:
               echo "🌆 [Scheduled Run: Evening Slot] Generating & Uploading Jujutsu Kaisen 4K Edit to @jazzcreates..."
               CMD="$CMD --universe jjk"
             fi
-          elif [ "${{ github.event.inputs.universe }}" != "random" ] && [ -n "${{ github.event.inputs.universe }}" ]; then
+          elif [ "${{ github.event.inputs.universe }}" = "random" ]; then
+            CHOSEN_UNI=$(python3 -c "import random; print(random.choice(['demonslayer', 'jjk']))")
+            echo "🎲 [Random Universe] Selected: $CHOSEN_UNI"
+            CMD="$CMD --universe $CHOSEN_UNI"
+          elif [ -n "${{ github.event.inputs.universe }}" ]; then
             CMD="$CMD --universe ${{ github.event.inputs.universe }}"
+          else
+            CMD="$CMD --universe demonslayer"
           fi
           
           if [ -n "${{ github.event.inputs.character }}" ]; then

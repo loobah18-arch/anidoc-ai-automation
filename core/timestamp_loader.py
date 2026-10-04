@@ -111,75 +111,111 @@ def find_best_episode_for_character(character: str) -> Optional[str]:
 def match_episode_code_from_filename(filename: str) -> Optional[str]:
     """
     Intelligently identifies the episode code from a video filename,
-    supporting JJK, Demon Slayer, and Mugen Train naming conventions.
+    strictly distinguishing Demon Slayer from Jujutsu Kaisen to prevent universe cross-contamination.
     """
     import re
     fn = filename.lower()
 
-    # 1. Demon Slayer specific matching
-    is_ds = any(k in fn for k in ["demon", "slayer", "kimetsu", "yaiba", "kny", "mugen", "tanjiro", "rengoku", "zenitsu", "uzui", "akaza", "giyu"])
+    # 1. Demon Slayer specific identification
+    is_ds = any(k in fn for k in [
+        "demon", "slayer", "kimetsu", "yaiba", "kny", "mugen", "tanjiro", "rengoku",
+        "zenitsu", "uzui", "akaza", "giyu", "inosuke", "muzan", "nezuko", "muichiro",
+        "gyutaro", "swordsmith", "entertainment", "yukaku", "hashira"
+    ])
 
-    # Check for Mugen train
-    if "mugen" in fn or "train" in fn:
-        if any(x in fn for x in ["07", "ep7", "e07", "part2", "climax"]):
-            return "DS_S02E07"
-        return "DS_S02E06"
+    # 2. Jujutsu Kaisen specific identification
+    is_jjk = any(k in fn for k in [
+        "jujutsu", "jjk", "gojo", "sukuna", "itadori", "yuji", "megumi", "toji",
+        "nobara", "choso", "mahito", "shibuya", "geto", "nanami", "maki", "panda"
+    ])
 
-    # Check for Swordsmith Village Arc
-    if "swordsmith" in fn or "katana" in fn:
-        m = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
-        if m:
-            ep_num = int(m.group(1))
-            code = f"DS_S03E{ep_num:02d}"
-            if load_episode_metadata(code):
-                return code
-        if "08" in fn or "e08" in fn:
-            return "DS_S03E08"
-        if "09" in fn or "e09" in fn:
-            return "DS_S03E09"
+    # ── CASE A: DEMON SLAYER ────────────────────────────────────────────────
+    if is_ds and not is_jjk:
+        # Check for Mugen Train
+        if "mugen" in fn or "train" in fn:
+            if any(x in fn for x in ["07", "ep7", "e07", "part2", "climax"]):
+                return "DS_S02E07"
+            return "DS_S02E06"
 
-    # Check for Entertainment District Arc
-    if "entertainment" in fn or "yukaku" in fn:
-        m = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
-        if m:
-            ep_num = int(m.group(1))
-            code = f"DS_S02E{ep_num:02d}"
-            if load_episode_metadata(code):
-                return code
-        if "10" in fn or "e10" in fn:
-            return "DS_S02E10"
-        if "09" in fn or "e09" in fn:
-            return "DS_S02E09"
-        if "08" in fn or "e08" in fn:
-            return "DS_S02E08"
+        # Check for Swordsmith Village Arc
+        if "swordsmith" in fn or "katana" in fn:
+            m = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
+            if m:
+                ep_num = int(m.group(1))
+                code = f"DS_S03E{ep_num:02d}"
+                if load_episode_metadata(code):
+                    return code
+            if "08" in fn or "e08" in fn:
+                return "DS_S03E08"
+            if "09" in fn or "e09" in fn:
+                return "DS_S03E09"
 
-    # Standard SxxExx or Sxx_Exx
-    match = re.search(r"[sS](\d{1,2})[-_\s\.]*[eE](\d{1,2})", fn)
-    if match:
-        season = int(match.group(1))
-        episode = int(match.group(2))
-        if is_ds:
+        # Check for Entertainment District Arc
+        if "entertainment" in fn or "yukaku" in fn:
+            m = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
+            if m:
+                ep_num = int(m.group(1))
+                code = f"DS_S02E{ep_num:02d}"
+                if load_episode_metadata(code):
+                    return code
+            if "10" in fn or "e10" in fn:
+                return "DS_S02E10"
+            if "09" in fn or "e09" in fn:
+                return "DS_S02E09"
+            if "08" in fn or "e08" in fn:
+                return "DS_S02E08"
+
+        # Standard SxxExx or Sxx_Exx for Demon Slayer
+        match = re.search(r"[sS](\d{1,2})[-_\s\.]*[eE](\d{1,2})", fn)
+        if match:
+            season = int(match.group(1))
+            episode = int(match.group(2))
             code = f"DS_S{season:02d}E{episode:02d}"
-            if load_episode_metadata(code):
-                return code
-        code = f"S{season:02d}E{episode:02d}"
-        if load_episode_metadata(code):
             return code
 
-    # Match standalone episode number e.g. " - 19 "
-    ep_match = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
-    if ep_match:
-        num = int(ep_match.group(1))
-        if is_ds:
+        # Match standalone episode number e.g. " - 19 "
+        ep_match = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
+        if ep_match:
+            num = int(ep_match.group(1))
             for s in [1, 2, 3]:
                 cand = f"DS_S{s:02d}E{num:02d}"
                 if load_episode_metadata(cand):
                     return cand
-        else:
-            for s in [1, 2]:
+            return f"DS_S01E{num:02d}"
+
+        return None
+
+    # ── CASE B: JUJUTSU KAISEN ──────────────────────────────────────────────
+    if is_jjk and not is_ds:
+        match = re.search(r"[sS](\d{1,2})[-_\s\.]*[eE](\d{1,2})", fn)
+        if match:
+            season = int(match.group(1))
+            episode = int(match.group(2))
+            code = f"S{season:02d}E{episode:02d}"
+            return code
+
+        ep_match = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
+        if ep_match:
+            num = int(ep_match.group(1))
+            for s in [2, 1]:
                 cand = f"S{s:02d}E{num:02d}"
                 if load_episode_metadata(cand):
                     return cand
+            return f"S01E{num:02d}"
+
+        return None
+
+    # ── CASE C: AMBIGUOUS / GENERIC FILENAME ─────────────────────────────────
+    match = re.search(r"[sS](\d{1,2})[-_\s\.]*[eE](\d{1,2})", fn)
+    if match:
+        season = int(match.group(1))
+        episode = int(match.group(2))
+        jjk_cand = f"S{season:02d}E{episode:02d}"
+        if load_episode_metadata(jjk_cand):
+            return jjk_cand
+        ds_cand = f"DS_S{season:02d}E{episode:02d}"
+        if load_episode_metadata(ds_cand):
+            return ds_cand
 
     return None
 

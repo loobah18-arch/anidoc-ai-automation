@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import List, Dict, Optional, Tuple, Any
 
 from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
+from core.clip_manager import CHARACTER_THEMES
 from core.timestamp_loader import (
     match_episode_code_from_filename,
     load_episode_metadata,
@@ -130,6 +131,34 @@ def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
         return []
 
 
+def get_file_universe(filename: str) -> Optional[str]:
+    """
+    Identifies the anime or movie universe of a video file with strict keyword isolation.
+    Guarantees Demon Slayer, Jujutsu Kaisen, and Marvel footage are never conflated.
+    """
+    fn = filename.lower()
+    is_ds = any(k in fn for k in [
+        "demon", "slayer", "kimetsu", "yaiba", "kny", "mugen", "tanjiro", "rengoku",
+        "zenitsu", "uzui", "akaza", "giyu", "inosuke", "muzan", "nezuko", "muichiro",
+        "gyutaro", "swordsmith", "entertainment", "yukaku", "hashira"
+    ])
+    is_jjk = any(k in fn for k in [
+        "jujutsu", "jjk", "gojo", "sukuna", "itadori", "yuji", "megumi", "toji",
+        "nobara", "choso", "mahito", "shibuya", "geto", "nanami", "maki", "panda"
+    ])
+    is_marvel = any(k in fn for k in [
+        "spider", "thor", "iron", "marvel", "avenger", "thanos", "loki", "wolverine", "deadpool"
+    ])
+
+    if is_ds and not is_jjk and not is_marvel:
+        return "demonslayer"
+    if is_jjk and not is_ds and not is_marvel:
+        return "jjk"
+    if is_marvel and not is_ds and not is_jjk:
+        return "marvel"
+    return None
+
+
 def pick_best_file_for_character(
     files: List[Dict[str, str]],
     character_key: str,
@@ -138,22 +167,36 @@ def pick_best_file_for_character(
     """
     Selects a DIVERSE, non-repetitive episode or movie for the target character.
     Tracks history so the same episode is not reused until the entire pool has been rotated through.
-    Prioritizes episodes matching the specific technique or fight named in the title.
+    Guarantees strict universe isolation:
+      - Demon Slayer characters ONLY receive Demon Slayer episodes.
+      - Jujutsu Kaisen characters ONLY receive Jujutsu Kaisen episodes.
+      - Cross-universe contamination is strictly prohibited.
     """
     if not files:
+        return None
+
+    char_theme = CHARACTER_THEMES.get(character_key)
+    if not char_theme:
+        return None
+    char_universe = char_theme["universe"]
+
+    # 1. STRICT UNIVERSE FILTERING: Filter files so ONLY the character's universe is eligible
+    universe_files = [f for f in files if get_file_universe(f["name"]) == char_universe]
+    if not universe_files:
+        print(f"⚠️ [GoogleDrive] No Google Drive files match universe '{char_universe}' for character '{character_key}'. Rejecting cross-universe selection.")
         return None
 
     history = _load_history()
     used_files = set(history.get("used_files", []))
 
-    # 0. Check if title prefers specific episodes (e.g., Black Flash -> S02E21, Hinokami -> DS_S01E19)
+    # 2. Check if title prefers specific episodes within the character's universe
     if title:
         try:
             intent = parse_title_intent(title)
             preferred_eps = intent.get("preferred_episodes") or []
             if preferred_eps:
                 title_matches = []
-                for f in files:
+                for f in universe_files:
                     code = match_episode_code_from_filename(f["name"])
                     if code and code in preferred_eps:
                         title_matches.append(f)
@@ -161,47 +204,37 @@ def pick_best_file_for_character(
                     unused_title = [f for f in title_matches if f["name"] not in used_files]
                     cand_pool = unused_title if unused_title else title_matches
                     chosen = random.choice(cand_pool)
-                    print(f"🎯 [GoogleDrive] Selected title-optimized episode ({intent['scene_type']}) for '{character_key}': {chosen['name']}")
+                    print(f"🎯 [GoogleDrive] Selected title-optimized episode ({intent['scene_type']}) for '{character_key}' ({char_universe.upper()}): {chosen['name']}")
                     history["used_files"].append(chosen["name"])
                     _save_history(history)
                     return chosen
         except Exception as e:
             print(f"⚠️ [GoogleDrive] Title-based file matching error: {e}")
 
-    # 1. Collect all matching eligible files for this character/universe
+    # 3. Match character episode preferences within the character's universe
     prefs = CHARACTER_EPISODE_PREFERENCES.get(character_key, [character_key])
     eligible_files = []
 
-    # Priority matching
-    for f in files:
+    for f in universe_files:
         clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
         if any(pref in clean_name or pref in f["name"].lower() for pref in prefs):
             eligible_files.append(f)
 
-    # Universe fallback if no exact character preference matched
     if not eligible_files:
-        if character_key in {"tanjiro", "rengoku", "akaza", "zenitsu", "tengen", "gyutaro", "giyu", "inosuke", "muzan", "nezuko", "muichiro"}:
-            eligible_files = [f for f in files if any(k in f["name"].lower() for k in ["demon", "slayer", "kimetsu", "yaiba", "kny", "mugen", "hashira", "entertainment", "swordsmith"])]
-        elif character_key in {"gojo", "sukuna", "toji", "yuji", "megumi", "mahito", "todo", "nobara", "choso"}:
-            eligible_files = [f for f in files if "jujutsu" in f["name"].lower() or "jjk" in f["name"].lower()]
-        else:
-            eligible_files = [f for f in files if any(k in f["name"].lower() for k in ["spider", "thor", "iron", "marvel"])]
+        eligible_files = universe_files
 
-    if not eligible_files:
-        eligible_files = files
-
-    # 2. Filter out recently used files to guarantee fresh footage
+    # 4. Filter out recently used files to guarantee fresh footage
     unused_eligible = [f for f in eligible_files if f["name"] not in used_files]
 
     if not unused_eligible:
-        # Reset cycle if all eligible episodes have been used
-        print("🔄 [GoogleDrive] All episodes in library have been used once. Resetting history cycle.")
-        history["used_files"] = []
+        # Reset cycle if all eligible episodes in this universe have been used
+        print(f"🔄 [GoogleDrive] All '{char_universe}' episodes in library have been used once. Resetting history cycle.")
+        history["used_files"] = [f for f in history.get("used_files", []) if f not in [u["name"] for u in universe_files]]
         unused_eligible = eligible_files
 
-    # 3. Pick a random unused file
+    # 5. Pick a random unused file from the correct universe
     chosen = random.choice(unused_eligible)
-    print(f"🎯 [GoogleDrive] Selected fresh non-repetitive episode for '{character_key}': {chosen['name']}")
+    print(f"🎯 [GoogleDrive] Selected fresh non-repetitive {char_universe.upper()} episode for '{character_key}': {chosen['name']}")
 
     # Record in history
     history["used_files"].append(chosen["name"])
@@ -393,9 +426,30 @@ def slice_action_moments_from_source(
     start_bound = 90.0 if total_duration > 300 else 10.0
     end_bound = (total_duration - 90.0) if total_duration > 300 else (total_duration - 10.0)
 
+    # Universe Safety Guard: Never slice a video for a character from another universe
+    file_universe = get_file_universe(video_path.name)
+    char_theme = CHARACTER_THEMES.get(character_key)
+    char_universe = char_theme["universe"] if char_theme else None
+
+    if file_universe and char_universe and file_universe != char_universe:
+        raise ValueError(
+            f"CRITICAL SAFETY VIOLATION: Source video '{video_path.name}' is from universe '{file_universe.upper()}', "
+            f"but character '{character_key}' belongs to universe '{char_universe.upper()}'. Aborting slice to prevent cross-contamination!"
+        )
+
     # ── Phase 1: Curated Episode Climax & Scene Extraction from Metadata ───────
     matched_ep_code = match_episode_code_from_filename(video_path.name)
     curated_candidates = []
+
+    # Ensure matched_ep_code belongs to the character's universe
+    if matched_ep_code:
+        is_code_ds = matched_ep_code.startswith("DS_")
+        if char_universe == "demonslayer" and not is_code_ds:
+            print(f"⚠️ [ActionSlicer] Mismatched episode code {matched_ep_code} for Demon Slayer character '{character_key}'. Ignoring.")
+            matched_ep_code = None
+        elif char_universe == "jjk" and is_code_ds:
+            print(f"⚠️ [ActionSlicer] Mismatched episode code {matched_ep_code} for JJK character '{character_key}'. Ignoring.")
+            matched_ep_code = None
 
     if matched_ep_code:
         print(f"📖 [ActionSlicer] Matched episode code: {matched_ep_code} for '{video_path.name}'")

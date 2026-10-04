@@ -42,7 +42,7 @@ from core.effects_engine import (
     build_velocity_clip_filter
 )
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
-from core.quote_ai import generate_edit_metadata
+from core.quote_ai import generate_edit_metadata, format_anime_description
 from core.opencut_engine import build_clip_audio_fade
 from core.smart_downloader import smart_fetch_clips
 from core.text_overlay import generate_edit_text_overlays
@@ -111,6 +111,13 @@ def render_cinematic_edit(
     title_text = custom_title or metadata["title"]
     metadata["quote"] = quote_text
     metadata["title"] = title_text
+    metadata["description"] = format_anime_description(
+        title=title_text,
+        quote=quote_text,
+        character_name=theme["name"],
+        universe=theme["universe"],
+        tags=metadata["tags"]
+    )
     print(f"💬 Quote: \"{quote_text}\"")
     print(f"📌 Title: {title_text}")
     

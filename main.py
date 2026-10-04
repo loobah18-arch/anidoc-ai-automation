@@ -65,16 +65,21 @@ def main():
         target_universe = "demonslayer"
 
     chosen_char = args.character
-    if not chosen_char:
-        if target_universe:
-            eligible = [k for k, v in CHARACTER_THEMES.items() if v["universe"] == target_universe]
-            if not eligible:
-                raise ValueError(f"No characters found for universe '{target_universe}'")
-            chosen_char = random.choice(eligible)
-        else:
-            # Default to anime characters (JJK and Demon Slayer)
-            anime_chars = [k for k, v in CHARACTER_THEMES.items() if v["universe"] in {"jjk", "demonslayer"}]
-            chosen_char = random.choice(anime_chars if anime_chars else list(CHARACTER_THEMES.keys()))
+    if chosen_char:
+        if chosen_char not in CHARACTER_THEMES:
+            raise ValueError(f"Unknown character '{chosen_char}'. Valid options: {list(CHARACTER_THEMES.keys())}")
+        char_uni = CHARACTER_THEMES[chosen_char]["universe"]
+        if target_universe and target_universe != char_uni:
+            print(f"⚠️ [Main] Character '{chosen_char}' belongs to universe '{char_uni}', adjusting universe filter from '{target_universe}' to '{char_uni}'.")
+        target_universe = char_uni
+    else:
+        if not target_universe:
+            # Randomly select between the two supported anime universes
+            target_universe = random.choice(["demonslayer", "jjk"])
+        eligible = [k for k, v in CHARACTER_THEMES.items() if v["universe"] == target_universe]
+        if not eligible:
+            raise ValueError(f"No characters found for universe '{target_universe}'")
+        chosen_char = random.choice(eligible)
             
     print(f"🔥 [AniDoc 4K Edit] Selected Character: {chosen_char} ({CHARACTER_THEMES[chosen_char]['universe'].upper()})")
     

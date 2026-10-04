@@ -152,5 +152,81 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         self.assertIsNotNone(chosen_jjk)
         self.assertIn("21", chosen_jjk["name"])
 
+    def test_06_universe_quarantine_in_gdrive_selection(self):
+        """Guarantee JJK characters NEVER receive Demon Slayer files, and vice versa."""
+        from core.gdrive_manager import get_file_universe
+
+        ds_only_files = [
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E24.mp4", "id": "fid_ds_24"},
+            {"name": "Kimetsu_no_Yaiba_S01E19_Hinokami.mkv", "id": "fid_ds_19"},
+            {"name": "Demon_Slayer_Mugen_Train_Ep_07.mkv", "id": "fid_ds_07"},
+        ]
+
+        # JJK characters requested when only Demon Slayer files exist MUST return None
+        for jjk_char in ["yuji", "gojo", "sukuna", "toji", "megumi"]:
+            chosen = pick_best_file_for_character(ds_only_files, jjk_char)
+            self.assertIsNone(chosen, f"JJK character '{jjk_char}' must NOT receive Demon Slayer files")
+
+        jjk_only_files = [
+            {"name": "Jujutsu_Kaisen_S01_E24.mp4", "id": "fid_jjk_24"},
+            {"name": "JJK_S02E17_Sukuna_Mahoraga.mp4", "id": "fid_jjk_17"},
+            {"name": "Jujutsu_Kaisen_S02E09_Gojo_Shibuya.mkv", "id": "fid_jjk_09"},
+        ]
+
+        # Demon Slayer characters requested when only JJK files exist MUST return None
+        for ds_char in ["tanjiro", "rengoku", "zenitsu", "inosuke", "muzan", "nezuko"]:
+            chosen = pick_best_file_for_character(jjk_only_files, ds_char)
+            self.assertIsNone(chosen, f"Demon Slayer character '{ds_char}' must NOT receive JJK files")
+
+    def test_07_metadata_universe_isolation_and_accurate_descriptions(self):
+        """Verify titles, tags, and rich descriptions are 100% accurate and isolated."""
+        from core.quote_ai import generate_edit_metadata, JJK_KEYWORDS, DEMONSLAYER_KEYWORDS
+
+        ds_chars = ["tanjiro", "rengoku", "zenitsu", "akaza", "giyu", "tengen", "inosuke", "muzan", "nezuko", "muichiro", "gyutaro"]
+        for char in ds_chars:
+            meta = generate_edit_metadata(char)
+            self.assertEqual(meta["universe"], "demonslayer")
+            self.assertIn("Demon Slayer: Kimetsu no Yaiba (鬼滅の刃)", meta["description"])
+            self.assertIn(meta["character_name"], meta["description"])
+            self.assertIn(meta["title"], meta["description"])
+            self.assertIn(meta["quote"], meta["description"])
+
+            # Verify no JJK terms in tags, title, or description
+            full_text = f"{meta['title']} {' '.join(meta['tags'])} {meta['description']}".lower()
+            for jjk_word in ["jjk", "jujutsu", "gojo", "sukuna", "itadori", "blackflash"]:
+                self.assertNotIn(jjk_word, meta["tags"], f"Demon Slayer '{char}' must not have tag '{jjk_word}'")
+                self.assertNotIn(jjk_word, meta["title"].lower(), f"Demon Slayer '{char}' must not have title term '{jjk_word}'")
+
+        jjk_chars = ["gojo", "sukuna", "toji", "yuji", "megumi", "mahito", "todo", "nobara"]
+        for char in jjk_chars:
+            meta = generate_edit_metadata(char)
+            self.assertEqual(meta["universe"], "jjk")
+            self.assertIn("Jujutsu Kaisen (呪術廻戦)", meta["description"])
+            self.assertIn(meta["character_name"], meta["description"])
+            self.assertIn(meta["title"], meta["description"])
+            self.assertIn(meta["quote"], meta["description"])
+
+            # Verify no Demon Slayer terms in tags, title, or description
+            for ds_word in ["demonslayer", "kimetsunoyaiba", "tanjiro", "rengoku", "zenitsu", "hashira"]:
+                self.assertNotIn(ds_word, meta["tags"], f"JJK '{char}' must not have tag '{ds_word}'")
+                self.assertNotIn(ds_word, meta["title"].lower(), f"JJK '{char}' must not have title term '{ds_word}'")
+
+    def test_08_filename_matching_and_universe_detection(self):
+        """Verify filenames never fall through across universes."""
+        from core.gdrive_manager import get_file_universe
+
+        ds_fn = "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E24.mp4"
+        self.assertEqual(get_file_universe(ds_fn), "demonslayer")
+        # Must return DS_S01E24, and NOT S01E24
+        code = match_episode_code_from_filename(ds_fn)
+        self.assertEqual(code, "DS_S01E24")
+        self.assertNotEqual(code, "S01E24")
+
+        jjk_fn = "Jujutsu_Kaisen_480P_S01_E24.mp4"
+        self.assertEqual(get_file_universe(jjk_fn), "jjk")
+        code_jjk = match_episode_code_from_filename(jjk_fn)
+        self.assertEqual(code_jjk, "S01E24")
+
 if __name__ == "__main__":
     unittest.main()
+
