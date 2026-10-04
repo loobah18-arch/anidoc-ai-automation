@@ -16,6 +16,7 @@ DEMONSLAYER_DIR = VIDEO_DIR / "demonslayer"
 FONTS_DIR = ASSETS_DIR / "fonts"
 OUTPUT_DIR = BASE_DIR / "output"
 SCRATCH_DIR = BASE_DIR / "scratch"
+AGENTS_DATA_DIR = BASE_DIR / ".agents" / "data"
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SCRATCH_DIR.mkdir(parents=True, exist_ok=True)

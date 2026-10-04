@@ -12,10 +12,69 @@ import requests
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 
-from config.settings import NVIDIA_API_KEY, OPENROUTER_API_KEY, CHANNEL_TAGS, SCRATCH_DIR
+from config.settings import NVIDIA_API_KEY, OPENROUTER_API_KEY, CHANNEL_TAGS, SCRATCH_DIR, AGENTS_DATA_DIR
 from core.clip_manager import CHARACTER_THEMES
 
 TITLE_HISTORY_FILE = SCRATCH_DIR / "title_history.json"
+CREATOR_BASELINES_FILE = AGENTS_DATA_DIR / "creator_baselines.json"
+
+
+def load_creator_baselines() -> Dict[str, Any]:
+    """Loads creator baselines from .agents/data/creator_baselines.json at runtime.
+    Returns empty dict if file missing (graceful degradation)."""
+    if CREATOR_BASELINES_FILE.exists():
+        try:
+            with open(CREATOR_BASELINES_FILE, "r") as f:
+                data = json.load(f)
+            print(f"📊 [QuoteAI] Loaded creator baselines from {CREATOR_BASELINES_FILE.name} "
+                  f"({len(data.get('tracked_creators', {}))} creators, "
+                  f"{len(data.get('viral_reference_benchmarks', []))} benchmarks)")
+            return data
+        except Exception as e:
+            print(f"⚠️ [QuoteAI] Failed to load creator baselines: {e}")
+    return {}
+
+
+def _build_competitor_context(baselines: Dict[str, Any], character_name: str, universe: str) -> str:
+    """Builds a compact competitor context string for AI prompts from creator baselines."""
+    parts = []
+    
+    # Extract relevant viral benchmarks for this universe
+    benchmarks = baselines.get("viral_reference_benchmarks", [])
+    relevant = [b for b in benchmarks if b.get("universe") == universe]
+    if relevant:
+        for b in relevant[:2]:  # Max 2 benchmarks to keep prompt lean
+            parts.append(
+                f"Top creator {b.get('creator', '?')}: "
+                f"title style='{b.get('title', '')}', "
+                f"hook='{b.get('hook_formula', '')}'"
+            )
+    
+    # Extract viral formula rules
+    formula = baselines.get("viral_video_formula", {})
+    if formula:
+        hook_dur = formula.get("hook_duration", "")
+        drop_t = formula.get("drop_timing", "")
+        if hook_dur:
+            parts.append(f"Hook window: {hook_dur}")
+        if drop_t:
+            parts.append(f"Drop timing: {drop_t}")
+    
+    return "; ".join(parts) if parts else ""
+
+
+def _get_benchmark_concepts_for_character(baselines: Dict[str, Any], character_key: str, universe: str) -> List[Dict[str, Any]]:
+    """Extracts matching viral reference benchmarks as fallback concepts for a character."""
+    concepts = []
+    benchmarks = baselines.get("viral_reference_benchmarks", [])
+    for b in benchmarks:
+        if b.get("universe") == universe and b.get("character") == character_key:
+            concepts.append({
+                "quote": b.get("hook_formula", "").split("->")[0].strip() if "->" in b.get("hook_formula", "") else "I am the strongest.",
+                "title": b.get("title", ""),
+                "tags": [character_key, universe, "animeedit", "4kedit", "phonk", "shorts"]
+            })
+    return concepts
 
 CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
     "gojo": [
@@ -655,18 +714,28 @@ def _extract_json_response(raw_text: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def query_opencode_deepseek_v4_flash(character_name: str, universe: str) -> Optional[Dict[str, Any]]:
+def query_opencode_deepseek_v4_flash(character_name: str, universe: str, competitor_context: str = "") -> Optional[Dict[str, Any]]:
     """
     Priority 1: Queries OpenCode DeepSeek v4 Flash via OpenCode CLI.
+    Injects competitor benchmark context from creator_baselines.json when available.
     """
     opencode_bin = shutil.which("opencode") or str(Path.home() / ".opencode/bin/opencode")
     if not opencode_bin or not (Path(opencode_bin).exists() or shutil.which("opencode")):
         return None
-        
+    
+    # Build competitor-aware prompt
+    competitor_hint = ""
+    if competitor_context:
+        competitor_hint = (
+            f"STYLE REFERENCE from top viral anime edit creators: {competitor_context}. "
+            "Match their title energy, hook intensity, and emoji usage. "
+        )
+    
     prompt = (
         f"You are a master viral YouTube Shorts creator making a 4K Phonk scene edit for {character_name} ({universe.upper()}). "
         f"CRITICAL REQUIREMENT: Character belongs strictly to {universe.upper()}. "
         f"Do NOT mention, tag, or reference any other anime franchise (e.g. no JJK for Demon Slayer, no Demon Slayer for JJK). "
+        f"{competitor_hint}"
         "Generate a JSON object with: "
         "1. 'quote': An iconic, punchy, badass 1-sentence quote or monologue line (under 12 words), "
         "2. 'title': Unique High-CTR YouTube Shorts title with emoji and hashtags (under 65 chars), "
@@ -696,9 +765,10 @@ def query_opencode_deepseek_v4_flash(character_name: str, universe: str) -> Opti
     return None
 
 
-def query_nvidia_nemotron(character_name: str, universe: str) -> Optional[Dict[str, Any]]:
+def query_nvidia_nemotron(character_name: str, universe: str, competitor_context: str = "") -> Optional[Dict[str, Any]]:
     """
     Priority 2: Queries NVIDIA Nemotron 3 Ultra if API key is present.
+    Injects competitor benchmark context from creator_baselines.json when available.
     """
     if not NVIDIA_API_KEY:
         return None
@@ -709,10 +779,17 @@ def query_nvidia_nemotron(character_name: str, universe: str) -> Optional[Dict[s
             "Authorization": f"Bearer {NVIDIA_API_KEY}",
             "Content-Type": "application/json"
         }
+        competitor_hint = ""
+        if competitor_context:
+            competitor_hint = (
+                f"STYLE REFERENCE from top viral anime edit creators: {competitor_context}. "
+                "Match their title energy, hook intensity, and emoji usage. "
+            )
         prompt = (
             f"You are an elite YouTube Shorts editor creating viral 4K Phonk edits for {character_name} ({universe.upper()}). "
             f"CRITICAL: Character belongs strictly to {universe.upper()}. "
             f"Do NOT mention or tag other anime or franchises. "
+            f"{competitor_hint}"
             "Generate a JSON object with: "
             "1. 'quote': a legendary 1-sentence badass quote (under 12 words), "
             "2. 'title': unique viral YouTube Short title with hashtags (under 70 chars), "
@@ -744,6 +821,7 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
     """
     Generates quote, title, description, and tags with non-repeating title rotation.
     Strictly isolates anime universes to eliminate any cross-universe contamination.
+    Dynamically reads competitor benchmarks from creator_baselines.json.
     """
     if not character_key or character_key not in CHARACTER_THEMES:
         character_key = random.choice(list(CHARACTER_THEMES.keys()))
@@ -751,12 +829,16 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
     theme = CHARACTER_THEMES[character_key]
     char_universe = theme.get("universe", "demonslayer")
     
-    # 1. Try OpenCode DeepSeek v4 Flash (Priority 1)
-    ai_meta = query_opencode_deepseek_v4_flash(theme["name"], char_universe)
+    # Load dynamic competitor baselines
+    baselines = load_creator_baselines()
+    competitor_ctx = _build_competitor_context(baselines, theme["name"], char_universe)
     
-    # 2. Try NVIDIA Nemotron (Priority 2)
+    # 1. Try OpenCode DeepSeek v4 Flash (Priority 1) with competitor context
+    ai_meta = query_opencode_deepseek_v4_flash(theme["name"], char_universe, competitor_ctx)
+    
+    # 2. Try NVIDIA Nemotron (Priority 2) with competitor context
     if not ai_meta:
-        ai_meta = query_nvidia_nemotron(theme["name"], char_universe)
+        ai_meta = query_nvidia_nemotron(theme["name"], char_universe, competitor_ctx)
         
     used_titles = _load_title_history()
     
@@ -769,7 +851,10 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
             
     if not chosen_concept:
         # 3. Non-repeating rotation from curated rich viral concept catalog
-        catalog = CHARACTER_VIRAL_CONCEPTS.get(character_key)
+        # Prepend dynamic competitor benchmark concepts from creator_baselines.json
+        benchmark_concepts = _get_benchmark_concepts_for_character(baselines, character_key, char_universe)
+        base_catalog = CHARACTER_VIRAL_CONCEPTS.get(character_key, [])
+        catalog = list(benchmark_concepts) + list(base_catalog)
         if not catalog:
             catalog = [
                 {
@@ -789,6 +874,7 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
             print(f"🔄 [QuoteAI] All catalog titles rotated through for {character_key}. Resetting title history.")
             unused_concepts = clean_catalog
             used_titles = [t for t in used_titles if t not in [c["title"] for c in clean_catalog]]
+
             
         chosen_concept = random.choice(unused_concepts)
         
