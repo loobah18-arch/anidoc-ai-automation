@@ -20,7 +20,7 @@
 ```
 anidoc-ai-automation/
 ├── .agents/
-│   ├── skills/             # 15 domain skills
+│   ├── skills/             # 21 domain editing & engineering skills
 │   ├── data/               # Seeded competitor radar, creator baselines, channel profile
 │   └── memory/             # RAM context.md, patterns.md, tech-stack.md, USER.md
 ├── .github/workflows/
