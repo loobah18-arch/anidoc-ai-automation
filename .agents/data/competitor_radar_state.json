@@ -1,64 +1,101 @@
 {
-  "last_updated": "2026-10-04T02:30:00Z",
+  "last_updated": "2026-10-04T03:25:00Z",
   "niche": "4K Anime Phonk Scene Edits & AMVs (Demon Slayer & Jujutsu Kaisen)",
+  "target_channel": {
+    "handle": "@jazzcreates",
+    "url": "https://youtube.com/@jazzcreates",
+    "note": "Target production channel. Strict USER.md constraint: NEVER use content or references from @jazzcreates as inspiration."
+  },
   "monitored_channels": [
     {
-      "handle": "@jazzcreates",
-      "url": "https://youtube.com/@jazzcreates",
-      "role": "Self / Benchmark Channel",
-      "last_checked": "2026-10-04T02:30:00Z",
+      "handle": "@Chakra_boy",
+      "name": "Chakra Boy",
+      "url": "https://youtube.com/@Chakra_boy",
+      "role": "Premier JJK Sakuga & Attitude Edit Benchmark",
+      "last_checked": "2026-10-04T03:25:00Z",
+      "specialty": "Jujutsu Kaisen Gojo & Sukuna High-Attitude 4K Edits",
+      "signature_formula": "0-3s high-status character stare -> sudden audio drop at 4.2s -> explosive bass impact with pristine widescreen letterbox",
       "recent_viral_formats": [
-        "Inosuke Beast Breathing drop (60s 4K Short)",
-        "Tanjiro Hinokami Kagura beat sync",
-        "Gojo Hollow Purple bass drop phonk",
-        "Sukuna Malevolent Shrine beat flash"
+        "Gojo Attitude Status (10M+ views): Sudden silence drop before Hollow Purple bass blast",
+        "Sukuna Shibuya Fire Arrow: Syncopated beat cuts matching flame sparks",
+        "Toji Fushiguro inverted spear strike with aggressive 808 distortion"
       ]
     },
     {
-      "handle": "@zenitsu_edits",
-      "url": "https://youtube.com/@zenitsu_edits",
-      "role": "Competitor / Demon Slayer Specialist",
-      "last_checked": "2026-10-04T02:30:00Z",
+      "handle": "@vantoise",
+      "name": "Vantoise",
+      "url": "https://youtube.com/@vantoise",
+      "role": "Velocity Flow & Twixtor AMV Specialist",
+      "last_checked": "2026-10-04T03:25:00Z",
+      "specialty": "Demon Slayer & JJK 60fps Smooth Velocity Ramps",
+      "signature_formula": "Slow-motion blade unsheathe -> instant speed-ramped decapitation on snare hit -> vibrating color glow CC",
       "recent_viral_formats": [
-        "Thunderclap God Speed sound barrier flash",
-        "Dual-tone yellow gold to cyan lightning grading"
+        "Zenitsu Thunderclap and Flash: 6-fold speed ramping with electric sound barrier pop",
+        "Tanjiro vs Rui Hinokami Kagura: Dual-tone cyan to crimson flame transition",
+        "Akaza Destructive Death Compass Needle: Impact frame flash on beat drop"
       ]
     },
     {
-      "handle": "@gojo_edits",
-      "url": "https://youtube.com/@gojo_edits",
-      "role": "Competitor / JJK Specialist",
-      "last_checked": "2026-10-04T02:30:00Z",
+      "handle": "@axell_edits",
+      "name": "Axell Edits",
+      "url": "https://youtube.com/@axell_edits",
+      "role": "Dark Cinematic Phonk & Mood Editor",
+      "last_checked": "2026-10-04T03:25:00Z",
+      "specialty": "Moody 4K HDR Color Grading & Brazilian Phonk Montagem",
+      "signature_formula": "Crushed blacks + vivid character eye saturation, 32-36 rapid cuts across 60 seconds, zero subtitles",
       "recent_viral_formats": [
-        "0.2s Domain Expansion Shibuya subway cinema",
-        "Hollow Purple deceleration into explosive bass drop"
+        "Gojo Awakened Shibuya Subway: Heavy bass reverb into sharp combat sequence",
+        "Kokushibo Moon Breathing: Dark purple visual vignette with punchy combat SFX",
+        "Sukuna vs Mahoraga: Rapid cut montage on Brazilian phonk bassline"
       ]
     },
     {
-      "handle": "@animegods_4k",
-      "url": "https://youtube.com/@animegods_4k",
-      "role": "Competitor / High-End 4K AMV",
-      "last_checked": "2026-10-04T02:30:00Z",
+      "handle": "@sasukevfx",
+      "name": "Sasuke VFX",
+      "url": "https://youtube.com/@sasukevfx",
+      "role": "High-BPM Beat Sync & Combat Montages",
+      "last_checked": "2026-10-04T03:25:00Z",
+      "specialty": "Aggressive Drift Phonk & Upper Moon Climax Edits",
+      "signature_formula": "Pure driving Phonk (volume 1.25) with subtle sword clash SFX (15%), rapid whip-pan transitions",
       "recent_viral_formats": [
-        "16:9 widescreen centered in 9:16 vertical letterbox",
-        "Crushed blacks with vivid character eye & energy saturation"
+        "Hashira Training Climax: Rapid cuts of Sanemi, Giyu, and Obanai sword clashes",
+        "Muichiro vs Gyokko: Mist breathing speed slices timed to high-hat syncopation",
+        "Yuji Itadori Black Flash: 5-hit sequence snapping exactly to bass kicks"
       ]
     },
     {
-      "handle": "@phonk_anime",
-      "url": "https://youtube.com/@phonk_anime",
-      "role": "Competitor / Phonk Music Sync",
-      "last_checked": "2026-10-04T02:30:00Z",
+      "handle": "@shinobi_edits",
+      "name": "Shinobi Edits",
+      "url": "https://youtube.com/@shinobi_edits",
+      "role": "4K HDR Aura & Sakuga Flow Benchmark",
+      "last_checked": "2026-10-04T03:25:00Z",
+      "specialty": "Pristine 16:9 in 9:16 Cinematic Letterbox & Eye Lighting",
+      "signature_formula": "100% clean video with zero text overlays, deep S-curve contrast, audio loudnorm to -12 LUFS",
       "recent_viral_formats": [
-        "Brazilian Phonk montagem with 32+ rapid beat cuts",
-        "Hard audio ducking before the 4-second bass drop"
+        "Rengoku Set Your Heart Ablaze: Fiery orange CC grade with explosive bass climax",
+        "Megumi Mahoraga Summoning: Ominous low-pass intro into thunderous beat drop",
+        "Tengen Uzui Musical Score: High-speed sword clash symphony with zero voice chopping"
+      ]
+    },
+    {
+      "handle": "@senpaii.amv",
+      "name": "Senpaii AMV",
+      "url": "https://youtube.com/@senpaii.amv",
+      "role": "Narrative Hype & Climax Curator",
+      "last_checked": "2026-10-04T03:25:00Z",
+      "specialty": "Demon Slayer Infinity Castle & JJK Shibuya War Pacing",
+      "signature_formula": "Epic scene selection from raw high-res episodes, smooth crossfades, high retention pacing",
+      "recent_viral_formats": [
+        "Infinity Castle Descent: All Upper Moons & Hashira faceoff cuts",
+        "Sukuna Domain Expansion vs Jogo: Pure visual spectacle with dark phonk drive",
+        "Giyu Tomioka Dead Calm: Stillness to explosive speed transition"
       ]
     }
   ],
   "history": [
     {
       "date": "2026-10-04",
-      "observation": "Demon Slayer and JJK 4K edits with strict franchise focus, cinematic widescreen letterbox, and beat-synced combat peaks generate 3.5x higher watch time than cropped full-bleed videos."
+      "observation": "Top anime edit creators (@Chakra_boy, @vantoise, @axell_edits, @sasukevfx, @shinobi_edits, @senpaii.amv) dominate YouTube Shorts by using 100% clean video without subtitle clutter, 16:9 widescreen centered in 9:16 letterbox, driving Phonk BGM (85%) with subtle combat SFX (15%), and zero awkward dialogue cuts."
     }
   ]
 }

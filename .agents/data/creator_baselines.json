@@ -1,78 +1,147 @@
 {
-  "last_updated": "2026-10-04T02:30:00Z",
+  "last_updated": "2026-10-04T03:25:00Z",
+  "target_channel": {
+    "channel_name": "JazzCreates",
+    "handle": "@jazzcreates",
+    "url": "https://youtube.com/@jazzcreates",
+    "note": "Production target. Strict USER.md constraint: NEVER use content or references from @jazzcreates as inspiration.",
+    "upload_schedule": "Twice daily: 06:30 UTC Demon Slayer, 18:30 UTC Jujutsu Kaisen"
+  },
   "tracked_creators": {
-    "jazzcreates": {
-      "channel_name": "JazzCreates",
-      "url": "https://youtube.com/@jazzcreates",
-      "niche": "4K HDR Phonk Anime Scene Edits (Demon Slayer & Jujutsu Kaisen)",
-      "baseline_views": 15000,
-      "upload_schedule": "Twice daily: 06:30 UTC Demon Slayer, 18:30 UTC Jujutsu Kaisen",
-      "pacing_style": "60.0s full duration, 30-36 beat-synced cuts, drop at 4.2-6.0s",
-      "color_grade_presets": ["hinokami_flame", "flame_hashira", "thunder_gold", "water_breathing", "beast_breathing", "sukuna_shrine", "jjk_void", "cyber_phonk"]
+    "chakra_boy": {
+      "channel_name": "Chakra Boy",
+      "handle": "@Chakra_boy",
+      "url": "https://youtube.com/@Chakra_boy",
+      "niche": "Jujutsu Kaisen & Shonen 4K High-Attitude Sakuga Edits",
+      "baseline_views": 250000,
+      "pacing_style": "High-status tension stare (0-3s) -> Sudden silence pause (0.3s) -> Devastating bass drop on punch impact",
+      "signature_mechanics": [
+        "Pristine 16:9 widescreen in 9:16 vertical letterbox",
+        "Zero subtitle burning (100% clean video)",
+        "Distorted 808 Phonk slides hitting on Sakuga impact frames",
+        "Vivid eye and cursed energy glow highlights"
+      ]
     },
-    "zenitsu_edits": {
-      "channel_name": "Zenitsu Edits",
-      "url": "https://youtube.com/@zenitsu_edits",
-      "niche": "Demon Slayer Speed & Lightning Edits",
-      "baseline_views": 42000,
-      "pacing_style": "High-velocity ramps on electric swordsmanship, heavy bass reverb"
+    "vantoise": {
+      "channel_name": "Vantoise",
+      "handle": "@vantoise",
+      "url": "https://youtube.com/@vantoise",
+      "niche": "Demon Slayer & JJK Velocity Flow & Twixtor 4K AMVs",
+      "baseline_views": 180000,
+      "pacing_style": "Smooth 60fps velocity twixtor ramping on sword strikes and technique triggers",
+      "signature_mechanics": [
+        "Slow-motion windup accelerating to warp-speed blade decapitation",
+        "Dual-tone color grading (cyan electric sparks to warm orange fire)",
+        "Seamless match cuts between character attacks across episodes"
+      ]
     },
-    "gojo_edits": {
-      "channel_name": "Gojo Edits",
-      "url": "https://youtube.com/@gojo_edits",
-      "niche": "Jujutsu Kaisen Gojo & Sukuna Cinema",
-      "baseline_views": 65000,
-      "pacing_style": "Monologue tension hook (3s) -> Dead silence (0.5s) -> Malevolent Shrine / Hollow Purple phonk blast"
+    "axell_edits": {
+      "channel_name": "Axell Edits",
+      "handle": "@axell_edits",
+      "url": "https://youtube.com/@axell_edits",
+      "niche": "Dark Cinematic Anime Edits & Brazilian Phonk Montagem",
+      "baseline_views": 320000,
+      "pacing_style": "32-36 rapid beat-synced cuts across 60 seconds with heavy downbeat camera shakes",
+      "signature_mechanics": [
+        "Deep crushed blacks and intense contrast curves",
+        "Brazilian Phonk montagem rhythm at 130-145 BPM",
+        "Impact flash frames on primary bass kicks"
+      ]
+    },
+    "sasukevfx": {
+      "channel_name": "Sasuke VFX",
+      "handle": "@sasukevfx",
+      "url": "https://youtube.com/@sasukevfx",
+      "niche": "High-BPM Phonk & Funk Anime Combat Montages",
+      "baseline_views": 140000,
+      "pacing_style": "Pure Phonk audio drive with subtle combat SFX (swords, punches, energy blasts) in background",
+      "signature_mechanics": [
+        "Zero vocal cutoffs; music drives 100% of momentum",
+        "Clustered multi-hit combos timed to syncopated snare rolls",
+        "Whip-pan transitions into full-screen explosions"
+      ]
+    },
+    "shinobi_edits": {
+      "channel_name": "Shinobi Edits",
+      "handle": "@shinobi_edits",
+      "url": "https://youtube.com/@shinobi_edits",
+      "niche": "4K HDR Anime Aura & Sakuga Flow Benchmark",
+      "baseline_views": 210000,
+      "pacing_style": "Clean cinematic widescreen aesthetic with professional audio normalization (-12 LUFS)",
+      "signature_mechanics": [
+        "Sharp unsharp-mask edge clarity on 4K renders",
+        "Subtle S-curve contrast boost with vignette focus",
+        "15% subtle battle SFX layered behind loud Phonk track"
+      ]
+    },
+    "senpaii_amv": {
+      "channel_name": "Senpaii AMV",
+      "handle": "@senpaii.amv",
+      "url": "https://youtube.com/@senpaii.amv",
+      "niche": "Demon Slayer Hashira Training & JJK Shibuya Hype Edits",
+      "baseline_views": 175000,
+      "pacing_style": "High narrative tension and character climax selection without speech clutter",
+      "signature_mechanics": [
+        "Selecting absolute peak battle animation segments from source episodes",
+        "Fast tempo pacing with zero dead air",
+        "Smooth crossfade audio integration avoiding awkward cutoffs"
+      ]
     }
   },
   "viral_reference_benchmarks": [
     {
-      "id": "ref_inosuke_01",
-      "title": "Lord Inosuke Unhinged Beast Breathing Energy 🐗⚔️ #inosuke #demonslayer #shorts",
-      "universe": "demonslayer",
-      "character": "inosuke",
-      "hook_formula": "Immediate beast charge shout + blade unsheathing -> 3s dialogue pause -> Beast Breathing bass drop",
-      "audio_formula": "Dark Phonk with aggressive 808 slides (130-140 BPM)",
-      "visual_pacing": "32 beat-synced cuts across 60 seconds with beast breathing indigo/cyan color balance",
-      "outlier_multiplier": "4.2x"
-    },
-    {
-      "id": "ref_tanjiro_01",
-      "title": "Tanjiro Awakens Sun Breathing Hinokami Kagura 🔥 #tanjiro #demonslayer #shorts",
-      "universe": "demonslayer",
-      "character": "tanjiro",
-      "hook_formula": "Hinokami Kagura flame sound trigger -> slow-motion breath inhale -> instantaneous sword decapitation flash",
-      "audio_formula": "Emotional orchestral phonk / Brazilian phonk crescendo",
-      "visual_pacing": "Warm red flame contrast grading, 36 cuts, finisher cut at 58s",
-      "outlier_multiplier": "5.1x"
-    },
-    {
-      "id": "ref_gojo_01",
-      "title": "Gojo Awakened Mode Is Untouchable 🥶⚡ #gojo #jjk #4kedit #shorts",
+      "id": "ref_gojo_attitude_01",
+      "creator": "@Chakra_boy",
+      "title": "Gojo Attitude Status 4K Phonk Edit 🥶⚡",
       "universe": "jjk",
       "character": "gojo",
-      "hook_formula": "Iconic quote 'Throughout heaven and earth, I alone am the honored one' -> Blindfold removal eye flash -> Hollow Purple blast",
-      "audio_formula": "Atmospheric drift phonk with distorted heavy bass",
-      "visual_pacing": "Cool blue / violet void grading, high contrast, crushed blacks",
-      "outlier_multiplier": "6.0x"
+      "hook_formula": "Gojo high-status stare -> dead silence (0.3s) -> explosive Hollow Purple bass blast",
+      "audio_formula": "Distorted Phonk 808 slide at 1.25x volume with highpass/lowpass master",
+      "visual_pacing": "32 beat-synced cuts, cool violet/blue CC grading, clean widescreen letterbox",
+      "outlier_multiplier": "7.5x"
     },
     {
-      "id": "ref_sukuna_01",
-      "title": "Sukuna's Malevolent Shrine Hits Different 🩸 #sukuna #jjk #jujutsukaisen #4kedit #shorts",
+      "id": "ref_zenitsu_thunder_01",
+      "creator": "@vantoise",
+      "title": "Zenitsu Godspeed Thunderclap Velocity Ramp ⚡",
+      "universe": "demonslayer",
+      "character": "zenitsu",
+      "hook_formula": "Slow-motion breathing posture -> sound barrier pop -> instant decapitation speed ramp",
+      "audio_formula": "Brazilian Phonk crescendo with thunder SFX layer",
+      "visual_pacing": "Electric gold lightning grading, 60fps velocity flow, high-contrast flash",
+      "outlier_multiplier": "5.8x"
+    },
+    {
+      "id": "ref_sukuna_shrine_01",
+      "creator": "@axell_edits",
+      "title": "Sukuna Malevolent Shrine Shibuya Massacre 🩸",
       "universe": "jjk",
       "character": "sukuna",
-      "hook_formula": "'Stand proud. You are strong.' -> Finger snap / Shrine hand sign -> Screen tear slicing montage",
-      "audio_formula": "Aggressive Brazilian phonk montagem",
-      "visual_pacing": "Crimson red tone with vignette, syncopated cuts on every snare hit",
-      "outlier_multiplier": "4.8x"
+      "hook_formula": "Malevolent Shrine hand sign -> instant world slash montage snapping to snare hits",
+      "audio_formula": "Heavy Montagem Phonk at 140 BPM with crushed bass",
+      "visual_pacing": "Deep crimson grading, vignette focus, 36 cuts across 60 seconds",
+      "outlier_multiplier": "6.2x"
+    },
+    {
+      "id": "ref_tanjiro_sun_01",
+      "creator": "@shinobi_edits",
+      "title": "Tanjiro Sun Breathing 13th Form Climax 🔥",
+      "universe": "demonslayer",
+      "character": "tanjiro",
+      "hook_formula": "Sun Breathing activation sound -> fast succession of all 12 forms into the 13th form strike",
+      "audio_formula": "Driving Phonk with subtle sword swing and fire swoosh SFX in background",
+      "visual_pacing": "Hinokami flame orange/red grade, zero subtitle burning, 100% clean video",
+      "outlier_multiplier": "5.4x"
     }
   ],
   "viral_video_formula": {
-    "hook_duration": "0.0s - 3.5s (High-tension dialogue quote or visual anomaly)",
-    "drop_timing": "4.0s - 6.0s (Audio drop snaps to primary combat impact / technique activation)",
+    "hook_duration": "0.0s - 3.5s (High-tension visual anomaly or character stare)",
+    "drop_timing": "4.0s - 6.0s (Audio drop snaps directly to primary combat impact / technique activation)",
     "framing": "1080x1920 (9:16 portrait) with centered 16:9 widescreen letterbox (656px black bars top & bottom)",
     "duration": "60.0s (Full 1-minute Shorts max watch time)",
-    "color_grading": "Muted saturation (0.65-0.80), boosted contrast (1.35-1.45), subtle unsharp sharpen (1.2-1.3), vignette PI/3.8",
+    "subtitles": "Completely disabled (100% pure clean video)",
+    "audio_mix": "85% driving Phonk BGM (volume 1.25) / 15% subtle anime combat SFX (volume 0.30, 80Hz HPF, 12kHz LPF), zero voice cutoffs",
+    "color_grading": "S-curve contrast (1.35-1.45), vivid character energy accents, subtle unsharp sharpen (1.2-1.3), vignette PI/3.8",
     "universe_isolation": "100% strict single-universe content. Never mix JJK and Demon Slayer audio, video, or metadata."
   }
 }
