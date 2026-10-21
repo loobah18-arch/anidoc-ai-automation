@@ -377,6 +377,26 @@ def get_english_audio_map(video_path: Path) -> List[str]:
     return ["-map", "0:v:0", "-map", "0:a:0?"]
 
 
+def is_black_or_credit_frame(video_path: Path, start_time: float, duration: float = 2.0) -> bool:
+    """
+    Checks if a segment consists predominantly of black void or credits text.
+    Uses FFmpeg blackdetect to filter out closing credits rolls.
+    """
+    cmd = [
+        "ffmpeg", "-ss", str(start_time), "-t", str(duration),
+        "-i", str(video_path),
+        "-vf", "blackdetect=d=0.4:pix_th=0.15",
+        "-f", "null", "-"
+    ]
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
+        if "black_start:" in res.stderr:
+            return True
+    except Exception:
+        pass
+    return False
+
+
 def slice_action_moments_from_source(
     video_path: Path,
     character_key: str,
@@ -422,9 +442,22 @@ def slice_action_moments_from_source(
     history = _load_history()
     file_used_ts = set(history.get("used_timestamps", {}).get(video_path.name, []))
 
-    # Skip Opening (0-90s) and Ending/Preview credits (last 90s)
-    start_bound = 90.0 if total_duration > 300 else 10.0
-    end_bound = (total_duration - 90.0) if total_duration > 300 else (total_duration - 10.0)
+    # Skip Opening (0-95s) and Ending/Preview credits:
+    # Full movies (>3600s): ending credits roll is 5-6 mins (360s)
+    # Standard 20-25 min episodes (>600s): ending song (ED) + credits roll + preview is 3.5 mins (210s)
+    # Medium clips (300-600s): skip last 90s
+    # Short clips (<=300s): skip last 15s
+    start_bound = 95.0 if total_duration > 600 else (10.0 if total_duration > 60 else 1.0)
+    if total_duration > 3600:
+        end_bound = total_duration - 360.0
+    elif total_duration > 600:
+        end_bound = total_duration - 210.0
+    elif total_duration > 300:
+        end_bound = total_duration - 90.0
+    elif total_duration > 60:
+        end_bound = total_duration - 15.0
+    else:
+        end_bound = total_duration - 2.0
 
     # Universe Safety Guard: Never slice a video for a character from another universe
     file_universe = get_file_universe(video_path.name)
@@ -592,10 +625,12 @@ def slice_action_moments_from_source(
         if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
             final_candidates.append(c)
 
-    # Fill with top dynamic audio combat scenes
+    # Fill with top dynamic audio combat scenes (verified free of black/credit voids)
     for a in audio_candidates:
         if len(final_candidates) >= n_clips + 8:
             break
+        if is_black_or_credit_frame(video_path, a["start"]):
+            continue
         if not any(abs(a["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
             final_candidates.append(a)
 
