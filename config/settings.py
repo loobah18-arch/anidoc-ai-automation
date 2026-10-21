@@ -32,7 +32,7 @@ TITLE_HISTORY_FILE = AGENTS_DATA_DIR / "title_history.json"
 VIDEO_WIDTH = 1080
 VIDEO_HEIGHT = 1920
 FPS = 24  # Source anime is 24fps — no need to upscale framerate
-DEFAULT_DURATION = 18.0  # High-retention 18.0s sweet spot for looping & 100%+ APV
+DEFAULT_DURATION = 28.0  # Perfect 28.0s duration: 5s buildup + 23s drop combat rush & finisher
 
 # Cinematic letterbox: 16:9 widescreen centered in 9:16 vertical canvas (matches lX7bIlY_KEE & MRurnn3AxyA)
 # Active 16:9 video is 1080x608, top bar 656px, bottom bar 656px (34.1% of frame height each)
