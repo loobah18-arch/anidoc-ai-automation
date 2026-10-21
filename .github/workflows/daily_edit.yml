@@ -139,6 +139,9 @@ jobs:
             CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
           fi
           
+          # Set explicit output filename stating what tool was used
+          CMD="$CMD --output 'output/[FFmpeg_xfade_Velocity]_Gojo_Hollow_Purple_18s.mp4'"
+          
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
           

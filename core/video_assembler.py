@@ -330,10 +330,18 @@ def render_cinematic_edit(
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
 
-    # Frame-Accurate Zero-Drift Video & Audio Concatenation
-    # Guarantees that every visual cut lands on the EXACT millisecond of the audio beat
-    concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
-    filter_chains.append(concat_v_str)
+    from core.xfade_engine import build_xfade_transition_filter
+    
+    seg_durs = [s["duration"] for s in segments]
+    xfade_chain = build_xfade_transition_filter(len(clip_paths), seg_durs, transition_duration=0.20)
+    
+    if xfade_chain and len(clip_paths) >= 2:
+        filter_chains.append(xfade_chain)
+        video_src_tag = "[xfade_vout]"
+    else:
+        concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
+        filter_chains.append(concat_v_str)
+        video_src_tag = "[concatenated_v]"
 
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
@@ -354,7 +362,7 @@ def render_cinematic_edit(
     overlay_chain = f"{letterbox_filter},{hook_filter}" if hook_filter else letterbox_filter
 
     filter_chains.append(
-        f"[concatenated_v]{flash_str},{overlay_chain}[vout]"
+        f"{video_src_tag}{flash_str},{overlay_chain}[vout]"
     )
     
     # Audio Dynamic Structure:
