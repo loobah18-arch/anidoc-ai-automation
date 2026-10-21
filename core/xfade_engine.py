@@ -26,7 +26,7 @@ def build_xfade_transition_filter(
     durations: List[float],
     transition_duration: float = 0.25,
     custom_transitions: Optional[List[str]] = None
-) -> Tuple_or_Filter:
+) -> str:
     """
     Constructs a chained FFmpeg xfade filtergraph for seamless scene transitions.
     Formula: offset_i = offset_{i-1} + dur_{i} - transition_duration
