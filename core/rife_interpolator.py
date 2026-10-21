@@ -62,7 +62,11 @@ def interpolate_video_to_60fps(
             return output_video
         else:
             print(f"⚠️ [OpticalFlow] FFmpeg stderr: {res.stderr[:200]}")
+            if output_video.exists():
+                output_video.unlink(missing_ok=True)
     except Exception as e:
         print(f"⚠️ [OpticalFlow] Error: {e}")
+        if output_video.exists():
+            output_video.unlink(missing_ok=True)
 
     return input_video
