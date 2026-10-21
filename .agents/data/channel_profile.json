@@ -1,6 +1,8 @@
 {
-  "channel_name": "@jazzcreates",
-  "channel_id": "UC_jazzcreates",
+  "channel_name": "@Jazzcreatesclips",
+  "channel_id": "UCW-tzdlwTcHHCwNWlyLQ1hQ",
+  "channel_handle": "@Jazzcreatesclips",
+  "channel_url": "https://www.youtube.com/channel/UCW-tzdlwTcHHCwNWlyLQ1hQ",
   "niche": "4K HDR Phonk Anime Scene Edits (Jujutsu Kaisen & Demon Slayer)",
   "schedule": {
     "morning_slot_utc": "06:30 UTC",
@@ -10,11 +12,11 @@
   },
   "video_specifications": {
     "resolution": "1080x1920 (9:16 Portrait Canvas)",
-    "active_video": "1080x608 (16:9 Widescreen centered)",
+    "active_video": "1080x608 (16:9 Widescreen centered with top/bottom engagement hooks)",
     "letterbox_top_px": 656,
     "letterbox_bottom_px": 656,
     "fps": 24,
-    "target_duration_seconds": 60.0,
+    "target_duration_seconds": 18.0,
     "video_codec": "libx264 (CRF 18-20, preset veryfast)",
     "audio_codec": "aac (320kbps, 48000Hz)"
   },

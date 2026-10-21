@@ -72,6 +72,18 @@ MULTI_CLIP_CATALOG = {
         "Megumi Fushiguro Mahoraga Summon Shibuya 4K 60FPS Scenepack logless",
         "Megumi Chimera Shadow Garden Domain Expansion 4K scenepack logless"
     ],
+    "nobara": [
+        "Nobara Kugisaki Hairpin Resonance Shibuya 4K 60FPS scenepack logless",
+        "Nobara Kugisaki vs Haruta Shibuya 4K 60FPS scenepack logless"
+    ],
+    "todo": [
+        "Aoi Todo Boogie Woogie Shibuya 4K 60FPS scenepack logless",
+        "Aoi Todo and Yuji vs Mahito 4K 60FPS scenepack logless"
+    ],
+    "mahito": [
+        "Mahito Idle Transfiguration Shibuya 4K 60FPS scenepack logless",
+        "Mahito Instant Spirit of Distorted Killing 4K scenepack logless"
+    ],
     # Demon Slayer (Kimetsu no Yaiba)
     "tanjiro": [
         "Tanjiro Hinokami Kagura vs Rui 4K 60FPS scenepack logless",
@@ -102,6 +114,22 @@ MULTI_CLIP_CATALOG = {
     "inosuke": [
         "Inosuke Beast Breathing Entertainment District 4K 60FPS scenepack logless",
         "Inosuke Hashibira Pig Assault 4K 60FPS scenepack logless"
+    ],
+    "muzan": [
+        "Muzan Kibutsuji Demon King 4K 60FPS scenepack logless",
+        "Muzan Kibutsuji vs Hashira Infinity Castle 4K scenepack logless"
+    ],
+    "nezuko": [
+        "Nezuko Kamado Awakened Demon Form 4K 60FPS scenepack logless",
+        "Nezuko Blood Demon Art Exploding Blood 4K scenepack logless"
+    ],
+    "muichiro": [
+        "Muichiro Tokito Mist Breathing 7th Form 4K 60FPS scenepack logless",
+        "Muichiro Tokito vs Gyokko 4K 60FPS scenepack logless"
+    ],
+    "gyutaro": [
+        "Gyutaro Blood Sickles Entertainment District 4K 60FPS scenepack logless",
+        "Gyutaro vs Tengen Uzui Final Battle 4K 60FPS scenepack logless"
     ]
 }
 

@@ -410,6 +410,88 @@ def build_decorative_initial_filter(
 
 
 # ═══════════════════════════════════════════════════════════════════
+# ENGAGEMENT HOOKS: Interactive Top/Bottom Letterbox Discussion Prompts
+# ═══════════════════════════════════════════════════════════════════
+ENGAGEMENT_HOOKS = {
+    # Jujutsu Kaisen
+    "gojo": "IS GOJO THE COLDEST CHARACTER IN JJK? 🥶",
+    "sukuna": "COULD ANYONE SURVIVE THIS DOMAIN? 🩸",
+    "toji": "WHO WON THIS FIGHT? DROP IT BELOW 👇",
+    "yuji": "RATE THIS BLACK FLASH IMPACT 1-10 🔥",
+    "megumi": "WAS MAHORAGA REALLY NECESSARY HERE? 💀",
+    "nobara": "IS NOBARA TOP 3 FEMALE CHARACTERS IN SHONEN? 🔨",
+    "todo": "IS AOI TODO THE BEST BROTHER IN ANIME? 👏",
+    "mahito": "MOST HATED VILLAIN IN JUJUTSU KAISEN? 👿",
+    # Demon Slayer
+    "tanjiro": "SUN BREATHING OR HINOKAMI KAGURA? 🔥",
+    "rengoku": "SET YOUR HEART ABLAZE ❤️‍🔥 RATE 1-10",
+    "zenitsu": "SLEEPING ZENITSU IS UNSTOPPABLE ⚡ AGREE?",
+    "akaza": "AKAZA OR KOKUSHIBO? WHO'S STRONGER? 🥋",
+    "giyu": "COULD ANYONE BREAK GIYU'S DEAD CALM? 🌊",
+    "tengen": "MOST FLASHY FIGHT IN ANIME HISTORY? 💎",
+    "inosuke": "LORD INOSUKE PURE CHAOS 🐗 RATE 1-10",
+    "muzan": "IS MUZAN THE COLDEST DEMON KING? 🩸",
+    "nezuko": "NEZUKO AWAKENED FORM WAS PURE HYPE 🔥",
+    "muichiro": "MUICHIRO DEFEATING UPPER 5 SOLO 🌫️ 1-10?",
+    "gyutaro": "GYUTARO VS TENGEN: BEST ANIME CLASH? ⚔️",
+    # Marvel Fallback
+    "spiderman": "BEST SPIDER-MAN MOMENT IN MCU? 🕸️",
+    "ironman": "IS THIS PEAK IRON MAN? 🦾",
+    "thor": "COLDEST THOR ENTRANCE IN MCU? ⚡",
+    "thanos": "WAS THANOS RIGHT? DROP BELOW 👇",
+}
+
+
+def build_engagement_hook_overlay(
+    character_key: str,
+    total_duration: float,
+    font_path: str = FONT_PATH
+) -> str:
+    """
+    Renders high-converting engagement discussion hooks in the upper and lower letterbox bars.
+    Eliminates dead black voids and prompts viewer comments to boost algorithmic distribution.
+    """
+    if not font_path:
+        return ""
+        
+    hook_text = ENGAGEMENT_HOOKS.get(character_key, "RATE THIS ANIME MOMENT 1-10 👇")
+    safe_hook = _escape_drawtext(hook_text)
+    safe_cta = _escape_drawtext("💬 Drop your rating 1-10 below 👇")
+    
+    t_start = 0.3
+    t_end = max(1.0, total_duration - 0.2)
+    alpha = _fade_alpha_expr(t_start, t_end, fade_in=0.3, fade_out=0.3)
+    
+    # Top hook in upper letterbox (y=280)
+    top_filter = (
+        f"drawtext=text='{safe_hook}'"
+        f":fontfile={font_path}"
+        f":fontsize=36"
+        f":fontcolor=white"
+        f":bordercolor=black"
+        f":borderw=4"
+        f":x=(w-text_w)/2"
+        f":y=280"
+        f":alpha='{alpha}'"
+    )
+    
+    # Bottom call-to-comment in lower letterbox (y=1640)
+    bot_filter = (
+        f"drawtext=text='{safe_cta}'"
+        f":fontfile={font_path}"
+        f":fontsize=28"
+        f":fontcolor=0xD4D4D4"
+        f":bordercolor=black"
+        f":borderw=3"
+        f":x=(w-text_w)/2"
+        f":y=1640"
+        f":alpha='{alpha}'"
+    )
+    
+    return f"{top_filter},{bot_filter}"
+
+
+# ═══════════════════════════════════════════════════════════════════
 # HIGH-LEVEL: Generate complete text overlay filter chain for an edit
 # ═══════════════════════════════════════════════════════════════════
 def generate_edit_text_overlays(

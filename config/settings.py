@@ -21,12 +21,18 @@ AGENTS_DATA_DIR = BASE_DIR / ".agents" / "data"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
 DEMONSLAYER_DIR.mkdir(parents=True, exist_ok=True)
+AGENTS_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-# Video Rendering Config (9:16 Portrait, matching reference viral AMV format)
+# Channel metadata
+CHANNEL_NAME = "@Jazzcreatesclips"
+CHANNEL_ID = "UCW-tzdlwTcHHCwNWlyLQ1hQ"
+TITLE_HISTORY_FILE = AGENTS_DATA_DIR / "title_history.json"
+
+# Video Rendering Config (9:16 Portrait, matching viral anime short sweet spot)
 VIDEO_WIDTH = 1080
 VIDEO_HEIGHT = 1920
 FPS = 24  # Source anime is 24fps — no need to upscale framerate
-DEFAULT_DURATION = 60.0  # Full-length 1-minute cinematic AMV (60.0s)
+DEFAULT_DURATION = 18.0  # High-retention 18.0s sweet spot for looping & 100%+ APV
 
 # Cinematic letterbox: 16:9 widescreen centered in 9:16 vertical canvas (matches lX7bIlY_KEE & MRurnn3AxyA)
 # Active 16:9 video is 1080x608, top bar 656px, bottom bar 656px (34.1% of frame height each)

@@ -15,7 +15,7 @@ from typing import Dict, Any, Optional, List
 from config.settings import NVIDIA_API_KEY, OPENROUTER_API_KEY, CHANNEL_TAGS, SCRATCH_DIR, AGENTS_DATA_DIR
 from core.clip_manager import CHARACTER_THEMES
 
-TITLE_HISTORY_FILE = SCRATCH_DIR / "title_history.json"
+TITLE_HISTORY_FILE = AGENTS_DATA_DIR / "title_history.json"
 CREATOR_BASELINES_FILE = AGENTS_DATA_DIR / "creator_baselines.json"
 
 
@@ -155,6 +155,21 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "title": "Sukuna Playing With Jogo Like A Toy 🥶 #sukuna #jogo #jjk #shorts",
             "tags": ["sukuna", "jogo", "jjk", "jujutsukaisen", "animeedit", "shorts"]
         },
+        {
+            "quote": "Dismantle and Cleave... everything in my radius shall turn to dust.",
+            "title": "Sukuna Unleashes 1000 Cuts Malevolent Shrine 🩸 #sukuna #jjk #shorts",
+            "tags": ["sukuna", "cleave", "dismantle", "jjk", "jujutsukaisen", "shorts"]
+        },
+        {
+            "quote": "A walking natural disaster. That is what true power looks like.",
+            "title": "Ryomen Sukuna — Pure Calamity in Shibuya 🌪️💀 #sukuna #jjk #shorts",
+            "tags": ["sukuna", "kingofcurses", "jjk", "jujutsukaisen", "animeedit", "shorts"]
+        },
+        {
+            "quote": "Fuga. An arrow of pure hellfire.",
+            "title": "The Raw Menace of Sukuna's Flame Arrow 🔥⚡ #sukuna #jjk #shorts",
+            "tags": ["sukuna", "fuga", "firearrow", "jjk", "jujutsukaisen", "shorts"]
+        }
     ],
     "toji": [
         {
@@ -177,6 +192,21 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "title": "Toji vs Dagon Domain Infiltration 🌊🗡️ #toji #dagon #jjk #shorts",
             "tags": ["toji", "megumi", "jjk", "jujutsukaisen", "animeedit", "shorts"]
         },
+        {
+            "quote": "Sharpening Playful Cloud with pure demonic intent.",
+            "title": "Toji Turning Playful Cloud Into A Lethal Weapon 👹 #toji #jjk #shorts",
+            "tags": ["toji", "playfulcloud", "jjk", "jujutsukaisen", "shorts"]
+        },
+        {
+            "quote": "The only man who pushed Satoru Gojo to the absolute brink.",
+            "title": "Why Special Grade Sorcerers Feared Toji Fushiguro 🗡️ #toji #jjk #shorts",
+            "tags": ["toji", "sorcererkiller", "jjk", "jujutsukaisen", "shorts"]
+        },
+        {
+            "quote": "Physical heavenly restriction pushed beyond all mortal limits.",
+            "title": "Toji Fushiguro Infiltration Speed Was Untouchable ⚡ #toji #jjk #shorts",
+            "tags": ["toji", "tojifushiguro", "jjk", "jujutsukaisen", "shorts"]
+        }
     ],
     "yuji": [
         {
@@ -199,6 +229,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "title": "Yuji vs Choso Bathroom Brawl Pure Cinema 🥋 #yuji #choso #jjk #shorts",
             "tags": ["yuji", "choso", "jjk", "jujutsukaisen", "4kedit", "shorts"]
         },
+        {
+            "quote": "Divergent fist hitting with devastating second-wave delayed impact.",
+            "title": "Yuji Itadori Divergent Fist Strike Power 💥 #yuji #jjk #shorts",
+            "tags": ["yuji", "divergentfist", "jjk", "jujutsukaisen", "shorts"]
+        },
+        {
+            "quote": "Landing four consecutive Black Flashes against special grades.",
+            "title": "Yuji Itadori Consecutive Black Flash Record ⚡🥋 #yuji #jjk #shorts",
+            "tags": ["yuji", "blackflash", "jjk", "jujutsukaisen", "shorts"]
+        }
     ],
     "megumi": [
         {
@@ -216,6 +256,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "title": "Megumi Shadow Chimera Domain Expansion 🌑 #megumi #jjk #shorts",
             "tags": ["megumi", "domainexpansion", "jjk", "jujutsukaisen", "shorts"]
         },
+        {
+            "quote": "Divine Dog Totality ripping through cursed spirits with ease.",
+            "title": "Megumi's Divine Dog Totality Pure Prowess 🐺⚡ #megumi #jjk #shorts",
+            "tags": ["megumi", "divinedog", "jjk", "jujutsukaisen", "shorts"]
+        },
+        {
+            "quote": "Max Elephant dropping immense pressure from above.",
+            "title": "Megumi Ten Shadows Technique Combat Mastery 🌑 #megumi #jjk #shorts",
+            "tags": ["megumi", "tenshadows", "jjk", "jujutsukaisen", "shorts"]
+        }
     ],
     "mahito": [
         {
@@ -237,6 +287,11 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "This is the true shape of my soul! Instant Spirit Body of Distorted Killing!",
             "title": "Mahito Final Form vs Yuji & Todo ⚔️ #mahito #yuji #todo #jjk #shorts",
             "tags": ["mahito", "jjk", "jujutsukaisen", "blackflash", "shorts"]
+        },
+        {
+            "quote": "Idle Transfiguration reshaping human flesh into nightmare horrors.",
+            "title": "The Terrifying Power of Idle Transfiguration 🩸💀 #mahito #jjk #shorts",
+            "tags": ["mahito", "idletransfiguration", "jjk", "jujutsukaisen", "shorts"]
         }
     ],
     "todo": [
@@ -249,6 +304,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "My Boogie Woogie is already dead... but my soul will never lose.",
             "title": "Aoi Todo's 530,000 IQ Boogie Woogie Climax 👏 #todo #mahito #jjk #shorts",
             "tags": ["todo", "boogiewoogie", "jjk", "jujutsukaisen", "animeedit", "shorts"]
+        },
+        {
+            "quote": "Swapping positions at the speed of sound mid-battle.",
+            "title": "Aoi Todo Disorienting Special Grade Curses 👏⚡ #todo #jjk #shorts",
+            "tags": ["todo", "aoitodo", "jjk", "jujutsukaisen", "shorts"]
+        },
+        {
+            "quote": "A true brother never leaves his partner behind in combat.",
+            "title": "Todo & Yuji: The Unstoppable Brotherhood 🤝🔥 #todo #yuji #jjk #shorts",
+            "tags": ["todo", "yuji", "jjk", "jujutsukaisen", "shorts"]
         }
     ],
     "nobara": [
@@ -261,6 +326,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "Tell everyone... that life wasn't so bad.",
             "title": "Nobara's Final Smile In Shibuya Broke Everyone 💔 #nobara #jjk #shorts",
             "tags": ["nobara", "shibuya", "jjk", "jujutsukaisen", "animeedit", "shorts"]
+        },
+        {
+            "quote": "I love myself when I'm pretty, and I love myself when I'm strong!",
+            "title": "Nobara Kugisaki's Coldest Speech In JJK 👑 #nobara #jjk #shorts",
+            "tags": ["nobara", "kugisaki", "jjk", "jujutsukaisen", "shorts"]
+        },
+        {
+            "quote": "Driving the cursed nail straight into the core with Hairpin!",
+            "title": "Nobara's Hairpin Explosion In 4K HDR 🔨💥 #nobara #jjk #shorts",
+            "tags": ["nobara", "hairpin", "jjk", "jujutsukaisen", "shorts"]
         }
     ],
     # ── Demon Slayer (Kimetsu no Yaiba) Universe ──
@@ -301,6 +376,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "Growing old and dying is what gives meaning to human life.",
             "title": "Why Kyojuro Rengoku Refused To Become A Demon 👑 #rengoku #demonslayer #shorts",
             "tags": ["rengoku", "flamehashira", "demonslayer", "kimetsunoyaiba", "shorts"]
+        },
+        {
+            "quote": "Flame Breathing, Fifth Form: Flame Tiger!",
+            "title": "Rengoku Flame Breathing 5th Form Flame Tiger 🐅🔥 #rengoku #demonslayer #shorts",
+            "tags": ["rengoku", "flametiger", "demonslayer", "kimetsunoyaiba", "shorts"]
+        },
+        {
+            "quote": "I will protect everyone on this train until my last breath!",
+            "title": "Rengoku Standing His Ground Until Dawn 🌅⚔️ #rengoku #demonslayer #shorts",
+            "tags": ["rengoku", "mugentrain", "demonslayer", "kimetsunoyaiba", "shorts"]
         }
     ],
     "zenitsu": [
@@ -318,6 +403,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "If you can only do one thing, hone it to perfection!",
             "title": "Zenitsu Locked In Is A Whole Different Demon Slayer 🥶 #zenitsu #demonslayer #shorts",
             "tags": ["zenitsu", "zenitsuagatsuma", "demonslayer", "animeedit", "shorts"]
+        },
+        {
+            "quote": "Lightning trails searing through the night sky at supersonic speeds.",
+            "title": "Zenitsu's Blind Speed Leaving Lightning Trails ⚡ #zenitsu #demonslayer #shorts",
+            "tags": ["zenitsu", "thunderbreathing", "demonslayer", "kimetsunoyaiba", "shorts"]
+        },
+        {
+            "quote": "Thunderclap and Flash Eightfold cutting down demons in seconds.",
+            "title": "Thunderclap and Flash Eightfold Pure Art ⚡🗡️ #zenitsu #demonslayer #shorts",
+            "tags": ["zenitsu", "eightfold", "demonslayer", "kimetsunoyaiba", "shorts"]
         }
     ],
     "akaza": [
@@ -335,6 +430,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "I only want to fight the strong. The weak disgust me!",
             "title": "Why Akaza Is The Most Respected Upper Moon 💀 #akaza #demonslayer #shorts",
             "tags": ["akaza", "demonslayer", "kimetsunoyaiba", "animeedit", "shorts"]
+        },
+        {
+            "quote": "Destructive Death: Annihilation Type! Pure martial fury!",
+            "title": "Akaza's Destructive Death Annihilation Clashes 🩸 #akaza #demonslayer #shorts",
+            "tags": ["akaza", "destructivedeath", "demonslayer", "kimetsunoyaiba", "shorts"]
+        },
+        {
+            "quote": "A warrior's battle spirit will never fade.",
+            "title": "Why Akaza Never Attacks Or Harms Women 🥋💀 #akaza #demonslayer #shorts",
+            "tags": ["akaza", "uppermoon", "demonslayer", "kimetsunoyaiba", "shorts"]
         }
     ],
     "giyu": [
@@ -347,6 +452,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "Don't cry. Don't despair. Stand up and fight for your sister!",
             "title": "The Coldest Hashira Giyu Tomioka 🥶🌊 #giyu #demonslayer #animeedit #shorts",
             "tags": ["giyu", "waterhashira", "demonslayer", "kimetsunoyaiba", "shorts"]
+        },
+        {
+            "quote": "Water Breathing Tenth Form: Constant Flux dragon strike!",
+            "title": "Water Breathing Tenth Form: Constant Flux 🐉🌊 #giyu #demonslayer #shorts",
+            "tags": ["giyu", "constantflux", "waterbreathing", "demonslayer", "shorts"]
+        },
+        {
+            "quote": "I will protect Tanjiro and Nezuko with my life.",
+            "title": "The Silent Lethality of Giyu Tomioka 🥶🌊 #giyu #demonslayer #shorts",
+            "tags": ["giyu", "tomioka", "demonslayer", "kimetsunoyaiba", "shorts"]
         }
     ],
     "tengen": [
@@ -359,6 +474,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "We're going for the win! Sound Breathing, Fifth Form: String Performance!",
             "title": "Tengen vs Gyutaro Best Fight In Anime History ⚔️🔥 #tengen #gyutaro #demonslayer #shorts",
             "tags": ["tengen", "gyutaro", "entertainmentdistrict", "demonslayer", "shorts"]
+        },
+        {
+            "quote": "Dual cleavers detonating explosive strikes with every clash!",
+            "title": "Tengen Uzui Flashy Dual Cleaver Clashes 💎💥 #tengen #demonslayer #shorts",
+            "tags": ["tengen", "soundbreathing", "demonslayer", "kimetsunoyaiba", "shorts"]
+        },
+        {
+            "quote": "Fighting poisoned with one arm and still matching Upper Moon 6.",
+            "title": "Tengen Fighting Poisoned With One Hand ⚔️🔥 #tengen #demonslayer #shorts",
+            "tags": ["tengen", "entertainmentdistrict", "demonslayer", "shorts"]
         }
     ],
     "inosuke": [
@@ -376,6 +501,16 @@ CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
             "quote": "Don't you dare cry! What's done is done! We keep moving forward!",
             "title": "Inosuke Comforting Tanjiro Showed His Pure Heart 🐗❤️ #inosuke #demonslayer #shorts",
             "tags": ["inosuke", "tanjiro", "demonslayer", "kimetsunoyaiba", "animeedit", "shorts"]
+        },
+        {
+            "quote": "Beast Breathing Fifth Form: Crazy Cutting whirlwind assault!",
+            "title": "Beast Breathing Fifth Form: Crazy Cutting 🐗⚔️ #inosuke #demonslayer #shorts",
+            "tags": ["inosuke", "crazycutting", "demonslayer", "kimetsunoyaiba", "shorts"]
+        },
+        {
+            "quote": "Charging headfirst into battle with zero fear of death.",
+            "title": "Inosuke Charging Headfirst Into Upper Moons 🐗💥 #inosuke #demonslayer #shorts",
+            "tags": ["inosuke", "pigassault", "demonslayer", "kimetsunoyaiba", "shorts"]
         }
     ],
     "muzan": [
@@ -628,7 +763,7 @@ def format_anime_description(
             f"🗡️ Series: {series_name}\n"
             f"🔥 Iconic Quote: \"{quote}\"\n\n"
             f"Watch in 4K HDR with headphones for maximum immersion! 🎧✨\n"
-            f"Like & Subscribe to @jazzcreates for daily 4K Demon Slayer and anime edits!\n\n"
+            f"Like & Subscribe to @Jazzcreatesclips for daily 4K Demon Slayer and anime edits!\n\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"📌 Series: Demon Slayer / Kimetsu no Yaiba\n"
             f"🎬 Type: Transformative 4K Phonk AMV / Fan Scene Edit\n"
@@ -647,7 +782,7 @@ def format_anime_description(
             f"🥋 Series: {series_name}\n"
             f"🔥 Iconic Quote: \"{quote}\"\n\n"
             f"Watch in 4K HDR with headphones for maximum immersion! 🎧✨\n"
-            f"Like & Subscribe to @jazzcreates for daily 4K Jujutsu Kaisen and anime edits!\n\n"
+            f"Like & Subscribe to @Jazzcreatesclips for daily 4K Jujutsu Kaisen and anime edits!\n\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"📌 Series: Jujutsu Kaisen (JJK)\n"
             f"🎬 Type: Transformative 4K Phonk AMV / Fan Scene Edit\n"
@@ -664,7 +799,7 @@ def format_anime_description(
             f"🎬 Universe: {universe.upper()}\n"
             f"🔥 Quote: \"{quote}\"\n\n"
             f"Watch in 4K HDR with headphones! 🎧✨\n"
-            f"Like & Subscribe to @jazzcreates for daily 4K scene edits!\n\n"
+            f"Like & Subscribe to @Jazzcreatesclips for daily 4K scene edits!\n\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"⚖️ Disclaimer: Transformative fan edit created for entertainment under Fair Use.\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"

@@ -1,11 +1,14 @@
-# Active Context: AniDoc AI Automation (@jazzcreates)
+# Active Context: AniDoc AI Automation (@Jazzcreatesclips)
 
 Active Project: `anidoc-ai-automation` at `~/anidoc-ai-automation`
-Channel: `@jazzcreates` on YouTube Shorts
+Channel: `@Jazzcreatesclips` on YouTube Shorts (https://www.youtube.com/channel/UCW-tzdlwTcHHCwNWlyLQ1hQ)
 Core Function: Automated 4K HDR Phonk Scene Edit Engine for Demon Slayer & Jujutsu Kaisen.
 
 ## Active Production State
-- Branch: `main` (commit `ff23584` / latest)
+- Branch: `main`
+- Target Duration: 18.0s (high-retention viral sweet spot)
+- Letterbox Framing: Interactive discussion hooks (prompting comments)
+- Duplicate Prevention: Persistent title history tracked in `.agents/data/title_history.json`
 - Schedule: Twice-daily automated publishing via `.github/workflows/daily_edit.yml`
   - 06:30 UTC Morning Slot: Demon Slayer (Kimetsu no Yaiba)
   - 18:30 UTC Evening Slot: Jujutsu Kaisen (JJK)

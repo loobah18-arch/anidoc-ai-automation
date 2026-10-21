@@ -45,7 +45,7 @@ from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PR
 from core.quote_ai import generate_edit_metadata, format_anime_description
 from core.opencut_engine import build_clip_audio_fade
 from core.smart_downloader import smart_fetch_clips
-from core.text_overlay import generate_edit_text_overlays
+from core.text_overlay import generate_edit_text_overlays, build_engagement_hook_overlay
 
 
 def generate_fallback_phonk_audio(duration: float, output_path: Path) -> Path:
@@ -345,15 +345,16 @@ def render_cinematic_edit(
     # 4K HDR Color Grade (CC Preset with S-curve colorlevels)
     cc_filter = build_cc_filter(active_cc)
     
-    # 100% Clean Video: Zero subtitles or text overlays
-    # Letterbox: 16:9 widescreen active frame with black bars top and bottom
+    # Letterbox with interactive discussion hook (prompts comments in top/bottom bars)
     letterbox_filter = (
         f"drawbox=x=0:y=0:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill,"
         f"drawbox=x=0:y=ih-{LETTERBOX_BAR_HEIGHT}:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill"
     )
+    hook_filter = build_engagement_hook_overlay(character_key, target_duration)
+    overlay_chain = f"{letterbox_filter},{hook_filter}" if hook_filter else letterbox_filter
 
     filter_chains.append(
-        f"[concatenated_v]{flash_str},{letterbox_filter}[vout]"
+        f"[concatenated_v]{flash_str},{overlay_chain}[vout]"
     )
     
     # Audio Dynamic Structure:

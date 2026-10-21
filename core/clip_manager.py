@@ -53,21 +53,21 @@ CHARACTER_THEMES = {
         "name": "Nobara Kugisaki",
         "colors": ["#dc2626", "#fbbf24", "#0f172a"],
         "cc_preset": "jjk_void",
-        "quote": "I'm going to be the greatest curse user!"
+        "quote": "I love myself when I'm pretty and all dressed up, and I love myself when I'm strong!"
     },
     "todo": {
         "universe": "jjk",
         "name": "Aoi Todo",
         "colors": ["#84cc16", "#365314", "#0f172a"],
         "cc_preset": "cyber_phonk",
-        "quote": "What's your type of woman?"
+        "quote": "What is your type of woman? Mine is a tall woman with a big ass!"
     },
     "mahito": {
         "universe": "jjk",
         "name": "Mahito",
         "colors": ["#a855f7", "#581c87", "#000000"],
         "cc_preset": "sukuna_shrine",
-        "quote": "Humans are so fun to play with!"
+        "quote": "We are curses, born of human negative emotion... let's curse each other to death!"
     },
 
     # ── Demon Slayer (Kimetsu no Yaiba) Universe ──
