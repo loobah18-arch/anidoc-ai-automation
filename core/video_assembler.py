@@ -46,6 +46,10 @@ from core.quote_ai import generate_edit_metadata, format_anime_description
 from core.opencut_engine import build_clip_audio_fade
 from core.smart_downloader import smart_fetch_clips
 from core.text_overlay import generate_edit_text_overlays, build_engagement_hook_overlay
+try:
+    from core.remotion_compositor import render_remotion_kinetic_overlay
+except ImportError:
+    render_remotion_kinetic_overlay = None
 
 
 def generate_fallback_phonk_audio(duration: float, output_path: Path) -> Path:
@@ -353,9 +357,30 @@ def render_cinematic_edit(
     hook_filter = build_engagement_hook_overlay(character_key, target_duration)
     overlay_chain = f"{letterbox_filter},{hook_filter}" if hook_filter else letterbox_filter
 
-    filter_chains.append(
-        f"[concatenated_v]{flash_str},{overlay_chain}[vout]"
-    )
+    # Remotion Kinetic Typography Overlay
+    remotion_overlay = None
+    if render_remotion_kinetic_overlay:
+        try:
+            remotion_overlay = render_remotion_kinetic_overlay(
+                quote_text=quote_text,
+                character_name=theme["name"],
+                accent_color=theme["colors"][0],
+                duration_sec=beat_grid.duration
+            )
+        except Exception as e:
+            print(f"⚠️ [Remotion] Overlay generation bypassed: {e}")
+
+    if remotion_overlay and remotion_overlay.exists():
+        rem_inp_idx = len(clip_paths) + 1  # clips + phonk = index len(clip_paths)
+        cmd_inputs.extend(["-i", str(remotion_overlay)])
+        filter_chains.append(
+            f"[concatenated_v]{flash_str},{overlay_chain}[v_base];"
+            f"[v_base][{rem_inp_idx}:v]overlay=0:0:shortest=1[vout]"
+        )
+    else:
+        filter_chains.append(
+            f"[concatenated_v]{flash_str},{overlay_chain}[vout]"
+        )
     
     # Audio Dynamic Structure:
     # 85% Dominant Phonk BGM / 15% Subtle Anime Combat SFX

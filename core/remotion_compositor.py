@@ -31,7 +31,7 @@ def render_remotion_kinetic_overlay(
         return None
 
     if not output_overlay_path:
-        output_overlay_path = BASE_DIR / "scratch" / "remotion_overlay.webm"
+        output_overlay_path = BASE_DIR / "scratch" / "remotion_overlay.mov"
     output_overlay_path.parent.mkdir(parents=True, exist_ok=True)
 
     props = {

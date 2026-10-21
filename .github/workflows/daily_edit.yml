@@ -150,7 +150,7 @@ jobs:
           fi
           
           # Set explicit output filename stating what tool was used
-          CMD="$CMD --output 'output/[Remotion_Kinetic_Typography]_Tanjiro_Sun_Breathing_18s.mp4'"
+          CMD="$CMD --character tanjiro --universe demonslayer --output 'output/[Remotion_Kinetic_Typography]_Tanjiro_Hinokami_Kagura_18s.mp4'"
           
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
