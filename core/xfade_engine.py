@@ -8,28 +8,29 @@ from typing import List, Dict, Any, Optional
 
 # Curated list of high-energy transition effects supported natively by FFmpeg xfade
 XFADE_TRANSITIONS = [
+    "zoomin",
+    "fadewhite",
+    "distance",
     "wipeleft",
     "wiperight",
-    "slideleft",
-    "slideright",
-    "circlecrop",
-    "fadeblack",
     "smoothleft",
+    "smoothright",
+    "circlecrop",
     "radial",
-    "horzopen",
-    "vertopen"
+    "horzopen"
 ]
 
 
 def build_xfade_transition_filter(
     clip_count: int,
     durations: List[float],
-    transition_duration: float = 0.25,
+    transition_duration: float = 0.18,
     custom_transitions: Optional[List[str]] = None
 ) -> str:
     """
     Constructs a chained FFmpeg xfade filtergraph for seamless scene transitions.
     Formula: offset_i = offset_{i-1} + dur_{i} - transition_duration
+    Uses punchy 0.18s transitions for sharp AMV beat-syncing.
     """
     if clip_count < 2:
         return ""
@@ -61,8 +62,8 @@ def build_velocity_ramp_expression(is_drop: bool, segment_duration: float) -> st
     """
     Generates a speed ramp filter expression for FFmpeg setpts.
     Pre-drop: tension buildup slow-mo (0.75x speed).
-    Drop impact: hyper-velocity explosion (1.35x speed).
+    Drop impact: hyper-velocity explosion (1.45x speed).
     """
     if is_drop:
-        return "setpts=0.74*PTS"
-    return "setpts=1.20*PTS"
+        return "setpts=0.68*PTS"
+    return "setpts=1.25*PTS"
