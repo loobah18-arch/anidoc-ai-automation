@@ -140,7 +140,7 @@ jobs:
           fi
           
           # Set explicit output filename stating what tool was used
-          CMD="$CMD --output 'output/[PySceneDetect]_Sukuna_Malevolent_Shrine_18s.mp4'"
+          CMD="$CMD --output 'output/[PySceneDetect]_Sukuna_Malevolent_Shrine_28s.mp4'"
           
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
