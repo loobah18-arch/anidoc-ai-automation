@@ -11,21 +11,26 @@ from typing import List, Dict, Any
 from config.settings import CC_PRESETS, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
 
 
-def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: int) -> Dict[str, Any]:
+def get_segment_velocity_profile(
+    seg: Dict[str, Any],
+    seg_idx: int,
+    total_segs: int,
+    enable_velocity_ramping: bool = True
+) -> Dict[str, Any]:
     """
     Determines the visual profile for a clip segment.
-
-    Reference video uses NO velocity ramps — straight hard cuts are the standard.
-    Motion comes from source footage, not speed manipulation.
-    Only two exceptions: slight intro slow-mo and held outro.
-
-    Returns speed=1.0 for all drop segments (no speed ramping).
+    If enable_velocity_ramping=False: uses straight cuts (speed=1.0).
+    If enable_velocity_ramping=True (default modern AMV):
+    - Intro (0-4.5s): Cinematic slow-mo hold (0.85x) with black bars.
+    - Beat Drop (~4.8s): Explosive speed snap (1.30x) with impact zoom punch and flash.
+    - Combat exchanges: Alternating velocity dynamics (1.25x snap clashes vs 0.85x slow-mo impact holds).
+    - Climax finisher: Cinematic slow-mo weight (0.80x) into lingering resolution.
     """
     is_drop = seg.get("is_drop", False)
     duration = seg.get("duration", 1.0)
 
     if not is_drop:
-        # Phase 1: Intro — slight slow-mo for cinematic weight (reference does hold intro shots)
+        # Phase 1: Intro — slight slow-mo for cinematic weight & narrative buildup
         return {
             "role": "intro_slowmo",
             "speed": 0.85,
@@ -34,8 +39,17 @@ def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: 
             "add_flash": False
         }
 
+    if not enable_velocity_ramping:
+        return {
+            "role": "straight_cut",
+            "speed": 1.0,
+            "scale_factor": 1.0,
+            "add_bars": False,
+            "add_flash": False
+        }
+
     if seg_idx == total_segs - 1:
-        # Final Outro — held shot, slight slow-mo for dramatic weight
+        # Final Outro — held climax finisher, dramatic weight
         return {
             "role": "climax_outro",
             "speed": 0.80,
@@ -44,14 +58,33 @@ def get_segment_velocity_profile(seg: Dict[str, Any], seg_idx: int, total_segs: 
             "add_flash": False
         }
 
-    # ALL drop segments: straight cuts, no velocity ramping, no zoom punch
-    return {
-        "role": "straight_cut",
-        "speed": 1.0,
-        "scale_factor": 1.0,
-        "add_bars": False,
-        "add_flash": False
-    }
+    # First drop segment: Explosive impact
+    if seg.get("is_first_drop", False) or seg_idx == sum(1 for s in range(seg_idx) if not seg.get("is_drop", False)):
+        return {
+            "role": "drop_impact",
+            "speed": 1.30,
+            "scale_factor": 1.08,
+            "add_bars": False,
+            "add_flash": True
+        }
+
+    # Alternating combat dynamics (fast attack snap vs slow-mo clash hold)
+    if seg_idx % 2 == 0:
+        return {
+            "role": "combat_snap",
+            "speed": 1.25,
+            "scale_factor": 1.04,
+            "add_bars": False,
+            "add_flash": False
+        }
+    else:
+        return {
+            "role": "combat_slowmo_hold",
+            "speed": 0.85,
+            "scale_factor": 1.02,
+            "add_bars": False,
+            "add_flash": False
+        }
 
 
 def build_velocity_clip_filter(
@@ -65,34 +98,34 @@ def build_velocity_clip_filter(
     add_bars: bool = False
 ) -> str:
     """
-    Builds the per-clip video filter chain for portrait 9:16 anime edits.
-    Reference style: straight hard cuts, no velocity ramps, no zoom punches.
-    Motion comes from source footage, not speed manipulation.
-
-    Only exceptions: slight slow-mo on intro/outro (speed 0.80-0.85x) with
-    light frame blending. All drop segments use speed=1.0.
+    Builds the per-clip video filter chain for portrait 9:16 anime edits with modern velocity curves:
+    - Lanczos scaling & black padding to 1080x1920
+    - Dynamic PTS speed remapping (1.25x-1.30x snap acceleration vs 0.80x-0.85x slow-mo)
+    - Temporal frame blending (tblend) for motion blur on slow-mo segments
+    - Snappy impact zoom punch via zoompan
     """
     filters = [
-        # Scale preserving original aspect ratio (16:9 or square) without cropping,
-        # then center in 1080x1920 portrait canvas with deep black letterbox bars (matches lX7bIlY_KEE & MRurnn3AxyA)
         f"scale={video_width}:{video_height}:force_original_aspect_ratio=decrease:flags=lanczos",
         f"pad={video_width}:{video_height}:(ow-iw)/2:(oh-ih)/2:color=black",
         f"fps={fps}",
         "setsar=1",
     ]
 
-    # Only apply speed ramp for intro/outro slow-mo (not for drop segments)
-    if speed < 0.95:
+    # Speed remapping
+    if speed > 1.05:
+        pts_mult = 1.0 / speed
+        filters.append(f"setpts={pts_mult:.4f}*PTS")
+    elif speed < 0.95:
         pts_mult = 1.0 / max(0.2, speed)
         filters.append(f"setpts={pts_mult:.4f}*PTS")
-        # Light frame blending for slow-mo smoothness
-        if speed < 0.82:
+        # Temporal frame blending for RSMB-style motion blur
+        if speed <= 0.88:
             filters.append("tblend=all_mode=average")
 
-    # Subtle zoom for intro (1.02x, barely noticeable but adds weight)
-    if scale_factor > 1.01 and scale_factor <= 1.05:
+    # Fast impact zoom punch via zoompan
+    if scale_factor > 1.01 and scale_factor <= 1.15:
         punch_delta = scale_factor - 1.0
-        punch_frames = 20
+        punch_frames = 15
         zoom_expr = f"if(lte(in,{punch_frames}),{scale_factor:.3f}-{punch_delta:.3f}*(in/{punch_frames}),1.0)"
         filters.append(
             f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
@@ -104,7 +137,6 @@ def build_velocity_clip_filter(
     ])
 
     if add_bars:
-        # Cinematic letterbox bars — 12.5% of frame height (matching reference ~80px on 640h)
         bar_h = max(60, int(video_height * 0.125))
         filters.append(f"drawbox=x=0:y=0:w=iw:h={bar_h}:color=black:t=fill")
         filters.append(f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black:t=fill")

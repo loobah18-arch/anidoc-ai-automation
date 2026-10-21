@@ -45,6 +45,18 @@ LETTERBOX_BAR_HEIGHT = 656  # Backwards compatibility
 # Color Grading (CC) Presets — DARK, moody, reference-matched (mean luma ~25-40)
 # Reference style: muted saturation (0.10-0.40), crushed blacks, high contrast
 CC_PRESETS = {
+    # ── Modern 2025/2026 TikTok & Shorts AMV Preset ──
+    "anime_hdr_vibrant": {
+        "contrast": 1.25,
+        "brightness": -0.03,
+        "saturation": 1.22,
+        "gamma": 0.92,
+        "colorbalance": "rs=0.04:gs=0.02:bs=0.06:rm=0.02:gm=0.01:bm=0.04",
+        "unsharp": "5:5:1.2:5:5:0.0",
+        "vignette": "PI/4.0",
+        "primary_color": "&H00FFFFFF",
+        "accent_color": "#FFD700"
+    },
     # ── Reference-Matched Unified Cinematic Presets ──
     "jjk_cinematic_dark": {
         "contrast": 1.35,

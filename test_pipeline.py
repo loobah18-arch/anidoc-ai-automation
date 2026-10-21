@@ -79,10 +79,14 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertEqual(len(flashes), 3)
         self.assertIn("drawbox=", flashes[0])
 
-        # Reference style: NO velocity ramps on drop segments (straight cuts)
-        vel = get_segment_velocity_profile({"is_drop": True, "duration": 1.2}, 0, 10)
-        self.assertEqual(vel["role"], "straight_cut")
-        self.assertAlmostEqual(vel["speed"], 1.0)
+        # Velocity profiles: straight cut vs modern velocity
+        vel_straight = get_segment_velocity_profile({"is_drop": True, "duration": 1.2}, 0, 10, enable_velocity_ramping=False)
+        self.assertEqual(vel_straight["role"], "straight_cut")
+        self.assertAlmostEqual(vel_straight["speed"], 1.0)
+
+        vel_modern = get_segment_velocity_profile({"is_drop": True, "duration": 1.2}, 0, 10, enable_velocity_ramping=True)
+        self.assertEqual(vel_modern["role"], "drop_impact")
+        self.assertAlmostEqual(vel_modern["speed"], 1.30)
 
         # Intro (non-drop) segment gets slight slow-mo for cinematic weight
         intro_vel = get_segment_velocity_profile({"is_drop": False, "duration": 1.2}, 0, 10)
@@ -177,6 +181,19 @@ class TestAniDocPipeline(unittest.TestCase):
         ]
         probe_res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
         self.assertIn(f"{VIDEO_WIDTH},{VIDEO_HEIGHT}", probe_res.stdout)
+
+    def test_08_automated_edit_reviewer(self):
+        from core.automated_edit_reviewer import review_edit_and_benchmark, generate_markdown_report
+        out_video = SCRATCH_DIR / "test_assembled_edit.mp4"
+        if not out_video.exists():
+            return
+        review = review_edit_and_benchmark(out_video, expected_drop_time=1.5)
+        self.assertIn("overall_score", review)
+        self.assertIn("pillar_scores", review)
+        self.assertTrue(review["overall_score"] > 50)
+        report_md = generate_markdown_report(review)
+        self.assertIn("AniDoc Automated Edit Review", report_md)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -158,7 +158,21 @@ jobs:
           echo "Executing: $CMD"
           eval $CMD
 
-      - name: Upload Output Artifacts
+      - name: Automated Edit Review & Trend Benchmark
+        if: always()
+        run: |
+          python -m core.automated_edit_reviewer --output-dir output
+
+      - name: Upload Review & Benchmark Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: edit-review-benchmark
+          path: |
+            output/edit_review_benchmark.*
+          retention-days: 14
+
+      - name: Upload Output Video Artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -175,6 +189,6 @@ jobs:
           git add .agents/data/
           if ! git diff --cached --quiet; then
             git commit -m "chore(state): update title history and creator baselines [skip ci]"
-            git pull --rebase origin main || true
-            git push origin main || echo "⚠️ Could not push state update"
+            git pull --rebase origin ${{ github.ref_name }} || true
+            git push origin ${{ github.ref_name }} || echo "⚠️ Could not push state update"
           fi
