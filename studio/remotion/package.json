@@ -1,0 +1,14 @@
+{
+  "name": "anidoc-remotion-typography",
+  "version": "1.0.0",
+  "description": "Remotion Kinetic Typography for AniDoc 4K Anime Shorts",
+  "scripts": {
+    "render": "remotion render src/Root.tsx KineticCaptions --props=props.json"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "^4.0.0"
+  }
+}

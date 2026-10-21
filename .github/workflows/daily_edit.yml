@@ -69,6 +69,16 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
+      - name: Set up Node.js for Remotion
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Remotion Dependencies
+        run: |
+          cd studio/remotion
+          npm install
+
       - name: Install System Dependencies (FFmpeg, Fonts, yt-dlp, Unpackers)
         run: |
           sudo rm -f /etc/apt/sources.list.d/google-chrome.list
@@ -138,6 +148,9 @@ jobs:
           if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
             CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
           fi
+          
+          # Set explicit output filename stating what tool was used
+          CMD="$CMD --output 'output/[Remotion_Kinetic_Typography]_Tanjiro_Sun_Breathing_18s.mp4'"
           
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
