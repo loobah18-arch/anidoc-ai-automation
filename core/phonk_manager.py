@@ -19,77 +19,89 @@ from typing import List, Dict, Any, Optional
 from config.settings import PHONK_DIR, SCRATCH_DIR
 
 
-# --- Curated Top 10 Viral AURA Phonk Catalog (Frame-Accurate Calibrated Drops) ---
+# --- Curated Top 10 Viral AURA Phonk Catalog (Frame-Accurate Calibrated Drops & Offset Sync) ---
+# audio_offset shifts the audio start so the massive 808 drop hits at ~4.8s into the edit,
+# giving the viewer a full 23+ seconds of intense, beat-synced combat action AFTER the drop!
 POPULAR_PHONK_CATALOG = [
     {
         "id": "andromeda_no_fear_phonk",
         "title": "ANDROMEDA - NO FEAR!",
         "genre": "Aura Phonk",
         "bpm": 135.0,
-        "default_drop": 5.31,
+        "default_drop": 4.80,
+        "audio_offset": 11.20,
     },
     {
         "id": "ashreveal_manasha_phonk",
         "title": "ASHREVEAL - MANASHA",
         "genre": "Aggressive Phonk",
         "bpm": 134.0,
-        "default_drop": 6.64,
+        "default_drop": 4.80,
+        "audio_offset": 14.20,
     },
     {
         "id": "dygo_funk_infernal",
         "title": "DYGO - FUNK INFERNAL",
         "genre": "Infernal Phonk",
         "bpm": 138.0,
-        "default_drop": 6.45,
+        "default_drop": 4.80,
+        "audio_offset": 10.20,
     },
     {
         "id": "irokz_funk_universo_slowed",
         "title": "IROKZ - FUNK UNIVERSO (SLOWED)",
         "genre": "Slowed Phonk",
         "bpm": 128.0,
-        "default_drop": 8.47,
+        "default_drop": 4.80,
+        "audio_offset": 13.20,
     },
     {
         "id": "lonown_avangard_phonk",
         "title": "LONOWN - AVANGARD (SLOWED)",
         "genre": "Aura Phonk",
         "bpm": 132.0,
-        "default_drop": 5.67,
+        "default_drop": 4.80,
+        "audio_offset": 11.20,
     },
     {
         "id": "mvsterious_slava_funk",
         "title": "MVSTERIOUS - SLAVA FUNK!",
         "genre": "Slava Phonk",
         "bpm": 136.0,
-        "default_drop": 6.47,
+        "default_drop": 4.80,
+        "audio_offset": 1.70,
     },
     {
         "id": "ncts_next_phonk",
         "title": "NCTS - NEXT",
         "genre": "Next Phonk",
         "bpm": 132.0,
-        "default_drop": 5.63,
+        "default_drop": 4.80,
+        "audio_offset": 11.20,
     },
     {
         "id": "nxght_blue_horizon_funk",
         "title": "NXGHT - BLUE HORIZON FUNK",
         "genre": "Horizon Phonk",
         "bpm": 136.0,
-        "default_drop": 5.84,
+        "default_drop": 4.80,
+        "audio_offset": 3.20,
     },
     {
         "id": "ogryzek_aura_phonk",
         "title": "OGRYZEK - AURA",
         "genre": "Aura Phonk",
         "bpm": 130.0,
-        "default_drop": 5.03,
+        "default_drop": 4.80,
+        "audio_offset": 20.20,
     },
     {
         "id": "trashxrl_deus_do_olimpo",
         "title": "TRASHXRL - DEUS DO OLIMPO",
         "genre": "Brazilian Phonk",
         "bpm": 140.0,
-        "default_drop": 5.84,
+        "default_drop": 4.80,
+        "audio_offset": 1.00,
     },
 ]
 
