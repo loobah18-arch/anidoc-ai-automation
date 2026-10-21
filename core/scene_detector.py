@@ -33,8 +33,14 @@ def detect_scene_cut_timestamps(
 
     if SCENEDETECT_AVAILABLE:
         try:
-            print(f"🎬 [PySceneDetect] Running ContentDetector on '{video_path.name}' (threshold={threshold})...")
-            scene_list = detect(str(video_path), ContentDetector(threshold=threshold, min_scene_len=int(min_scene_len_sec * 24)))
+            print(f"🎬 [PySceneDetect] Running AdaptiveDetector on '{video_path.name}'...")
+            # AdaptiveDetector uses rolling score deltas, perfectly handling anime Sakuga flashes
+            detector = AdaptiveDetector(adaptive_threshold=3.0, min_scene_len=int(min_scene_len_sec * 24))
+            scene_list = detect(str(video_path), detector)
+            if not scene_list:
+                print("ℹ️ [PySceneDetect] Fallback to ContentDetector...")
+                scene_list = detect(str(video_path), ContentDetector(threshold=threshold, min_scene_len=int(min_scene_len_sec * 24)))
+
             for start_tc, end_tc in scene_list:
                 s = start_tc.get_seconds()
                 e = end_tc.get_seconds()
@@ -45,7 +51,7 @@ def detect_scene_cut_timestamps(
                         e = s + max_scene_len_sec
                     scenes.append((round(s, 2), round(e, 2)))
             if scenes:
-                print(f"✅ [PySceneDetect] Detected {len(scenes)} natural scene cuts in '{video_path.name}'.")
+                print(f"✅ [PySceneDetect] Detected {len(scenes)} natural keyframe scene cuts in '{video_path.name}'.")
                 return scenes
         except Exception as err:
             print(f"⚠️ [PySceneDetect] Failed to run scenedetect: {err}, falling back to FFmpeg...")
