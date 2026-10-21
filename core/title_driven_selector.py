@@ -259,13 +259,13 @@ def get_title_driven_clips(
             if scene.get("action_score", 0) < intent["min_action_score"]:
                 continue
 
-            # Check if scene matches title keywords
+            # Check if scene matches title keywords (heavy boost to keep title relevance supreme)
             keyword_match = any(kw in desc for kw in intent["action_keywords"])
             if keyword_match or intent["scene_type"] == "fight":
                 all_clips.append({
                     **scene,
                     "episode": ep_code,
-                    "relevance_score": scene.get("action_score", 0) + (0.1 if keyword_match else 0)
+                    "relevance_score": scene.get("action_score", 0) + (1.5 if keyword_match else 0)
                 })
 
     # Sort by relevance
