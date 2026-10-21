@@ -178,12 +178,56 @@ def slice_scenepack_into_clips(
     except Exception:
         total_dur = 20.0
         
-    print(f"✂️ Slicing '{raw_video_path.name}' ({total_dur:.1f}s) into {seg_duration}s action cuts with audio & watermark removal...")
+    print(f"✂️ Slicing '{raw_video_path.name}' ({total_dur:.1f}s) into action cuts with audio & watermark removal...")
     
     # Check if raw input has audio
     has_audio = check_clip_has_audio(raw_video_path)
     
+    # Try PySceneDetect for natural combat cut boundaries
+    from core.scene_detector import detect_scene_cut_timestamps
+    detected_scenes = detect_scene_cut_timestamps(raw_video_path, min_scene_len_sec=1.2, max_scene_len_sec=3.5)
+
     generated_clips = []
+    count = len(list(output_dir.glob(f"{clip_prefix}_clip_*.mp4")))
+    added = 0
+    
+    # Watermark-free 9:16 crop filter (trims 24px off edges then centers)
+    vf_filter = (
+        f"crop=w=iw-48:h=ih-48:x=24:y=24,"
+        f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=increase,"
+        f"crop={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1"
+    )
+
+    if detected_scenes:
+        for (start_t, end_t) in detected_scenes:
+            if added >= max_clips:
+                break
+            dur = end_t - start_t
+            out_clip = output_dir / f"{clip_prefix}_clip_{count:02d}.mp4"
+            cmd = [
+                "ffmpeg", "-y",
+                "-ss", f"{start_t:.2f}",
+                "-i", str(raw_video_path),
+                "-t", f"{dur:.2f}",
+                "-vf", vf_filter,
+                "-c:v", "libx264",
+                "-preset", "veryfast",
+                "-pix_fmt", "yuv420p"
+            ]
+            if has_audio:
+                cmd.extend(["-c:a", "aac", "-b:a", "192k"])
+            else:
+                cmd.extend(["-an"])
+            cmd.append(str(out_clip))
+            res = subprocess.run(cmd, capture_output=True)
+            if res.returncode == 0 and out_clip.exists() and out_clip.stat().st_size > 10_000:
+                generated_clips.append(out_clip)
+                count += 1
+                added += 1
+        if generated_clips:
+            print(f"✅ [PySceneDetect] Sliced {len(generated_clips)} keyframe-accurate action cuts.")
+            return generated_clips
+
     # Randomized start jitter for dynamic scene sampling
     t = random.uniform(0.5, max(0.6, total_dur * 0.05))
     count = len(list(output_dir.glob(f"{clip_prefix}_clip_*.mp4")))

@@ -11,3 +11,4 @@ edge-tts>=7.0.0
 tiktok-uploader>=1.1.5
 selenium>=4.0.0
 gdown>=5.0.0
+scenedetect[opencv]>=0.6.2
