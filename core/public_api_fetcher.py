@@ -240,7 +240,17 @@ def slice_scenepack_into_clips(
         f"crop={VIDEO_WIDTH}:{VIDEO_HEIGHT},setsar=1"
     )
     
-    while t + seg_duration <= total_dur and added < max_clips:
+    # Guard against closing credits, outro cards, and watermark screens
+    if total_dur > 600:
+        max_end = total_dur - 210.0
+    elif total_dur > 180:
+        max_end = total_dur - 45.0
+    elif total_dur > 60:
+        max_end = total_dur - 15.0
+    else:
+        max_end = max(1.0, total_dur - 3.0)
+
+    while t + seg_duration <= max_end and added < max_clips:
         out_clip = output_dir / f"{clip_prefix}_clip_{count:02d}.mp4"
         cmd = [
             "ffmpeg", "-y",
