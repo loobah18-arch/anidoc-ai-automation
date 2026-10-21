@@ -24,11 +24,12 @@ from core.phonk_manager import POPULAR_PHONK_CATALOG
 
 
 class BeatGrid:
-    def __init__(self, duration: float, drop_time: float, beat_times: List[float], bpm: float = 134.0):
+    def __init__(self, duration: float, drop_time: float, beat_times: List[float], bpm: float = 134.0, audio_offset: float = 0.0):
         self.duration = duration
         self.drop_time = drop_time
         self.beat_times = sorted(list(set([round(t, 2) for t in beat_times if 0.0 <= t <= duration])))
         self.bpm = bpm
+        self.audio_offset = audio_offset
 
     def get_cut_segments(self) -> List[Dict[str, Any]]:
         """Returns list of segments with start, end, duration, is_drop, and prev_is_drop flags.
@@ -90,11 +91,12 @@ class BeatGrid:
         return flash_times[:max_flashes]
 
 
-def _stream_wav_from_ffmpeg(audio_path: Path, duration: float) -> Tuple[np.ndarray, int]:
+def _stream_wav_from_ffmpeg(audio_path: Path, duration: float, offset: float = 0.0) -> Tuple[np.ndarray, int]:
     """Extracts mono 22050 Hz PCM via FFmpeg pipe (no temp file / no WAV header)."""
     SR = 22050
     cmd = [
         "ffmpeg", "-y",
+        "-ss", f"{offset:.2f}",
         "-i", str(audio_path),
         "-t", f"{duration:.2f}",
         "-ac", "1", "-ar", str(SR),
@@ -299,7 +301,8 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
     matched_entry = next((item for item in POPULAR_PHONK_CATALOG if item["id"] == track_stem or item["id"] in track_stem), None)
 
     calibrated_bpm = matched_entry.get("bpm", 134.0) if matched_entry else 134.0
-    calibrated_drop = matched_entry.get("default_drop", 6.0) if matched_entry else 6.0
+    calibrated_drop = matched_entry.get("default_drop", 4.80) if matched_entry else 4.80
+    audio_offset = matched_entry.get("audio_offset", 0.0) if matched_entry else 0.0
 
     try:
         probe_cmd = [
@@ -309,7 +312,8 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
             str(audio_path)
         ]
         res = subprocess.run(probe_cmd, capture_output=True, text=True, check=True)
-        dur = min(float(res.stdout.strip()), target_duration)
+        raw_dur = float(res.stdout.strip())
+        dur = min(max(0.1, raw_dur - audio_offset), target_duration)
 
         # ── Real audio onset detection via scipy ──────────────────────────────
         detected_bpm = calibrated_bpm
@@ -317,7 +321,7 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
         detected_onsets = []
 
         try:
-            audio_data, sr = _stream_wav_from_ffmpeg(audio_path, dur)
+            audio_data, sr = _stream_wav_from_ffmpeg(audio_path, dur, offset=audio_offset)
             detected_bpm, detected_onsets = _detect_onsets_and_bpm(audio_data, sr)
 
             # Use detected BPM for unknown tracks; for catalog tracks, prefer catalog BPM
@@ -326,17 +330,16 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
                 calibrated_bpm = detected_bpm
                 print(f"  🔍 [BeatSync] Detected BPM: {detected_bpm:.1f} (no catalog match)")
 
-            # Detect drop from actual onsets: highest-energy onset in 4-9s window
+            # Detect drop from actual onsets: highest-energy onset in 4-6.5s window
             if detected_onsets:
-                drop_candidates = [t for t in detected_onsets if 4.0 <= t <= 9.0]
+                drop_candidates = [t for t in detected_onsets if 3.5 <= t <= 7.0]
                 if drop_candidates:
                     # Prefer the onset closest to the catalog drop time
                     detected_drop = min(drop_candidates, key=lambda t: abs(t - calibrated_drop))
-                    print(f"  🎯 [BeatSync] Drop snapped: {calibrated_drop:.2f}s → {detected_drop:.3f}s (from {len(detected_onsets)} onsets)")
+                    print(f"  🎯 [BeatSync] Drop snapped: {calibrated_drop:.2f}s → {detected_drop:.3f}s (offset {audio_offset:.1f}s)")
                 else:
-                    # No onsets in drop window — use catalog/estimated drop
                     detected_drop = calibrated_drop
-                    print(f"  ⚠️  [BeatSync] No onsets in 4-9s window, using catalog drop: {detected_drop:.2f}s")
+                    print(f"  ⚠️  [BeatSync] Using calibrated drop: {detected_drop:.2f}s (offset {audio_offset:.1f}s)")
             else:
                 print(f"  ⚠️  [BeatSync] No onsets detected, using catalog defaults")
 
@@ -347,6 +350,7 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
 
         # ── Generate procedural grid then snap to real onsets ──────────────────
         grid = generate_procedural_beat_grid(duration=dur, drop_time=detected_drop, bpm=calibrated_bpm)
+        grid.audio_offset = audio_offset
 
         if detected_onsets:
             grid.beat_times = _snap_grid_to_onsets(grid.beat_times, detected_onsets, calibrated_bpm)
@@ -354,7 +358,7 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
                               if any(abs(t - o) < 0.05 for o in detected_onsets))
             print(f"  📐 [BeatSync] Snapped {snapped_count}/{len(grid.beat_times)} cuts to real bass onsets")
 
-        print(f"🎵 [BeatSync] Track: {track_stem} | BPM: {calibrated_bpm:.1f} | Drop: {detected_drop:.3f}s | Duration: {dur:.1f}s | Onsets: {len(detected_onsets)}")
+        print(f"🎵 [BeatSync] Track: {track_stem} | BPM: {calibrated_bpm:.1f} | Drop: {detected_drop:.3f}s | Offset: {audio_offset:.1f}s | Dur: {dur:.1f}s")
         return grid
 
     except Exception as e:

@@ -275,7 +275,11 @@ def render_cinematic_edit(
         has_clip_audio_list.append(check_clip_has_audio(cp))
         
     phonk_inp_idx = len(clip_paths)
-    cmd_inputs.extend(["-i", str(audio_path)])
+    phonk_offset = getattr(beat_grid, "audio_offset", 0.0)
+    if phonk_offset > 0.0:
+        cmd_inputs.extend(["-ss", f"{phonk_offset:.2f}", "-i", str(audio_path)])
+    else:
+        cmd_inputs.extend(["-i", str(audio_path)])
 
     filter_chains = []
     concat_v_inputs = []
