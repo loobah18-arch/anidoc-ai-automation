@@ -46,7 +46,7 @@ def render_remotion_kinetic_overlay(
     frames = int(duration_sec * fps)
     cmd = [
         "npx", "remotion", "render",
-        str(REMOTION_DIR / "src" / "Root.tsx"),
+        str(REMOTION_DIR / "src" / "index.ts"),
         "KineticCaptions",
         str(output_overlay_path),
         f"--props={props_file}",
