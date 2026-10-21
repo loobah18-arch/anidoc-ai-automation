@@ -49,6 +49,7 @@ def main():
     parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts")
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
     parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
+    parser.add_argument("--interpolate-60fps", action="store_true", help="Interpolate video to silky-smooth 60fps with RIFE/optical flow")
     parser.add_argument("--studio", action="store_true", help="Launch the AniDoc Studio Web Video Editing Software")
     parser.add_argument("--port", type=int, default=7860, help="Port for AniDoc Studio server (default: 7860)")
     
@@ -103,6 +104,9 @@ def main():
     )
     
     output_path = result["output_path"]
+    if args.interpolate_60fps:
+        from core.rife_interpolator import interpolate_video_to_60fps
+        output_path = interpolate_video_to_60fps(output_path)
     metadata = result["metadata"]
     
     print("\n=======================================================")
