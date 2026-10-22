@@ -104,6 +104,19 @@ def main():
     
     output_path = result["output_path"]
     metadata = result["metadata"]
+
+    # 60fps Optical Flow Pass (Matches user favorite 60fps RIFE benchmark)
+    try:
+        from core.rife_interpolator import interpolate_video_to_60fps
+        print(f"⚡ [60FPS] Running optical flow frame interpolation on {output_path.name}...")
+        temp_60fps = output_path.parent / f"{output_path.stem}_60fps.mp4"
+        interpolated = interpolate_video_to_60fps(output_path, temp_60fps, target_fps=60)
+        if interpolated.exists() and interpolated != output_path and interpolated.stat().st_size > 10_000:
+            output_path.unlink(missing_ok=True)
+            interpolated.rename(output_path)
+            print(f"✅ [60FPS] Upgraded final edit to buttery 60fps: {output_path.name}")
+    except Exception as e:
+        print(f"⚠️ [60FPS] Notice during 60fps interpolation: {e}")
     
     print("\n=======================================================")
     print("🎉 4K Phonk / Scene Edit Short Rendered Successfully!")

@@ -39,18 +39,26 @@ class BeatGrid:
         held shot — no micro-subdivision, no flash inserts between segments.
         Flash moments are identified separately (2-3 per edit) at the biggest drops.
         """
-        raw_segments = []
+        # Ensure contiguous segment boundaries from 0.0 to duration
         all_points = [0.0] + self.beat_times
         if self.duration not in all_points:
             all_points.append(self.duration)
         all_points = sorted(list(set(all_points)))
 
-        for i in range(len(all_points) - 1):
-            s = all_points[i]
-            e = all_points[i+1]
-            dur = e - s
-            if dur < 0.5:
-                continue  # skip sub-half-second fragments (noise)
+        merged_points = [all_points[0]]
+        for pt in all_points[1:]:
+            if pt - merged_points[-1] >= 0.35:
+                merged_points.append(pt)
+            elif pt == all_points[-1] and len(merged_points) > 1:
+                merged_points[-1] = pt
+
+        if merged_points[-1] < self.duration:
+            merged_points.append(self.duration)
+
+        raw_segments = []
+        for i in range(len(merged_points) - 1):
+            s = merged_points[i]
+            e = merged_points[i+1]
             raw_segments.append({"start": s, "end": e})
 
         # No subdivision — each beat-to-beat interval is one held shot.
@@ -230,28 +238,29 @@ def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time:
 
     # ── Act 1: Atmospheric Hook / Dialogue Build ──
     effective_drop = min(drop_time, max(1.5, min(8.0, duration - 4.0)))
-    if effective_drop > 4.5:
+    if effective_drop > 3.5:
         beat_times.append(round(effective_drop * 0.5, 2))
     beat_times.append(round(effective_drop, 2))
 
     if duration < 30.0:
-        # 3-act for short edits
-        remaining_time = max(2.0, duration - effective_drop)
-        combat_end = effective_drop + remaining_time * 0.70
-        cut_step = beat_interval * 2 if bpm < 140 else beat_interval * 4
-        if cut_step < 0.65:
-            cut_step = beat_interval * 4
-        if cut_step > 2.0:
-            cut_step = beat_interval * 2
-
+        # Modern High-Energy 3-Act AMV for TikTok / Shorts:
+        # Act 1: Hook (0.0 to effective_drop)
+        # Act 2: Combat Velocity Rush (effective_drop to duration - 2.8s) - syncopated 1-beat & 2-beat cuts
+        # Act 3: Climax Finisher (duration - 2.8s to duration) - dramatic held finisher
+        climax_start = round(duration - 2.8, 2)
         curr = effective_drop
-        while curr + cut_step < combat_end:
-            curr += cut_step
-            beat_times.append(round(curr, 2))
 
-        climax_strike = round(duration - min(3.5, max(1.8, remaining_time * 0.35)), 2)
-        if climax_strike > (beat_times[-1] if beat_times else 0.0) + 0.8 and climax_strike < duration - 1.0:
-            beat_times.append(climax_strike)
+        # Alternate 1-beat (fast strike cut) and 2-beat (technique impact hold) cuts
+        step_toggle = False
+        while curr < climax_start - 0.4:
+            step = beat_interval if step_toggle else (beat_interval * 2)
+            step = max(0.45, min(0.95, step))
+            step_toggle = not step_toggle
+            curr += step
+            if curr < climax_start - 0.35:
+                beat_times.append(round(curr, 2))
+
+        beat_times.append(climax_start)
     else:
         # 5-act for 1-minute / longer edits
         # Act 2: Wave 1 Combat (drop to ~42% duration)

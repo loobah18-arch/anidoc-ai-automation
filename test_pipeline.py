@@ -59,6 +59,15 @@ class TestAniDocPipeline(unittest.TestCase):
         flash_times = grid.get_flash_timestamps()
         self.assertLessEqual(len(flash_times), 3)
 
+        # Test short edit (<30s) modern AMV velocity grid
+        short_grid = generate_procedural_beat_grid(duration=28.0, drop_time=4.8, bpm=134.0)
+        self.assertEqual(short_grid.duration, 28.0)
+        self.assertEqual(short_grid.drop_time, 4.8)
+        short_segs = short_grid.get_cut_segments()
+        self.assertTrue(len(short_segs) >= 15, "Short AMV edit should produce 15+ cuts for high velocity")
+        self.assertLess(len(short_segs), 45)
+        self.assertTrue(any(abs(s["start"] - 4.8) < 0.05 for s in short_segs))
+
     def test_03_effects_filter_builders(self):
         marvel_cc = build_cc_filter("marvel_hdr")
         self.assertIn("eq=contrast=", marvel_cc)
