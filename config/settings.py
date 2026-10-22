@@ -31,29 +31,42 @@ TITLE_HISTORY_FILE = AGENTS_DATA_DIR / "title_history.json"
 # Video Rendering Config (9:16 Portrait, matching viral anime short sweet spot)
 VIDEO_WIDTH = 1080
 VIDEO_HEIGHT = 1920
-FPS = 24  # Source anime is 24fps — no need to upscale framerate
+FOREGROUND_WIDTH = 1080
+FOREGROUND_HEIGHT = 1350  # 4:5 tall centered foreground
+FOREGROUND_Y_OFFSET = 285   # (1920 - 1350) / 2 = 285
+FPS = 60  # High-bitrate 60fps export
 DEFAULT_DURATION = 28.0  # Perfect 28.0s duration: 5s buildup + 23s drop combat rush & finisher
 
-# Cinematic letterbox: 16:9 widescreen centered in 9:16 vertical canvas (matches lX7bIlY_KEE & MRurnn3AxyA)
-# Active 16:9 video is 1080x608, top bar 656px, bottom bar 656px (34.1% of frame height each)
-FRAMING_MODE = "cinematic_widescreen"  # "cinematic_widescreen" (16:9 centered) or "square_centered" (1:1 centered)
-LETTERBOX_TOP_BAR = 656
-LETTERBOX_BOT_BAR = 656
-ACTIVE_FRAME_HEIGHT = 608
-LETTERBOX_BAR_HEIGHT = 656  # Backwards compatibility
+# Full 9:16 Vertical Layout (Blurred Synced Background + 4:5 Foreground, 0% black bars)
+FRAMING_MODE = "vertical_dual_layer"
+LETTERBOX_TOP_BAR = 0
+LETTERBOX_BOT_BAR = 0
+ACTIVE_FRAME_HEIGHT = 1350
+LETTERBOX_BAR_HEIGHT = 0  # Backwards compatibility
 
-# Color Grading (CC) Presets — DARK, moody, reference-matched (mean luma ~25-40)
-# Reference style: muted saturation (0.10-0.40), crushed blacks, high contrast
+# Color Grading (CC) Presets — Vibrant Anime Glow (HDR-style highlights, no crushed-black mud)
 CC_PRESETS = {
+    # ── Vibrant Anime Glow (2026 AMV Standard) ──
+    "vibrant_anime_glow": {
+        "contrast": 1.15,
+        "brightness": 0.02,
+        "saturation": 1.25,
+        "gamma": 1.15,
+        "colorbalance": "rs=0.03:gs=0.01:bs=0.04",
+        "unsharp": "5:5:1.0:5:5:0.0",
+        "vignette": "0",  # Clean edges, no dark crushing
+        "primary_color": "&H00FFFFFF",
+        "accent_color": "#FFD700"
+    },
     # ── Modern 2025/2026 TikTok & Shorts AMV Preset ──
     "anime_hdr_vibrant": {
-        "contrast": 1.25,
-        "brightness": -0.03,
-        "saturation": 1.22,
-        "gamma": 0.92,
-        "colorbalance": "rs=0.04:gs=0.02:bs=0.06:rm=0.02:gm=0.01:bm=0.04",
-        "unsharp": "5:5:1.2:5:5:0.0",
-        "vignette": "PI/4.0",
+        "contrast": 1.18,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=0.03:gs=0.01:bs=0.04",
+        "unsharp": "5:5:1.0:5:5:0.0",
+        "vignette": "0",
         "primary_color": "&H00FFFFFF",
         "accent_color": "#FFD700"
     },
@@ -104,13 +117,13 @@ CC_PRESETS = {
         "accent_color": "#00D2FF"
     },
     "warm_red": {
-        "contrast": 1.38,
-        "brightness": -0.07,
-        "saturation": 0.70,
-        "gamma": 0.84,
-        "colorbalance": "rs=0.20:gs=-0.05:bs=-0.15:rm=0.12:gm=-0.03:bm=-0.08",
-        "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/3.8",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.15,
+        "colorbalance": "rs=0.10:gs=-0.02:bs=-0.05",
+        "unsharp": "5:5:1.0:5:5:0.0",
+        "vignette": "0",  # Eliminated dark-red crushed vignette
         "primary_color": "&H003333FF",  # Crimson
         "accent_color": "#FF2233"
     },

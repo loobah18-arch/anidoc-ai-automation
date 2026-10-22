@@ -95,14 +95,15 @@ def build_velocity_clip_filter(
     video_width: int = VIDEO_WIDTH,
     video_height: int = VIDEO_HEIGHT,
     fps: int = FPS,
-    add_bars: bool = False
+    add_bars: bool = False,
+    is_intro_hook: bool = False
 ) -> str:
     """
-    Builds the per-clip video filter chain for portrait 9:16 anime edits with modern velocity curves:
-    - Lanczos scaling & black padding to 1080x1920
+    Builds the per-clip video filter chain with modern velocity curves:
     - Dynamic PTS speed remapping (1.25x-1.30x snap acceleration vs 0.80x-0.85x slow-mo)
     - Temporal frame blending (tblend) for motion blur on slow-mo segments
-    - Snappy impact zoom punch via zoompan
+    - Snappy exponential decay zoom punch on beat cuts (1.12x -> 1.0x over first 0.15s / 9 frames at 60fps)
+    - Smooth continuous zoom-in for intro hook (1.0x -> 1.15x)
     """
     filters = [
         f"scale={video_width}:{video_height}:force_original_aspect_ratio=decrease:flags=lanczos",
@@ -122,11 +123,16 @@ def build_velocity_clip_filter(
         if speed <= 0.88:
             filters.append("tblend=all_mode=average")
 
-    # Fast impact zoom punch via zoompan
-    if scale_factor > 1.01 and scale_factor <= 1.15:
-        punch_delta = scale_factor - 1.0
-        punch_frames = 15
-        zoom_expr = f"if(lte(in,{punch_frames}),{scale_factor:.3f}-{punch_delta:.3f}*(in/{punch_frames}),1.0)"
+    # Zoom Punch on Beat Cuts or Continuous Intro Hook Zoom
+    if is_intro_hook:
+        hook_frames = max(30, int(duration * fps))
+        zoom_expr = f"min(1.0+0.15*(in/{hook_frames}),1.15)"
+        filters.append(
+            f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
+        )
+    elif scale_factor > 1.01:
+        punch_frames = 9 if fps >= 50 else 5
+        zoom_expr = f"if(lte(in,{punch_frames}),1.0+0.12*exp(-0.35*in),1.0)"
         filters.append(
             f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
         )
@@ -144,27 +150,165 @@ def build_velocity_clip_filter(
     return ",".join(filters)
 
 
-def build_cc_filter(preset_name: str = "cool_blue") -> str:
+def build_vertical_dual_layer_chain(
+    input_tag: str,
+    output_tag: str,
+    seg_idx: int,
+    duration: float,
+    speed: float = 1.0,
+    scale_factor: float = 1.0,
+    video_width: int = VIDEO_WIDTH,
+    video_height: int = VIDEO_HEIGHT,
+    fg_height: int = 1350,
+    y_offset: int = 285,
+    fps: int = FPS,
+    is_intro_hook: bool = False
+) -> str:
     """
-    Builds the dark, moody color grade filtergraph snippet.
-    Targets mean luma ~25-40 (reference style) — very dark with muted saturation.
-
-    Now supports colorbalance field for dual-tone blue/red alternation.
+    Builds the complete 2026 9:16 Vertical Layout (Blurred Synced Background + 4:5 Foreground):
+    1. Edge Watermark Crop: Crops 6% off all four edges (strips TV logos & studio credits).
+    2. Background Layer (1080x1920): Scales/crops to fill canvas, heavy Gaussian blur (boxblur=28:5),
+       brightness scaled by 0.45.
+    3. Foreground Layer (1080x1350, 4:5): Center-crop to 4:5 tall frame, subtle 4px white border.
+    4. Overlays foreground onto background at y=285 (0% black bars).
+    5. Applies velocity speed remapping and exponential zoom punch.
     """
-    cfg = CC_PRESETS.get(preset_name, CC_PRESETS["cool_blue"])
-    eq_part = f"eq=contrast={cfg['contrast']}:brightness={cfg['brightness']}:saturation={cfg['saturation']}:gamma={cfg['gamma']}"
-    unsharp_part = f"unsharp={cfg['unsharp']}"
-    vignette_part = f"vignette={cfg['vignette']}"
-    # Crushed blacks + clipped highlights for high-contrast moody look
-    levels_part = "colorlevels=rimin=0.05:gimin=0.05:bimin=0.05:rimax=0.96:gimax=0.96:bimax=0.96"
-    # Lighter grain (c0s=12) — visible but not heavy
-    grain_part = "noise=c0s=12:allf=t+u"
+    bg_raw = f"bg_raw_{seg_idx}"
+    fg_raw = f"fg_raw_{seg_idx}"
+    bg_out = f"bg_{seg_idx}"
+    fg_out = f"fg_{seg_idx}"
+    comp_out = f"comp_{seg_idx}"
 
-    parts = [eq_part, levels_part]
+    # 1. 6% Edge Crop & split into background and foreground
+    crop_split = (
+        f"{input_tag}crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06,split=2[{bg_raw}][{fg_raw}]"
+    )
+
+    # 2. Ambient Blurred Background (1080x1920)
+    bg_chain = (
+        f"[{bg_raw}]scale={video_width}:{video_height}:force_original_aspect_ratio=increase,"
+        f"crop={video_width}:{video_height},boxblur=28:5,"
+        f"colorchannelmixer=aa=1.0:rr=0.45:gg=0.45:bb=0.45,setsar=1[{bg_out}]"
+    )
+
+    # 3. 4:5 Foreground Frame (1080x1350) with 4px border
+    fg_chain = (
+        f"[{fg_raw}]scale={video_width}:{fg_height}:force_original_aspect_ratio=increase,"
+        f"crop={video_width}:{fg_height},"
+        f"drawbox=x=0:y=0:w={video_width}:h={fg_height}:color=white@0.65:t=4,setsar=1[{fg_out}]"
+    )
+
+    # 4. Composite Overlay
+    composite = f"[{bg_out}][{fg_out}]overlay=x=0:y={y_offset},setsar=1,fps={fps}[{comp_out}]"
+
+    # 5. Speed remapping, zoom punch, trim
+    post_filters = []
+    if speed > 1.05:
+        pts_mult = 1.0 / speed
+        post_filters.append(f"setpts={pts_mult:.4f}*PTS")
+    elif speed < 0.95:
+        pts_mult = 1.0 / max(0.2, speed)
+        post_filters.append(f"setpts={pts_mult:.4f}*PTS")
+        if speed <= 0.88:
+            post_filters.append("tblend=all_mode=average")
+
+    if is_intro_hook:
+        hook_frames = max(30, int(duration * fps))
+        post_filters.append(
+            f"zoompan=z='min(1.0+0.15*(in/{hook_frames}),1.15)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
+        )
+    elif scale_factor > 1.01:
+        punch_frames = 9 if fps >= 50 else 5
+        post_filters.append(
+            f"zoompan=z='if(lte(in,{punch_frames}),1.0+0.12*exp(-0.35*in),1.0)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
+        )
+
+    post_filters.extend([
+        f"trim=duration={duration:.3f}",
+        "setpts=PTS-STARTPTS"
+    ])
+    post_str = ",".join(post_filters)
+    final_chain = f"[{comp_out}]{post_str}{output_tag}"
+
+    return f"{crop_split};{bg_chain};{fg_chain};{composite};{final_chain}"
+
+
+def build_cc_filter(preset_name: str = "vibrant_anime_glow", is_dark_scene: bool = False) -> str:
+    """
+    Builds clean HDR-style Anime Glow Color Grading:
+    1. Auto-Exposure Lift: If scene is dark, applies gamma=1.20 and brightness=0.03.
+    2. S-curve contrast boost (1.15x) and saturation boost (1.25x).
+    3. Eliminates dark-red vignette that crushes shadows.
+    """
+    cfg = CC_PRESETS.get(preset_name, CC_PRESETS.get("vibrant_anime_glow", CC_PRESETS.get("cool_blue")))
+    contrast = cfg.get("contrast", 1.15)
+    saturation = cfg.get("saturation", 1.25)
+    brightness = cfg.get("brightness", 0.02)
+    gamma = cfg.get("gamma", 1.15)
+
+    if is_dark_scene:
+        gamma = max(1.20, gamma)
+        brightness = max(0.03, brightness)
+
+    eq_part = f"eq=contrast={contrast}:brightness={brightness}:saturation={saturation}:gamma={gamma}"
+    unsharp_part = f"unsharp={cfg.get('unsharp', '5:5:1.0:5:5:0.0')}"
+
+    parts = [eq_part]
     if cfg.get("colorbalance"):
         parts.append(f"colorbalance={cfg['colorbalance']}")
-    parts.extend([unsharp_part, vignette_part, grain_part])
+
+    parts.append(unsharp_part)
+    vig = cfg.get("vignette", "0")
+    if vig and vig != "0":
+        parts.append(f"vignette={vig}")
+
     return ",".join(parts)
+
+
+def build_selective_bloom_filter(input_tag: str, output_tag: str, threshold: int = 185, opacity: float = 0.30) -> str:
+    """
+    Selective Bloom / Glow Filter:
+    Duplicates the frame, thresholds bright highlights (luma > threshold), applies Gaussian blur,
+    and blends blurred highlights back onto the base frame using additive blending at opacity (30%).
+    Makes sword slashes, fire, lightning, and eyes glow without darkening shadows.
+    """
+    base_tag = "bloom_base"
+    hi_tag = "bloom_hi"
+    glow_tag = "bloom_glow"
+    return (
+        f"{input_tag}split=2[{base_tag}][{hi_tag}];"
+        f"[{hi_tag}]lutyuv=y='if(gt(val,{threshold}),val,0)',boxblur=12:3[{glow_tag}];"
+        f"[{base_tag}][{glow_tag}]blend=all_mode=addition:all_opacity={opacity:.2f}{output_tag}"
+    )
+
+
+def build_heavy_drop_impact_filters(
+    heavy_drop_times: List[float],
+    duration: float = 0.033,  # 2 frames at 60fps
+    flash_opacity: float = 0.15
+) -> List[str]:
+    """
+    Impact Shake & White Exposure Flash on Heavy Drops:
+    On the top 30% loudest bass hits:
+    - 2-frame directional camera shake (±12px X/Y offset)
+    - 2-frame 15% white exposure flash
+    """
+    if not heavy_drop_times:
+        return []
+
+    filters = []
+    for t in heavy_drop_times:
+        t_end = t + duration
+        shake_x = f"if(between(t\\,{t:.3f}\\,{t_end:.3f})\\,12+12*sin(t*50)\\,12)"
+        shake_y = f"if(between(t\\,{t:.3f}\\,{t_end:.3f})\\,12+12*cos(t*50)\\,12)"
+        filters.append(
+            f"crop=w=iw-24:h=ih-24:x='{shake_x}':y='{shake_y}',scale=1080:1920:flags=neighbor"
+        )
+        cond = f"between(t\\,{t:.3f}\\,{t_end:.3f})"
+        filters.append(
+            f"drawbox=x=0:y=0:w=iw:h=ih:color=white@{flash_opacity}:t=fill:enable='{cond}'"
+        )
+    return filters
 
 
 def build_monochrome_cc_filter(preset_name: str = "mono_bw") -> str:

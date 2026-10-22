@@ -29,6 +29,7 @@ from core.timestamp_loader import (
     get_character_clips
 )
 from core.title_driven_selector import parse_title_intent, get_title_driven_clips
+from core.scene_scorer import SceneScorer
 
 SUPPORTED_VIDEO_EXTS = {".mp4", ".mkv", ".mov", ".avi", ".webm", ".ts", ".m4v"}
 SUPPORTED_ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".7z", ".rar"}
@@ -558,7 +559,34 @@ def slice_action_moments_from_source(
 
         print(f"✨ [ActionSlicer] Extracted {len(curated_candidates)} curated epic moments from metadata for {matched_ep_code}.")
 
-    # ── Phase 2: Dynamic FFmpeg Audio Volume Scan across the Episode ─────────
+    # ── Phase 2: OpenCV Motion, Climax & Highlight Energy Analysis ───────────
+    cv_candidates = []
+    intro_hook_cand = None
+    try:
+        scorer = SceneScorer(video_path)
+        scorer.analyze(step_frames=4, window_duration=clip_duration)
+        ranked_cv = scorer.get_ranked_scenes(
+            n_clips=n_clips * 2,
+            clip_duration=clip_duration,
+            min_gap=clip_duration * 1.2,
+            start_bound=start_bound,
+            end_bound=end_bound
+        )
+        for w in ranked_cv:
+            if not any(abs(w["start"] - prev) < 5.0 for prev in file_used_ts):
+                cv_candidates.append({
+                    "start": w["start"],
+                    "score": float(w["score"]) + (25.0 if w.get("climax_boost") else 0.0),
+                    "description": "OpenCV Climax Motion & Neon Energy",
+                    "tag": f"🔥 CV Motion ({w.get('avg_diff', 0):.1f}) Climax",
+                    "is_curated": False
+                })
+        intro_hook_cand = scorer.find_active_intro_hook(max_start=start_bound + 30.0)
+        print(f"👁️ [ActionSlicer] OpenCV Scorer discovered {len(cv_candidates)} high-motion climax windows.")
+    except Exception as e:
+        print(f"⚠️ [ActionSlicer] OpenCV scoring fallback: {e}")
+
+    # ── Phase 2b: Dynamic FFmpeg Audio Volume Scan across the Episode ─────────
     rand_offset = random.uniform(0.0, 2.5)
     step = 4.0 if total_duration > 600 else 2.0
     t = start_bound + rand_offset
@@ -613,21 +641,29 @@ def slice_action_moments_from_source(
         t += step
 
     audio_candidates.sort(key=lambda x: x["score"], reverse=True)
-    print(f"⚔️ [ActionSlicer] Discovered {len(audio_candidates)} dynamic audio combat moments.")
+    cv_candidates.sort(key=lambda x: x["score"], reverse=True)
+    print(f"⚔️ [ActionSlicer] Discovered {len(audio_candidates)} audio combat & {len(cv_candidates)} CV climax moments.")
 
-    # ── Phase 3: Hybrid Merge (Curated Climax + Dynamic Audio Variety) ────────
+    # ── Phase 3: Hybrid Merge (Curated Climax + OpenCV Vision + Audio Clash) ──
     curated_candidates.sort(key=lambda x: x["score"], reverse=True)
     final_candidates = []
 
-    # Allocate up to 60-70% to curated scenes if available
-    curated_quota = min(len(curated_candidates), max(4, int(n_clips * 0.65))) if curated_candidates else 0
+    # Allocate up to 50% to curated scenes if available
+    curated_quota = min(len(curated_candidates), max(3, int(n_clips * 0.50))) if curated_candidates else 0
     for c in curated_candidates[:curated_quota]:
         if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
             final_candidates.append(c)
 
+    # Add top OpenCV vision motion & climax candidates (verified non-dark, high movement)
+    for cv in cv_candidates:
+        if len(final_candidates) >= n_clips + 8:
+            break
+        if not any(abs(cv["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+            final_candidates.append(cv)
+
     # Fill with top dynamic audio combat scenes (verified free of black/credit voids)
     for a in audio_candidates:
-        if len(final_candidates) >= n_clips + 8:
+        if len(final_candidates) >= n_clips + 12:
             break
         if is_black_or_credit_frame(video_path, a["start"]):
             continue
@@ -636,7 +672,7 @@ def slice_action_moments_from_source(
 
     # Fill any remaining quota with extra curated scenes
     for c in curated_candidates[curated_quota:]:
-        if len(final_candidates) >= n_clips + 8:
+        if len(final_candidates) >= n_clips + 12:
             break
         if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
             final_candidates.append(c)
@@ -657,13 +693,13 @@ def slice_action_moments_from_source(
             t += 15.0
 
     final_candidates.sort(key=lambda x: x["score"], reverse=True)
-    print(f"🎬 [ActionSlicer] Total hybrid candidate pool: {len(final_candidates)} scenes (Curated + Dynamic Audio).")
+    print(f"🎬 [ActionSlicer] Total hybrid candidate pool: {len(final_candidates)} scenes (Curated + OpenCV Vision + Audio).")
 
     # ── Phase 4: Intelligent Scene Orchestration for Beat Drops ───────────────
     # The #1 loudest / most epic climax scene is mapped to the Beat Drop (index 4)
     # The #2 scene is mapped to the Bridge Drop (~index 22 or 12)
     # The #3 scene is mapped to the Climax Outro Finisher (last clip)
-    # The lowest energy scenes are mapped to the Intro (clips 00-03)
+    # Intro Hook Enforcement: Intro clip 00 is forced to have active movement (intro_hook_cand)
     drop_idx = min(4, max(0, n_clips - 1))
     bridge_idx = min(22, max(0, n_clips - 2)) if n_clips > 24 else min(12, max(0, n_clips - 2))
     last_idx = n_clips - 1
@@ -681,6 +717,16 @@ def slice_action_moments_from_source(
     selected = [None] * n_clips
     for i in range(min(drop_idx, len(intro_pool))):
         selected[i] = intro_pool[i]
+
+    # Force active intro hook if available
+    if intro_hook_cand:
+        selected[0] = {
+            "start": intro_hook_cand["start"],
+            "score": intro_hook_cand["score"],
+            "description": "Active Intro Hook Shot",
+            "tag": "🎯 Intro Hook",
+            "is_curated": False
+        }
 
     selected[drop_idx] = drop_climax
     selected[bridge_idx] = sec_drop
@@ -713,8 +759,9 @@ def slice_action_moments_from_source(
             "-i", str(video_path),
         ] + eng_audio_map + [
             "-vf", (
-                f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=decrease:flags=lanczos,"
-                f"pad={VIDEO_WIDTH}:{VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2:color=black,"
+                # 6% edge watermark crop to eliminate TV logos & studio credits
+                "crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06,"
+                "scale=1920:1080:force_original_aspect_ratio=decrease:flags=lanczos,"
                 f"setsar=1,fps={FPS}"
             ),
             "-c:v", "libx264",

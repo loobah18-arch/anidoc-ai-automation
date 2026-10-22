@@ -19,17 +19,42 @@ from typing import List, Dict, Any, Optional, Tuple
 import numpy as np
 from scipy.signal import butter, sosfilt, correlate
 
+try:
+    import librosa
+    HAVE_LIBROSA = True
+except ImportError:
+    HAVE_LIBROSA = False
+
 from config.settings import SCRATCH_DIR, DEFAULT_DURATION
 from core.phonk_manager import POPULAR_PHONK_CATALOG
 
 
 class BeatGrid:
-    def __init__(self, duration: float, drop_time: float, beat_times: List[float], bpm: float = 134.0, audio_offset: float = 0.0):
+    def __init__(self, duration: float, drop_time: float, beat_times: List[float], bpm: float = 134.0, audio_offset: float = 0.0, heavy_drop_times: Optional[List[float]] = None):
         self.duration = duration
         self.drop_time = drop_time
         self.beat_times = sorted(list(set([round(t, 2) for t in beat_times if 0.0 <= t <= duration])))
         self.bpm = bpm
         self.audio_offset = audio_offset
+        self.heavy_drop_times = heavy_drop_times or []
+
+    def get_heavy_drop_timestamps(self) -> List[float]:
+        """Returns the top 30% loudest bass hit timestamps for shake & flash impact."""
+        if self.heavy_drop_times:
+            return [t for t in self.heavy_drop_times if 0.0 <= t <= self.duration]
+        if not self.beat_times:
+            return [self.drop_time] if self.drop_time > 0 else []
+        post_drop = [t for t in self.beat_times if t >= self.drop_time]
+        if not post_drop:
+            return [self.drop_time]
+        # First drop is always #1 heavy hit
+        heavy = [self.drop_time]
+        count = max(1, int(len(post_drop) * 0.30))
+        step = max(2, len(post_drop) // max(1, count))
+        for i in range(step, len(post_drop), step):
+            if post_drop[i] not in heavy:
+                heavy.append(post_drop[i])
+        return sorted(heavy[:count])
 
     def get_cut_segments(self) -> List[Dict[str, Any]]:
         """Returns list of segments with start, end, duration, is_drop, and prev_is_drop flags.
@@ -361,11 +386,27 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
         grid = generate_procedural_beat_grid(duration=dur, drop_time=detected_drop, bpm=calibrated_bpm)
         grid.audio_offset = audio_offset
 
+        heavy_drops = []
+        if HAVE_LIBROSA:
+            try:
+                y, sr = librosa.load(str(audio_path), sr=22050, offset=audio_offset, duration=dur, mono=True)
+                onset_env = librosa.onset.onset_strength(y=y, sr=sr)
+                lib_onsets = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
+                if len(lib_onsets) > 0:
+                    energies = onset_env[lib_onsets]
+                    thresh = np.percentile(energies, 70.0)
+                    heavy_frames = lib_onsets[energies >= thresh]
+                    heavy_drops = [round(float(t), 2) for t in librosa.frames_to_time(heavy_frames, sr=sr) if t >= detected_drop]
+            except Exception as le:
+                print(f"  ⚠️ [BeatSync] Librosa analysis fallback: {le}")
+
         if detected_onsets:
             grid.beat_times = _snap_grid_to_onsets(grid.beat_times, detected_onsets, calibrated_bpm)
             snapped_count = sum(1 for i, t in enumerate(grid.beat_times)
                               if any(abs(t - o) < 0.05 for o in detected_onsets))
             print(f"  📐 [BeatSync] Snapped {snapped_count}/{len(grid.beat_times)} cuts to real bass onsets")
+
+        grid.heavy_drop_times = heavy_drops or grid.get_heavy_drop_timestamps()
 
         print(f"🎵 [BeatSync] Track: {track_stem} | BPM: {calibrated_bpm:.1f} | Drop: {detected_drop:.3f}s | Offset: {audio_offset:.1f}s | Dur: {dur:.1f}s")
         return grid

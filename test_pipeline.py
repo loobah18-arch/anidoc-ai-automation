@@ -203,6 +203,77 @@ class TestAniDocPipeline(unittest.TestCase):
         report_md = generate_markdown_report(review)
         self.assertIn("AniDoc Automated Edit Review", report_md)
 
+    def test_09_modern_amv_architectural_features(self):
+        # 1. Typography & Unicode Emoji Sanitization
+        from core.text_overlay import clean_overlay_text, build_engagement_hook_overlay
+        raw_text = "Hinokami Kagura 🔥⚡ Slash ⚔️ Rate 1-10 👇"
+        cleaned = clean_overlay_text(raw_text)
+        self.assertNotIn("🔥", cleaned)
+        self.assertNotIn("⚡", cleaned)
+        self.assertNotIn("⚔️", cleaned)
+        self.assertNotIn("👇", cleaned)
+        self.assertIn("★", cleaned)
+        self.assertIn("//", cleaned)
+        self.assertIn(">>", cleaned)
+
+        # 2. Dynamic Timed Typography Overlays (First 3.5s hook, Final 4.0s CTA)
+        hook_overlay = build_engagement_hook_overlay("tanjiro", total_duration=28.0)
+        self.assertIn("between(t\\,0\\,3.50)", hook_overlay)
+        self.assertIn("gte(t\\,24.00)", hook_overlay)
+        self.assertIn("borderw=4", hook_overlay)
+        self.assertIn("shadowcolor=", hook_overlay)
+
+        # 3. Full 9:16 Vertical Layout (Blurred Synced Background + 4:5 Foreground)
+        from core.effects_engine import (
+            build_vertical_dual_layer_chain,
+            build_selective_bloom_filter,
+            build_heavy_drop_impact_filters
+        )
+        dual_chain = build_vertical_dual_layer_chain(
+            input_tag="[0:v]",
+            output_tag="[v0]",
+            seg_idx=0,
+            duration=2.5,
+            speed=1.0,
+            scale_factor=1.10,
+            video_width=1080,
+            video_height=1920,
+            fg_height=1350,
+            y_offset=285,
+            fps=60,
+            is_intro_hook=True
+        )
+        # 6% edge crop
+        self.assertIn("crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06", dual_chain)
+        # Blurred synced background (1080x1920, boxblur=28:5, brightness 0.45)
+        self.assertIn("boxblur=28:5", dual_chain)
+        self.assertIn("colorchannelmixer=aa=1.0:rr=0.45:gg=0.45:bb=0.45", dual_chain)
+        # 4:5 Foreground (1080x1350) with 4px border at y=285
+        self.assertIn("drawbox=x=0:y=0:w=1080:h=1350:color=white@0.65:t=4", dual_chain)
+        self.assertIn("overlay=x=0:y=285", dual_chain)
+
+        # 4. Selective Bloom / Glow (Highlights > 185, additive 30%)
+        bloom = build_selective_bloom_filter("[base_v]", "[bloom_v]", threshold=185, opacity=0.30)
+        self.assertIn("lutyuv=y='if(gt(val,185),val,0)'", bloom)
+        self.assertIn("blend=all_mode=addition:all_opacity=0.30", bloom)
+
+        # 5. Heavy Drop Impacts (2-frame shake & 15% white exposure flash)
+        impacts = build_heavy_drop_impact_filters([4.80, 12.50])
+        self.assertEqual(len(impacts), 4)  # 2 timestamps x (1 shake + 1 flash)
+        self.assertTrue(any("crop=w=iw-24:h=ih-24" in f for f in impacts))
+        self.assertTrue(any("color=white@0.15" in f for f in impacts))
+
+        # 6. SceneScorer OpenCV module
+        from core.scene_scorer import SceneScorer
+        test_clip = SCRATCH_DIR / "test_proc_scene.mp4"
+        if test_clip.exists():
+            scorer = SceneScorer(test_clip)
+            windows = scorer.analyze(step_frames=4, window_duration=1.0)
+            self.assertTrue(len(windows) >= 1)
+            self.assertIn("score", windows[0])
+            self.assertIn("avg_luma", windows[0])
+            self.assertIn("avg_diff", windows[0])
+
 
 if __name__ == "__main__":
     unittest.main()

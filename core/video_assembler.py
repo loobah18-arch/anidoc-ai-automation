@@ -39,7 +39,10 @@ from core.effects_engine import (
     build_monochrome_cc_filter,
     build_beat_flash_filters,
     get_segment_velocity_profile,
-    build_velocity_clip_filter
+    build_velocity_clip_filter,
+    build_vertical_dual_layer_chain,
+    build_selective_bloom_filter,
+    build_heavy_drop_impact_filters
 )
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata, format_anime_description
@@ -294,32 +297,27 @@ def render_cinematic_edit(
     secondary_tone = "warm_red" if primary_tone == "cool_blue" else "cool_blue"
     mono_modes = ["mono_bw", "mono_blue", "mono_white"]
 
-    # Build per-clip video filters with velocity curves & per-segment color grading
+    # Build per-clip video filters with 9:16 Vertical Layout (Blurred synced bg + 4:5 fg) & velocity curves
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
-        clip_vf = build_velocity_clip_filter(
+        is_intro_hook = (idx == 0)
+
+        # Full 9:16 Vertical Layout (Blurred Synced Background + 4:5 Foreground, 0% black bars)
+        dual_chain = build_vertical_dual_layer_chain(
+            input_tag=f"[{idx}:v]",
+            output_tag=f"[v{idx}]",
             seg_idx=idx,
             duration=seg["duration"],
             speed=vel_profile["speed"],
             scale_factor=vel_profile["scale_factor"],
             video_width=VIDEO_WIDTH,
             video_height=VIDEO_HEIGHT,
+            fg_height=1350,
+            y_offset=285,
             fps=FPS,
-            add_bars=vel_profile.get("add_bars", False)
+            is_intro_hook=is_intro_hook
         )
-
-        # ── Unified Cinematic Color Grade (matches reference edits lX7bIlY_KEE & MRurnn3AxyA) ──
-        # Single cohesive grade across the entire edit prevents disorienting color-switching.
-        # Rare dramatic monochromatic B&W accent only at high-energy power climax (e.g. Black Flash).
-        is_climax_moment = (idx == len(segments) - 2 and seg.get("is_drop") and len(segments) > 4)
-        if is_climax_moment and character_key in ["yuji", "sukuna"]:
-            clip_cc = build_monochrome_cc_filter("mono_bw")
-        else:
-            clip_cc = build_cc_filter(active_cc)
-        clip_vf = f"{clip_vf},{clip_cc}"
-
-        v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
-        filter_chains.append(v_chain)
+        filter_chains.append(dual_chain)
         concat_v_inputs.append(f"[v{idx}]")
 
         # Clip audio fades + extraction (all segments use source audio)
@@ -335,46 +333,44 @@ def render_cinematic_edit(
         concat_a_inputs.append(f"[a{idx}]")
 
     # Frame-Accurate Zero-Drift Video & Audio Concatenation
-    # Guarantees that every visual cut lands on the EXACT millisecond of the audio beat
     concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
     filter_chains.append(concat_v_str)
 
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
-    
-    # Impact White Flashes on Beat Drops
-    flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.08, opacity=0.75)
-    flash_str = ",".join(flash_filters) if flash_filters else "null"
-    
-    # 4K HDR Color Grade (CC Preset with S-curve colorlevels)
-    cc_filter = build_cc_filter(active_cc)
-    
-    # Letterbox with interactive discussion hook (prompts comments in top/bottom bars)
-    letterbox_filter = (
-        f"drawbox=x=0:y=0:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill,"
-        f"drawbox=x=0:y=ih-{LETTERBOX_BAR_HEIGHT}:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill"
-    )
+
+    # ── Selective Bloom / Glow (Threshold highlights > 185, blend at 30% additive) ──
+    bloom_chain = build_selective_bloom_filter("[concatenated_v]", "[v_bloomed]", threshold=185, opacity=0.30)
+    filter_chains.append(bloom_chain)
+
+    # ── Heavy Drop Impact Shake & 2-Frame White Flashes (top 30% loudest hits) ──
+    heavy_drops = beat_grid.get_heavy_drop_timestamps()
+    impact_filters = build_heavy_drop_impact_filters(heavy_drops, duration=0.033, flash_opacity=0.15)
+    impact_str = ",".join(impact_filters) if impact_filters else "null"
+
+    # ── Vibrant Anime Glow Color Grading (auto-exposure lift for dark scenes, S-curve contrast & saturation) ──
+    vibrant_cc = build_cc_filter(active_cc)
+
+    # ── Timed Dynamic Typography Overlays (Hook top first 3.5s only, CTA bottom final 4.0s only, 0% black bars) ──
     hook_filter = build_engagement_hook_overlay(character_key, target_duration)
-    overlay_chain = f"{letterbox_filter},{hook_filter}" if hook_filter else letterbox_filter
+    overlay_chain = f"{impact_str},{vibrant_cc},{hook_filter}" if hook_filter else f"{impact_str},{vibrant_cc}"
 
     filter_chains.append(
-        f"[concatenated_v]{flash_str},{overlay_chain}[vout]"
+        f"[v_bloomed]{overlay_chain}[vout]"
     )
-    
+
     # Audio Dynamic Structure:
     # 85% Dominant Phonk BGM / 15% Subtle Anime Combat SFX
-    # Eliminates awkward mid-sentence dialogue cuts by keeping the Phonk track clean and driving throughout.
-    # Clip combat SFX (swords, punches, energy impacts) are mixed in gently without cutting characters off.
-    # Master: loudnorm to -12 dB (commercial streaming loudness)
+    # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
     filter_chains.append(
         f"[clip_sfx_raw]volume=0.30,highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
         f"[{phonk_inp_idx}:a]volume=1.25[phonk_full];"
         f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=85 15:dropout_transition=2,"
-        f"volume=1.20,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"
+        f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
-    
+
     full_filter_complex = ";".join(filter_chains)
-    
+
     cmd = [
         "ffmpeg", "-y",
         *cmd_inputs,
@@ -382,9 +378,8 @@ def render_cinematic_edit(
         "-map", "[vout]",
         "-map", "[aout]",
         "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-crf", "15",
-        "-x264-params", "bframes=5:ref=5",
+        "-preset", "medium",
+        "-crf", "18",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "192k",

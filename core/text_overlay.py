@@ -18,12 +18,75 @@ into the video filtergraph. No separate files needed.
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
-from config.settings import VIDEO_WIDTH, VIDEO_HEIGHT
+from config.settings import VIDEO_WIDTH, VIDEO_HEIGHT, FONTS_DIR
+
+
+def clean_overlay_text(text: str) -> str:
+    """
+    Sanitizes text strings by replacing non-ASCII emojis (which render as broken '▯'
+    boxes on headless Linux runners) with clean, stylized ASCII/font-safe glyphs (//, >>, ★).
+    """
+    if not text:
+        return ""
+    replacements = {
+        "🔥": " ★ ",
+        "💥": " ★ ",
+        "⚡": " // ",
+        "✨": " ★ ",
+        "⚔️": " // ",
+        "⚔": " // ",
+        "🗡️": " // ",
+        "🗡": " // ",
+        "👑": " ★ ",
+        "👇": " >> ",
+        "👉": " >> ",
+        "💬": "",
+        "💜": " ★ ",
+        "🖤": " ★ ",
+        "🩸": " ★ ",
+        "🐅": " ★ ",
+        "🕷️": " ★ ",
+        "🕷": " ★ ",
+        "🍿": "",
+        "🎬": "",
+        "🎯": "",
+        "🚀": " >> ",
+        "💯": " 100 ",
+        "💀": " // ",
+        "🥶": " // ",
+        "🔨": " // ",
+        "👏": " ★ ",
+        "👿": " ★ ",
+        "❤️‍🔥": " ★ ",
+        "🥋": " // ",
+        "🌊": " // ",
+        "💎": " ★ ",
+        "🐗": " ★ ",
+        "🌫️": " // ",
+        "🌫": " // ",
+        "🕸️": " // ",
+        "🦾": " ★ ",
+    }
+    cleaned = text
+    for emoji_char, replacement in replacements.items():
+        cleaned = cleaned.replace(emoji_char, replacement)
+
+    # Strip any remaining unhandled non-ASCII Unicode emojis
+    safe_chars = []
+    for ch in cleaned:
+        code = ord(ch)
+        if 32 <= code <= 126 or ch == "★":
+            safe_chars.append(ch)
+        else:
+            safe_chars.append(" ")
+
+    return " ".join("".join(safe_chars).split())
 
 
 def _escape_drawtext(text: str) -> str:
     """Escapes text for FFmpeg drawtext filter (special chars)."""
-    return (text
+    sanitized = clean_overlay_text(text)
+    return (sanitized
         .replace("\\", "\\\\\\\\")
         .replace("'", "'\\\\\\''")
         .replace(":", "\\\\:")
@@ -34,8 +97,17 @@ def _escape_drawtext(text: str) -> str:
 
 
 def _find_font() -> str:
-    """Finds a bold sans font for title cards and overlays."""
+    """Finds bundled BebasNeue or a system bold sans font for title cards and overlays."""
     import os
+    # Check bundled custom fonts first
+    bundled = [
+        FONTS_DIR / "BebasNeue-Regular.ttf",
+        FONTS_DIR / "Montserrat-Black.ttf",
+    ]
+    for b in bundled:
+        if b.exists():
+            return str(b)
+
     prefix = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
     candidates = [
         f"{prefix}/share/fonts/TTF/DejaVuSans-Bold.ttf",
@@ -448,46 +520,62 @@ def build_engagement_hook_overlay(
     font_path: str = FONT_PATH
 ) -> str:
     """
-    Renders high-converting engagement discussion hooks in the upper and lower letterbox bars.
-    Eliminates dead black voids and prompts viewer comments to boost algorithmic distribution.
+    Renders dynamic timed typography overlays matching 2026 AMV standards:
+    1. Hook Title: Displayed ONLY for the first 3.5 seconds (0:00–0:03.5),
+       fading out smoothly right as the beat drops.
+    2. Call-To-Action: Displayed ONLY during the final 4.0 seconds.
+    3. Styled in uppercase white with 4px black stroke and subtle drop shadow.
+    4. Sanitizes all emoji icons into clean glyphs to prevent broken '▯' boxes on Linux.
     """
     if not font_path:
+        font_path = _find_font()
+    if not font_path:
         return ""
-        
-    hook_text = ENGAGEMENT_HOOKS.get(character_key, "RATE THIS ANIME MOMENT 1-10 👇")
-    safe_hook = _escape_drawtext(hook_text)
-    safe_cta = _escape_drawtext("💬 Drop your rating 1-10 below 👇")
-    
-    t_start = 0.3
-    t_end = max(1.0, total_duration - 0.2)
-    alpha = _fade_alpha_expr(t_start, t_end, fade_in=0.3, fade_out=0.3)
-    
-    # Top hook in upper letterbox (y=280)
+
+    hook_text = ENGAGEMENT_HOOKS.get(character_key, "RATE THIS ANIME MOMENT 1-10")
+    safe_hook = _escape_drawtext(hook_text).upper()
+    safe_cta = _escape_drawtext("DROP YOUR RATING 1-10 BELOW >>").upper()
+
+    # ── 1. Hook Title: FIRST 3.5s ONLY (smooth fadeout into the beat drop) ──
+    hook_end = min(3.5, max(1.5, total_duration * 0.25))
+    alpha_hook = (
+        f"if(lt(t\\,0.2)\\,t/0.2\\,"
+        f"if(lt(t\\,{hook_end - 0.5:.2f})\\,1\\,"
+        f"if(lt(t\\,{hook_end:.2f})\\,({hook_end:.2f}-t)/0.5\\,0)))"
+    )
     top_filter = (
         f"drawtext=text='{safe_hook}'"
         f":fontfile={font_path}"
-        f":fontsize=36"
+        f":fontsize=38"
         f":fontcolor=white"
         f":bordercolor=black"
         f":borderw=4"
+        f":shadowcolor=black@0.7"
+        f":shadowx=2:shadowy=2"
         f":x=(w-text_w)/2"
-        f":y=280"
-        f":alpha='{alpha}'"
+        f":y=210"
+        f":alpha='{alpha_hook}'"
+        f":enable='between(t\\,0\\,{hook_end:.2f})'"
     )
-    
-    # Bottom call-to-comment in lower letterbox (y=1640)
+
+    # ── 2. CTA: FINAL 4.0s ONLY ──
+    cta_start = max(0.0, total_duration - 4.0)
+    alpha_cta = f"if(lt(t\\,{cta_start + 0.4:.2f})\\,(t-{cta_start:.2f})/0.4\\,1)"
     bot_filter = (
         f"drawtext=text='{safe_cta}'"
         f":fontfile={font_path}"
-        f":fontsize=28"
-        f":fontcolor=0xD4D4D4"
+        f":fontsize=32"
+        f":fontcolor=white"
         f":bordercolor=black"
-        f":borderw=3"
+        f":borderw=4"
+        f":shadowcolor=black@0.7"
+        f":shadowx=2:shadowy=2"
         f":x=(w-text_w)/2"
-        f":y=1640"
-        f":alpha='{alpha}'"
+        f":y=1680"
+        f":alpha='{alpha_cta}'"
+        f":enable='gte(t\\,{cta_start:.2f})'"
     )
-    
+
     return f"{top_filter},{bot_filter}"
 
 
