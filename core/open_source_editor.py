@@ -65,7 +65,8 @@ def generate_editly_spec(
                 # Climax into outro: dramatic fade
                 transition = {"name": "fade", "duration": 0.30}
             else:
-                t_name = EDITLY_TRANSITIONS[idx % len(EDITLY_TRANSITIONS)]
+                # Rhythmic transition pairing: alternating punch crosszoom and directional gl-wipes
+                t_name = "crosszoom" if idx % 2 == 0 else EDITLY_TRANSITIONS[idx % len(EDITLY_TRANSITIONS)]
                 transition = {"name": t_name, "duration": 0.20}
 
         clip_spec = {

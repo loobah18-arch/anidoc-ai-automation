@@ -238,15 +238,27 @@ def render_cinematic_edit(
     if len(clip_paths) >= n_clips:
         n_intro = sum(1 for f in drop_flags if not f)
         intro_c = clip_paths[:n_intro] if n_intro > 0 else [clip_paths[0]]
-        combat_c = clip_paths[n_intro:n_clips - 1] if n_clips > n_intro + 1 else clip_paths[n_intro:]
+        combat_pool = clip_paths[n_intro:n_clips - 1] if n_clips > n_intro + 1 else clip_paths[n_intro:]
         finisher_c = clip_paths[-1]
 
-        if not combat_c:
-            combat_c = clip_paths[:]
+        if not combat_pool:
+            combat_pool = clip_paths[:]
+
+        # ── Dual-Timeline Parallel Contrast Cutting ──
+        # Interleaves Stream A (Character Intent / Face & Eye Close-Up) with Stream B (Wide Sakuga / Slashing VFX)
+        if len(combat_pool) >= 2:
+            stream_a = combat_pool[0::2]
+            stream_b = combat_pool[1::2]
+        else:
+            stream_a = combat_pool
+            stream_b = combat_pool
 
         ordered_clips = []
-        c_i = 0
         in_i = 0
+        a_i = 0
+        b_i = 0
+        combat_step = 0
+
         for idx, (dur, is_d) in enumerate(zip(durations, drop_flags)):
             if not is_d:
                 ordered_clips.append(intro_c[in_i % len(intro_c)])
@@ -254,8 +266,13 @@ def render_cinematic_edit(
             elif idx == n_clips - 1:
                 ordered_clips.append(finisher_c)
             else:
-                ordered_clips.append(combat_c[c_i % len(combat_c)])
-                c_i += 1
+                if combat_step % 2 == 0:
+                    ordered_clips.append(stream_a[a_i % len(stream_a)])
+                    a_i += 1
+                else:
+                    ordered_clips.append(stream_b[b_i % len(stream_b)])
+                    b_i += 1
+                combat_step += 1
         clip_paths = ordered_clips
     elif clip_paths:
         while len(clip_paths) < n_clips:
