@@ -385,13 +385,21 @@ def render_cinematic_edit(
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
 
+    # ── Heavy Drop Impact Shake & RGB Chromatic Aberration Split (top 30% loudest hits) ──
+    heavy_drops = beat_grid.get_heavy_drop_timestamps()
+    impact_filters = build_heavy_drop_impact_filters(heavy_drops, duration=0.033, flash_opacity=0.15, chroma_shift_px=10)
+    impact_str = ",".join(impact_filters) if impact_filters else ""
+
     # Vibrant Anime Glow Color Grading + Beat Flashes (Zero intrusive text banners)
     vibrant_cc = build_cc_filter(active_cc)
     flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.08, opacity=0.75)
-    flash_str = ",".join(flash_filters) if flash_filters else "null"
+    flash_str = ",".join(flash_filters) if flash_filters else ""
+
+    overlay_parts = [p for p in [impact_str, flash_str, vibrant_cc] if p]
+    overlay_chain = ",".join(overlay_parts)
 
     filter_chains.append(
-        f"{video_src_tag}{flash_str},{vibrant_cc}[vout]"
+        f"{video_src_tag}{overlay_chain}[vout]"
     )
 
     # Audio Dynamic Structure:

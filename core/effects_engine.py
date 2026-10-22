@@ -359,12 +359,14 @@ def build_selective_bloom_filter(input_tag: str, output_tag: str, threshold: int
 def build_heavy_drop_impact_filters(
     heavy_drop_times: List[float],
     duration: float = 0.033,  # 2 frames at 60fps
-    flash_opacity: float = 0.15
+    flash_opacity: float = 0.15,
+    chroma_shift_px: int = 10
 ) -> List[str]:
     """
-    Impact Shake & White Exposure Flash on Heavy Drops:
+    Impact Shake, Chromatic Aberration RGB Split & White Exposure Flash on Heavy Drops:
     On the top 30% loudest bass hits:
-    - 2-frame directional camera shake (±12px X/Y offset)
+    - 2-frame directional camera shake (±12px X/Y offset) with edge mirroring
+    - 2-frame RGB chromatic aberration split (chromashift cbh/crh ±10px with edge wrap)
     - 2-frame 15% white exposure flash
     """
     if not heavy_drop_times:
@@ -375,10 +377,13 @@ def build_heavy_drop_impact_filters(
         t_end = t + duration
         shake_x = f"if(between(t\\,{t:.3f}\\,{t_end:.3f})\\,12+12*sin(t*50)\\,12)"
         shake_y = f"if(between(t\\,{t:.3f}\\,{t_end:.3f})\\,12+12*cos(t*50)\\,12)"
+        cond = f"between(t\\,{t:.3f}\\,{t_end:.3f})"
         filters.append(
             f"crop=w=iw-24:h=ih-24:x='{shake_x}':y='{shake_y}',scale=1080:1920:flags=neighbor"
         )
-        cond = f"between(t\\,{t:.3f}\\,{t_end:.3f})"
+        filters.append(
+            f"chromashift=cbh={chroma_shift_px}:crh=-{chroma_shift_px}:edge=1:enable='{cond}'"
+        )
         filters.append(
             f"drawbox=x=0:y=0:w=iw:h=ih:color=white@{flash_opacity}:t=fill:enable='{cond}'"
         )

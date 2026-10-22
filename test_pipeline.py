@@ -257,10 +257,11 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("lutyuv=y='if(gt(val,185),val,0)'", bloom)
         self.assertIn("blend=all_mode=addition:all_opacity=0.30", bloom)
 
-        # 5. Heavy Drop Impacts (2-frame shake & 15% white exposure flash)
+        # 5. Heavy Drop Impacts (2-frame shake, RGB chromatic aberration split & 15% white flash)
         impacts = build_heavy_drop_impact_filters([4.80, 12.50])
-        self.assertEqual(len(impacts), 4)  # 2 timestamps x (1 shake + 1 flash)
+        self.assertEqual(len(impacts), 6)  # 2 timestamps x (1 shake + 1 chromashift + 1 flash)
         self.assertTrue(any("crop=w=iw-24:h=ih-24" in f for f in impacts))
+        self.assertTrue(any("chromashift=cbh=10:crh=-10" in f for f in impacts))
         self.assertTrue(any("color=white@0.15" in f for f in impacts))
 
         # 6. SceneScorer OpenCV module
