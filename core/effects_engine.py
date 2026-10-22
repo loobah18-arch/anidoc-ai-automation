@@ -149,7 +149,8 @@ def build_pre_drop_audio_vacuum_filter(
         f"highpass=f=1200:enable='between(t\\,{riser_start:.3f}\\,{vac_start:.3f})'",
         f"volume=enable='between(t\\,{vac_start:.3f}\\,{vac_end:.3f})':volume=0.0",
         f"volume=enable='between(t\\,{drop_time:.3f}\\,{impact_end:.3f})':volume=1.35",
-        f"bass=g=4:f=65:enable='gte(t\\,{drop_time:.3f})'"
+        f"bass=g=4:f=65:enable='gte(t\\,{drop_time:.3f})'",
+        f"treble=g=2.5:f=4500:enable='between(t\\,{drop_time:.3f}\\,{drop_time+0.80:.3f})'"
     ]
     return ",".join(filters)
 
@@ -341,18 +342,27 @@ def build_cc_filter(preset_name: str = "vibrant_anime_glow", is_dark_scene: bool
 
 def build_selective_bloom_filter(input_tag: str, output_tag: str, threshold: int = 185, opacity: float = 0.30) -> str:
     """
-    Selective Bloom / Glow Filter:
-    Duplicates the frame, thresholds bright highlights (luma > threshold), applies Gaussian blur,
-    and blends blurred highlights back onto the base frame using additive blending at opacity (30%).
-    Makes sword slashes, fire, lightning, and eyes glow without darkening shadows.
+    Hierarchical Multi-Radius Selective Neon Bloom / Element Glow:
+    1. Thresholds bright combat sakuga (luma > threshold, e.g. Hinokami fire, lightning).
+    2. Inner neon core: boxblur=4:2 for intense edge sharpness on sword blades and eyes.
+    3. Outer atmospheric aura: boxblur=20:3 for smooth ambient light dispersion.
+    4. Blends inner + outer additively, then overlays onto base video without washing out dark shadows.
     """
     base_tag = "bloom_base"
     hi_tag = "bloom_hi"
-    glow_tag = "bloom_glow"
+    inner_raw = "glow_in_raw"
+    outer_raw = "glow_out_raw"
+    inner_glow = "glow_inner"
+    outer_glow = "glow_outer"
+    tot_glow = "glow_tot"
+
     return (
         f"{input_tag}split=2[{base_tag}][{hi_tag}];"
-        f"[{hi_tag}]lutyuv=y='if(gt(val,{threshold}),val,0)',boxblur=12:3[{glow_tag}];"
-        f"[{base_tag}][{glow_tag}]blend=all_mode=addition:all_opacity={opacity:.2f}{output_tag}"
+        f"[{hi_tag}]lutyuv=y='if(gt(val,{threshold}),val,0)',split=2[{inner_raw}][{outer_raw}];"
+        f"[{inner_raw}]boxblur=4:2[{inner_glow}];"
+        f"[{outer_raw}]boxblur=20:3[{outer_glow}];"
+        f"[{inner_glow}][outer_glow]blend=all_mode=addition[{tot_glow}];"
+        f"[{base_tag}][{tot_glow}]blend=all_mode=addition:all_opacity={opacity:.2f}{output_tag}"
     )
 
 
