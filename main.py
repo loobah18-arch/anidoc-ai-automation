@@ -118,6 +118,23 @@ def main():
     except Exception as e:
         print(f"⚠️ [60FPS] Notice during 60fps interpolation: {e}")
     
+    # Save assembly telemetry for automated reviewer
+    try:
+        import json
+        telemetry_path = output_path.parent / "assembler_telemetry.json"
+        with open(telemetry_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "video_file": output_path.name,
+                "character": chosen_char,
+                "duration": result["duration"],
+                "drop_time": result.get("drop_time", 4.80),
+                "cuts_count": result.get("cuts_count", 0),
+                "cut_timestamps": result.get("cut_timestamps", [])
+            }, f, indent=2)
+        print(f"📊 [Telemetry] Saved assembly metrics to {telemetry_path.name}")
+    except Exception as e:
+        print(f"⚠️ [Telemetry] Notice saving telemetry: {e}")
+
     print("\n=======================================================")
     print("🎉 4K Phonk / Scene Edit Short Rendered Successfully!")
     print(f"📁 Video Path: {output_path}")

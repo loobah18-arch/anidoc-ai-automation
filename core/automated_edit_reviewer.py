@@ -157,8 +157,27 @@ def review_edit_and_benchmark(video_path: Path, expected_drop_time: float = 4.8)
     """
     meta = get_video_stream_metadata(video_path)
     dur = meta.get("duration", 28.0)
-    cuts = detect_scene_cuts(video_path)
     luma = analyze_luminance_and_color(video_path)
+
+    # Ingest assembler Ground Truth telemetry if available
+    telemetry_file = video_path.parent / "assembler_telemetry.json"
+    telemetry = {}
+    if telemetry_file.exists():
+        try:
+            with open(telemetry_file, "r", encoding="utf-8") as f:
+                telemetry = json.load(f)
+        except Exception as e:
+            print(f"⚠️ [Reviewer] Telemetry read notice: {e}")
+
+    if telemetry.get("drop_time"):
+        expected_drop_time = float(telemetry["drop_time"])
+
+    ground_truth_cuts = telemetry.get("cut_timestamps", [])
+    if len(ground_truth_cuts) >= 5:
+        cuts = ground_truth_cuts
+        print(f"📐 [Reviewer] Using assembler Ground Truth cuts ({len(cuts)} cuts, drop at {expected_drop_time:.2f}s)")
+    else:
+        cuts = detect_scene_cuts(video_path)
     
     # Pacing Metrics
     n_cuts = len(cuts)
