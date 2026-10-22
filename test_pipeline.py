@@ -274,6 +274,35 @@ class TestAniDocPipeline(unittest.TestCase):
             self.assertIn("avg_luma", windows[0])
             self.assertIn("avg_diff", windows[0])
 
+    def test_10_open_source_editor_integration(self):
+        from core.open_source_editor import (
+            is_editly_available, generate_editly_spec, EDITLY_TRANSITIONS
+        )
+        self.assertIsInstance(is_editly_available(), bool)
+        self.assertTrue(len(EDITLY_TRANSITIONS) >= 5)
+
+        # Verify declarative spec generation with 16:9 widescreen contain mode
+        dummy_clips = [Path("/tmp/c1.mp4"), Path("/tmp/c2.mp4")]
+        dummy_segs = [
+            {"duration": 2.5, "is_drop": False},
+            {"duration": 3.0, "is_drop": True}
+        ]
+        spec = generate_editly_spec(
+            clip_paths=dummy_clips,
+            segments=dummy_segs,
+            audio_path=Path("/tmp/audio.mp3"),
+            output_path=Path("/tmp/out.mp4")
+        )
+        self.assertEqual(spec["width"], VIDEO_WIDTH)
+        self.assertEqual(spec["height"], VIDEO_HEIGHT)
+        self.assertEqual(spec["fps"], 60)
+        self.assertEqual(len(spec["clips"]), 2)
+        # Ensure 16:9 widescreen contain mode is specified
+        self.assertEqual(spec["clips"][0]["layers"][0]["resizeMode"], "contain")
+        self.assertEqual(spec["clips"][1]["layers"][0]["resizeMode"], "contain")
+        # Ensure beat drop transition is crosszoom
+        self.assertEqual(spec["clips"][0]["transition"]["name"], "crosszoom")
+
 
 if __name__ == "__main__":
     unittest.main()

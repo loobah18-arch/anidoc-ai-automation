@@ -25,8 +25,12 @@ from typing import Dict, Any, List, Optional
 from config.settings import (
     OUTPUT_DIR, SCRATCH_DIR, PHONK_DIR,
     VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS,
-    LETTERBOX_BAR_HEIGHT, CHARACTER_COLOR_MAP, DEFAULT_DURATION
+    LETTERBOX_BAR_HEIGHT, CHARACTER_COLOR_MAP, DEFAULT_DURATION, FRAMING_MODE
 )
+from core.open_source_editor import (
+    is_editly_available, generate_editly_spec, render_with_editly, post_process_editly_output
+)
+from core.xfade_engine import build_xfade_transition_filter
 from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
@@ -297,27 +301,59 @@ def render_cinematic_edit(
     secondary_tone = "warm_red" if primary_tone == "cool_blue" else "cool_blue"
     mono_modes = ["mono_bw", "mono_blue", "mono_white"]
 
-    # Build per-clip video filters with 9:16 Vertical Layout (Blurred synced bg + 4:5 fg) & velocity curves
+    # ── Open-Source Video Editor Pathway (mifi/editly with WebGL gl-transitions) ──
+    if is_editly_available():
+        print("🚀 [OpenSourceEditor] Detected mifi/editly. Assembling AMV using open-source WebGL editor...")
+        temp_editly_out = SCRATCH_DIR / f"editly_raw_{character_key}.mp4"
+        spec = generate_editly_spec(
+            clip_paths=clip_paths,
+            segments=segments,
+            audio_path=audio_path,
+            output_path=temp_editly_out,
+            width=VIDEO_WIDTH,
+            height=VIDEO_HEIGHT,
+            fps=FPS,
+            audio_offset=phonk_offset
+        )
+        if render_with_editly(spec, output_path=temp_editly_out):
+            print("✨ [OpenSourceEditor] editly render succeeded! Applying loudnorm mastering...")
+            if post_process_editly_output(temp_editly_out, output_path):
+                print(f"✅ Rendered AMV successfully via editly: {output_path.name} ({output_path.stat().st_size // 1024} KB)")
+                return {
+                    "status": "success",
+                    "output_path": output_path,
+                    "metadata": metadata,
+                    "character_key": character_key,
+                    "duration": beat_grid.duration,
+                    "drop_time": beat_grid.drop_time,
+                    "cuts_count": len(segments),
+                    "cut_timestamps": [round(seg["start"], 3) for seg in segments],
+                    "file_size_kb": output_path.stat().st_size // 1024,
+                    "audio_used": Path(audio_path).name,
+                    "subtitle_style": subtitle_style,
+                    "cc_preset": active_cc,
+                    "engine": "editly"
+                }
+        print("⚠️ [OpenSourceEditor] editly render did not complete. Falling back to native FFmpeg xfade engine.")
+
+    # Build per-clip video filters with clean cinematic widescreen framing & velocity curves
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         is_intro_hook = (idx == 0)
 
-        # Full 9:16 Vertical Layout (Blurred Synced Background + 4:5 Foreground, 0% black bars)
-        dual_chain = build_vertical_dual_layer_chain(
-            input_tag=f"[{idx}:v]",
-            output_tag=f"[v{idx}]",
+        clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
             duration=seg["duration"],
             speed=vel_profile["speed"],
             scale_factor=vel_profile["scale_factor"],
             video_width=VIDEO_WIDTH,
             video_height=VIDEO_HEIGHT,
-            fg_height=1350,
-            y_offset=285,
             fps=FPS,
+            add_bars=vel_profile.get("add_bars", False),
             is_intro_hook=is_intro_hook
         )
-        filter_chains.append(dual_chain)
+        v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
+        filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
 
         # Clip audio fades + extraction (all segments use source audio)
@@ -332,31 +368,27 @@ def render_cinematic_edit(
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
 
-    # Frame-Accurate Zero-Drift Video & Audio Concatenation
-    concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
-    filter_chains.append(concat_v_str)
+    # Dynamic xfade transitions between clips (zoomin, wipeleft, fadewhite, smoothleft)
+    seg_durs = [s["duration"] for s in segments]
+    xfade_chain = build_xfade_transition_filter(len(clip_paths), seg_durs, transition_duration=0.20)
+    if xfade_chain and len(clip_paths) >= 2:
+        filter_chains.append(xfade_chain)
+        video_src_tag = "[xfade_vout]"
+    else:
+        concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
+        filter_chains.append(concat_v_str)
+        video_src_tag = "[concatenated_v]"
 
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
 
-    # ── Selective Bloom / Glow (Threshold highlights > 185, blend at 30% additive) ──
-    bloom_chain = build_selective_bloom_filter("[concatenated_v]", "[v_bloomed]", threshold=185, opacity=0.30)
-    filter_chains.append(bloom_chain)
-
-    # ── Heavy Drop Impact Shake & 2-Frame White Flashes (top 30% loudest hits) ──
-    heavy_drops = beat_grid.get_heavy_drop_timestamps()
-    impact_filters = build_heavy_drop_impact_filters(heavy_drops, duration=0.033, flash_opacity=0.15)
-    impact_str = ",".join(impact_filters) if impact_filters else "null"
-
-    # ── Vibrant Anime Glow Color Grading (auto-exposure lift for dark scenes, S-curve contrast & saturation) ──
+    # Vibrant Anime Glow Color Grading + Beat Flashes (Zero intrusive text banners)
     vibrant_cc = build_cc_filter(active_cc)
-
-    # ── Timed Dynamic Typography Overlays (Hook top first 3.5s only, CTA bottom final 4.0s only, 0% black bars) ──
-    hook_filter = build_engagement_hook_overlay(character_key, target_duration)
-    overlay_chain = f"{impact_str},{vibrant_cc},{hook_filter}" if hook_filter else f"{impact_str},{vibrant_cc}"
+    flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.08, opacity=0.75)
+    flash_str = ",".join(flash_filters) if flash_filters else "null"
 
     filter_chains.append(
-        f"[v_bloomed]{overlay_chain}[vout]"
+        f"{video_src_tag}{flash_str},{vibrant_cc}[vout]"
     )
 
     # Audio Dynamic Structure:

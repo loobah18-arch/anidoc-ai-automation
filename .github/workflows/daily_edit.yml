@@ -63,20 +63,32 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install System Dependencies (FFmpeg, Fonts, yt-dlp, Unpackers)
+      - name: Install System Dependencies (FFmpeg, Fonts, yt-dlp, Xvfb, headless-gl)
         run: |
           sudo rm -f /etc/apt/sources.list.d/google-chrome.list
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update -o Acquire::Retries=3 || true
-          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core fonts-montserrat fontconfig p7zip-full unrar-free
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg fonts-dejavu-core fonts-montserrat fontconfig p7zip-full unrar-free \
+            xvfb libgl1-mesa-dev libglu1-mesa-dev libglew-dev libosmesa6-dev pkg-config
           sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
+
+      - name: Install Open-Source Video Editor (Editly from GitHub)
+        run: |
+          npm install -g editly
+          editly --help || true
 
       - name: Install Dependencies
         run: |

@@ -37,12 +37,12 @@ FOREGROUND_Y_OFFSET = 285   # (1920 - 1350) / 2 = 285
 FPS = 60  # High-bitrate 60fps export
 DEFAULT_DURATION = 28.0  # Perfect 28.0s duration: 5s buildup + 23s drop combat rush & finisher
 
-# Full 9:16 Vertical Layout (Blurred Synced Background + 4:5 Foreground, 0% black bars)
-FRAMING_MODE = "vertical_dual_layer"
-LETTERBOX_TOP_BAR = 0
-LETTERBOX_BOT_BAR = 0
-ACTIVE_FRAME_HEIGHT = 1350
-LETTERBOX_BAR_HEIGHT = 0  # Backwards compatibility
+# Clean Cinematic Widescreen Framing (Preserves 100% anime choreography with letterbox bars)
+FRAMING_MODE = "cinematic_widescreen"
+LETTERBOX_TOP_BAR = 656
+LETTERBOX_BOT_BAR = 656
+ACTIVE_FRAME_HEIGHT = 608
+LETTERBOX_BAR_HEIGHT = 656
 
 # Color Grading (CC) Presets — Vibrant Anime Glow (HDR-style highlights, no crushed-black mud)
 CC_PRESETS = {
