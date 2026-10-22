@@ -303,6 +303,34 @@ class TestAniDocPipeline(unittest.TestCase):
         # Ensure beat drop transition is crosszoom
         self.assertEqual(spec["clips"][0]["transition"]["name"], "crosszoom")
 
+    def test_11_bezier_velocity_and_audio_vacuum(self):
+        from core.effects_engine import (
+            build_bezier_velocity_pts_expression,
+            build_pre_drop_audio_vacuum_filter,
+            build_velocity_clip_filter
+        )
+        # 1. Non-linear Bézier 3-phase velocity curve
+        expr = build_bezier_velocity_pts_expression(duration=1.2, fast_speed=2.2, slow_speed=0.40)
+        self.assertIn("if(lt(T", expr)
+        self.assertIn("TB", expr)
+
+        # 2. Velocity filter with Bézier ramping and tblend motion blur
+        vf = build_velocity_clip_filter(
+            seg_idx=1,
+            duration=1.2,
+            speed=1.25,
+            use_bezier_velocity=True
+        )
+        self.assertIn("tblend=all_mode=average", vf)
+        self.assertIn("setpts=", vf)
+
+        # 3. Pre-Drop Audio Vacuum filter (low-cut riser + dead-silence vacuum + bass boost)
+        audio_fx = build_pre_drop_audio_vacuum_filter(drop_time=4.80)
+        self.assertIn("highpass=f=1200", audio_fx)
+        self.assertIn("volume=0.0", audio_fx)
+        self.assertIn("volume=1.35", audio_fx)
+        self.assertIn("bass=g=4:f=65", audio_fx)
+
 
 if __name__ == "__main__":
     unittest.main()

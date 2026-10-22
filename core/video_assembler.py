@@ -46,7 +46,8 @@ from core.effects_engine import (
     build_velocity_clip_filter,
     build_vertical_dual_layer_chain,
     build_selective_bloom_filter,
-    build_heavy_drop_impact_filters
+    build_heavy_drop_impact_filters,
+    build_pre_drop_audio_vacuum_filter
 )
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata, format_anime_description
@@ -340,6 +341,7 @@ def render_cinematic_edit(
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         is_intro_hook = (idx == 0)
+        use_bezier = vel_profile.get("use_bezier_velocity", False)
 
         clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
@@ -350,7 +352,8 @@ def render_cinematic_edit(
             video_height=VIDEO_HEIGHT,
             fps=FPS,
             add_bars=vel_profile.get("add_bars", False),
-            is_intro_hook=is_intro_hook
+            is_intro_hook=is_intro_hook,
+            use_bezier_velocity=use_bezier
         )
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
@@ -393,10 +396,12 @@ def render_cinematic_edit(
 
     # Audio Dynamic Structure:
     # 85% Dominant Phonk BGM / 15% Subtle Anime Combat SFX
+    # Pre-Drop Audio Vacuum (0.55s highpass riser + 0.16s dead silence + 808 drop sub-boost)
     # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
+    audio_vacuum_fx = build_pre_drop_audio_vacuum_filter(drop_t)
     filter_chains.append(
         f"[clip_sfx_raw]volume=0.30,highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
-        f"[{phonk_inp_idx}:a]volume=1.25[phonk_full];"
+        f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.25[phonk_full];"
         f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=85 15:dropout_transition=2,"
         f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )

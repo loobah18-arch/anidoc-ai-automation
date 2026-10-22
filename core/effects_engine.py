@@ -65,7 +65,8 @@ def get_segment_velocity_profile(
             "speed": 1.30,
             "scale_factor": 1.08,
             "add_bars": False,
-            "add_flash": True
+            "add_flash": True,
+            "use_bezier_velocity": True
         }
 
     # Alternating combat dynamics (fast attack snap vs slow-mo clash hold)
@@ -75,7 +76,8 @@ def get_segment_velocity_profile(
             "speed": 1.25,
             "scale_factor": 1.04,
             "add_bars": False,
-            "add_flash": False
+            "add_flash": False,
+            "use_bezier_velocity": True
         }
     else:
         return {
@@ -83,8 +85,73 @@ def get_segment_velocity_profile(
             "speed": 0.85,
             "scale_factor": 1.02,
             "add_bars": False,
-            "add_flash": False
+            "add_flash": False,
+            "use_bezier_velocity": True
         }
+
+
+def build_bezier_velocity_pts_expression(
+    duration: float,
+    fast_speed: float = 2.2,
+    slow_speed: float = 0.40
+) -> str:
+    """
+    Constructs a 3-phase velocity curve PTS remapping expression for FFmpeg setpts.
+    Phase 1 (0 to 25% duration): Fast snap-in (2.2x speed) rushing into the action.
+    Phase 2 (25% to 65% duration): Cinematic slow-motion hold (0.40x speed) savouring the impact.
+    Phase 3 (65% to 100% duration): Acceleration snap-out (2.0x speed) into the next scene cut.
+    Normalized so output duration matches exact segment duration.
+    """
+    t1 = round(duration * 0.25, 3)
+    t2 = round(duration * 0.65, 3)
+
+    m1 = 1.0 / max(0.1, fast_speed)
+    m2 = 1.0 / max(0.1, slow_speed)
+    m3 = 1.0 / max(0.1, fast_speed * 0.9)
+
+    out1 = t1 * m1
+    out2 = out1 + (t2 - t1) * m2
+    out_end = out2 + (duration - t2) * m3
+
+    # Normalization factor
+    k = duration / max(0.001, out_end)
+    m1_norm = m1 * k
+    m2_norm = m2 * k
+    m3_norm = m3 * k
+    o1_norm = out1 * k
+    o2_norm = out2 * k
+
+    expr = (
+        f"(if(lt(T\\,{t1:.3f})\\,{m1_norm:.4f}*T\\,"
+        f"if(lt(T\\,{t2:.3f})\\,{o1_norm:.4f}+{m2_norm:.4f}*(T-{t1:.3f})\\,"
+        f"{o2_norm:.4f}+{m3_norm:.4f}*(T-{t2:.3f}))))/TB"
+    )
+    return expr
+
+
+def build_pre_drop_audio_vacuum_filter(
+    drop_time: float,
+    vacuum_duration: float = 0.16,
+    riser_duration: float = 0.55
+) -> str:
+    """
+    Generates an audio filter chain creating the signature AMV pre-drop vacuum:
+    1. Low-cut riser (drop_time - 0.71s to drop_time - 0.16s): highpass at 1200Hz thins out bass.
+    2. Dead-silence vacuum (drop_time - 0.16s to drop_time): volume = 0.0 for 160ms.
+    3. Drop impact explosion (drop_time to drop_time + 1.4s): volume = 1.35x with +4dB sub-bass boost (65Hz).
+    """
+    vac_start = max(0.1, drop_time - vacuum_duration)
+    vac_end = drop_time
+    riser_start = max(0.05, vac_start - riser_duration)
+    impact_end = drop_time + 1.40
+
+    filters = [
+        f"highpass=f=1200:enable='between(t\\,{riser_start:.3f}\\,{vac_start:.3f})'",
+        f"volume=enable='between(t\\,{vac_start:.3f}\\,{vac_end:.3f})':volume=0.0",
+        f"volume=enable='between(t\\,{drop_time:.3f}\\,{impact_end:.3f})':volume=1.35",
+        f"bass=g=4:f=65:enable='gte(t\\,{drop_time:.3f})'"
+    ]
+    return ",".join(filters)
 
 
 def build_velocity_clip_filter(
@@ -96,10 +163,12 @@ def build_velocity_clip_filter(
     video_height: int = VIDEO_HEIGHT,
     fps: int = FPS,
     add_bars: bool = False,
-    is_intro_hook: bool = False
+    is_intro_hook: bool = False,
+    use_bezier_velocity: bool = False
 ) -> str:
     """
     Builds the per-clip video filter chain with modern velocity curves:
+    - Non-linear Bézier 3-phase curves (fast snap-in -> slow-motion impact hold -> fast snap-out)
     - Dynamic PTS speed remapping (1.25x-1.30x snap acceleration vs 0.80x-0.85x slow-mo)
     - Temporal frame blending (tblend) for motion blur on slow-mo segments
     - Snappy exponential decay zoom punch on beat cuts (1.12x -> 1.0x over first 0.15s / 9 frames at 60fps)
@@ -112,8 +181,13 @@ def build_velocity_clip_filter(
         "setsar=1",
     ]
 
-    # Speed remapping
-    if speed > 1.05:
+    # Speed remapping: Non-linear Bézier curve vs constant speed multiplier
+    if use_bezier_velocity and duration >= 0.40 and not is_intro_hook:
+        bezier_pts = build_bezier_velocity_pts_expression(duration=duration, fast_speed=2.2, slow_speed=0.40)
+        filters.append(f"setpts='{bezier_pts}'")
+        # Temporal frame blending for silky motion blur during the slow-mo hold phase
+        filters.append("tblend=all_mode=average")
+    elif speed > 1.05:
         pts_mult = 1.0 / speed
         filters.append(f"setpts={pts_mult:.4f}*PTS")
     elif speed < 0.95:
