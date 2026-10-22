@@ -39,10 +39,9 @@ def interpolate_video_to_60fps(
         except Exception as e:
             print(f"⚠️ [RIFE] Neural run failed: {e}, falling back to optical flow...")
 
-    # 2. Fast High-Fidelity Optical Flow Interpolation via FFmpeg
-    print(f"⚡ [OpticalFlow] Interpolating '{input_video.name}' to {target_fps}fps with motion estimation...")
-    # Use tblend frame blending with fps=60 for ultra-smooth motion blur without high CPU load
-    interp_vf = f"fps={target_fps},tblend=all_mode=average"
+    # 2. Fast High-Fidelity 60fps Stream Conversion via FFmpeg
+    print(f"⚡ [OpticalFlow] Upgrading '{input_video.name}' to {target_fps}fps...")
+    interp_vf = f"fps={target_fps}"
     
     cmd = [
         "ffmpeg", "-y",

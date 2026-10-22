@@ -71,30 +71,35 @@ def get_video_stream_metadata(video_path: Path) -> Dict[str, Any]:
         return {}
 
 
-def detect_scene_cuts(video_path: Path, scene_threshold: float = 0.28) -> List[float]:
-    """Detects scene transition timestamps using FFmpeg select=gt(scene,X)."""
-    cmd = [
-        "ffmpeg", "-i", str(video_path),
-        "-filter_complex", f"select='gt(scene,{scene_threshold})',metadata=print:key=lavfi.scene_score",
-        "-f", "null", "-"
-    ]
-    try:
-        res = subprocess.run(cmd, capture_output=True, text=True)
-        lines = res.stderr.splitlines()
-        cut_times = []
-        for line in lines:
-            if "pts_time:" in line:
-                parts = line.split("pts_time:")
-                if len(parts) > 1:
-                    t_val = parts[1].split()[0]
-                    try:
-                        cut_times.append(round(float(t_val), 3))
-                    except ValueError:
-                        pass
-        return cut_times
-    except Exception as e:
-        print(f"⚠️ [Reviewer] Scene cut detection error: {e}")
-        return []
+def detect_scene_cuts(video_path: Path, scene_threshold: float = 0.15) -> List[float]:
+    """
+    Detects scene transition timestamps using FFmpeg select=gt(scene,X).
+    Automatically adapts threshold (0.15 -> 0.08) for frame-interpolated / motion-blurred video.
+    """
+    for th in [scene_threshold, 0.08]:
+        cmd = [
+            "ffmpeg", "-i", str(video_path),
+            "-filter_complex", f"select='gt(scene,{th})',metadata=print:key=lavfi.scene_score",
+            "-f", "null", "-"
+        ]
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            lines = res.stderr.splitlines()
+            cut_times = []
+            for line in lines:
+                if "pts_time:" in line:
+                    parts = line.split("pts_time:")
+                    if len(parts) > 1:
+                        t_val = parts[1].split()[0]
+                        try:
+                            cut_times.append(round(float(t_val), 3))
+                        except ValueError:
+                            pass
+            if len(cut_times) >= 3:
+                return cut_times
+        except Exception as e:
+            print(f"⚠️ [Reviewer] Scene cut detection error with th={th}: {e}")
+    return cut_times if 'cut_times' in locals() else []
 
 
 def analyze_luminance_and_color(video_path: Path) -> Dict[str, float]:
