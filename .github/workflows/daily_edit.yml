@@ -81,13 +81,14 @@ jobs:
           sudo apt-get update -o Acquire::Retries=3 || true
           sudo apt-get install -y --no-install-recommends \
             ffmpeg fonts-dejavu-core fonts-montserrat fontconfig p7zip-full unrar-free \
-            xvfb libgl1-mesa-dev libglu1-mesa-dev libglew-dev libosmesa6-dev pkg-config
+            xvfb libgl1-mesa-dev libglu1-mesa-dev libglew-dev libosmesa6-dev \
+            libxi-dev libxext-dev libx11-dev build-essential pkg-config
           sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
       - name: Install Open-Source Video Editor (Editly from GitHub)
         run: |
-          npm install -g editly
+          npm install -g editly || echo "⚠️ editly install failed, will use native xfade fallback"
           editly --help || true
 
       - name: Install Dependencies
