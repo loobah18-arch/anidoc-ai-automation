@@ -47,7 +47,8 @@ from core.effects_engine import (
     build_vertical_dual_layer_chain,
     build_selective_bloom_filter,
     build_heavy_drop_impact_filters,
-    build_pre_drop_audio_vacuum_filter
+    build_pre_drop_audio_vacuum_filter,
+    build_combat_foley_audio_filter
 )
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata, format_anime_description
@@ -335,7 +336,8 @@ def render_cinematic_edit(
         )
         if render_with_editly(spec, output_path=temp_editly_out):
             print("✨ [OpenSourceEditor] editly render succeeded! Applying loudnorm mastering...")
-            if post_process_editly_output(temp_editly_out, output_path):
+            combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
+            if post_process_editly_output(temp_editly_out, output_path, drop_time=beat_grid.drop_time, combat_cut_times=combat_times):
                 print(f"✅ Rendered AMV successfully via editly: {output_path.name} ({output_path.stat().st_size // 1024} KB)")
                 return {
                     "status": "success",
@@ -422,10 +424,13 @@ def render_cinematic_edit(
     # Audio Dynamic Structure:
     # 85% Dominant Phonk BGM / 15% Subtle Anime Combat SFX
     # Pre-Drop Audio Vacuum (0.55s highpass riser + 0.16s dead silence + 808 drop sub-boost)
+    # Katana Combat Foley transient presence on cut onsets
     # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
     audio_vacuum_fx = build_pre_drop_audio_vacuum_filter(drop_t)
+    combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
+    combat_foley_fx = build_combat_foley_audio_filter(combat_times, drop_t)
     filter_chains.append(
-        f"[clip_sfx_raw]volume=0.30,highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
+        f"[clip_sfx_raw]volume=0.30,{combat_foley_fx},highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
         f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.25[phonk_full];"
         f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=85 15:dropout_transition=2,"
         f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"

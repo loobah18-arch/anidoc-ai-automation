@@ -155,6 +155,43 @@ def build_pre_drop_audio_vacuum_filter(
     return ",".join(filters)
 
 
+def build_combat_foley_audio_filter(
+    combat_cut_times: List[float],
+    drop_time: float,
+    boost_window: float = 0.20
+) -> str:
+    """
+    Constructs dynamic transient shaping for anime combat Foley sound design:
+    1. Vocal Dialogue Clarity (0.0s to drop_time - 0.55s):
+       Boosts dialogue volume to 0.45 with highpass at 100Hz for crisp monologue intelligibility.
+    2. Katana / Combat Clash Transients (on peak combat cut onsets):
+       - High-treble presence boost (4800Hz, +3.5dB) to make blade clashes and sparks slice through.
+       - Mid-bass impact boost (85Hz, +3.0dB) for kinetic weight on technique strikes.
+       - Dynamic volume lift (1.5x) during the first 200ms of each combat cut.
+    """
+    filters = []
+
+    # 1. Dialogue clarity during intro
+    intro_end = max(0.1, drop_time - 0.55)
+    filters.append(f"volume=enable='between(t\\,0\\,{intro_end:.3f})':volume=0.45")
+    filters.append(f"highpass=f=100:enable='between(t\\,0\\,{intro_end:.3f})'")
+
+    # 2. Combat Foley boosts on cut timestamps after drop
+    valid_cuts = [t for t in combat_cut_times if t >= drop_time - 0.10]
+    if len(valid_cuts) > 8:
+        step = max(1, len(valid_cuts) // 8)
+        valid_cuts = valid_cuts[::step][:8]
+
+    for t in valid_cuts:
+        t_end = t + boost_window
+        cond = f"between(t\\,{t:.3f}\\,{t_end:.3f})"
+        filters.append(f"volume=enable='{cond}':volume=1.50")
+        filters.append(f"treble=g=3.5:f=4800:enable='{cond}'")
+        filters.append(f"bass=g=3.0:f=85:enable='{cond}'")
+
+    return ",".join(filters) if filters else "anull"
+
+
 def build_velocity_clip_filter(
     seg_idx: int,
     duration: float,

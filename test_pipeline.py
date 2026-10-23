@@ -308,6 +308,7 @@ class TestAniDocPipeline(unittest.TestCase):
         from core.effects_engine import (
             build_bezier_velocity_pts_expression,
             build_pre_drop_audio_vacuum_filter,
+            build_combat_foley_audio_filter,
             build_velocity_clip_filter
         )
         # 1. Non-linear Bézier 3-phase velocity curve
@@ -331,6 +332,12 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("volume=0.0", audio_fx)
         self.assertIn("volume=1.35", audio_fx)
         self.assertIn("bass=g=4:f=65", audio_fx)
+
+        # 4. Katana Combat Foley sound design filter
+        foley_fx = build_combat_foley_audio_filter(combat_cut_times=[4.80, 5.50, 6.20], drop_time=4.80)
+        self.assertIn("treble=g=3.5:f=4800", foley_fx)
+        self.assertIn("bass=g=3.0:f=85", foley_fx)
+        self.assertIn("volume=1.50", foley_fx)
 
 
 if __name__ == "__main__":

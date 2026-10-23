@@ -143,17 +143,32 @@ def render_with_editly(
         return False
 
 
-def post_process_editly_output(raw_video: Path, final_output: Path) -> bool:
+def post_process_editly_output(
+    raw_video: Path,
+    final_output: Path,
+    drop_time: Optional[float] = None,
+    combat_cut_times: Optional[List[float]] = None
+) -> bool:
     """
-    Applies high-bitrate loudnorm -14 LUFS audio normalization and faststart to editly output.
+    Applies high-bitrate loudnorm -14 LUFS audio normalization, pre-drop vacuum,
+    and combat Foley transient enhancement to editly output.
     """
+    af_filters = []
+    if drop_time is not None:
+        from core.effects_engine import build_pre_drop_audio_vacuum_filter, build_combat_foley_audio_filter
+        af_filters.append(build_pre_drop_audio_vacuum_filter(drop_time))
+        if combat_cut_times:
+            af_filters.append(build_combat_foley_audio_filter(combat_cut_times, drop_time))
+    af_filters.append("loudnorm=I=-14:TP=-1.5:LRA=11")
+    af_str = ",".join(af_filters)
+
     cmd = [
         "ffmpeg", "-y",
         "-i", str(raw_video),
         "-c:v", "copy",
         "-c:a", "aac",
         "-b:a", "192k",
-        "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
+        "-af", af_str,
         "-movflags", "+faststart",
         str(final_output)
     ]
