@@ -60,14 +60,14 @@ def generate_editly_spec(
             next_seg = segments[idx + 1] if idx + 1 < len(segments) else {}
             if next_seg.get("is_drop", False) and not is_drop:
                 # Transition into the 808 beat drop: explosive crosszoom!
-                transition = {"name": "crosszoom", "duration": 0.25}
+                transition = {"name": "crosszoom", "duration": 0.18}
             elif idx == n_clips - 2:
                 # Climax into outro: dramatic fade
-                transition = {"name": "fade", "duration": 0.30}
+                transition = {"name": "fade", "duration": 0.25}
             else:
-                # Rhythmic transition pairing: alternating punch crosszoom and directional gl-wipes
+                # Rhythmic transition pairing: snappy 0.12s punch crosszoom and directional gl-wipes
                 t_name = "crosszoom" if idx % 2 == 0 else EDITLY_TRANSITIONS[idx % len(EDITLY_TRANSITIONS)]
-                transition = {"name": t_name, "duration": 0.20}
+                transition = {"name": t_name, "duration": 0.12}
 
         clip_spec = {
             "duration": dur,
@@ -97,7 +97,7 @@ def generate_editly_spec(
                 "resizeMode": "contain"
             },
             "transition": {
-                "duration": 0.20,
+                "duration": 0.12,
                 "name": "directional-left"
             }
         },

@@ -38,15 +38,15 @@ HISTORY_FILE = SCRATCH_DIR / "gdrive_edit_history.json"
 
 CHARACTER_EPISODE_PREFERENCES = {
     # JJK Combat Preferences
-    "gojo": ["e09", "e04", "e03", "e08", "e05", "e07", "e01"],       # Shibuya Curses, Awakened vs Toji, Subway Brawl
-    "sukuna": ["e17", "e16", "e15", "e18", "e20"],                   # Sukuna vs Mahoraga, Sukuna vs Jogo Meteor, Shibuya Climax
-    "toji": ["e04", "e03", "e14", "e15", "e02"],                     # Toji vs Gojo Awakened, Toji vs Dagon, Toji vs Megumi
-    "yuji": ["e20", "e21", "e13", "e19", "e22", "e18"],             # Yuji & Todo vs Mahito (Black Flash), Yuji vs Choso Brawl
-    "megumi": ["e15", "e16", "e14", "e17", "e12"],                   # Mahoraga Summon & Domain Clashes
-    "mahito": ["e20", "e21", "e19", "e18", "e22", "e13", "e12", "e07"], # Yuji & Todo vs Mahito, Nanami vs Mahito
-    "todo": ["e20", "e21", "e19", "e18", "e15"],                         # Double Black Flash, Boogie Woogie
-    "nobara": ["e19", "e24", "e03"],                                     # Resonance vs Mahito, Death Painting
-    "choso": ["e13", "e24", "choso", "shibuya"],                         # Choso vs Yuji bathroom brawl, Death Painting
+    "gojo": ["s02e09", "s02e04", "s01e07", "s02e03", "s02e08", "s02e05", "gojo"],       # Shibuya Curses, Awakened vs Toji, Subway Brawl
+    "sukuna": ["s02e17", "s02e16", "s02e15", "s01e04", "s01e05", "sukuna"],             # Sukuna vs Mahoraga, Sukuna vs Jogo Meteor, Shibuya Climax
+    "toji": ["s02e04", "s02e03", "s02e14", "s02e15", "toji"],                           # Toji vs Gojo Awakened, Toji vs Dagon, Toji vs Megumi (S2 ONLY)
+    "yuji": ["s02e21", "s02e20", "s02e13", "s01e24", "s01e19", "yuji"],                 # Yuji & Todo vs Mahito (Black Flash), Yuji vs Choso Brawl
+    "megumi": ["s02e15", "s02e16", "s02e14", "s01e05", "megumi"],                       # Mahoraga Summon & Domain Clashes
+    "mahito": ["s02e21", "s02e20", "s02e19", "s02e18", "s02e13", "s01e13", "mahito"],   # Yuji & Todo vs Mahito, Nanami vs Mahito
+    "todo": ["s02e21", "s02e20", "s02e19", "s02e18", "s01e20", "todo"],                 # Double Black Flash, Boogie Woogie
+    "nobara": ["s02e19", "s01e24", "s01e03", "nobara"],                                 # Resonance vs Mahito, Death Painting
+    "choso": ["s02e13", "s01e24", "choso", "shibuya"],                                   # Choso vs Yuji bathroom brawl, Death Painting
     # Demon Slayer (Kimetsu no Yaiba) Preferences
     "tanjiro": ["entertainment", "mugen", "swordsmith", "hashira", "hinokami", "e19", "e10", "e11", "e08", "e01"],
     "rengoku": ["mugen", "train", "akaza", "rengoku", "e07", "e06", "e05"],
@@ -186,6 +186,14 @@ def pick_best_file_for_character(
     if not universe_files:
         print(f"⚠️ [GoogleDrive] No Google Drive files match universe '{char_universe}' for character '{character_key}'. Rejecting cross-universe selection.")
         return None
+
+    # Quality Gate: Filter out 480p low-res and dual-audio/piracy-dub files (favor 1080p/720p)
+    clean_pool = [
+        f for f in universe_files
+        if not any(b in f["name"].lower() for b in ["480p", "hindi", "dual audio", "pikahd"])
+    ]
+    if clean_pool:
+        universe_files = clean_pool
 
     history = _load_history()
     used_files = set(history.get("used_files", []))

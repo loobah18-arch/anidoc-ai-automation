@@ -24,8 +24,8 @@ DS_S01E17_TIMESTAMPS = {
     "scenes": [
         {"start": 120.0, "end": 260.0, "action_level": "MODERATE", "priority": "medium", "description": "Zenitsu runs through Natagumo forest, discovers spider poison", "characters_present": ["zenitsu"]},
         {"start": 480.0, "end": 660.0, "action_level": "INTENSE", "priority": "high", "description": "Zenitsu passes out on tree branch, asleep mode awakens", "characters_present": ["zenitsu"]},
-        {"start": 780.0, "end": 920.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Gramps flashback: Hone a single strike to absolute perfection", "characters_present": ["zenitsu"]},
-        {"start": 960.0, "end": 1050.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Thunder Breathing First Form: Thunderclap and Flash Sixfold lightning blitz", "characters_present": ["zenitsu"]},
+        {"start": 780.0, "end": 920.0, "action_level": "MODERATE", "priority": "medium", "description": "Gramps flashback: Hone a single strike to absolute perfection", "characters_present": ["zenitsu"]},
+        {"start": 960.0, "end": 1050.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX: Thunder Breathing First Form: Thunderclap and Flash Sixfold lightning blitz", "characters_present": ["zenitsu"]},
         {"start": 1050.0, "end": 1200.0, "action_level": "INTENSE", "priority": "high", "description": "Spider Demon decapitation shockwave and moon silhouette", "characters_present": ["zenitsu"]},
     ]
 }

@@ -339,6 +339,30 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("bass=g=3.0:f=85", foley_fx)
         self.assertIn("volume=1.50", foley_fx)
 
+    def test_12_modern_xfade_transitions(self):
+        from core.xfade_engine import (
+            build_xfade_transition_filter,
+            MODERN_COMBAT_TRANSITIONS,
+            MODERN_DROP_TRANSITIONS,
+            MODERN_OUTRO_TRANSITIONS
+        )
+        self.assertTrue(len(MODERN_COMBAT_TRANSITIONS) >= 5)
+        self.assertIn("hlslice", MODERN_COMBAT_TRANSITIONS)
+        self.assertIn("diagtl", MODERN_COMBAT_TRANSITIONS)
+        self.assertIn("fadewhite", MODERN_DROP_TRANSITIONS)
+
+        # Chained filter with drop index and outro
+        durs = [1.5, 1.2, 0.8, 1.0, 1.4]
+        xf = build_xfade_transition_filter(
+            clip_count=len(durs),
+            durations=durs,
+            transition_duration=0.12,
+            drop_index=2
+        )
+        self.assertIn("xfade=transition=", xf)
+        self.assertIn("duration=0.12", xf)
+        self.assertIn("[xfade_vout]", xf)
+
 
 if __name__ == "__main__":
     unittest.main()

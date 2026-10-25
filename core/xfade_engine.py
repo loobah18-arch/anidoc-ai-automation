@@ -8,29 +8,60 @@ from typing import List, Dict, Any, Optional
 
 # Curated list of high-energy transition effects supported natively by FFmpeg xfade
 XFADE_TRANSITIONS = [
+    "hlslice",
+    "hrslice",
+    "diagtl",
+    "diagbr",
+    "hblur",
     "zoomin",
     "fadewhite",
     "distance",
-    "wipeleft",
-    "wiperight",
     "smoothleft",
     "smoothright",
-    "circlecrop",
-    "radial",
-    "horzopen"
+    "squeezeh"
+]
+
+# 2026 Modern AMV Transitions (Katana slashes, directional whips, kinetic zoom punches)
+MODERN_COMBAT_TRANSITIONS = [
+    "hlslice",     # Horizontal katana slash cut
+    "hrslice",     # Reverse horizontal slash cut
+    "diagtl",      # Diagonal top-left katana slash
+    "diagbr",      # Diagonal bottom-right katana slash
+    "hblur",       # High-speed horizontal motion-blur whip
+    "zoomin",      # Kinetic punch zoom forward into strike
+    "smoothleft",  # Directional whip pan left following blade swing
+    "smoothright", # Directional whip pan right following blade swing
+    "squeezeh",    # Fast horizontal compression snap
+    "distance"     # 3D spatial push warp
+]
+
+# Beat drop transition impact
+MODERN_DROP_TRANSITIONS = [
+    "fadewhite",   # Signature 2026 white exposure burst on 808 drop
+    "zoomin",      # Hyper-velocity punch zoom
+    "distance"     # Spatial impact push
+]
+
+# Outro resolution transition
+MODERN_OUTRO_TRANSITIONS = [
+    "fadeblack",   # Cinematic fade to black
+    "dissolve"
 ]
 
 
 def build_xfade_transition_filter(
     clip_count: int,
     durations: List[float],
-    transition_duration: float = 0.18,
-    custom_transitions: Optional[List[str]] = None
+    transition_duration: float = 0.12,
+    custom_transitions: Optional[List[str]] = None,
+    drop_index: Optional[int] = None
 ) -> str:
     """
-    Constructs a chained FFmpeg xfade filtergraph for seamless scene transitions.
-    Formula: offset_i = offset_{i-1} + dur_{i} - transition_duration
-    Uses punchy 0.18s transitions for sharp AMV beat-syncing.
+    Constructs a chained FFmpeg xfade filtergraph with 2026 Modern AMV transitions:
+    - Beat Drop Transition (at drop_index): High-impact 'fadewhite' or 'zoomin' flash.
+    - Combat Cuts: Ultra-snappy 0.12s katana slashes (hlslice, diagtl, diagbr, hblur, zoomin).
+    - Outro (final cut): Cinematic fadeblack on the final climax resolution cut.
+    - Formula: offset_i = offset_{i-1} + dur_{i} - transition_duration
     """
     if clip_count < 2:
         return ""
@@ -40,11 +71,18 @@ def build_xfade_transition_filter(
     last_v = "[v0]"
     
     for i in range(1, clip_count):
-        t_effect = (
-            custom_transitions[i % len(custom_transitions)]
-            if custom_transitions
-            else random.choice(XFADE_TRANSITIONS)
-        )
+        # 1. Beat Drop transition
+        if drop_index is not None and i == drop_index:
+            t_effect = random.choice(MODERN_DROP_TRANSITIONS)
+        # 2. Outro transition
+        elif i == clip_count - 1:
+            t_effect = random.choice(MODERN_OUTRO_TRANSITIONS)
+        # 3. Custom or modern combat slash
+        elif custom_transitions:
+            t_effect = custom_transitions[i % len(custom_transitions)]
+        else:
+            t_effect = random.choice(MODERN_COMBAT_TRANSITIONS)
+
         next_v = f"[v{i}]"
         out_v = f"[xfade_v{i}]" if i < clip_count - 1 else "[xfade_vout]"
         

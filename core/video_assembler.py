@@ -390,9 +390,10 @@ def render_cinematic_edit(
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
 
-    # Dynamic xfade transitions between clips (zoomin, wipeleft, fadewhite, smoothleft)
+    # 2026 Modern AMV xfade transitions (snappy 0.12s katana slashes + 808 drop white flash)
     seg_durs = [s["duration"] for s in segments]
-    xfade_chain = build_xfade_transition_filter(len(clip_paths), seg_durs, transition_duration=0.20)
+    drop_idx = sum(1 for s in segments if not s.get("is_drop", False))
+    xfade_chain = build_xfade_transition_filter(len(clip_paths), seg_durs, transition_duration=0.12, drop_index=drop_idx)
     if xfade_chain and len(clip_paths) >= 2:
         filter_chains.append(xfade_chain)
         video_src_tag = "[xfade_vout]"

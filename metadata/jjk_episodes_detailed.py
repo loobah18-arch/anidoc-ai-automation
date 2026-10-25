@@ -115,49 +115,20 @@ S01E04_TIMESTAMPS = {
     ]
 }
 
-# Episode S01E07 - Assault
+# Episode S01E07 - Assault (Gojo vs Jogo & Infinite Void)
 S01E07_TIMESTAMPS = {
     "episode_code": "S01E07",
     "title": "Assault",
     "duration": 1440.0,
     "characters": [
         {
-            "name": "Yuji",
-            "role": "Protagonist",
-            "key_moments": ["Returns from death", "Reunites with Megumi and Nobara", "Surprise reveal"]
-        },
-        {
-            "name": "Todo",
-            "role": "Ally",
-            "key_moments": ["Goodwill event preparation", "Questions about 'type of woman'"]
-        },
-        {
-            "name": "Gojo",
-            "role": "Mentor",
-            "key_moments": ["Reveals Yuji is alive", "Explains resurrection plan"]
-        }
-    ],
-    "scenes": [
-        {"start": 240.0, "end": 360.0, "action_level": "MODERATE", "priority": "medium", "description": "Goodwill event intro - other schools arrive", "characters_present": ["todo", "gojo"]},
-        {"start": 900.0, "end": 1080.0, "action_level": "INTENSE", "priority": "high", "description": "Todo confronts Megumi - type of woman question", "characters_present": ["todo", "megumi"]},
-        {"start": 1200.0, "end": 1380.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Yuji revealed alive - surprise return", "characters_present": ["yuji", "megumi", "nobara"]},
-    ]
-}
-
-# Episode S01E09 - Small Fry and Reverse Retribution
-S01E09_TIMESTAMPS = {
-    "episode_code": "S01E09",
-    "title": "Small Fry and Reverse Retribution",
-    "duration": 1440.0,
-    "characters": [
-        {
             "name": "Gojo",
             "role": "Main",
             "key_moments": [
-                "Fights Jogo at restaurant",
+                "Fights Jogo at restaurant and road",
                 "Domain Expansion: Infinite Void",
                 "Demonstrates overwhelming superiority",
-                "Toying with Jogo"
+                "Blindfold removal and Six Eyes reveal"
             ]
         },
         {
@@ -172,11 +143,43 @@ S01E09_TIMESTAMPS = {
     ],
     "scenes": [
         {"start": 0.0, "end": 180.0, "action_level": "CALM", "priority": "low", "description": "Setup - cursed spirits meet, plan against Gojo", "characters_present": ["jogo"]},
-        {"start": 300.0, "end": 480.0, "action_level": "INTENSE", "priority": "high", "description": "Gojo vs Jogo begins - restaurant fight", "characters_present": ["gojo", "jogo"]},
+        {"start": 300.0, "end": 480.0, "action_level": "INTENSE", "priority": "high", "description": "Gojo vs Jogo begins - road fight and limitless showcase", "characters_present": ["gojo", "jogo"]},
         {"start": 540.0, "end": 720.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Jogo's Domain Expansion - Coffin of Iron Mountain", "characters_present": ["gojo", "jogo"]},
-        {"start": 720.0, "end": 900.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Gojo's Domain Expansion - Infinite Void showcase", "characters_present": ["gojo", "jogo"]},
-        {"start": 900.0, "end": 1080.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Gojo toys with Jogo - overwhelming power display", "characters_present": ["gojo", "jogo"]},
+        {"start": 720.0, "end": 900.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX: Gojo removes blindfold, Domain Expansion: Infinite Void", "characters_present": ["gojo", "jogo"]},
+        {"start": 900.0, "end": 1080.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Gojo toys with Jogo - decapitates Jogo with bare hands", "characters_present": ["gojo", "jogo"]},
         {"start": 1200.0, "end": 1380.0, "action_level": "INTENSE", "priority": "high", "description": "Aftermath - Hanami appears, Jogo retreats", "characters_present": ["gojo", "jogo"]},
+    ]
+}
+
+# Episode S01E09 - Small Fry and Reverse Retribution (Nanami vs Mahito)
+S01E09_TIMESTAMPS = {
+    "episode_code": "S01E09",
+    "title": "Small Fry and Reverse Retribution",
+    "duration": 1440.0,
+    "characters": [
+        {
+            "name": "Nanami",
+            "role": "Mentor",
+            "key_moments": [
+                "Investigates movie theater deaths",
+                "Enters sewers with Yuji",
+                "Ratio Technique 7:3 showcase"
+            ]
+        },
+        {
+            "name": "Mahito",
+            "role": "Villain",
+            "key_moments": [
+                "Experiments on Junpei",
+                "Idle Transfiguration in sewers"
+            ]
+        }
+    ],
+    "scenes": [
+        {"start": 0.0, "end": 240.0, "action_level": "CALM", "priority": "low", "description": "Movie theater aftermath - deformed corpses found", "characters_present": ["nanami", "yuji"]},
+        {"start": 420.0, "end": 600.0, "action_level": "MODERATE", "priority": "medium", "description": "Nanami and Yuji track residual cursed energy to sewers", "characters_present": ["nanami", "yuji"]},
+        {"start": 720.0, "end": 960.0, "action_level": "INTENSE", "priority": "high", "description": "Nanami encounters transfigured humans in sewers, Ratio Technique slashes", "characters_present": ["nanami"]},
+        {"start": 1080.0, "end": 1320.0, "action_level": "INTENSE", "priority": "high", "description": "Mahito meets Junpei on rooftop, demonstrates cursed energy", "characters_present": ["mahito"]},
     ]
 }
 
