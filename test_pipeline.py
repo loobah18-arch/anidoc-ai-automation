@@ -345,20 +345,20 @@ class TestAniDocPipeline(unittest.TestCase):
             MODERN_OUTRO_TRANSITIONS
         )
         self.assertTrue(len(MODERN_COMBAT_TRANSITIONS) >= 5)
-        self.assertIn("hlslice", MODERN_COMBAT_TRANSITIONS)
-        self.assertIn("diagtl", MODERN_COMBAT_TRANSITIONS)
-        self.assertIn("fadewhite", MODERN_DROP_TRANSITIONS)
+        self.assertIn("smoothleft", MODERN_COMBAT_TRANSITIONS)
+        self.assertIn("smoothright", MODERN_COMBAT_TRANSITIONS)
+        self.assertIn("zoomin", MODERN_DROP_TRANSITIONS)
 
         # Chained filter with drop index and outro
         durs = [1.5, 1.2, 0.8, 1.0, 1.4]
         xf = build_xfade_transition_filter(
             clip_count=len(durs),
             durations=durs,
-            transition_duration=0.12,
+            transition_duration=0.15,
             drop_index=2
         )
         self.assertIn("xfade=transition=", xf)
-        self.assertIn("duration=0.12", xf)
+        self.assertIn("duration=0.15", xf)
         self.assertIn("[xfade_vout]", xf)
 
 
