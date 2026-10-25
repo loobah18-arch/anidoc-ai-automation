@@ -72,7 +72,7 @@ class BeatGrid:
 
         merged_points = [all_points[0]]
         for pt in all_points[1:]:
-            if pt - merged_points[-1] >= 0.35:
+            if pt - merged_points[-1] >= 0.55:
                 merged_points.append(pt)
             elif pt == all_points[-1] and len(merged_points) > 1:
                 merged_points[-1] = pt
@@ -269,20 +269,27 @@ def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time:
 
     if duration < 30.0:
         # Modern High-Energy 3-Act AMV for TikTok / Shorts:
-        # Act 1: Hook (0.0 to effective_drop)
-        # Act 2: Combat Velocity Rush (effective_drop to duration - 2.8s) - syncopated 1-beat & 2-beat cuts
-        # Act 3: Climax Finisher (duration - 2.8s to duration) - dramatic held finisher
+        # Act 1: Hook (0.0 to effective_drop) - 1 to 2 narrative/eye shots (~2.0s-2.4s)
+        # Act 2: Climax Beat Drop Strike (effective_drop to drop_hold) - held 1.8s-2.4s so full sakuga executes
+        # Act 3: Combat Velocity Rhythm (drop_hold to duration - 2.8s) - syncopated 2-beat & 3-beat cuts
+        # Act 4: Climax Finisher (duration - 2.8s to duration) - dramatic held finisher
         climax_start = round(duration - 2.8, 2)
         curr = effective_drop
 
-        # Alternate 1-beat (fast strike cut) and 2-beat (technique impact hold) cuts
+        # On the 808 drop, HOLD the #1 climax action shot for 1.8s - 2.4s so the full choreography hits
+        drop_hold = min(2.4, max(1.8, beat_interval * 4))
+        curr += drop_hold
+        if curr < climax_start - 0.5:
+            beat_times.append(round(curr, 2))
+
+        # Alternate 2-beat (fast strike cut) and 3-beat (technique impact hold) cuts on musical rhythm
         step_toggle = False
-        while curr < climax_start - 0.4:
-            step = beat_interval if step_toggle else (beat_interval * 2)
-            step = max(0.45, min(0.95, step))
+        while curr < climax_start - 0.5:
+            step = (beat_interval * 2) if step_toggle else (beat_interval * 3)
+            step = max(0.85, min(1.60, step))
             step_toggle = not step_toggle
             curr += step
-            if curr < climax_start - 0.35:
+            if curr < climax_start - 0.4:
                 beat_times.append(round(curr, 2))
 
         beat_times.append(climax_start)

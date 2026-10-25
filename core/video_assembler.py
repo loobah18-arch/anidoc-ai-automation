@@ -149,6 +149,7 @@ def render_cinematic_edit(
     durations = [seg["duration"] for seg in segments]
     drop_flags = [seg["is_drop"] for seg in segments]
     n_clips = len(segments)
+    drop_idx = next((i for i, seg in enumerate(segments) if seg["start"] >= drop_t - 0.05), 2)
 
     universe_dir = SCRATCH_DIR / theme.get("universe", "marvel")
     universe_dir.mkdir(parents=True, exist_ok=True)
@@ -179,7 +180,8 @@ def render_cinematic_edit(
                 target_character=character_key,
                 output_dir=universe_dir,
                 n_clips=n_clips + 4,
-                title=title_text
+                title=title_text,
+                drop_index=drop_idx
             )
             if gdrive_clips:
                 clip_paths = gdrive_clips

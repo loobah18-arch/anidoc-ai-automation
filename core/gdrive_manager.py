@@ -47,8 +47,8 @@ CHARACTER_EPISODE_PREFERENCES = {
     "todo": ["s02e21", "s02e20", "s02e19", "s02e18", "s01e20", "todo"],                 # Double Black Flash, Boogie Woogie
     "nobara": ["s02e19", "s01e24", "s01e03", "nobara"],                                 # Resonance vs Mahito, Death Painting
     "choso": ["s02e13", "s01e24", "choso", "shibuya"],                                   # Choso vs Yuji bathroom brawl, Death Painting
-    # Demon Slayer (Kimetsu no Yaiba) Preferences
-    "tanjiro": ["entertainment", "mugen", "swordsmith", "hashira", "hinokami", "e19", "e10", "e11", "e08", "e01"],
+    # Demon Slayer (Kimetsu no Yaiba) Preferences - Prioritizes top combat episodes (Hinokami Kagura, Entertainment District, Mugen Train)
+    "tanjiro": ["hinokami", "e19", "entertainment", "mugen", "swordsmith", "hashira", "e10", "e11", "e08"],
     "rengoku": ["mugen", "train", "akaza", "rengoku", "e07", "e06", "e05"],
     "akaza": ["mugen", "train", "akaza", "rengoku", "e06", "e07", "hashira"],
     "zenitsu": ["thunder", "zenitsu", "e12", "e17", "entertainment", "e10", "spider"],
@@ -220,14 +220,18 @@ def pick_best_file_for_character(
         except Exception as e:
             print(f"⚠️ [GoogleDrive] Title-based file matching error: {e}")
 
-    # 3. Match character episode preferences within the character's universe
+    # 3. Match character episode preferences in strict priority order
     prefs = CHARACTER_EPISODE_PREFERENCES.get(character_key, [character_key])
     eligible_files = []
 
-    for f in universe_files:
-        clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
-        if any(pref in clean_name or pref in f["name"].lower() for pref in prefs):
-            eligible_files.append(f)
+    for pref in prefs:
+        for f in universe_files:
+            clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
+            if (pref in clean_name or pref in f["name"].lower()) and f not in eligible_files:
+                eligible_files.append(f)
+        if len(eligible_files) >= 3:
+            # Top-tier preference matches found (e.g. Hinokami Kagura or Shibuya Climax)
+            break
 
     if not eligible_files:
         eligible_files = universe_files
@@ -412,7 +416,8 @@ def slice_action_moments_from_source(
     output_dir: Path,
     n_clips: int = 15,
     clip_duration: float = 3.2,
-    title: Optional[str] = None
+    title: Optional[str] = None,
+    drop_index: Optional[int] = None
 ) -> List[Path]:
     """
     Hybrid Action Slicer: Combines curated iconic/epic episode timestamps from metadata analysis
@@ -711,8 +716,11 @@ def slice_action_moments_from_source(
     # The #2 scene is mapped to the Bridge Drop (~index 22 or 12)
     # The #3 scene is mapped to the Climax Outro Finisher (last clip)
     # Intro Hook Enforcement: Intro clip 00 is forced to have active movement (intro_hook_cand)
-    drop_idx = min(4, max(0, n_clips - 1))
-    bridge_idx = min(22, max(0, n_clips - 2)) if n_clips > 24 else min(12, max(0, n_clips - 2))
+    if drop_index is not None and 0 <= drop_index < n_clips:
+        drop_idx = drop_index
+    else:
+        drop_idx = min(2, max(0, n_clips - 1))
+    bridge_idx = min(n_clips - 4, max(drop_idx + 2, int(n_clips * 0.7))) if n_clips > 6 else max(0, n_clips - 2)
     last_idx = n_clips - 1
 
     drop_climax = final_candidates[0]
@@ -818,7 +826,8 @@ def fetch_and_prepare_gdrive_footage(
     target_character: str,
     output_dir: Path,
     n_clips: int = 15,
-    title: Optional[str] = None
+    title: Optional[str] = None,
+    drop_index: Optional[int] = None
 ) -> List[Path]:
     """
     Lightning-Fast Non-Repetitive Google Drive Ingestion:
@@ -850,7 +859,8 @@ def fetch_and_prepare_gdrive_footage(
         character_key=target_character,
         output_dir=output_dir,
         n_clips=n_clips,
-        title=title
+        title=title,
+        drop_index=drop_index
     )
 
     return sliced_clips
