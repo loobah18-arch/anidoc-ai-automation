@@ -5,73 +5,104 @@
   "universe": "jjk",
   "characters": [
     {
-      "name": "Yuji",
-      "role": "Protagonist",
-      "key_moments": [
-        "Returns from death",
-        "Reunites with Megumi and Nobara",
-        "Surprise reveal"
-      ]
-    },
-    {
-      "name": "Todo",
-      "role": "Ally",
-      "key_moments": [
-        "Goodwill event preparation",
-        "Questions about 'type of woman'"
-      ]
-    },
-    {
       "name": "Gojo",
-      "role": "Mentor",
+      "role": "Main",
       "key_moments": [
-        "Reveals Yuji is alive",
-        "Explains resurrection plan"
+        "Fights Jogo at restaurant and road",
+        "Domain Expansion: Infinite Void",
+        "Demonstrates overwhelming superiority",
+        "Blindfold removal and Six Eyes reveal"
+      ]
+    },
+    {
+      "name": "Jogo",
+      "role": "Villain",
+      "key_moments": [
+        "Challenges Gojo",
+        "Domain Expansion: Coffin of the Iron Mountain",
+        "Utterly defeated"
       ]
     }
   ],
-  "scene_count": 3,
+  "scene_count": 6,
   "source": "Google Drive - JJK Collection",
-  "notes": "JJK combat episode",
+  "notes": "JJK combat episode - Gojo vs Jogo & Infinite Void",
   "scenes": [
     {
-      "start": 240.0,
-      "end": 360.0,
-      "action_level": "MODERATE",
-      "priority": "medium",
-      "description": "Goodwill event intro - other schools arrive",
+      "start": 0.0,
+      "end": 180.0,
+      "action_level": "CALM",
+      "priority": "low",
+      "description": "Setup - cursed spirits meet, plan against Gojo",
       "characters_present": [
-        "todo",
-        "gojo"
+        "jogo"
       ],
-      "action_score": 0.55,
-      "duration": 120.0
+      "action_score": 0.3,
+      "duration": 180.0
+    },
+    {
+      "start": 300.0,
+      "end": 480.0,
+      "action_level": "INTENSE",
+      "priority": "high",
+      "description": "Gojo vs Jogo begins - road fight and limitless showcase",
+      "characters_present": [
+        "gojo",
+        "jogo"
+      ],
+      "action_score": 0.85,
+      "duration": 180.0
+    },
+    {
+      "start": 540.0,
+      "end": 720.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Jogo's Domain Expansion - Coffin of Iron Mountain",
+      "characters_present": [
+        "gojo",
+        "jogo"
+      ],
+      "action_score": 0.90,
+      "duration": 180.0
+    },
+    {
+      "start": 720.0,
+      "end": 900.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "💎 CLIMAX: Gojo removes blindfold, Domain Expansion: Infinite Void showcase",
+      "characters_present": [
+        "gojo",
+        "jogo"
+      ],
+      "action_score": 1.0,
+      "duration": 180.0
     },
     {
       "start": 900.0,
       "end": 1080.0,
-      "action_level": "INTENSE",
+      "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Todo confronts Megumi - type of woman question",
+      "description": "Gojo toys with Jogo - decapitates Jogo with bare hands",
       "characters_present": [
-        "todo",
-        "megumi"
+        "gojo",
+        "jogo"
       ],
-      "action_score": 0.75,
+      "action_score": 0.95,
       "duration": 180.0
     },
     {
       "start": 1200.0,
       "end": 1380.0,
-      "action_level": "EXPLOSIVE",
+      "action_level": "INTENSE",
       "priority": "high",
-      "description": "Yuji revealed alive - surprise return",
+      "description": "Aftermath - Hanami appears, Jogo retreats",
       "characters_present": [
-        "yuji",
-        "megumi",
-        "nobara"
+        "gojo",
+        "jogo"
       ],
-      "action_score": 0.95,
+      "action_score": 0.75,
       "duration": 180.0
     }
   ]

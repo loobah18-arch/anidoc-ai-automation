@@ -46,13 +46,13 @@
     {
       "start": 780.0,
       "end": 920.0,
-      "action_level": "EXPLOSIVE",
-      "priority": "high",
+      "action_level": "MODERATE",
+      "priority": "medium",
       "description": "Gramps flashback: Hone a single strike to absolute perfection",
       "characters_present": [
         "zenitsu"
       ],
-      "action_score": 0.95,
+      "action_score": 0.50,
       "duration": 140.0
     },
     {
@@ -60,11 +60,11 @@
       "end": 1050.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Thunder Breathing First Form: Thunderclap and Flash Sixfold lightning blitz",
+      "description": "💎 CLIMAX: Thunder Breathing First Form: Thunderclap and Flash Sixfold lightning blitz",
       "characters_present": [
         "zenitsu"
       ],
-      "action_score": 0.95,
+      "action_score": 1.0,
       "duration": 90.0
     },
     {

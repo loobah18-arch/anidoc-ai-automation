@@ -40,7 +40,7 @@ TITLE_KEYWORDS = {
         "keywords": ["gojo", "satoru", "six eyes", "limitless", "hollow purple", "purple", "honored one"],
         "action_keywords": ["gojo", "void", "hollow", "purple", "red", "blue", "awakened"],
         "min_action_score": 0.8,
-        "preferred_episodes": ["S02E04", "S02E09", "S01E09", "S01E07"],
+        "preferred_episodes": ["S02E04", "S02E09", "S01E07"],
     },
     "yuji": {
         "keywords": ["yuji", "itadori", "i am you", "divergent fist"],

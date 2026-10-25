@@ -508,13 +508,16 @@ def slice_action_moments_from_source(
         # 2. Character-specific curated scenes from episode metadata
         char_scenes = get_character_clips(matched_ep_code, character_key, min_action_score=0.55, max_clips=25)
 
-        # 3. General high-action scenes from episode metadata
+        # 3. General high-action scenes from episode metadata (Strict character presence check)
         ep_meta = load_episode_metadata(matched_ep_code)
         general_scenes = []
-        if ep_meta:
+        if ep_meta and not char_scenes:
+            print(f"⚠️ [ActionSlicer] Character '{character_key}' is NOT present in {matched_ep_code} metadata. Suppressing general other-character climaxes.")
+            general_scenes = []
+        elif ep_meta:
             general_scenes = [
                 s for s in ep_meta.get("scenes", [])
-                if float(s.get("action_score", 0.0)) >= 0.70
+                if float(s.get("action_score", 0.0)) >= 0.70 and character_key.lower() in [c.lower() for c in s.get("characters_present", [])]
             ]
 
         seen_ranges = set()
