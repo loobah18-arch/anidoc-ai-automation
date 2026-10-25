@@ -390,10 +390,10 @@ def render_cinematic_edit(
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
 
-    # 2026 Modern AMV xfade transitions (snappy 0.12s katana slashes + 808 drop white flash)
+    # 2026 Modern AMV xfade transitions (snappy 0.10s katana slashes + 808 drop white flash)
     seg_durs = [s["duration"] for s in segments]
     drop_idx = sum(1 for s in segments if not s.get("is_drop", False))
-    xfade_chain = build_xfade_transition_filter(len(clip_paths), seg_durs, transition_duration=0.12, drop_index=drop_idx)
+    xfade_chain = build_xfade_transition_filter(len(clip_paths), seg_durs, transition_duration=0.10, drop_index=drop_idx)
     if xfade_chain and len(clip_paths) >= 2:
         filter_chains.append(xfade_chain)
         video_src_tag = "[xfade_vout]"
@@ -405,9 +405,9 @@ def render_cinematic_edit(
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
 
-    # ── Heavy Drop Impact Shake & RGB Chromatic Aberration Split (top 30% loudest hits) ──
+    # ── Heavy Drop Impact Exposure Flash (top 30% loudest hits) ──
     heavy_drops = beat_grid.get_heavy_drop_timestamps()
-    impact_filters = build_heavy_drop_impact_filters(heavy_drops, duration=0.033, flash_opacity=0.15, chroma_shift_px=10)
+    impact_filters = build_heavy_drop_impact_filters(heavy_drops, duration=0.033, flash_opacity=0.25)
     impact_str = ",".join(impact_filters) if impact_filters else ""
 
     # Vibrant Anime Glow Color Grading + Beat Flashes (Zero intrusive text banners)
@@ -423,7 +423,7 @@ def render_cinematic_edit(
     )
 
     # Audio Dynamic Structure:
-    # 85% Dominant Phonk BGM / 15% Subtle Anime Combat SFX
+    # 75% Dominant Phonk BGM / 25% Crisp Anime Combat SFX
     # Pre-Drop Audio Vacuum (0.55s highpass riser + 0.16s dead silence + 808 drop sub-boost)
     # Katana Combat Foley transient presence on cut onsets
     # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
@@ -431,9 +431,9 @@ def render_cinematic_edit(
     combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
     combat_foley_fx = build_combat_foley_audio_filter(combat_times, drop_t)
     filter_chains.append(
-        f"[clip_sfx_raw]volume=0.30,{combat_foley_fx},highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
+        f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=120,lowpass=f=12000[clip_sfx_balanced];"
         f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.25[phonk_full];"
-        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=85 15:dropout_transition=2,"
+        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=75 25:dropout_transition=2,"
         f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
 

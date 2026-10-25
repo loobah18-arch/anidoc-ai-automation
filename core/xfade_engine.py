@@ -21,25 +21,19 @@ XFADE_TRANSITIONS = [
     "squeezeh"
 ]
 
-# 2026 Modern AMV Transitions (Katana slashes, directional whips, kinetic zoom punches)
+# 2026 Modern AMV Transitions (Clean Katana slashes and kinetic zoom punches; no blur/warp)
 MODERN_COMBAT_TRANSITIONS = [
     "hlslice",     # Horizontal katana slash cut
     "hrslice",     # Reverse horizontal slash cut
     "diagtl",      # Diagonal top-left katana slash
     "diagbr",      # Diagonal bottom-right katana slash
-    "hblur",       # High-speed horizontal motion-blur whip
     "zoomin",      # Kinetic punch zoom forward into strike
-    "smoothleft",  # Directional whip pan left following blade swing
-    "smoothright", # Directional whip pan right following blade swing
-    "squeezeh",    # Fast horizontal compression snap
-    "distance"     # 3D spatial push warp
 ]
 
 # Beat drop transition impact
 MODERN_DROP_TRANSITIONS = [
     "fadewhite",   # Signature 2026 white exposure burst on 808 drop
     "zoomin",      # Hyper-velocity punch zoom
-    "distance"     # Spatial impact push
 ]
 
 # Outro resolution transition
@@ -52,14 +46,14 @@ MODERN_OUTRO_TRANSITIONS = [
 def build_xfade_transition_filter(
     clip_count: int,
     durations: List[float],
-    transition_duration: float = 0.12,
+    transition_duration: float = 0.10,
     custom_transitions: Optional[List[str]] = None,
     drop_index: Optional[int] = None
 ) -> str:
     """
     Constructs a chained FFmpeg xfade filtergraph with 2026 Modern AMV transitions:
     - Beat Drop Transition (at drop_index): High-impact 'fadewhite' or 'zoomin' flash.
-    - Combat Cuts: Ultra-snappy 0.12s katana slashes (hlslice, diagtl, diagbr, hblur, zoomin).
+    - Combat Cuts: Ultra-snappy 0.10s katana slashes (hlslice, diagtl, diagbr, zoomin).
     - Outro (final cut): Cinematic fadeblack on the final climax resolution cut.
     - Formula: offset_i = offset_{i-1} + dur_{i} - transition_duration
     """

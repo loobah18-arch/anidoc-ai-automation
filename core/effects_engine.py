@@ -220,34 +220,16 @@ def build_velocity_clip_filter(
     ]
 
     # Speed remapping: Non-linear Bézier curve vs constant speed multiplier
+    # Clean anime frames without ghosting (tblend permanently removed per pro tutorials)
     if use_bezier_velocity and duration >= 0.40 and not is_intro_hook:
         bezier_pts = build_bezier_velocity_pts_expression(duration=duration, fast_speed=2.2, slow_speed=0.40)
         filters.append(f"setpts='{bezier_pts}'")
-        # Temporal frame blending for silky motion blur during the slow-mo hold phase
-        filters.append("tblend=all_mode=average")
     elif speed > 1.05:
         pts_mult = 1.0 / speed
         filters.append(f"setpts={pts_mult:.4f}*PTS")
     elif speed < 0.95:
         pts_mult = 1.0 / max(0.2, speed)
         filters.append(f"setpts={pts_mult:.4f}*PTS")
-        # Temporal frame blending for RSMB-style motion blur
-        if speed <= 0.88:
-            filters.append("tblend=all_mode=average")
-
-    # Zoom Punch on Beat Cuts or Continuous Intro Hook Zoom
-    if is_intro_hook:
-        hook_frames = max(30, int(duration * fps))
-        zoom_expr = f"min(1.0+0.15*(in/{hook_frames}),1.15)"
-        filters.append(
-            f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
-        )
-    elif scale_factor > 1.01:
-        punch_frames = 9 if fps >= 50 else 5
-        zoom_expr = f"if(lte(in,{punch_frames}),1.0+0.12*exp(-0.35*in),1.0)"
-        filters.append(
-            f"zoompan=z='{zoom_expr}':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
-        )
 
     filters.extend([
         f"trim=duration={duration:.3f}",
@@ -321,19 +303,6 @@ def build_vertical_dual_layer_chain(
     elif speed < 0.95:
         pts_mult = 1.0 / max(0.2, speed)
         post_filters.append(f"setpts={pts_mult:.4f}*PTS")
-        if speed <= 0.88:
-            post_filters.append("tblend=all_mode=average")
-
-    if is_intro_hook:
-        hook_frames = max(30, int(duration * fps))
-        post_filters.append(
-            f"zoompan=z='min(1.0+0.15*(in/{hook_frames}),1.15)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
-        )
-    elif scale_factor > 1.01:
-        punch_frames = 9 if fps >= 50 else 5
-        post_filters.append(
-            f"zoompan=z='if(lte(in,{punch_frames}),1.0+0.12*exp(-0.35*in),1.0)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s={video_width}x{video_height}:fps={fps}"
-        )
 
     post_filters.extend([
         f"trim=duration={duration:.3f}",
@@ -406,15 +375,13 @@ def build_selective_bloom_filter(input_tag: str, output_tag: str, threshold: int
 def build_heavy_drop_impact_filters(
     heavy_drop_times: List[float],
     duration: float = 0.033,  # 2 frames at 60fps
-    flash_opacity: float = 0.15,
-    chroma_shift_px: int = 10
+    flash_opacity: float = 0.25,
+    chroma_shift_px: int = 0
 ) -> List[str]:
     """
-    Impact Shake, Chromatic Aberration RGB Split & White Exposure Flash on Heavy Drops:
+    Signature 2026 Beat Drop Impact Flash:
     On the top 30% loudest bass hits:
-    - 2-frame directional camera shake (±12px X/Y offset) with edge mirroring
-    - 2-frame RGB chromatic aberration split (chromashift cbh/crh ±10px with edge wrap)
-    - 2-frame 15% white exposure flash
+    - 2-frame 25% white exposure flash (clean, zero nearest-neighbor pixelation, zero 3D-glasses blur)
     """
     if not heavy_drop_times:
         return []
@@ -422,15 +389,7 @@ def build_heavy_drop_impact_filters(
     filters = []
     for t in heavy_drop_times:
         t_end = t + duration
-        shake_x = f"if(between(t\\,{t:.3f}\\,{t_end:.3f})\\,12+12*sin(t*50)\\,12)"
-        shake_y = f"if(between(t\\,{t:.3f}\\,{t_end:.3f})\\,12+12*cos(t*50)\\,12)"
         cond = f"between(t\\,{t:.3f}\\,{t_end:.3f})"
-        filters.append(
-            f"crop=w=iw-24:h=ih-24:x='{shake_x}':y='{shake_y}',scale=1080:1920:flags=neighbor"
-        )
-        filters.append(
-            f"chromashift=cbh={chroma_shift_px}:crh=-{chroma_shift_px}:edge=1:enable='{cond}'"
-        )
         filters.append(
             f"drawbox=x=0:y=0:w=iw:h=ih:color=white@{flash_opacity}:t=fill:enable='{cond}'"
         )

@@ -39,6 +39,27 @@ def interpolate_video_to_60fps(
         except Exception as e:
             print(f"⚠️ [RIFE] Neural run failed: {e}, falling back to optical flow...")
 
+    # Fast check: If video is already 60fps, skip redundant re-encode
+    try:
+        check_cmd = [
+            "ffprobe", "-v", "error", "-select_streams", "v:0",
+            "-show_entries", "stream=r_frame_rate", "-of", "default=noprint_wrappers=1:nokey=1",
+            str(input_video)
+        ]
+        probe_res = subprocess.run(check_cmd, capture_output=True, text=True, timeout=10)
+        if probe_res.returncode == 0:
+            rate_str = probe_res.stdout.strip()
+            if "/" in rate_str:
+                num, den = rate_str.split("/")
+                current_fps = float(num) / float(den) if float(den) != 0 else 0
+            else:
+                current_fps = float(rate_str) if rate_str else 0
+            if abs(current_fps - target_fps) < 1.0:
+                print(f"✨ [OpticalFlow] Video '{input_video.name}' is already {target_fps}fps. Skipping redundant re-encode.")
+                return input_video
+    except Exception:
+        pass
+
     # 2. Fast High-Fidelity 60fps Stream Conversion via FFmpeg
     print(f"⚡ [OpticalFlow] Upgrading '{input_video.name}' to {target_fps}fps...")
     interp_vf = f"fps={target_fps}"
@@ -48,8 +69,8 @@ def interpolate_video_to_60fps(
         "-i", str(input_video),
         "-vf", interp_vf,
         "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-crf", "18",
+        "-preset", "medium",
+        "-crf", "17",
         "-c:a", "copy",
         str(output_video)
     ]
