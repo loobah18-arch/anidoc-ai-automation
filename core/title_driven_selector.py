@@ -22,7 +22,7 @@ TITLE_KEYWORDS = {
         "keywords": ["domain expansion", "domain", "infinite void", "malevolent shrine", "chimera shadow"],
         "action_keywords": ["domain", "expansion", "void", "shrine", "coffin", "shadow garden", "horizon"],
         "min_action_score": 0.9,
-        "preferred_episodes": ["S02E09", "S02E17", "S02E14", "S01E09", "S02E16"],
+        "preferred_episodes": ["S02E09", "S02E17", "S02E14", "S01E07", "S02E16"],
     },
     "mahoraga": {
         "keywords": ["mahoraga", "eight-handled", "summon", "shikigami"],
@@ -40,7 +40,7 @@ TITLE_KEYWORDS = {
         "keywords": ["gojo", "satoru", "six eyes", "limitless", "hollow purple", "purple", "honored one"],
         "action_keywords": ["gojo", "void", "hollow", "purple", "red", "blue", "awakened"],
         "min_action_score": 0.8,
-        "preferred_episodes": ["S02E04", "S02E09", "S01E09", "S01E07"],
+        "preferred_episodes": ["S02E04", "S02E09", "S01E07"],
     },
     "yuji": {
         "keywords": ["yuji", "itadori", "i am you", "divergent fist"],
@@ -58,7 +58,7 @@ TITLE_KEYWORDS = {
         "keywords": ["toji", "fushiguro", "heavenly restriction", "sorcerer killer"],
         "action_keywords": ["toji", "dagon", "awakening", "playful cloud", "inverted spear"],
         "min_action_score": 0.8,
-        "preferred_episodes": ["S02E04", "S02E14", "S01E04"],
+        "preferred_episodes": ["S02E04", "S02E14", "S02E03"],
     },
     "mahito": {
         "keywords": ["mahito", "idle transfiguration", "instant spirit body", "curse"],

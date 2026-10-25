@@ -19,17 +19,42 @@ from typing import List, Dict, Any, Optional, Tuple
 import numpy as np
 from scipy.signal import butter, sosfilt, correlate
 
+try:
+    import librosa
+    HAVE_LIBROSA = True
+except ImportError:
+    HAVE_LIBROSA = False
+
 from config.settings import SCRATCH_DIR, DEFAULT_DURATION
 from core.phonk_manager import POPULAR_PHONK_CATALOG
 
 
 class BeatGrid:
-    def __init__(self, duration: float, drop_time: float, beat_times: List[float], bpm: float = 134.0, audio_offset: float = 0.0):
+    def __init__(self, duration: float, drop_time: float, beat_times: List[float], bpm: float = 134.0, audio_offset: float = 0.0, heavy_drop_times: Optional[List[float]] = None):
         self.duration = duration
         self.drop_time = drop_time
         self.beat_times = sorted(list(set([round(t, 2) for t in beat_times if 0.0 <= t <= duration])))
         self.bpm = bpm
         self.audio_offset = audio_offset
+        self.heavy_drop_times = heavy_drop_times or []
+
+    def get_heavy_drop_timestamps(self) -> List[float]:
+        """Returns the top 30% loudest bass hit timestamps for shake & flash impact."""
+        if self.heavy_drop_times:
+            return [t for t in self.heavy_drop_times if 0.0 <= t <= self.duration]
+        if not self.beat_times:
+            return [self.drop_time] if self.drop_time > 0 else []
+        post_drop = [t for t in self.beat_times if t >= self.drop_time]
+        if not post_drop:
+            return [self.drop_time]
+        # First drop is always #1 heavy hit
+        heavy = [self.drop_time]
+        count = max(1, int(len(post_drop) * 0.30))
+        step = max(2, len(post_drop) // max(1, count))
+        for i in range(step, len(post_drop), step):
+            if post_drop[i] not in heavy:
+                heavy.append(post_drop[i])
+        return sorted(heavy[:count])
 
     def get_cut_segments(self) -> List[Dict[str, Any]]:
         """Returns list of segments with start, end, duration, is_drop, and prev_is_drop flags.
@@ -39,18 +64,26 @@ class BeatGrid:
         held shot — no micro-subdivision, no flash inserts between segments.
         Flash moments are identified separately (2-3 per edit) at the biggest drops.
         """
-        raw_segments = []
+        # Ensure contiguous segment boundaries from 0.0 to duration
         all_points = [0.0] + self.beat_times
         if self.duration not in all_points:
             all_points.append(self.duration)
         all_points = sorted(list(set(all_points)))
 
-        for i in range(len(all_points) - 1):
-            s = all_points[i]
-            e = all_points[i+1]
-            dur = e - s
-            if dur < 0.5:
-                continue  # skip sub-half-second fragments (noise)
+        merged_points = [all_points[0]]
+        for pt in all_points[1:]:
+            if pt - merged_points[-1] >= 0.35:
+                merged_points.append(pt)
+            elif pt == all_points[-1] and len(merged_points) > 1:
+                merged_points[-1] = pt
+
+        if merged_points[-1] < self.duration:
+            merged_points.append(self.duration)
+
+        raw_segments = []
+        for i in range(len(merged_points) - 1):
+            s = merged_points[i]
+            e = merged_points[i+1]
             raw_segments.append({"start": s, "end": e})
 
         # No subdivision — each beat-to-beat interval is one held shot.
@@ -230,28 +263,29 @@ def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time:
 
     # ── Act 1: Atmospheric Hook / Dialogue Build ──
     effective_drop = min(drop_time, max(1.5, min(8.0, duration - 4.0)))
-    if effective_drop > 4.5:
+    if effective_drop > 3.5:
         beat_times.append(round(effective_drop * 0.5, 2))
     beat_times.append(round(effective_drop, 2))
 
     if duration < 30.0:
-        # 3-act for short edits
-        remaining_time = max(2.0, duration - effective_drop)
-        combat_end = effective_drop + remaining_time * 0.70
-        cut_step = beat_interval * 2 if bpm < 140 else beat_interval * 4
-        if cut_step < 0.65:
-            cut_step = beat_interval * 4
-        if cut_step > 2.0:
-            cut_step = beat_interval * 2
-
+        # Modern High-Energy 3-Act AMV for TikTok / Shorts:
+        # Act 1: Hook (0.0 to effective_drop)
+        # Act 2: Combat Velocity Rush (effective_drop to duration - 2.8s) - syncopated 1-beat & 2-beat cuts
+        # Act 3: Climax Finisher (duration - 2.8s to duration) - dramatic held finisher
+        climax_start = round(duration - 2.8, 2)
         curr = effective_drop
-        while curr + cut_step < combat_end:
-            curr += cut_step
-            beat_times.append(round(curr, 2))
 
-        climax_strike = round(duration - min(3.5, max(1.8, remaining_time * 0.35)), 2)
-        if climax_strike > (beat_times[-1] if beat_times else 0.0) + 0.8 and climax_strike < duration - 1.0:
-            beat_times.append(climax_strike)
+        # Alternate 1-beat (fast strike cut) and 2-beat (technique impact hold) cuts
+        step_toggle = False
+        while curr < climax_start - 0.4:
+            step = beat_interval if step_toggle else (beat_interval * 2)
+            step = max(0.45, min(0.95, step))
+            step_toggle = not step_toggle
+            curr += step
+            if curr < climax_start - 0.35:
+                beat_times.append(round(curr, 2))
+
+        beat_times.append(climax_start)
     else:
         # 5-act for 1-minute / longer edits
         # Act 2: Wave 1 Combat (drop to ~42% duration)
@@ -352,11 +386,27 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
         grid = generate_procedural_beat_grid(duration=dur, drop_time=detected_drop, bpm=calibrated_bpm)
         grid.audio_offset = audio_offset
 
+        heavy_drops = []
+        if HAVE_LIBROSA:
+            try:
+                y, sr = librosa.load(str(audio_path), sr=22050, offset=audio_offset, duration=dur, mono=True)
+                onset_env = librosa.onset.onset_strength(y=y, sr=sr)
+                lib_onsets = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
+                if len(lib_onsets) > 0:
+                    energies = onset_env[lib_onsets]
+                    thresh = np.percentile(energies, 70.0)
+                    heavy_frames = lib_onsets[energies >= thresh]
+                    heavy_drops = [round(float(t), 2) for t in librosa.frames_to_time(heavy_frames, sr=sr) if t >= detected_drop]
+            except Exception as le:
+                print(f"  ⚠️ [BeatSync] Librosa analysis fallback: {le}")
+
         if detected_onsets:
             grid.beat_times = _snap_grid_to_onsets(grid.beat_times, detected_onsets, calibrated_bpm)
             snapped_count = sum(1 for i, t in enumerate(grid.beat_times)
                               if any(abs(t - o) < 0.05 for o in detected_onsets))
             print(f"  📐 [BeatSync] Snapped {snapped_count}/{len(grid.beat_times)} cuts to real bass onsets")
+
+        grid.heavy_drop_times = heavy_drops or grid.get_heavy_drop_timestamps()
 
         print(f"🎵 [BeatSync] Track: {track_stem} | BPM: {calibrated_bpm:.1f} | Drop: {detected_drop:.3f}s | Offset: {audio_offset:.1f}s | Dur: {dur:.1f}s")
         return grid

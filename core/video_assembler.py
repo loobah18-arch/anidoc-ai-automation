@@ -25,8 +25,12 @@ from typing import Dict, Any, List, Optional
 from config.settings import (
     OUTPUT_DIR, SCRATCH_DIR, PHONK_DIR,
     VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS,
-    LETTERBOX_BAR_HEIGHT, CHARACTER_COLOR_MAP, DEFAULT_DURATION
+    LETTERBOX_BAR_HEIGHT, CHARACTER_COLOR_MAP, DEFAULT_DURATION, FRAMING_MODE
 )
+from core.open_source_editor import (
+    is_editly_available, generate_editly_spec, render_with_editly, post_process_editly_output
+)
+from core.xfade_engine import build_xfade_transition_filter
 from core.beat_detector import analyze_audio_beats, BeatGrid
 from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
 from core.phonk_manager import get_random_or_specified_phonk
@@ -39,7 +43,12 @@ from core.effects_engine import (
     build_monochrome_cc_filter,
     build_beat_flash_filters,
     get_segment_velocity_profile,
-    build_velocity_clip_filter
+    build_velocity_clip_filter,
+    build_vertical_dual_layer_chain,
+    build_selective_bloom_filter,
+    build_heavy_drop_impact_filters,
+    build_pre_drop_audio_vacuum_filter,
+    build_combat_foley_audio_filter
 )
 from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
 from core.quote_ai import generate_edit_metadata, format_anime_description
@@ -230,15 +239,27 @@ def render_cinematic_edit(
     if len(clip_paths) >= n_clips:
         n_intro = sum(1 for f in drop_flags if not f)
         intro_c = clip_paths[:n_intro] if n_intro > 0 else [clip_paths[0]]
-        combat_c = clip_paths[n_intro:n_clips - 1] if n_clips > n_intro + 1 else clip_paths[n_intro:]
+        combat_pool = clip_paths[n_intro:n_clips - 1] if n_clips > n_intro + 1 else clip_paths[n_intro:]
         finisher_c = clip_paths[-1]
 
-        if not combat_c:
-            combat_c = clip_paths[:]
+        if not combat_pool:
+            combat_pool = clip_paths[:]
+
+        # ── Dual-Timeline Parallel Contrast Cutting ──
+        # Interleaves Stream A (Character Intent / Face & Eye Close-Up) with Stream B (Wide Sakuga / Slashing VFX)
+        if len(combat_pool) >= 2:
+            stream_a = combat_pool[0::2]
+            stream_b = combat_pool[1::2]
+        else:
+            stream_a = combat_pool
+            stream_b = combat_pool
 
         ordered_clips = []
-        c_i = 0
         in_i = 0
+        a_i = 0
+        b_i = 0
+        combat_step = 0
+
         for idx, (dur, is_d) in enumerate(zip(durations, drop_flags)):
             if not is_d:
                 ordered_clips.append(intro_c[in_i % len(intro_c)])
@@ -246,8 +267,13 @@ def render_cinematic_edit(
             elif idx == n_clips - 1:
                 ordered_clips.append(finisher_c)
             else:
-                ordered_clips.append(combat_c[c_i % len(combat_c)])
-                c_i += 1
+                if combat_step % 2 == 0:
+                    ordered_clips.append(stream_a[a_i % len(stream_a)])
+                    a_i += 1
+                else:
+                    ordered_clips.append(stream_b[b_i % len(stream_b)])
+                    b_i += 1
+                combat_step += 1
         clip_paths = ordered_clips
     elif clip_paths:
         while len(clip_paths) < n_clips:
@@ -294,9 +320,48 @@ def render_cinematic_edit(
     secondary_tone = "warm_red" if primary_tone == "cool_blue" else "cool_blue"
     mono_modes = ["mono_bw", "mono_blue", "mono_white"]
 
-    # Build per-clip video filters with velocity curves & per-segment color grading
+    # ── Open-Source Video Editor Pathway (mifi/editly with WebGL gl-transitions) ──
+    if is_editly_available():
+        print("🚀 [OpenSourceEditor] Detected mifi/editly. Assembling AMV using open-source WebGL editor...")
+        temp_editly_out = SCRATCH_DIR / f"editly_raw_{character_key}.mp4"
+        spec = generate_editly_spec(
+            clip_paths=clip_paths,
+            segments=segments,
+            audio_path=audio_path,
+            output_path=temp_editly_out,
+            width=VIDEO_WIDTH,
+            height=VIDEO_HEIGHT,
+            fps=FPS,
+            audio_offset=phonk_offset
+        )
+        if render_with_editly(spec, output_path=temp_editly_out):
+            print("✨ [OpenSourceEditor] editly render succeeded! Applying loudnorm mastering...")
+            combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
+            if post_process_editly_output(temp_editly_out, output_path, drop_time=beat_grid.drop_time, combat_cut_times=combat_times):
+                print(f"✅ Rendered AMV successfully via editly: {output_path.name} ({output_path.stat().st_size // 1024} KB)")
+                return {
+                    "status": "success",
+                    "output_path": output_path,
+                    "metadata": metadata,
+                    "character_key": character_key,
+                    "duration": beat_grid.duration,
+                    "drop_time": beat_grid.drop_time,
+                    "cuts_count": len(segments),
+                    "cut_timestamps": [round(seg["start"], 3) for seg in segments],
+                    "file_size_kb": output_path.stat().st_size // 1024,
+                    "audio_used": Path(audio_path).name,
+                    "subtitle_style": subtitle_style,
+                    "cc_preset": active_cc,
+                    "engine": "editly"
+                }
+        print("⚠️ [OpenSourceEditor] editly render did not complete. Falling back to native FFmpeg xfade engine.")
+
+    # Build per-clip video filters with clean cinematic widescreen framing & velocity curves
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
+        is_intro_hook = (idx == 0)
+        use_bezier = vel_profile.get("use_bezier_velocity", False)
+
         clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
             duration=seg["duration"],
@@ -305,19 +370,10 @@ def render_cinematic_edit(
             video_width=VIDEO_WIDTH,
             video_height=VIDEO_HEIGHT,
             fps=FPS,
-            add_bars=vel_profile.get("add_bars", False)
+            add_bars=vel_profile.get("add_bars", False),
+            is_intro_hook=is_intro_hook,
+            use_bezier_velocity=use_bezier
         )
-
-        # ── Unified Cinematic Color Grade (matches reference edits lX7bIlY_KEE & MRurnn3AxyA) ──
-        # Single cohesive grade across the entire edit prevents disorienting color-switching.
-        # Rare dramatic monochromatic B&W accent only at high-energy power climax (e.g. Black Flash).
-        is_climax_moment = (idx == len(segments) - 2 and seg.get("is_drop") and len(segments) > 4)
-        if is_climax_moment and character_key in ["yuji", "sukuna"]:
-            clip_cc = build_monochrome_cc_filter("mono_bw")
-        else:
-            clip_cc = build_cc_filter(active_cc)
-        clip_vf = f"{clip_vf},{clip_cc}"
-
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
@@ -334,47 +390,55 @@ def render_cinematic_edit(
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
 
-    # Frame-Accurate Zero-Drift Video & Audio Concatenation
-    # Guarantees that every visual cut lands on the EXACT millisecond of the audio beat
-    concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
-    filter_chains.append(concat_v_str)
+    # 2026 Modern AMV xfade transitions (snappy 0.12s katana slashes + 808 drop white flash)
+    seg_durs = [s["duration"] for s in segments]
+    drop_idx = sum(1 for s in segments if not s.get("is_drop", False))
+    xfade_chain = build_xfade_transition_filter(len(clip_paths), seg_durs, transition_duration=0.12, drop_index=drop_idx)
+    if xfade_chain and len(clip_paths) >= 2:
+        filter_chains.append(xfade_chain)
+        video_src_tag = "[xfade_vout]"
+    else:
+        concat_v_str = "".join(concat_v_inputs) + f"concat=n={len(clip_paths)}:v=1:a=0[concatenated_v]"
+        filter_chains.append(concat_v_str)
+        video_src_tag = "[concatenated_v]"
 
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
-    
-    # Impact White Flashes on Beat Drops
+
+    # ── Heavy Drop Impact Shake & RGB Chromatic Aberration Split (top 30% loudest hits) ──
+    heavy_drops = beat_grid.get_heavy_drop_timestamps()
+    impact_filters = build_heavy_drop_impact_filters(heavy_drops, duration=0.033, flash_opacity=0.15, chroma_shift_px=10)
+    impact_str = ",".join(impact_filters) if impact_filters else ""
+
+    # Vibrant Anime Glow Color Grading + Beat Flashes (Zero intrusive text banners)
+    vibrant_cc = build_cc_filter(active_cc)
     flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.08, opacity=0.75)
-    flash_str = ",".join(flash_filters) if flash_filters else "null"
-    
-    # 4K HDR Color Grade (CC Preset with S-curve colorlevels)
-    cc_filter = build_cc_filter(active_cc)
-    
-    # Letterbox with interactive discussion hook (prompts comments in top/bottom bars)
-    letterbox_filter = (
-        f"drawbox=x=0:y=0:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill,"
-        f"drawbox=x=0:y=ih-{LETTERBOX_BAR_HEIGHT}:w=iw:h={LETTERBOX_BAR_HEIGHT}:color=black:t=fill"
-    )
-    hook_filter = build_engagement_hook_overlay(character_key, target_duration)
-    overlay_chain = f"{letterbox_filter},{hook_filter}" if hook_filter else letterbox_filter
+    flash_str = ",".join(flash_filters) if flash_filters else ""
+
+    overlay_parts = [p for p in [impact_str, flash_str, vibrant_cc] if p]
+    overlay_chain = ",".join(overlay_parts)
 
     filter_chains.append(
-        f"[concatenated_v]{flash_str},{overlay_chain}[vout]"
+        f"{video_src_tag}{overlay_chain}[vout]"
     )
-    
+
     # Audio Dynamic Structure:
     # 85% Dominant Phonk BGM / 15% Subtle Anime Combat SFX
-    # Eliminates awkward mid-sentence dialogue cuts by keeping the Phonk track clean and driving throughout.
-    # Clip combat SFX (swords, punches, energy impacts) are mixed in gently without cutting characters off.
-    # Master: loudnorm to -12 dB (commercial streaming loudness)
+    # Pre-Drop Audio Vacuum (0.55s highpass riser + 0.16s dead silence + 808 drop sub-boost)
+    # Katana Combat Foley transient presence on cut onsets
+    # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
+    audio_vacuum_fx = build_pre_drop_audio_vacuum_filter(drop_t)
+    combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
+    combat_foley_fx = build_combat_foley_audio_filter(combat_times, drop_t)
     filter_chains.append(
-        f"[clip_sfx_raw]volume=0.30,highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
-        f"[{phonk_inp_idx}:a]volume=1.25[phonk_full];"
+        f"[clip_sfx_raw]volume=0.30,{combat_foley_fx},highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
+        f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.25[phonk_full];"
         f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=85 15:dropout_transition=2,"
-        f"volume=1.20,loudnorm=I=-12:TP=-0.5:LRA=7[aout]"
+        f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
-    
+
     full_filter_complex = ";".join(filter_chains)
-    
+
     cmd = [
         "ffmpeg", "-y",
         *cmd_inputs,
@@ -382,9 +446,8 @@ def render_cinematic_edit(
         "-map", "[vout]",
         "-map", "[aout]",
         "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-crf", "15",
-        "-x264-params", "bframes=5:ref=5",
+        "-preset", "medium",
+        "-crf", "18",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "192k",
@@ -406,7 +469,9 @@ def render_cinematic_edit(
         "metadata": metadata,
         "character_key": character_key,
         "duration": beat_grid.duration,
+        "drop_time": beat_grid.drop_time,
         "cuts_count": len(segments),
+        "cut_timestamps": [round(seg["start"], 3) for seg in segments],
         "file_size_kb": output_path.stat().st_size // 1024,
         "audio_used": Path(audio_path).name,
         "subtitle_style": subtitle_style,
