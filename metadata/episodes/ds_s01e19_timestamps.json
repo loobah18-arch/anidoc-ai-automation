@@ -32,75 +32,87 @@
       "start": 180.0,
       "end": 360.0,
       "action_level": "INTENSE",
-      "priority": "high",
+      "priority": "medium",
       "description": "Tanjiro fights Rui with Water Breathing Tenth Form Constant Flux",
       "characters_present": [
         "tanjiro"
       ],
-      "action_score": 0.75,
+      "action_score": 0.70,
       "duration": 180.0
     },
     {
       "start": 420.0,
       "end": 600.0,
       "action_level": "INTENSE",
-      "priority": "high",
+      "priority": "medium",
       "description": "Rui's Blood Demon Art Cutting Thread Cage traps Tanjiro",
       "characters_present": [
         "tanjiro"
       ],
-      "action_score": 0.75,
+      "action_score": 0.70,
       "duration": 180.0
     },
     {
       "start": 780.0,
       "end": 960.0,
-      "action_level": "EXPLOSIVE",
-      "priority": "high",
+      "action_level": "CALM",
+      "priority": "low",
       "description": "Tanjuro Kagura memory: Breath properly and dance without fatigue",
       "characters_present": [
         "tanjiro"
       ],
-      "action_score": 0.95,
+      "action_score": 0.60,
       "duration": 180.0
     },
     {
-      "start": 960.0,
-      "end": 1100.0,
+      "start": 980.0,
+      "end": 1080.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Hinokami Kagura Dance of the Fire God flame sword transformation",
+      "description": "Tanjiro shifts to Sun Breathing: Nichirin blade ignites into Hinokami Kagura flame sword",
       "characters_present": [
         "tanjiro"
       ],
-      "action_score": 0.95,
-      "duration": 140.0
-    },
-    {
-      "start": 1100.0,
-      "end": 1220.0,
-      "action_level": "EXPLOSIVE",
-      "priority": "high",
-      "description": "Nezuko Blood Demon Art Exploding Blood ignites the threads into crimson fire",
-      "characters_present": [
-        "tanjiro",
-        "nezuko"
-      ],
-      "action_score": 0.95,
-      "duration": 120.0
-    },
-    {
-      "start": 1220.0,
-      "end": 1320.0,
-      "action_level": "EXPLOSIVE",
-      "priority": "high",
-      "description": "Tanjiro cleaves through Rui's flaming neck with Kamado song climax",
-      "characters_present": [
-        "tanjiro",
-        "nezuko"
-      ],
-      "action_score": 0.95,
+      "action_score": 1.00,
       "duration": 100.0
+    },
+    {
+      "start": 1080.0,
+      "end": 1180.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Hinokami Kagura Enbu: Giant Fire Dragon manifests and roars as Tanjiro charges slicing through Rui's threads",
+      "characters_present": [
+        "tanjiro"
+      ],
+      "action_score": 1.00,
+      "duration": 100.0
+    },
+    {
+      "start": 1180.0,
+      "end": 1240.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Nezuko awakens Blood Demon Art: Exploding Blood (Bakketsu) turning threads into brilliant crimson and pink flames",
+      "characters_present": [
+        "tanjiro",
+        "nezuko"
+      ],
+      "action_score": 0.98,
+      "duration": 60.0
+    },
+    {
+      "start": 1240.0,
+      "end": 1315.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Combined Climax Strike: Tanjiro charges through pink flames and severs Rui's neck with fiery circular slash",
+      "characters_present": [
+        "tanjiro",
+        "nezuko"
+      ],
+      "action_score": 1.00,
+      "duration": 75.0
     }
   ]
 }

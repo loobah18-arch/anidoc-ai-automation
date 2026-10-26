@@ -463,11 +463,11 @@ def slice_action_moments_from_source(
     # Short clips (<=300s): skip last 15s
     start_bound = 95.0 if total_duration > 600 else (10.0 if total_duration > 60 else 1.0)
     if total_duration > 3600:
-        end_bound = total_duration - 360.0
+        end_bound = total_duration - 240.0
     elif total_duration > 600:
-        end_bound = total_duration - 210.0
+        end_bound = total_duration - 45.0  # Retain final 3.5 minutes so climax battles (Kamado song, decapitations) are never cut off
     elif total_duration > 300:
-        end_bound = total_duration - 90.0
+        end_bound = total_duration - 30.0
     elif total_duration > 60:
         end_bound = total_duration - 15.0
     else:
@@ -541,8 +541,20 @@ def slice_action_moments_from_source(
             seen_ranges.add(key)
 
             scene_len = max(clip_duration, en - st)
+            action_lvl = str(s.get("action_level", "MODERATE")).upper()
+            is_explosive = action_lvl == "EXPLOSIVE" or float(s.get("action_score", 0.0)) >= 0.90
+
             if scene_len <= clip_duration * 1.5:
                 pts = [st]
+            elif is_explosive:
+                # Step densely across the entire explosive combat scene (every 6.0-7.5 seconds)
+                # to extract all distinct sakuga sword strikes, sparks, and flame arcs!
+                pts = []
+                cur_t = st
+                step = max(clip_duration * 1.5, 6.0)
+                while cur_t + clip_duration <= en:
+                    pts.append(round(cur_t, 2))
+                    cur_t += step
             elif scene_len <= 15.0:
                 mid = st + (scene_len - clip_duration) * 0.45
                 pts = [mid]
@@ -664,34 +676,31 @@ def slice_action_moments_from_source(
     curated_candidates.sort(key=lambda x: x["score"], reverse=True)
     final_candidates = []
 
-    # Allocate up to 50% to curated scenes if available
-    curated_quota = min(len(curated_candidates), max(3, int(n_clips * 0.50))) if curated_candidates else 0
-    for c in curated_candidates[:curated_quota]:
-        if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
-            final_candidates.append(c)
-
-    # Add top OpenCV vision motion & climax candidates (verified non-dark, high movement)
-    for cv in cv_candidates:
+    # 1. 100% Curated Priority: Use all curated sakuga moments first!
+    # They are verified canonical sakuga/combat moments that fans actually want to see.
+    for c in curated_candidates:
         if len(final_candidates) >= n_clips + 8:
             break
-        if not any(abs(cv["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
-            final_candidates.append(cv)
-
-    # Fill with top dynamic audio combat scenes (verified free of black/credit voids)
-    for a in audio_candidates:
-        if len(final_candidates) >= n_clips + 12:
-            break
-        if is_black_or_credit_frame(video_path, a["start"]):
-            continue
-        if not any(abs(a["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
-            final_candidates.append(a)
-
-    # Fill any remaining quota with extra curated scenes
-    for c in curated_candidates[curated_quota:]:
-        if len(final_candidates) >= n_clips + 12:
-            break
         if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
             final_candidates.append(c)
+
+    # 2. Add OpenCV vision motion & climax candidates ONLY if more clips are needed
+    if len(final_candidates) < n_clips + 8:
+        for cv in cv_candidates:
+            if len(final_candidates) >= n_clips + 8:
+                break
+            if not any(abs(cv["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+                final_candidates.append(cv)
+
+    # 3. Add dynamic audio combat scenes if still needed
+    if len(final_candidates) < n_clips + 12:
+        for a in audio_candidates:
+            if len(final_candidates) >= n_clips + 12:
+                break
+            if is_black_or_credit_frame(video_path, a["start"]):
+                continue
+            if not any(abs(a["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+                final_candidates.append(a)
 
     # Safe fallback if too few candidates met strict thresholds
     if len(final_candidates) < n_clips:
@@ -712,10 +721,9 @@ def slice_action_moments_from_source(
     print(f"🎬 [ActionSlicer] Total hybrid candidate pool: {len(final_candidates)} scenes (Curated + OpenCV Vision + Audio).")
 
     # ── Phase 4: Intelligent Scene Orchestration for Beat Drops ───────────────
-    # The #1 loudest / most epic climax scene is mapped to the Beat Drop (index 4)
+    # The #1 loudest / most epic climax scene is mapped to the Beat Drop (index 4 or drop_idx)
     # The #2 scene is mapped to the Bridge Drop (~index 22 or 12)
     # The #3 scene is mapped to the Climax Outro Finisher (last clip)
-    # Intro Hook Enforcement: Intro clip 00 is forced to have active movement (intro_hook_cand)
     if drop_index is not None and 0 <= drop_index < n_clips:
         drop_idx = drop_index
     else:
@@ -723,29 +731,69 @@ def slice_action_moments_from_source(
     bridge_idx = min(n_clips - 4, max(drop_idx + 2, int(n_clips * 0.7))) if n_clips > 6 else max(0, n_clips - 2)
     last_idx = n_clips - 1
 
-    drop_climax = final_candidates[0]
-    sec_drop = final_candidates[1] if len(final_candidates) > 1 else final_candidates[0]
-    finisher = final_candidates[2] if len(final_candidates) > 2 else final_candidates[0]
-    remaining_cand = final_candidates[3:] if len(final_candidates) > 3 else final_candidates
+    # Find the drop climax: highest score scene with 'dragon', 'fire god', 'enbu', 'transformation', 'drop', or highest energy
+    drop_candidates = [
+        c for c in final_candidates
+        if any(kw in c.get("description", "").lower() for kw in ["dragon", "fire god", "enbu", "transformation", "flame sword", "drop", "awakening"])
+    ]
+    if drop_candidates:
+        drop_climax = max(drop_candidates, key=lambda x: x["score"])
+    else:
+        drop_climax = final_candidates[0]
 
-    # Sort remaining into intro (lowest score dialogue/walk) and combat (high energy clashes)
-    sorted_by_energy = sorted(remaining_cand, key=lambda x: x["score"])
-    intro_pool = sorted_by_energy[:drop_idx]
-    combat_pool = sorted_by_energy[drop_idx:] if len(sorted_by_energy) > drop_idx else sorted_by_energy
+    # Find the true finisher: scene with 'decapitation', 'neck', 'slash', or latest timestamp among explosive candidates
+    finisher_candidates = [
+        c for c in final_candidates
+        if c != drop_climax and any(kw in c.get("description", "").lower() for kw in ["decapitat", "neck", "sever", "finisher", "final", "kamado song", "cleave"])
+    ]
+    if finisher_candidates:
+        finisher = max(finisher_candidates, key=lambda x: x["start"])
+    elif len(final_candidates) > 2:
+        finisher = final_candidates[2]
+    else:
+        finisher = final_candidates[0]
+
+    # Find secondary drop (bridge drop)
+    sec_candidates = [
+        c for c in final_candidates
+        if c != drop_climax and c != finisher and any(kw in c.get("description", "").lower() for kw in ["exploding blood", "bakketsu", "pink", "clash", "secondary", "thread cage"])
+    ]
+    if sec_candidates:
+        sec_drop = max(sec_candidates, key=lambda x: x["score"])
+    elif len(final_candidates) > 1:
+        other_candidates = [c for c in final_candidates if c != drop_climax and c != finisher]
+        sec_drop = other_candidates[0] if other_candidates else final_candidates[1]
+    else:
+        sec_drop = drop_climax
+
+    # Find intro candidates: prefer scenes with intent, breath, shift, ignition, awakening, blade
+    intro_candidates = [
+        c for c in final_candidates
+        if c not in (drop_climax, sec_drop, finisher) and any(kw in c.get("description", "").lower() for kw in ["shift", "breath", "ignit", "awaken", "flame sword", "blade", "intent", "eye"])
+    ]
+    if len(intro_candidates) >= drop_idx:
+        intro_pool = intro_candidates[:drop_idx]
+    else:
+        remaining_cand = [c for c in final_candidates if c not in (drop_climax, sec_drop, finisher)]
+        sorted_by_energy = sorted(remaining_cand, key=lambda x: x["score"])
+        intro_pool = sorted_by_energy[:drop_idx]
+
+    combat_pool = [c for c in final_candidates if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool]
 
     selected = [None] * n_clips
     for i in range(min(drop_idx, len(intro_pool))):
         selected[i] = intro_pool[i]
 
-    # Force active intro hook if available
-    if intro_hook_cand:
-        selected[0] = {
-            "start": intro_hook_cand["start"],
-            "score": intro_hook_cand["score"],
-            "description": "Active Intro Hook Shot",
-            "tag": "🎯 Intro Hook",
-            "is_curated": False
-        }
+    # Force active intro hook only if no curated intro exists
+    if intro_hook_cand and (not selected[0] or not selected[0].get("is_curated")):
+        if not any(c.get("is_curated") for c in selected if c):
+            selected[0] = {
+                "start": intro_hook_cand["start"],
+                "score": intro_hook_cand["score"],
+                "description": "Active Intro Hook Shot",
+                "tag": "🎯 Intro Hook",
+                "is_curated": False
+            }
 
     selected[drop_idx] = drop_climax
     selected[bridge_idx] = sec_drop
