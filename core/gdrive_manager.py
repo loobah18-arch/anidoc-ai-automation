@@ -292,9 +292,13 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
     safe_name = re.sub(r"[^\w\.-]", "_", file_info["name"])
     out_path = download_dir / safe_name
 
-    if out_path.exists() and out_path.stat().st_size > 1_000_000:
+    min_valid_bytes = 15_000_000  # Minimum 15MB to ensure full episode footage, not truncated preview uploads
+
+    if out_path.exists() and out_path.stat().st_size > min_valid_bytes:
         print(f"⚡ [GoogleDrive] File already cached: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
         return out_path
+    elif out_path.exists():
+        out_path.unlink(missing_ok=True)
 
     print(f"🚀 [GoogleDrive] Downloading '{file_info['name']}' ({file_id})...")
 
@@ -332,11 +336,12 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
                     if chunk:
                         f.write(chunk)
             
-            if out_path.exists() and out_path.stat().st_size > 1_000_000:
+            if out_path.exists() and out_path.stat().st_size > min_valid_bytes:
                 print(f"✅ [GoogleDrive] Direct stream downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
                 return out_path
             else:
                 if out_path.exists():
+                    print(f"⚠️ [GoogleDrive] File '{out_path.name}' is only {out_path.stat().st_size // (1024*1024)} MB (incomplete/truncated upload < 15MB). Discarding.")
                     out_path.unlink()
     except Exception as e:
         print(f"⚠️ [GoogleDrive] Direct stream error: {e}")
@@ -348,9 +353,12 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
         import gdown
         print(f"🔄 [GoogleDrive] Trying gdown for file {file_id}...")
         downloaded = gdown.download(id=file_id, output=str(out_path), quiet=False)
-        if downloaded and Path(downloaded).exists() and Path(downloaded).stat().st_size > 1_000_000:
+        if downloaded and Path(downloaded).exists() and Path(downloaded).stat().st_size > min_valid_bytes:
             print(f"✅ [GoogleDrive] gdown downloaded: {out_path.name} ({Path(downloaded).stat().st_size // (1024*1024)} MB)")
             return Path(downloaded)
+        elif downloaded and Path(downloaded).exists():
+            print(f"⚠️ [GoogleDrive] File '{out_path.name}' via gdown is only {Path(downloaded).stat().st_size // (1024*1024)} MB (< 15MB). Discarding.")
+            Path(downloaded).unlink(missing_ok=True)
     except Exception as e:
         print(f"⚠️ [GoogleDrive] gdown module error: {e}")
 
@@ -367,9 +375,12 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
             "--quiet"
         ]
         subprocess.run(cmd, capture_output=True, timeout=300)
-        if out_path.exists() and out_path.stat().st_size > 1_000_000:
+        if out_path.exists() and out_path.stat().st_size > min_valid_bytes:
             print(f"✅ [GoogleDrive] yt-dlp downloaded: {out_path.name} ({out_path.stat().st_size // (1024*1024)} MB)")
             return out_path
+        elif out_path.exists():
+            print(f"⚠️ [GoogleDrive] File '{out_path.name}' via yt-dlp is only {out_path.stat().st_size // (1024*1024)} MB (< 15MB). Discarding.")
+            out_path.unlink(missing_ok=True)
     except Exception as e:
         print(f"⚠️ [GoogleDrive] yt-dlp error: {e}")
 
@@ -961,14 +972,24 @@ def fetch_and_prepare_gdrive_footage(
         print("⚠️ [GoogleDrive] No files retrieved from Google Drive folder index.")
         return []
 
-    best_file = pick_best_file_for_character(items, target_character, title=title)
-    if not best_file:
-        print(f"⚠️ [GoogleDrive] No matching file found for '{target_character}'.")
-        return []
+    raw_video = None
+    attempted_names = set()
+    for _ in range(min(5, len(items))):
+        available_items = [it for it in items if it["name"] not in attempted_names]
+        if not available_items:
+            break
+        best_file = pick_best_file_for_character(available_items, target_character, title=title)
+        if not best_file:
+            break
+        attempted_names.add(best_file["name"])
+        raw_video = download_single_gdrive_file(best_file, gdrive_workdir)
+        if raw_video and raw_video.exists() and raw_video.stat().st_size > 15_000_000:
+            break
+        print(f"⚠️ [GoogleDrive] '{best_file['name']}' was unavailable or incomplete (<15MB). Trying next candidate episode...")
+        raw_video = None
 
-    raw_video = download_single_gdrive_file(best_file, gdrive_workdir)
     if not raw_video:
-        print(f"⚠️ [GoogleDrive] Failed to download {best_file['name']}.")
+        print(f"⚠️ [GoogleDrive] Could not download any valid (>15MB) episode for '{target_character}'.")
         return []
 
     sliced_clips = slice_action_moments_from_source(

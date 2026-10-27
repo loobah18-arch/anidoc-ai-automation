@@ -186,11 +186,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     if style_preset == "spur_hook":
         # ── Viral Upper-Third Hook Statement Mode (Matches reference edit) ──
-        # Phase 1: Setup statement (0.0s to drop)
-        # Pivot: "BUT?" (drop - 0.4s to drop)
+        # Phase 1: Setup statement (plays continuously from start until beat drop)
         # Phase 2: Climax punchline with Crimson Red keyword emphasis (drop to end)
         t_drop = drop_time if drop_time and (start_time < drop_time < end_time) else (start_time + total_dur * 0.45)
-        pivot_t = max(start_time + 1.0, t_drop - 0.40)
 
         if " | " in quote_text:
             setup_raw, punch_raw = quote_text.split(" | ", 1)
@@ -206,18 +204,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             setup_words = words
             punch_words = words
 
-        # Setup statement line
+        # Setup statement line (plays cleanly until the beat drop, no intrusive "BUT?" / "OR?")
         setup_line = _format_spur_line(setup_words, cfg['active_word'], cfg['primary'])
         ts_0 = format_ass_timestamp(start_time)
-        ts_pivot_start = format_ass_timestamp(pivot_t)
-        events.append(f"Dialogue: 1,{ts_0},{ts_pivot_start},BaseText,,0,0,0,,{{\\fscx106\\fscy106\\t(0,100,\\fscx100\\fscy100)}}{setup_line}")
-
-        # Pivot question line ("OR?" if question asks "or", else "BUT?")
-        pivot_word = "OR?" if " OR " in quote_text.upper() else "BUT?"
         ts_drop = format_ass_timestamp(t_drop)
-        events.append(f"Dialogue: 1,{ts_pivot_start},{ts_drop},BaseText,,0,0,0,,{{\\fscx118\\fscy118\\t(0,80,\\fscx100\\fscy100)}}{{\\c{cfg['active_word']}&}}{pivot_word}")
+        events.append(f"Dialogue: 1,{ts_0},{ts_drop},BaseText,,0,0,0,,{{\\fscx106\\fscy106\\t(0,100,\\fscx100\\fscy100)}}{setup_line}")
 
-        # Punchline statement line (with crimson red emphasis keywords)
+        # Punchline statement line (with crimson red emphasis keywords, from drop to end)
         punch_line = _format_spur_line(punch_words, cfg['active_word'], cfg['primary'])
         ts_end = format_ass_timestamp(end_time)
         events.append(f"Dialogue: 1,{ts_drop},{ts_end},BaseText,,0,0,0,,{{\\fscx110\\fscy110\\t(0,100,\\fscx100\\fscy100)}}{punch_line}")
