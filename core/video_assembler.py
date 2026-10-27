@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 from config.settings import (
-    OUTPUT_DIR, SCRATCH_DIR, PHONK_DIR,
+    OUTPUT_DIR, SCRATCH_DIR, PHONK_DIR, FONTS_DIR,
     VIDEO_WIDTH, VIDEO_HEIGHT, FPS, CC_PRESETS,
     LETTERBOX_BAR_HEIGHT, CHARACTER_COLOR_MAP, DEFAULT_DURATION, FRAMING_MODE
 )
@@ -85,9 +85,9 @@ def render_cinematic_edit(
     phonk_track: Optional[str] = None,
     output_path: Optional[Path] = None,
     target_duration: float = DEFAULT_DURATION,
-    subtitle_style: str = "viral_karaoke",
-    burn_subtitles: bool = False,
-    enable_subtitles: bool = False,
+    subtitle_style: str = "spur_hook",
+    burn_subtitles: bool = True,
+    enable_subtitles: bool = True,
     custom_quote: Optional[str] = None,
     custom_title: Optional[str] = None,
     cc_preset: Optional[str] = None,
@@ -287,10 +287,26 @@ def render_cinematic_edit(
     # Micro-flash inserts REMOVED — reference uses rare flashes as overlays, not segments.
     # Flashes are handled via build_beat_flash_filters (2-3 total per edit) as overlays.
 
-    # 5. Pure 100% Clean Video (Zero Subtitles or Awkward Dialogue Burning)
-    # Subtitles and text overlays are completely disabled to ensure visual purity,
-    # avoiding awkward mid-sentence dialogue cutoffs or forced text on the screen.
+    # 5. Viral Upper-Third Statement Subtitles (Spur World / Reference Style)
     ass_path = None
+    if enable_subtitles or burn_subtitles or subtitle_style == "spur_hook":
+        try:
+            ass_out = SCRATCH_DIR / f"subtitles_{character_key}.ass"
+            quote_text = custom_quote or metadata.get("quote") or metadata.get("title") or "THE GREATEST WARRIOR"
+            ass_path = generate_kinetic_subtitles(
+                quote_text=quote_text,
+                start_time=0.2,
+                end_time=beat_grid.duration - 0.5,
+                output_ass_path=ass_out,
+                style_preset=subtitle_style or "spur_hook",
+                character_name=theme["name"],
+                drop_time=beat_grid.drop_time
+            )
+            print(f"✨ [Subtitles] Generated viral '{subtitle_style}' ASS subtitles: {ass_path.name}")
+        except Exception as e:
+            print(f"⚠️ [Subtitles] Notice generating subtitles: {e}")
+            ass_path = None
+
     active_cc = cc_preset or theme["cc_preset"]
     cc_cfg = CC_PRESETS.get(active_cc, CC_PRESETS["marvel_hdr"])
     
@@ -339,7 +355,7 @@ def render_cinematic_edit(
         if render_with_editly(spec, output_path=temp_editly_out):
             print("✨ [OpenSourceEditor] editly render succeeded! Applying loudnorm mastering...")
             combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
-            if post_process_editly_output(temp_editly_out, output_path, drop_time=beat_grid.drop_time, combat_cut_times=combat_times):
+            if post_process_editly_output(temp_editly_out, output_path, drop_time=beat_grid.drop_time, combat_cut_times=combat_times, ass_path=ass_path):
                 print(f"✅ Rendered AMV successfully via editly: {output_path.name} ({output_path.stat().st_size // 1024} KB)")
                 return {
                     "status": "success",
@@ -418,8 +434,13 @@ def render_cinematic_edit(
 
     # Vibrant Anime Glow Color Grading (Zero random flashes / strobe per pro tutorials)
     vibrant_cc = build_cc_filter(active_cc)
+    sub_filter = ""
+    if ass_path and ass_path.exists():
+        escaped_ass = str(ass_path).replace("\\", "/").replace(":", "\\:")
+        fonts_arg = f":fontsdir='{FONTS_DIR}'" if FONTS_DIR.exists() else ""
+        sub_filter = f",subtitles='{escaped_ass}'{fonts_arg}"
     filter_chains.append(
-        f"{video_src_tag}{vibrant_cc}[vout]"
+        f"{video_src_tag}{vibrant_cc}{sub_filter}[vout]"
     )
 
     # Audio Dynamic Structure:

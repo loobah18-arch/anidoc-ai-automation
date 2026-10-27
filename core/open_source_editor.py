@@ -147,12 +147,14 @@ def post_process_editly_output(
     raw_video: Path,
     final_output: Path,
     drop_time: Optional[float] = None,
-    combat_cut_times: Optional[List[float]] = None
+    combat_cut_times: Optional[List[float]] = None,
+    ass_path: Optional[Path] = None
 ) -> bool:
     """
     Applies high-bitrate loudnorm -14 LUFS audio normalization, pre-drop vacuum,
-    and combat Foley transient enhancement to editly output.
+    combat Foley transient enhancement, and optional ASS subtitles to editly output.
     """
+    from config.settings import FONTS_DIR
     af_filters = []
     if drop_time is not None:
         from core.effects_engine import build_pre_drop_audio_vacuum_filter, build_combat_foley_audio_filter
@@ -162,10 +164,18 @@ def post_process_editly_output(
     af_filters.append("loudnorm=I=-14:TP=-1.5:LRA=11")
     af_str = ",".join(af_filters)
 
+    vf_opts = []
+    if ass_path and ass_path.exists():
+        escaped_ass = str(ass_path).replace("\\", "/").replace(":", "\\:")
+        fonts_arg = f":fontsdir='{FONTS_DIR}'" if FONTS_DIR.exists() else ""
+        vf_opts = ["-vf", f"subtitles='{escaped_ass}'{fonts_arg}", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18"]
+    else:
+        vf_opts = ["-c:v", "copy"]
+
     cmd = [
         "ffmpeg", "-y",
         "-i", str(raw_video),
-        "-c:v", "copy",
+        *vf_opts,
         "-c:a", "aac",
         "-b:a", "192k",
         "-af", af_str,

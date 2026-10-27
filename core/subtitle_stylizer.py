@@ -27,6 +27,19 @@ def format_ass_timestamp(seconds: float) -> str:
 
 
 SUBTITLE_STYLE_PRESETS = {
+    "spur_hook": {
+        "font": "Bebas Neue",
+        "fontsize": 68,
+        "primary": "&H00FFFFFF",         # Pure Crisp White
+        "active_word": "&H001E27FF",     # Crimson Red Highlight (&HAABBGGRR in ASS)
+        "outline": "&H00000000",         # Deep Solid Black Outline
+        "shadow": "&HA0000000",          # Dark Drop Shadow
+        "outline_width": 7.5,
+        "shadow_depth": 4.0,
+        "alignment": 8,                  # Top-Center (Upper Third Header Zone)
+        "margin_v": 200,                 # 200px from top of 1080x1920 canvas
+        "margin_lr": 80,
+    },
     "viral_karaoke": {
         "font": "Arial",
         "fontsize": 64,                  # Proportional for 1:1 square canvas
@@ -82,31 +95,57 @@ SUBTITLE_STYLE_PRESETS = {
 }
 
 
+EMPHASIS_KEYWORDS = {
+    "DEADLY", "BATTLES", "DUTY", "CLIMAX", "SUN", "HINOKAMI", "GOD", "SHRINE",
+    "PURPLE", "STRONGEST", "CURSE", "OBLITERATED", "SEVERED", "DEMON", "PURE",
+    "CALAMITY", "POWER", "FATAL", "FLAME", "AWAKENED", "KILLER", "MASSACRE",
+    "BLOOD", "DRAGON", "DESTRUCTION", "CINEMA", "TEENAGERS", "FIGHT", "BRO",
+    "SLAYER", "HOLLOW", "DOMAIN", "EXPANSION", "FIRE", "RED", "SOUL", "MALEVOLENT",
+    "DEATH", "VOICES", "INFINITY", "THUNDER", "LIGHTNING", "AURA", "RAGE"
+}
+
+
+def _format_spur_line(words: List[str], red_hex: str, white_hex: str) -> str:
+    """Formats words into 2 lines with red keyword emphasis matching the reference edit."""
+    formatted = []
+    has_red = False
+    for w in words:
+        clean = w.strip(".,!?:;\"'").upper()
+        if clean in EMPHASIS_KEYWORDS:
+            formatted.append(r"{\c" + red_hex + r"&}" + w.upper() + r"{\c" + white_hex + r"&}")
+            has_red = True
+        else:
+            formatted.append(w.upper())
+    if not has_red and words:
+        last = words[-1]
+        formatted[-1] = r"{\c" + red_hex + r"&}" + last.upper() + r"{\c" + white_hex + r"&}"
+
+    if len(words) > 4:
+        mid = len(words) // 2
+        return " ".join(formatted[:mid]) + r"\N" + " ".join(formatted[mid:])
+    return " ".join(formatted)
+
+
 def generate_kinetic_subtitles(
     quote_text: str,
     start_time: float = 0.2,
     end_time: float = 6.8,
     output_ass_path: Optional[Path] = None,
-    style_preset: str = "viral_karaoke",
+    style_preset: str = "spur_hook",
     primary_color: Optional[str] = None,
     active_color: Optional[str] = None,
     glow_color: Optional[str] = None,
     character_name: str = "SPIDER-MAN",
-    chunk_size: int = 3
+    chunk_size: int = 3,
+    drop_time: Optional[float] = None
 ) -> Path:
     """
-    Generates word-by-word animated kinetic karaoke subtitles (.ass) for YouTube Shorts.
-
-    Key fixes vs previous version:
-    - No more [CHARACTER] badge (it was ugly and amateurish)
-    - WrapStyle=1: text wraps instead of clipping off right edge
-    - margin_v=180: sits above phone navigation chrome
-    - Wider MarginL/MarginR to keep text inside safe zone
-    - Bigger fontsize + outline for punchy viral look
+    Generates high-retention ASS subtitles for YouTube Shorts.
+    Supports both Upper-Third Viral Hook Statement Mode (spur_hook) and Kinetic Word Karaoke.
     """
     output_ass_path.parent.mkdir(parents=True, exist_ok=True)
     
-    cfg = SUBTITLE_STYLE_PRESETS.get(style_preset, SUBTITLE_STYLE_PRESETS["viral_karaoke"]).copy()
+    cfg = SUBTITLE_STYLE_PRESETS.get(style_preset, SUBTITLE_STYLE_PRESETS["spur_hook"]).copy()
     if primary_color:
         cfg["primary"] = primary_color
     if active_color:
@@ -141,37 +180,72 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     
     events = []
-    
-    # Word-by-word karaoke lines (NO badge — removed ugly [CHARACTER] top tag)
-    for chunk_idx in range(0, len(words), chunk_size):
-        chunk_words = words[chunk_idx:chunk_idx + chunk_size]
-        chunk_start = start_time + (chunk_idx * word_dur)
-        chunk_end = min(end_time, start_time + ((chunk_idx + len(chunk_words)) * word_dur))
-        
-        # Word-by-word highlight within this chunk
-        for word_in_chunk_idx, active_word in enumerate(chunk_words):
-            global_word_idx = chunk_idx + word_in_chunk_idx
-            w_start = start_time + (global_word_idx * word_dur)
-            w_end = min(end_time, w_start + word_dur)
+
+    if style_preset == "spur_hook":
+        # ── Viral Upper-Third Hook Statement Mode (Matches reference edit) ──
+        # Phase 1: Setup statement (0.0s to drop)
+        # Pivot: "BUT?" (drop - 0.4s to drop)
+        # Phase 2: Climax punchline with Crimson Red keyword emphasis (drop to end)
+        t_drop = drop_time if drop_time and (start_time < drop_time < end_time) else (start_time + total_dur * 0.45)
+        pivot_t = max(start_time + 1.0, t_drop - 0.40)
+
+        if " | " in quote_text:
+            setup_raw, punch_raw = quote_text.split(" | ", 1)
+            setup_words = [w.strip() for w in setup_raw.split() if w.strip()]
+            punch_words = [w.strip() for w in punch_raw.split() if w.strip()]
+        elif len(words) >= 6:
+            mid = len(words) // 2
+            setup_words = words[:mid]
+            punch_words = words[mid:]
+        else:
+            setup_words = words
+            punch_words = words
+
+        # Setup statement line
+        setup_line = _format_spur_line(setup_words, cfg['active_word'], cfg['primary'])
+        ts_0 = format_ass_timestamp(start_time)
+        ts_pivot_start = format_ass_timestamp(pivot_t)
+        events.append(f"Dialogue: 1,{ts_0},{ts_pivot_start},BaseText,,0,0,0,,{{\\fscx106\\fscy106\\t(0,100,\\fscx100\\fscy100)}}{setup_line}")
+
+        # Pivot question line ("BUT?")
+        ts_drop = format_ass_timestamp(t_drop)
+        events.append(f"Dialogue: 1,{ts_pivot_start},{ts_drop},BaseText,,0,0,0,,{{\\fscx118\\fscy118\\t(0,80,\\fscx100\\fscy100)}}{{\\c{cfg['active_word']}&}}BUT?")
+
+        # Punchline statement line (with crimson red emphasis keywords)
+        punch_line = _format_spur_line(punch_words, cfg['active_word'], cfg['primary'])
+        ts_end = format_ass_timestamp(end_time)
+        events.append(f"Dialogue: 1,{ts_drop},{ts_end},BaseText,,0,0,0,,{{\\fscx110\\fscy110\\t(0,100,\\fscx100\\fscy100)}}{punch_line}")
+    else:
+        # Word-by-word karaoke lines
+        for chunk_idx in range(0, len(words), chunk_size):
+            chunk_words = words[chunk_idx:chunk_idx + chunk_size]
+            chunk_start = start_time + (chunk_idx * word_dur)
+            chunk_end = min(end_time, start_time + ((chunk_idx + len(chunk_words)) * word_dur))
             
-            ts_start = format_ass_timestamp(w_start)
-            ts_end = format_ass_timestamp(w_end)
-            
-            # Construct chunk string with highlighted word
-            line_parts = []
-            for j, w in enumerate(chunk_words):
-                w_upper = w.upper()
-                if j == word_in_chunk_idx:
-                    # Active word: Highlighted color + 118% dynamic bounce scale
-                    line_parts.append(
-                        f"{{\\c{cfg['active_word']}\\t(0,100,\\fscx118\\fscy118)\\t(100,200,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
-                    )
-                else:
-                    # Inactive word: Clean white
-                    line_parts.append(f"{{\\c{cfg['primary']}}}{w_upper}")
-                    
-            formatted_line = " ".join(line_parts)
-            events.append(f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{formatted_line}")
+            # Word-by-word highlight within this chunk
+            for word_in_chunk_idx, active_word in enumerate(chunk_words):
+                global_word_idx = chunk_idx + word_in_chunk_idx
+                w_start = start_time + (global_word_idx * word_dur)
+                w_end = min(end_time, w_start + word_dur)
+                
+                ts_start = format_ass_timestamp(w_start)
+                ts_end = format_ass_timestamp(w_end)
+                
+                # Construct chunk string with highlighted word
+                line_parts = []
+                for j, w in enumerate(chunk_words):
+                    w_upper = w.upper()
+                    if j == word_in_chunk_idx:
+                        # Active word: Highlighted color + 118% dynamic bounce scale
+                        line_parts.append(
+                            f"{{\\c{cfg['active_word']}\\t(0,100,\\fscx118\\fscy118)\\t(100,200,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
+                        )
+                    else:
+                        # Inactive word: Clean white
+                        line_parts.append(f"{{\\c{cfg['primary']}}}{w_upper}")
+                        
+                formatted_line = " ".join(line_parts)
+                events.append(f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{formatted_line}")
             
     full_ass = ass_header + "\n".join(events) + "\n"
     with open(output_ass_path, "w", encoding="utf-8") as f:

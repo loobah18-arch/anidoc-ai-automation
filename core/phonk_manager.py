@@ -103,6 +103,14 @@ POPULAR_PHONK_CATALOG = [
         "default_drop": 4.80,
         "audio_offset": 1.00,
     },
+    {
+        "id": "montagem_vozes_profundas",
+        "title": "DJ MAXZZ - MONTAGEM VOZES PROFUNDAS",
+        "genre": "Dark Brazilian Phonk",
+        "bpm": 132.0,
+        "default_drop": 4.80,
+        "audio_offset": 0.00,
+    },
 ]
 
 # Live trending search queries — these rotate per run for max freshness

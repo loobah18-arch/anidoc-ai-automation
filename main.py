@@ -36,9 +36,10 @@ def main():
     parser.add_argument("--universe", type=str, choices=["jjk", "demonslayer", "demon_slayer", "marvel"], default=None, help="Universe filter (jjk, demonslayer, or marvel)")
     parser.add_argument("--duration", type=float, default=DEFAULT_DURATION, help=f"Target video duration in seconds (default: {DEFAULT_DURATION})")
     parser.add_argument("--phonk", type=str, default=None, help="Phonk track name or ID from library (e.g. tokyo_drift_phonk, brazilian_phonk_montagem, dark_shadow_phonk, cyber_phonk_beat, gigachad_phonk)")
-    parser.add_argument("--subtitle-style", type=str, default=None, help="Deprecated (subtitles disabled for 100%% clean video)")
-    parser.add_argument("--subtitles", action="store_true", default=False, help="Deprecated (subtitles disabled for 100%% clean video)")
-    parser.add_argument("--burn-subtitles", action="store_true", default=False, help="Deprecated (subtitles disabled for 100%% clean video)")
+    parser.add_argument("--subtitle-style", type=str, default="spur_hook", help="Subtitle style preset (spur_hook, viral_karaoke, cyber_glow, anime_shrine, cinematic_minimal)")
+    parser.add_argument("--no-subtitles", action="store_true", default=False, help="Disable subtitle burning")
+    parser.add_argument("--subtitles", action="store_true", default=True, help="Enable subtitles (enabled by default)")
+    parser.add_argument("--burn-subtitles", action="store_true", default=True, help="Burn subtitles into video (enabled by default)")
     parser.add_argument("--quote", type=str, default=None, help="Custom dialogue monologue quote")
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
     parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (jjk_void, sukuna_shrine, hinokami_flame, thunder_gold, water_breathing, flame_hashira, akaza_compass, cyber_phonk)")
@@ -83,16 +84,18 @@ def main():
             
     print(f"🔥 [AniDoc 4K Edit] Selected Character: {chosen_char} ({CHARACTER_THEMES[chosen_char]['universe'].upper()})")
     
-    # Render Video (100% Clean Pure Video, Zero Subtitles)
+    # Render Video (with Upper-Third Hook Statement Subtitles matching reference style)
+    burn_subs = not args.no_subtitles
+    sub_style = args.subtitle_style or "spur_hook"
     result = render_cinematic_edit(
         character_key=chosen_char,
         audio_path=Path(args.audio) if args.audio else None,
         phonk_track=args.phonk,
         output_path=Path(args.output) if args.output else None,
         target_duration=args.duration,
-        subtitle_style="viral_karaoke",
-        burn_subtitles=False,
-        enable_subtitles=False,
+        subtitle_style=sub_style,
+        burn_subtitles=burn_subs,
+        enable_subtitles=burn_subs,
         custom_quote=args.quote,
         custom_title=args.title,
         cc_preset=args.cc,
@@ -141,7 +144,7 @@ def main():
     print(f"⏱️  Duration:   {result['duration']:.2f}s ({result['cuts_count']} beat-synced cuts)")
     print(f"💾 File Size:  {result['file_size_kb']} KB")
     print(f"🎧 Audio:      {result.get('audio_used', 'Phonk Audio')}")
-    print(f"✨ Subtitles:  {result.get('subtitle_style', 'viral_karaoke')}")
+    print(f"✨ Subtitles:  {result.get('subtitle_style', 'spur_hook')}")
     print(f"🎨 Color CC:   {result.get('cc_preset', 'marvel_hdr')}")
     print(f"🏷️  Title:      {metadata['title']}")
     print("=======================================================\n")

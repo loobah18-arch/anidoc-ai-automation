@@ -38,6 +38,7 @@ on:
           - 'nxght_blue_horizon_funk'
           - 'trashxrl_deus_do_olimpo'
           - 'irokz_funk_universo_slowed'
+          - 'montagem_vozes_profundas'
       gdrive_folder:
         description: 'Google Drive folder link or ID containing raw movies/episodes (optional)'
         required: false

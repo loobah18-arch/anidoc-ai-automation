@@ -135,21 +135,21 @@ class TestAniDocPipeline(unittest.TestCase):
 
     def test_05_word_by_word_karaoke_subtitles(self):
         ass_out = SCRATCH_DIR / "test_subs.ass"
-        for style in ["viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"]:
+        for style in ["spur_hook", "viral_karaoke", "cyber_glow", "anime_shrine", "cinematic_minimal"]:
             generate_kinetic_subtitles(
                 quote_text="Throughout heaven and earth I alone am the honored one",
                 start_time=0.5,
                 end_time=5.5,
                 output_ass_path=ass_out,
                 style_preset=style,
-                character_name="GOJO"
+                character_name="GOJO",
+                drop_time=2.5
             )
             self.assertTrue(ass_out.exists())
             with open(ass_out, "r", encoding="utf-8") as f:
                 content = f.read()
                 self.assertIn("[Script Info]", content)
                 self.assertIn("HONORED", content)
-                # Note: character badge removed from subtitles (cleaner look)
                 self.assertIn("BaseText", content)
 
     def test_06_procedural_scene_rendering(self):
