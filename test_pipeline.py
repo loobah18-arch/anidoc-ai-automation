@@ -257,12 +257,10 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("lutyuv=y='if(gt(val,185),val,0)'", bloom)
         self.assertIn("blend=all_mode=addition:all_opacity=0.30", bloom)
 
-        # 5. Heavy Drop Impacts (2-frame shake, RGB chromatic aberration split & 15% white flash)
+        # 5. Heavy Drop Impacts (2-frame 25% white exposure burst, clean without chromashift or neighbor scaling)
         impacts = build_heavy_drop_impact_filters([4.80, 12.50])
-        self.assertEqual(len(impacts), 6)  # 2 timestamps x (1 shake + 1 chromashift + 1 flash)
-        self.assertTrue(any("crop=w=iw-24:h=ih-24" in f for f in impacts))
-        self.assertTrue(any("chromashift=cbh=10:crh=-10" in f for f in impacts))
-        self.assertTrue(any("color=white@0.15" in f for f in impacts))
+        self.assertEqual(len(impacts), 2)  # 2 timestamps x 1 flash
+        self.assertTrue(any("color=white@0.25" in f for f in impacts))
 
         # 6. SceneScorer OpenCV module
         from core.scene_scorer import SceneScorer
@@ -316,14 +314,14 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("if(lt(T", expr)
         self.assertIn("TB", expr)
 
-        # 2. Velocity filter with Bézier ramping and tblend motion blur
+        # 2. Velocity filter with Bézier ramping (clean anime frames without tblend ghosting)
         vf = build_velocity_clip_filter(
             seg_idx=1,
             duration=1.2,
             speed=1.25,
             use_bezier_velocity=True
         )
-        self.assertIn("tblend=all_mode=average", vf)
+        self.assertNotIn("tblend=all_mode=average", vf)
         self.assertIn("setpts=", vf)
 
         # 3. Pre-Drop Audio Vacuum filter (low-cut riser + dead-silence vacuum + bass boost)
@@ -347,20 +345,20 @@ class TestAniDocPipeline(unittest.TestCase):
             MODERN_OUTRO_TRANSITIONS
         )
         self.assertTrue(len(MODERN_COMBAT_TRANSITIONS) >= 5)
-        self.assertIn("hlslice", MODERN_COMBAT_TRANSITIONS)
-        self.assertIn("diagtl", MODERN_COMBAT_TRANSITIONS)
-        self.assertIn("fadewhite", MODERN_DROP_TRANSITIONS)
+        self.assertIn("smoothleft", MODERN_COMBAT_TRANSITIONS)
+        self.assertIn("smoothright", MODERN_COMBAT_TRANSITIONS)
+        self.assertIn("zoomin", MODERN_DROP_TRANSITIONS)
 
         # Chained filter with drop index and outro
         durs = [1.5, 1.2, 0.8, 1.0, 1.4]
         xf = build_xfade_transition_filter(
             clip_count=len(durs),
             durations=durs,
-            transition_duration=0.12,
+            transition_duration=0.15,
             drop_index=2
         )
         self.assertIn("xfade=transition=", xf)
-        self.assertIn("duration=0.12", xf)
+        self.assertIn("duration=0.15", xf)
         self.assertIn("[xfade_vout]", xf)
 
 

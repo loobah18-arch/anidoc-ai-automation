@@ -149,6 +149,7 @@ def render_cinematic_edit(
     durations = [seg["duration"] for seg in segments]
     drop_flags = [seg["is_drop"] for seg in segments]
     n_clips = len(segments)
+    drop_idx = next((i for i, seg in enumerate(segments) if seg["start"] >= drop_t - 0.05), 2)
 
     universe_dir = SCRATCH_DIR / theme.get("universe", "marvel")
     universe_dir.mkdir(parents=True, exist_ok=True)
@@ -179,7 +180,8 @@ def render_cinematic_edit(
                 target_character=character_key,
                 output_dir=universe_dir,
                 n_clips=n_clips + 4,
-                title=title_text
+                title=title_text,
+                drop_index=drop_idx
             )
             if gdrive_clips:
                 clip_paths = gdrive_clips
@@ -356,15 +358,18 @@ def render_cinematic_edit(
                 }
         print("⚠️ [OpenSourceEditor] editly render did not complete. Falling back to native FFmpeg xfade engine.")
 
-    # Build per-clip video filters with clean cinematic widescreen framing & velocity curves
+    # 2026 Buttery-Smooth AMV Transitions with Zero-Drift Handle Compensation
+    # Each clip (except final) receives +0.15s handle to perfectly maintain 100% beat sync without drift.
+    trans_dur = 0.15
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         is_intro_hook = (idx == 0)
         use_bezier = vel_profile.get("use_bezier_velocity", False)
+        clip_render_dur = seg["duration"] + (trans_dur if idx < len(segments) - 1 else 0.0)
 
         clip_vf = build_velocity_clip_filter(
             seg_idx=idx,
-            duration=seg["duration"],
+            duration=clip_render_dur,
             speed=vel_profile["speed"],
             scale_factor=vel_profile["scale_factor"],
             video_width=VIDEO_WIDTH,
@@ -390,10 +395,16 @@ def render_cinematic_edit(
         filter_chains.append(a_chain)
         concat_a_inputs.append(f"[a{idx}]")
 
-    # 2026 Modern AMV xfade transitions (snappy 0.12s katana slashes + 808 drop white flash)
+    # 2026 Modern AMV xfade transitions (smooth directional movement & kinetic zooms, zero random flashes)
     seg_durs = [s["duration"] for s in segments]
     drop_idx = sum(1 for s in segments if not s.get("is_drop", False))
-    xfade_chain = build_xfade_transition_filter(len(clip_paths), seg_durs, transition_duration=0.12, drop_index=drop_idx)
+    xfade_chain = build_xfade_transition_filter(
+        len(clip_paths),
+        seg_durs,
+        transition_duration=trans_dur,
+        drop_index=drop_idx,
+        use_handle_compensation=True
+    )
     if xfade_chain and len(clip_paths) >= 2:
         filter_chains.append(xfade_chain)
         video_src_tag = "[xfade_vout]"
@@ -405,25 +416,14 @@ def render_cinematic_edit(
     concat_a_str = "".join(concat_a_inputs) + f"concat=n={len(clip_paths)}:v=0:a=1[clip_sfx_raw]"
     filter_chains.append(concat_a_str)
 
-    # ── Heavy Drop Impact Shake & RGB Chromatic Aberration Split (top 30% loudest hits) ──
-    heavy_drops = beat_grid.get_heavy_drop_timestamps()
-    impact_filters = build_heavy_drop_impact_filters(heavy_drops, duration=0.033, flash_opacity=0.15, chroma_shift_px=10)
-    impact_str = ",".join(impact_filters) if impact_filters else ""
-
-    # Vibrant Anime Glow Color Grading + Beat Flashes (Zero intrusive text banners)
+    # Vibrant Anime Glow Color Grading (Zero random flashes / strobe per pro tutorials)
     vibrant_cc = build_cc_filter(active_cc)
-    flash_filters = build_beat_flash_filters(beat_grid.beat_times, flash_duration=0.08, opacity=0.75)
-    flash_str = ",".join(flash_filters) if flash_filters else ""
-
-    overlay_parts = [p for p in [impact_str, flash_str, vibrant_cc] if p]
-    overlay_chain = ",".join(overlay_parts)
-
     filter_chains.append(
-        f"{video_src_tag}{overlay_chain}[vout]"
+        f"{video_src_tag}{vibrant_cc}[vout]"
     )
 
     # Audio Dynamic Structure:
-    # 85% Dominant Phonk BGM / 15% Subtle Anime Combat SFX
+    # 75% Dominant Phonk BGM / 25% Crisp Anime Combat SFX
     # Pre-Drop Audio Vacuum (0.55s highpass riser + 0.16s dead silence + 808 drop sub-boost)
     # Katana Combat Foley transient presence on cut onsets
     # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
@@ -431,9 +431,9 @@ def render_cinematic_edit(
     combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
     combat_foley_fx = build_combat_foley_audio_filter(combat_times, drop_t)
     filter_chains.append(
-        f"[clip_sfx_raw]volume=0.30,{combat_foley_fx},highpass=f=80,lowpass=f=12000[clip_sfx_balanced];"
+        f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=120,lowpass=f=12000[clip_sfx_balanced];"
         f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.25[phonk_full];"
-        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=85 15:dropout_transition=2,"
+        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=75 25:dropout_transition=2,"
         f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
 

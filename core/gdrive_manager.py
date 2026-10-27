@@ -47,8 +47,8 @@ CHARACTER_EPISODE_PREFERENCES = {
     "todo": ["s02e21", "s02e20", "s02e19", "s02e18", "s01e20", "todo"],                 # Double Black Flash, Boogie Woogie
     "nobara": ["s02e19", "s01e24", "s01e03", "nobara"],                                 # Resonance vs Mahito, Death Painting
     "choso": ["s02e13", "s01e24", "choso", "shibuya"],                                   # Choso vs Yuji bathroom brawl, Death Painting
-    # Demon Slayer (Kimetsu no Yaiba) Preferences
-    "tanjiro": ["entertainment", "mugen", "swordsmith", "hashira", "hinokami", "e19", "e10", "e11", "e08", "e01"],
+    # Demon Slayer (Kimetsu no Yaiba) Preferences - Prioritizes top combat episodes (Hinokami Kagura, Entertainment District, Mugen Train)
+    "tanjiro": ["hinokami", "e19", "entertainment", "mugen", "swordsmith", "hashira", "e10", "e11", "e08"],
     "rengoku": ["mugen", "train", "akaza", "rengoku", "e07", "e06", "e05"],
     "akaza": ["mugen", "train", "akaza", "rengoku", "e06", "e07", "hashira"],
     "zenitsu": ["thunder", "zenitsu", "e12", "e17", "entertainment", "e10", "spider"],
@@ -220,14 +220,18 @@ def pick_best_file_for_character(
         except Exception as e:
             print(f"⚠️ [GoogleDrive] Title-based file matching error: {e}")
 
-    # 3. Match character episode preferences within the character's universe
+    # 3. Match character episode preferences in strict priority order
     prefs = CHARACTER_EPISODE_PREFERENCES.get(character_key, [character_key])
     eligible_files = []
 
-    for f in universe_files:
-        clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
-        if any(pref in clean_name or pref in f["name"].lower() for pref in prefs):
-            eligible_files.append(f)
+    for pref in prefs:
+        for f in universe_files:
+            clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
+            if (pref in clean_name or pref in f["name"].lower()) and f not in eligible_files:
+                eligible_files.append(f)
+        if len(eligible_files) >= 3:
+            # Top-tier preference matches found (e.g. Hinokami Kagura or Shibuya Climax)
+            break
 
     if not eligible_files:
         eligible_files = universe_files
@@ -412,7 +416,8 @@ def slice_action_moments_from_source(
     output_dir: Path,
     n_clips: int = 15,
     clip_duration: float = 3.2,
-    title: Optional[str] = None
+    title: Optional[str] = None,
+    drop_index: Optional[int] = None
 ) -> List[Path]:
     """
     Hybrid Action Slicer: Combines curated iconic/epic episode timestamps from metadata analysis
@@ -458,11 +463,11 @@ def slice_action_moments_from_source(
     # Short clips (<=300s): skip last 15s
     start_bound = 95.0 if total_duration > 600 else (10.0 if total_duration > 60 else 1.0)
     if total_duration > 3600:
-        end_bound = total_duration - 360.0
+        end_bound = total_duration - 240.0
     elif total_duration > 600:
-        end_bound = total_duration - 210.0
+        end_bound = total_duration - 45.0  # Retain final 3.5 minutes so climax battles (Kamado song, decapitations) are never cut off
     elif total_duration > 300:
-        end_bound = total_duration - 90.0
+        end_bound = total_duration - 30.0
     elif total_duration > 60:
         end_bound = total_duration - 15.0
     else:
@@ -536,8 +541,21 @@ def slice_action_moments_from_source(
             seen_ranges.add(key)
 
             scene_len = max(clip_duration, en - st)
+            action_lvl = str(s.get("action_level", "MODERATE")).upper()
+            is_explosive = action_lvl == "EXPLOSIVE" or float(s.get("action_score", 0.0)) >= 0.90
+
             if scene_len <= clip_duration * 1.5:
                 pts = [st]
+            elif is_explosive:
+                # Sample up to 6 evenly spaced clips across the explosive scene
+                # so NO single scene can monopolize the candidate pool!
+                max_clips_per_scene = 6
+                step = max(clip_duration * 1.5, scene_len / max_clips_per_scene)
+                pts = []
+                cur_t = st
+                while cur_t + clip_duration <= en and len(pts) < max_clips_per_scene:
+                    pts.append(round(cur_t, 2))
+                    cur_t += step
             elif scene_len <= 15.0:
                 mid = st + (scene_len - clip_duration) * 0.45
                 pts = [mid]
@@ -657,36 +675,36 @@ def slice_action_moments_from_source(
 
     # ── Phase 3: Hybrid Merge (Curated Climax + OpenCV Vision + Audio Clash) ──
     curated_candidates.sort(key=lambda x: x["score"], reverse=True)
+    # If explosive/high-action sakuga candidates alone can fill the edit, use only pure sakuga!
+    explosive_curated = [c for c in curated_candidates if c["score"] >= 100.0]
+    candidate_source = explosive_curated if len(explosive_curated) >= n_clips else curated_candidates
     final_candidates = []
 
-    # Allocate up to 50% to curated scenes if available
-    curated_quota = min(len(curated_candidates), max(3, int(n_clips * 0.50))) if curated_candidates else 0
-    for c in curated_candidates[:curated_quota]:
-        if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
-            final_candidates.append(c)
-
-    # Add top OpenCV vision motion & climax candidates (verified non-dark, high movement)
-    for cv in cv_candidates:
+    # 1. 100% Curated Priority: Use all curated sakuga moments first!
+    # They are verified canonical sakuga/combat moments that fans actually want to see.
+    for c in candidate_source:
         if len(final_candidates) >= n_clips + 8:
             break
-        if not any(abs(cv["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
-            final_candidates.append(cv)
-
-    # Fill with top dynamic audio combat scenes (verified free of black/credit voids)
-    for a in audio_candidates:
-        if len(final_candidates) >= n_clips + 12:
-            break
-        if is_black_or_credit_frame(video_path, a["start"]):
-            continue
-        if not any(abs(a["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
-            final_candidates.append(a)
-
-    # Fill any remaining quota with extra curated scenes
-    for c in curated_candidates[curated_quota:]:
-        if len(final_candidates) >= n_clips + 12:
-            break
         if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
             final_candidates.append(c)
+
+    # 2. Add OpenCV vision motion & climax candidates ONLY if more clips are needed
+    if len(final_candidates) < n_clips + 8:
+        for cv in cv_candidates:
+            if len(final_candidates) >= n_clips + 8:
+                break
+            if not any(abs(cv["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+                final_candidates.append(cv)
+
+    # 3. Add dynamic audio combat scenes if still needed
+    if len(final_candidates) < n_clips + 12:
+        for a in audio_candidates:
+            if len(final_candidates) >= n_clips + 12:
+                break
+            if is_black_or_credit_frame(video_path, a["start"]):
+                continue
+            if not any(abs(a["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+                final_candidates.append(a)
 
     # Safe fallback if too few candidates met strict thresholds
     if len(final_candidates) < n_clips:
@@ -707,37 +725,94 @@ def slice_action_moments_from_source(
     print(f"🎬 [ActionSlicer] Total hybrid candidate pool: {len(final_candidates)} scenes (Curated + OpenCV Vision + Audio).")
 
     # ── Phase 4: Intelligent Scene Orchestration for Beat Drops ───────────────
-    # The #1 loudest / most epic climax scene is mapped to the Beat Drop (index 4)
+    # The #1 loudest / most epic climax scene is mapped to the Beat Drop (index 4 or drop_idx)
     # The #2 scene is mapped to the Bridge Drop (~index 22 or 12)
     # The #3 scene is mapped to the Climax Outro Finisher (last clip)
-    # Intro Hook Enforcement: Intro clip 00 is forced to have active movement (intro_hook_cand)
-    drop_idx = min(4, max(0, n_clips - 1))
-    bridge_idx = min(22, max(0, n_clips - 2)) if n_clips > 24 else min(12, max(0, n_clips - 2))
+    if drop_index is not None and 0 <= drop_index < n_clips:
+        drop_idx = drop_index
+    else:
+        drop_idx = min(2, max(0, n_clips - 1))
+    bridge_idx = min(n_clips - 4, max(drop_idx + 2, int(n_clips * 0.7))) if n_clips > 6 else max(0, n_clips - 2)
     last_idx = n_clips - 1
 
-    drop_climax = final_candidates[0]
-    sec_drop = final_candidates[1] if len(final_candidates) > 1 else final_candidates[0]
-    finisher = final_candidates[2] if len(final_candidates) > 2 else final_candidates[0]
-    remaining_cand = final_candidates[3:] if len(final_candidates) > 3 else final_candidates
+    # Find the drop climax: signature primary attack (e.g. Fire Dragon, Domain Expansion, Sixfold Lightning)
+    drop_candidates = [
+        c for c in final_candidates
+        if any(kw in c.get("description", "").lower() for kw in ["dragon", "enbu", "giant fire", "domain expansion", "hollow purple", "sixfold", "musical score", "ninth form"])
+    ]
+    if drop_candidates:
+        drop_climax = max(drop_candidates, key=lambda x: x["score"])
+    else:
+        drop_climax = final_candidates[0]
 
-    # Sort remaining into intro (lowest score dialogue/walk) and combat (high energy clashes)
-    sorted_by_energy = sorted(remaining_cand, key=lambda x: x["score"])
-    intro_pool = sorted_by_energy[:drop_idx]
-    combat_pool = sorted_by_energy[drop_idx:] if len(sorted_by_energy) > drop_idx else sorted_by_energy
+    # Find the true finisher: scene with 'decapitation', 'neck', 'slash', or latest timestamp among explosive candidates
+    finisher_candidates = [
+        c for c in final_candidates
+        if c != drop_climax and any(kw in c.get("description", "").lower() for kw in ["decapitat", "neck", "sever", "cleave", "circular slash", "kamado song", "wolf hunt"])
+    ]
+    if finisher_candidates:
+        finisher = max(finisher_candidates, key=lambda x: x["start"])
+    elif len(final_candidates) > 2:
+        finisher = final_candidates[-1]
+    else:
+        finisher = final_candidates[0]
+
+    # Find secondary drop (bridge drop)
+    sec_candidates = [
+        c for c in final_candidates
+        if c != drop_climax and c != finisher and any(kw in c.get("description", "").lower() for kw in ["exploding blood", "bakketsu", "pink", "boogie woogie", "godspeed", "destructive death"])
+    ]
+    if sec_candidates:
+        sec_drop = max(sec_candidates, key=lambda x: x["score"])
+    elif len(final_candidates) > 1:
+        other_candidates = [c for c in final_candidates if c != drop_climax and c != finisher]
+        sec_drop = other_candidates[0] if other_candidates else final_candidates[1]
+    else:
+        sec_drop = drop_climax
+
+    # Find intro candidates: clips chronologically before drop_climax, or intent/breath/blade
+    intro_candidates = [
+        c for c in final_candidates
+        if c not in (drop_climax, sec_drop, finisher) and (
+            c["start"] < drop_climax["start"] or any(kw in c.get("description", "").lower() for kw in ["shift", "breath", "ignit", "awaken", "flame sword", "blade", "intent", "eye"])
+        )
+    ]
+    if len(intro_candidates) >= drop_idx:
+        intro_pool = intro_candidates[:drop_idx]
+    else:
+        remaining_cand = [c for c in final_candidates if c not in (drop_climax, sec_drop, finisher)]
+        sorted_by_energy = sorted(remaining_cand, key=lambda x: x["score"])
+        intro_pool = sorted_by_energy[:drop_idx]
+    intro_pool.sort(key=lambda x: x["start"])
+
+    # Combat pool for clips AFTER the drop: prefer clips chronologically >= drop_climax['start']
+    post_drop_candidates = [
+        c for c in final_candidates
+        if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c["start"] >= drop_climax["start"]
+    ]
+    post_drop_candidates.sort(key=lambda x: x["start"])
+
+    other_combat = [
+        c for c in final_candidates
+        if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c not in post_drop_candidates
+    ]
+    other_combat.sort(key=lambda x: x["start"])
+    combat_pool = post_drop_candidates + other_combat
 
     selected = [None] * n_clips
     for i in range(min(drop_idx, len(intro_pool))):
         selected[i] = intro_pool[i]
 
-    # Force active intro hook if available
-    if intro_hook_cand:
-        selected[0] = {
-            "start": intro_hook_cand["start"],
-            "score": intro_hook_cand["score"],
-            "description": "Active Intro Hook Shot",
-            "tag": "🎯 Intro Hook",
-            "is_curated": False
-        }
+    # Force active intro hook only if no curated intro exists
+    if intro_hook_cand and (not selected[0] or not selected[0].get("is_curated")):
+        if not any(c.get("is_curated") for c in selected if c):
+            selected[0] = {
+                "start": intro_hook_cand["start"],
+                "score": intro_hook_cand["score"],
+                "description": "Active Intro Hook Shot",
+                "tag": "🎯 Intro Hook",
+                "is_curated": False
+            }
 
     selected[drop_idx] = drop_climax
     selected[bridge_idx] = sec_drop
@@ -818,7 +893,8 @@ def fetch_and_prepare_gdrive_footage(
     target_character: str,
     output_dir: Path,
     n_clips: int = 15,
-    title: Optional[str] = None
+    title: Optional[str] = None,
+    drop_index: Optional[int] = None
 ) -> List[Path]:
     """
     Lightning-Fast Non-Repetitive Google Drive Ingestion:
@@ -850,7 +926,8 @@ def fetch_and_prepare_gdrive_footage(
         character_key=target_character,
         output_dir=output_dir,
         n_clips=n_clips,
-        title=title
+        title=title,
+        drop_index=drop_index
     )
 
     return sliced_clips

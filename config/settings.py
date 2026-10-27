@@ -39,10 +39,10 @@ DEFAULT_DURATION = 28.0  # Perfect 28.0s duration: 5s buildup + 23s drop combat 
 
 # Clean Cinematic Widescreen Framing (Preserves 100% anime choreography with letterbox bars)
 FRAMING_MODE = "cinematic_widescreen"
-LETTERBOX_TOP_BAR = 656
-LETTERBOX_BOT_BAR = 656
-ACTIVE_FRAME_HEIGHT = 608
-LETTERBOX_BAR_HEIGHT = 656
+LETTERBOX_TOP_BAR = 285
+LETTERBOX_BOT_BAR = 285
+ACTIVE_FRAME_HEIGHT = 1350
+LETTERBOX_BAR_HEIGHT = 285
 
 # Color Grading (CC) Presets — Vibrant Anime Glow (HDR-style highlights, no crushed-black mud)
 CC_PRESETS = {
@@ -94,25 +94,25 @@ CC_PRESETS = {
         "accent_color": "#FFFFFF"
     },
     "sukuna_crimson": {
-        "contrast": 1.38,
-        "brightness": -0.07,
-        "saturation": 0.75,
-        "gamma": 0.84,
-        "colorbalance": "rs=0.22:gs=-0.06:bs=-0.14:rm=0.15:gm=-0.04:bm=-0.08",
-        "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/3.6",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=0.10:gs=-0.02:bs=-0.06:rm=0.08:gm=-0.02:bm=-0.04",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H003333FF",
         "accent_color": "#FF2233"
     },
     # ── Primary dual-tone presets (cool blue ↔ warm red alternation) ──
     "cool_blue": {
-        "contrast": 1.40,
-        "brightness": -0.08,
-        "saturation": 0.65,
-        "gamma": 0.82,
-        "colorbalance": "rs=-0.15:gs=0.05:bs=0.20:rm=-0.08:gm=0.02:bm=0.12",
-        "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/3.8",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=-0.06:gs=0.02:bs=0.08:rm=-0.04:gm=0.01:bm=0.06",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H00D2FF00",  # Cyan
         "accent_color": "#00D2FF"
     },
@@ -197,24 +197,24 @@ CC_PRESETS = {
         "accent_color": "#00D2FF"
     },
     "jjk_void": {
-        "contrast": 1.42,
-        "brightness": -0.09,
-        "saturation": 0.60,
-        "gamma": 0.80,
-        "colorbalance": "rs=0.10:gs=-0.05:bs=0.18:rm=0.08:gm=-0.03:bm=0.14",
-        "unsharp": "5:5:1.4:5:5:0.0",
-        "vignette": "PI/3.8",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=0.05:gs=-0.02:bs=0.08:rm=0.04:gm=-0.01:bm=0.06",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H00FF55D2",
         "accent_color": "#D200FF"
     },
     "sukuna_shrine": {
-        "contrast": 1.40,
-        "brightness": -0.08,
-        "saturation": 0.65,
-        "gamma": 0.83,
-        "colorbalance": "rs=0.18:gs=-0.06:bs=-0.12:rm=0.14:gm=-0.04:bm=-0.08",
-        "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/3.8",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=0.08:gs=-0.02:bs=-0.05:rm=0.06:gm=-0.02:bm=-0.03",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H003333FF",
         "accent_color": "#FF2233"
     },
@@ -231,68 +231,68 @@ CC_PRESETS = {
     },
     # ── Demon Slayer (Kimetsu no Yaiba) Presets ──
     "hinokami_flame": {
-        "contrast": 1.42,
-        "brightness": -0.06,
-        "saturation": 0.80,
-        "gamma": 0.82,
-        "colorbalance": "rs=0.25:gs=0.02:bs=-0.16:rm=0.18:gm=0.01:bm=-0.10",
-        "unsharp": "5:5:1.4:5:5:0.0",
-        "vignette": "PI/3.6",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=0.10:gs=0.01:bs=-0.08:rm=0.08:gm=0.01:bm=-0.05",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H001166FF",  # Sun Breathing Orange-Flame
         "accent_color": "#FF6611"
     },
     "thunder_gold": {
-        "contrast": 1.45,
-        "brightness": -0.05,
-        "saturation": 0.75,
-        "gamma": 0.85,
-        "colorbalance": "rs=0.18:gs=0.15:bs=-0.20:rm=0.12:gm=0.10:bm=-0.14",
-        "unsharp": "5:5:1.4:5:5:0.0",
-        "vignette": "PI/3.8",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=0.08:gs=0.06:bs=-0.10:rm=0.06:gm=0.04:bm=-0.06",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H0000D7FF",  # Electric Golden Amber
         "accent_color": "#FFD700"
     },
     "water_breathing": {
-        "contrast": 1.38,
-        "brightness": -0.07,
-        "saturation": 0.72,
-        "gamma": 0.84,
-        "colorbalance": "rs=-0.16:gs=0.06:bs=0.24:rm=-0.10:gm=0.04:bm=0.16",
-        "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/3.8",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=-0.08:gs=0.03:bs=0.10:rm=-0.05:gm=0.02:bm=0.08",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H00FFFF00",  # Oceanic Cyan / Aqua
         "accent_color": "#00FFFF"
     },
     "flame_hashira": {
-        "contrast": 1.44,
-        "brightness": -0.06,
-        "saturation": 0.82,
-        "gamma": 0.80,
-        "colorbalance": "rs=0.28:gs=-0.04:bs=-0.18:rm=0.20:gm=-0.02:bm=-0.12",
-        "unsharp": "5:5:1.4:5:5:0.0",
-        "vignette": "PI/3.5",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=0.12:gs=-0.02:bs=-0.08:rm=0.10:gm=-0.01:bm=-0.05",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H001133FF",  # Fiery Crimson Flame
         "accent_color": "#FF3311"
     },
     "akaza_compass": {
-        "contrast": 1.40,
-        "brightness": -0.08,
-        "saturation": 0.65,
-        "gamma": 0.82,
-        "colorbalance": "rs=0.08:gs=-0.06:bs=0.22:rm=0.05:gm=-0.04:bm=0.16",
-        "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/3.8",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=0.04:gs=-0.03:bs=0.10:rm=0.03:gm=-0.02:bm=0.08",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H00E020D0",  # Snowflake Cyan / Magenta
         "accent_color": "#D020E0"
     },
     "beast_breathing": {
-        "contrast": 1.40,
-        "brightness": -0.07,
-        "saturation": 0.65,
-        "gamma": 0.83,
-        "colorbalance": "rs=-0.12:gs=0.04:bs=0.18:rm=-0.08:gm=0.02:bm=0.12",
-        "unsharp": "5:5:1.3:5:5:0.0",
-        "vignette": "PI/3.8",
+        "contrast": 1.15,
+        "brightness": 0.01,
+        "saturation": 1.25,
+        "gamma": 1.12,
+        "colorbalance": "rs=-0.06:gs=0.02:bs=0.08:rm=-0.04:gm=0.01:bm=0.06",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
         "primary_color": "&H00D2FF00",  # Wild Beast Indigo/Cyan
         "accent_color": "#00FFD2"
     }

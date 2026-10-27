@@ -21,25 +21,19 @@ XFADE_TRANSITIONS = [
     "squeezeh"
 ]
 
-# 2026 Modern AMV Transitions (Katana slashes, directional whips, kinetic zoom punches)
+# 2026 Modern AMV Transitions (Smooth directional movement, kinetic punches, and clean optical dissolves; no harsh blinds or flashes)
 MODERN_COMBAT_TRANSITIONS = [
-    "hlslice",     # Horizontal katana slash cut
-    "hrslice",     # Reverse horizontal slash cut
-    "diagtl",      # Diagonal top-left katana slash
-    "diagbr",      # Diagonal bottom-right katana slash
-    "hblur",       # High-speed horizontal motion-blur whip
-    "zoomin",      # Kinetic punch zoom forward into strike
-    "smoothleft",  # Directional whip pan left following blade swing
-    "smoothright", # Directional whip pan right following blade swing
-    "squeezeh",    # Fast horizontal compression snap
-    "distance"     # 3D spatial push warp
+    "smoothleft",   # Smooth horizontal camera pan left following blade swing
+    "smoothright",  # Smooth horizontal camera pan right following blade swing
+    "zoomin",       # Kinetic punch zoom forward into strike
+    "dissolve",     # Clean seamless optical dissolve
+    "wipeleft",     # Clean directional wipe
 ]
 
-# Beat drop transition impact
+# Beat drop transition impact (Zero strobe / white flash)
 MODERN_DROP_TRANSITIONS = [
-    "fadewhite",   # Signature 2026 white exposure burst on 808 drop
-    "zoomin",      # Hyper-velocity punch zoom
-    "distance"     # Spatial impact push
+    "zoomin",      # Hyper-velocity punch zoom into beat drop
+    "dissolve",    # Smooth dramatic impact dissolve
 ]
 
 # Outro resolution transition
@@ -52,22 +46,24 @@ MODERN_OUTRO_TRANSITIONS = [
 def build_xfade_transition_filter(
     clip_count: int,
     durations: List[float],
-    transition_duration: float = 0.12,
+    transition_duration: float = 0.15,
     custom_transitions: Optional[List[str]] = None,
-    drop_index: Optional[int] = None
+    drop_index: Optional[int] = None,
+    use_handle_compensation: bool = True
 ) -> str:
     """
-    Constructs a chained FFmpeg xfade filtergraph with 2026 Modern AMV transitions:
-    - Beat Drop Transition (at drop_index): High-impact 'fadewhite' or 'zoomin' flash.
-    - Combat Cuts: Ultra-snappy 0.12s katana slashes (hlslice, diagtl, diagbr, hblur, zoomin).
+    Constructs a chained FFmpeg xfade filtergraph with buttery-smooth 2026 transitions:
+    - Beat Drop Transition (at drop_index): Smooth kinetic 'zoomin' or 'dissolve' (zero random flash).
+    - Combat Cuts: Smooth directional pans and kinetic punches (smoothleft, smoothright, zoomin, dissolve, wipeleft).
     - Outro (final cut): Cinematic fadeblack on the final climax resolution cut.
-    - Formula: offset_i = offset_{i-1} + dur_{i} - transition_duration
+    - Zero-Drift Sync Formula: With handle compensation, transition offset_i = sum(durations[:i])
+      matching musical beats with 0.00ms cumulative error.
     """
     if clip_count < 2:
         return ""
 
     filter_parts = []
-    current_offset = durations[0] - transition_duration
+    current_offset = durations[0] if use_handle_compensation else max(0.1, durations[0] - transition_duration)
     last_v = "[v0]"
     
     for i in range(1, clip_count):
@@ -91,7 +87,10 @@ def build_xfade_transition_filter(
         )
         last_v = out_v
         if i < len(durations) - 1:
-            current_offset += durations[i] - transition_duration
+            if use_handle_compensation:
+                current_offset += durations[i]
+            else:
+                current_offset += durations[i] - transition_duration
 
     return ";".join(filter_parts)
 
