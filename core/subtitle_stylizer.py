@@ -101,7 +101,10 @@ EMPHASIS_KEYWORDS = {
     "CALAMITY", "POWER", "FATAL", "FLAME", "AWAKENED", "KILLER", "MASSACRE",
     "BLOOD", "DRAGON", "DESTRUCTION", "CINEMA", "TEENAGERS", "FIGHT", "BRO",
     "SLAYER", "HOLLOW", "DOMAIN", "EXPANSION", "FIRE", "RED", "SOUL", "MALEVOLENT",
-    "DEATH", "VOICES", "INFINITY", "THUNDER", "LIGHTNING", "AURA", "RAGE"
+    "DEATH", "VOICES", "INFINITY", "THUNDER", "LIGHTNING", "AURA", "RAGE",
+    "SURVIVE", "SURVIVES", "DEFEAT", "WIN", "WINS", "STRONGER", "WEAK", "WARRIOR",
+    "COLDEST", "CRAZIEST", "BEAST", "GENIUS", "CHAOS", "GODSPEED", "1V1",
+    "SOLO", "DEADLIEST", "PRIME", "BEST", "PEAK", "PRODIGY", "POISON", "UNTOUCHABLE"
 }
 
 
@@ -193,6 +196,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             setup_raw, punch_raw = quote_text.split(" | ", 1)
             setup_words = [w.strip() for w in setup_raw.split() if w.strip()]
             punch_words = [w.strip() for w in punch_raw.split() if w.strip()]
+            if punch_words and punch_words[0].upper() in ("OR", "BUT"):
+                punch_words = punch_words[1:]
         elif len(words) >= 6:
             mid = len(words) // 2
             setup_words = words[:mid]
@@ -207,9 +212,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         ts_pivot_start = format_ass_timestamp(pivot_t)
         events.append(f"Dialogue: 1,{ts_0},{ts_pivot_start},BaseText,,0,0,0,,{{\\fscx106\\fscy106\\t(0,100,\\fscx100\\fscy100)}}{setup_line}")
 
-        # Pivot question line ("BUT?")
+        # Pivot question line ("OR?" if question asks "or", else "BUT?")
+        pivot_word = "OR?" if " OR " in quote_text.upper() else "BUT?"
         ts_drop = format_ass_timestamp(t_drop)
-        events.append(f"Dialogue: 1,{ts_pivot_start},{ts_drop},BaseText,,0,0,0,,{{\\fscx118\\fscy118\\t(0,80,\\fscx100\\fscy100)}}{{\\c{cfg['active_word']}&}}BUT?")
+        events.append(f"Dialogue: 1,{ts_pivot_start},{ts_drop},BaseText,,0,0,0,,{{\\fscx118\\fscy118\\t(0,80,\\fscx100\\fscy100)}}{{\\c{cfg['active_word']}&}}{pivot_word}")
 
         # Punchline statement line (with crimson red emphasis keywords)
         punch_line = _format_spur_line(punch_words, cfg['active_word'], cfg['primary'])

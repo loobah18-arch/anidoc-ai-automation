@@ -76,6 +76,128 @@ def _get_benchmark_concepts_for_character(baselines: Dict[str, Any], character_k
             })
     return concepts
 
+
+# ═══════════════════════════════════════════════════════════════════
+# HIGH-RETENTION VIRAL ENGAGEMENT DEBATE QUESTIONS (YouTube Shorts & Reels)
+# Formatted as: "Setup Premise before drop | Debate Question after drop?"
+# ═══════════════════════════════════════════════════════════════════
+CHARACTER_ENGAGEMENT_QUESTIONS: Dict[str, List[str]] = {
+    # ── Jujutsu Kaisen Universe ──
+    "gojo": [
+        "COULD ANYONE ACTUALLY BEAT | PRIME SATORU GOJO 1V1?",
+        "THEY TRIED TO SEAL HIS INFINITY | WHO SURVIVES THE UNLIMITED VOID?",
+        "IS SATORU GOJO TRULY | THE STRONGEST IN ANIME HISTORY?",
+        "COULD ANY SORCERER BREACH | GOJO'S INFINITE DOMAIN?"
+    ],
+    "sukuna": [
+        "COULD ANYONE SURVIVE | SUKUNA'S MALEVOLENT SHRINE?",
+        "WHO SURVIVES THIS DEADLY BATTLE | SUKUNA OR PRIME GOJO?",
+        "IS RYOMEN SUKUNA | THE DEADLIEST CURSE IN HISTORY?",
+        "COULD ANYONE DODGE | SUKUNA'S FATAL FLAME ARROW?"
+    ],
+    "yuji": [
+        "IS YUJI'S BLACK FLASH | THE STRONGEST HIT IN JJK?",
+        "COULD ANY SPECIAL GRADE SURVIVE | YUJI'S ENRAGED COMBAT CLASH?",
+        "DID YUJI DESERVE BETTER | AFTER SHIBUYA'S DESTRUCTION?"
+    ],
+    "toji": [
+        "COULD TOJI BEAT ANY SPECIAL GRADE | WITH ZERO CURSED ENERGY?",
+        "IS TOJI FUSHIGURO | THE DEADLIEST KILLER IN ANIME?",
+        "WAS TOJI THE COLDEST CHARACTER | IN THE ENTIRE SERIES?"
+    ],
+    "megumi": [
+        "WAS MAHORAGA REALLY NECESSARY | TO WIN THIS DEADLY FIGHT?",
+        "COULD MEGUMI TAME MAHORAGA | IN HIS PRIME FORM?"
+    ],
+    "nobara": [
+        "IS NOBARA TOP TIER | IN FEMALE SHONEN CHARACTERS?",
+        "COULD ANYONE DODGE NOBARA'S | FATAL RESONANCE NAIL?"
+    ],
+    "todo": [
+        "IS AOI TODO | THE BEST BROTHER IN ANIME?",
+        "COULD ANY DUO BEAT YUJI & TODO | IN A REAL COMBAT CLASH?"
+    ],
+    "mahito": [
+        "IS MAHITO THE MOST HATED | VILLAIN IN ANIME HISTORY?",
+        "DID MAHITO GET THE MOST SATISFYING | BEATDOWN IN SHIBUYA?"
+    ],
+
+    # ── Demon Slayer (Kimetsu no Yaiba) Universe ──
+    "tanjiro": [
+        "IS HINOKAMI KAGURA | THE STRONGEST BREATHING FORM?",
+        "COULD ANY DEMON SURVIVE | TANJIRO'S PURE SUN BREATHING?",
+        "WAS THIS CLIMAX | THE PEAK OF MODERN ANIME?",
+        "WHO CARRIED DEMON SLAYER HARDER | TANJIRO OR RENGOKU?"
+    ],
+    "inosuke": [
+        "IS LORD INOSUKE | THE CRAZIEST BEAST IN ANIME?",
+        "COULD ANYONE MATCH | INOSUKE'S UNHINGED COMBAT POWER?",
+        "IS INOSUKE PURE CHAOS | OR A TRUE COMBAT GENIUS?",
+        "WHO WINS IN A REAL FIGHT | INOSUKE OR ZENITSU?"
+    ],
+    "rengoku": [
+        "IS RENGOKU THE GREATEST HASHIRA | IN DEMON SLAYER HISTORY?",
+        "COULD RENGOKU HAVE BEATEN AKAZA | WITH A SLAYER MARK?",
+        "WAS RENGOKU'S FINAL STAND | THE MOST EMOTIONAL DEATH?"
+    ],
+    "zenitsu": [
+        "COULD ANYONE DODGE | ZENITSU'S GODSPEED THUNDER?",
+        "IS SLEEPING ZENITSU STRONGER | THAN HALF THE HASHIRAS?",
+        "WAS ZENITSU'S THUNDER GOD SPEED | THE CLEANEST SAKUGA?"
+    ],
+    "akaza": [
+        "COULD AKAZA DEFEAT KOKUSHIBO | IN A PURE 1V1 BATTLE?",
+        "DID AKAZA HAVE THE SADDEST | BACKSTORY IN DEMON SLAYER?",
+        "COULD ANY HASHIRA BEAT AKAZA | WITHOUT A SLAYER MARK?"
+    ],
+    "giyu": [
+        "COULD ANY DEMON BREACH | GIYU'S DEAD CALM ELEVENTH FORM?",
+        "IS GIYU TOMIOKA | THE STRONGEST WATER HASHIRA?"
+    ],
+    "tengen": [
+        "IS TENGEN VS GYUTARO | THE BEST ANIME FIGHT OF ALL TIME?",
+        "COULD ANY OTHER HASHIRA SURVIVE | GYUTARO'S DEADLY POISON?"
+    ],
+    "muzan": [
+        "IS KIBUTSUJI MUZAN | THE COLDEST DEMON KING EVER?",
+        "COULD ALL 9 HASHIRAS TOGETHER | BEAT PRIME HEALTHY MUZAN?"
+    ],
+    "nezuko": [
+        "IS AWAKENED NEZUKO STRONGER | THAN AN UPPER RANK DEMON?",
+        "WAS NEZUKO'S AWAKENED FORM | THE HYPER CLIMAX OF DISTRICT ARC?"
+    ],
+    "muichiro": [
+        "DID MUICHIRO SOLO AN UPPER MOON | FASTER THAN ANY HASHIRA?",
+        "IS MUICHIRO TOKITO | THE BIGGEST PRODIGY IN ANIME?"
+    ],
+    "gyutaro": [
+        "WAS GYUTARO'S BLOOD SICKLE | THE DEADLIEST DEMON ART?",
+        "IS GYUTARO THE STRONGEST UPPER 6 | TO EVER LIVE?"
+    ],
+
+    # ── Marvel Fallback ──
+    "spiderman": [
+        "IS THIS THE BEST SPIDER-MAN MOMENT | IN ALL OF MARVEL CINEMA?",
+        "WHO IS THE STRONGEST SPIDER-MAN | TOBEY, ANDREW, OR TOM?"
+    ],
+    "ironman": [
+        "IS TONY STARK'S FINAL SACRIFICE | THE PEAK OF MCU HISTORY?"
+    ],
+    "thor": [
+        "WAS THOR'S WAKANDA ENTRANCE | THE COLDEST SCENE IN CINEMA?"
+    ]
+}
+
+
+def get_character_engagement_question(character_key: str) -> str:
+    """Returns an interactive, viral engagement debate question for the character."""
+    questions = CHARACTER_ENGAGEMENT_QUESTIONS.get(character_key, [
+        "COULD ANYONE SURVIVE | THIS DEADLY COMBAT CLIMAX?",
+        "IS THIS THE MOST CINEMATIC | MOMENT IN ANIME HISTORY?"
+    ])
+    return random.choice(questions)
+
+
 CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {
     "gojo": [
         {
@@ -872,7 +994,7 @@ def query_opencode_deepseek_v4_flash(character_name: str, universe: str, competi
         f"Do NOT mention, tag, or reference any other anime franchise (e.g. no JJK for Demon Slayer, no Demon Slayer for JJK). "
         f"{competitor_hint}"
         "Generate a JSON object with: "
-        "1. 'quote': An iconic, punchy, badass 1-sentence quote or monologue line (under 12 words), "
+        "1. 'quote': A viral, high-CTR engagement debate question formatted as 'Setup Premise | Debate Question?' (under 12 words, NO character dialogue lines, e.g. 'IS INOSUKE PURE CHAOS | OR A COMBAT GENIUS?'), "
         "2. 'title': Unique High-CTR YouTube Shorts title with emoji and hashtags (under 65 chars), "
         "3. 'tags': List of 8 viral trending hashtags without hash symbols. "
         "Output ONLY raw JSON with keys 'quote', 'title', 'tags'."
@@ -926,7 +1048,7 @@ def query_nvidia_nemotron(character_name: str, universe: str, competitor_context
             f"Do NOT mention or tag other anime or franchises. "
             f"{competitor_hint}"
             "Generate a JSON object with: "
-            "1. 'quote': a legendary 1-sentence badass quote (under 12 words), "
+            "1. 'quote': a viral engagement debate question formatted as 'Setup Premise | Debate Question?' (under 12 words, NO character dialogue lines), "
             "2. 'title': unique viral YouTube Short title with hashtags (under 70 chars), "
             "3. 'tags': array of 8 viral hashtags."
         )
@@ -1013,7 +1135,14 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
             
         chosen_concept = random.choice(unused_concepts)
         
-    quote = chosen_concept["quote"]
+    engagement_q = get_character_engagement_question(character_key)
+    raw_quote = chosen_concept.get("quote", "")
+    # If the concept quote is dialogue (lacks '?' or '|'), replace with curated engagement question
+    if "?" in raw_quote or " | " in raw_quote:
+        quote = raw_quote
+    else:
+        quote = engagement_q
+
     title = chosen_concept["title"]
     raw_tags = chosen_concept.get("tags", [character_key, "animeedit", "4kedit", "shorts"])
     tags = sanitize_tags(raw_tags, char_universe, character_key)
@@ -1037,6 +1166,7 @@ def generate_edit_metadata(character_key: str = None) -> Dict[str, Any]:
         "character_name": theme["name"],
         "universe": char_universe,
         "quote": quote,
+        "engagement_question": quote,
         "title": title,
         "tags": tags,
         "description": description

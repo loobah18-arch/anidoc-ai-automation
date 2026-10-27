@@ -116,7 +116,7 @@ def render_cinematic_edit(
     
     # 1. Generate Metadata & Quotes
     metadata = generate_edit_metadata(character_key)
-    quote_text = custom_quote or metadata["quote"]
+    quote_text = custom_quote or metadata.get("engagement_question") or metadata["quote"]
     title_text = custom_title or metadata["title"]
     metadata["quote"] = quote_text
     metadata["title"] = title_text
@@ -294,7 +294,7 @@ def render_cinematic_edit(
     if enable_subtitles or burn_subtitles or subtitle_style == "spur_hook":
         try:
             ass_out = SCRATCH_DIR / f"subtitles_{character_key}.ass"
-            quote_text = custom_quote or metadata.get("quote") or metadata.get("title") or "THE GREATEST WARRIOR"
+            quote_text = custom_quote or metadata.get("engagement_question") or metadata.get("quote") or metadata.get("title") or "WHO IS THE STRONGEST WARRIOR?"
             ass_path = generate_kinetic_subtitles(
                 quote_text=quote_text,
                 start_time=0.2,
