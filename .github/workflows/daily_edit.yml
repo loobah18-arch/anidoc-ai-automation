@@ -39,6 +39,7 @@ on:
           - 'trashxrl_deus_do_olimpo'
           - 'irokz_funk_universo_slowed'
           - 'montagem_vozes_profundas'
+          - 'rayelo_ultraslowed'
       gdrive_folder:
         description: 'Google Drive folder link or ID containing raw movies/episodes (optional)'
         required: false
@@ -50,9 +51,9 @@ on:
         default: false
         type: boolean
       upload:
-        description: 'Upload rendered Short to YouTube (disabled by default on feature branches)'
+        description: 'Upload rendered Short to YouTube (enabled by default)'
         required: false
-        default: false
+        default: true
         type: boolean
 
 jobs:
@@ -156,17 +157,16 @@ jobs:
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
           
-          # During testing, uploads are disabled by default (default: false).
-          # Upload only occurs if explicitly enabled via input (upload == 'true'),
-          # or on scheduled daily runs on the main branch.
-          if [ "${{ github.event.inputs.upload }}" = "true" ]; then
-            echo "🚀 [Publish] Manual YouTube upload requested."
-            CMD="$CMD --upload"
-          elif [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.ref_name }}" = "main" ]; then
+          # YouTube uploads: enabled by default (unless explicitly set to false),
+          # and enabled for scheduled daily runs on the main branch.
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.ref_name }}" = "main" ]; then
             echo "🚀 [Publish] Scheduled daily upload on main."
             CMD="$CMD --upload"
+          elif [ "${{ github.event.inputs.upload }}" != "false" ]; then
+            echo "🚀 [Publish] YouTube upload enabled."
+            CMD="$CMD --upload"
           else
-            echo "🔒 [Testing Mode] Skipping YouTube upload for this run (upload disabled by default while testing)."
+            echo "🔒 [Testing Mode] Skipping YouTube upload for this run (upload=false requested)."
           fi
           
           echo "Executing: $CMD"

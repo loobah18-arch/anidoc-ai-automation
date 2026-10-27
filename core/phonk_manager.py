@@ -111,6 +111,14 @@ POPULAR_PHONK_CATALOG = [
         "default_drop": 4.80,
         "audio_offset": 0.00,
     },
+    {
+        "id": "rayelo_ultraslowed",
+        "title": "IROKZ, TESOROX, DJ ZAREK - RAYELO (ULTRA SLOWED)",
+        "genre": "Brazilian Phonk",
+        "bpm": 136.0,
+        "default_drop": 7.48,
+        "audio_offset": 0.00,
+    },
 ]
 
 # Live trending search queries — these rotate per run for max freshness
