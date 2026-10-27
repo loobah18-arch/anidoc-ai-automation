@@ -361,6 +361,31 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("duration=0.15", xf)
         self.assertIn("[xfade_vout]", xf)
 
+    def test_13_gdrive_slicer_filter_even_dimensions(self):
+        """Verifies that GDrive action moment slicing filter strictly enforces even dimensions (preventing exit code 187)."""
+        test_out = SCRATCH_DIR / "test_even_dim_slice.mp4"
+        test_out.unlink(missing_ok=True)
+        vf_chain = (
+            "crop=trunc(in_w*0.88/2)*2:trunc(in_h*0.88/2)*2:trunc(in_w*0.06/2)*2:trunc(in_h*0.06/2)*2,"
+            "scale=1920:1080:force_original_aspect_ratio=decrease:flags=lanczos,"
+            "scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=1,fps=60"
+        )
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", "testsrc=duration=0.5:size=1920x1080:rate=30",
+            "-t", "0.5",
+            "-vf", vf_chain,
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            "-pix_fmt", "yuv420p",
+            str(test_out)
+        ]
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        self.assertEqual(res.returncode, 0, f"FFmpeg failed: {res.stderr}")
+        self.assertTrue(test_out.exists())
+        self.assertGreater(test_out.stat().st_size, 5000)
+        test_out.unlink(missing_ok=True)
+
 
 if __name__ == "__main__":
     unittest.main()

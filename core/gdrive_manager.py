@@ -870,48 +870,54 @@ def slice_action_moments_from_source(
     generated_clips = []
     new_used_ts = []
 
+    # Resilient watermark-free 1080p crop filter that GUARANTEES even width & height (no exit 187)
+    vf_chain = (
+        "crop=trunc(in_w*0.88/2)*2:trunc(in_h*0.88/2)*2:trunc(in_w*0.06/2)*2:trunc(in_h*0.06/2)*2,"
+        "scale=1920:1080:force_original_aspect_ratio=decrease:flags=lanczos,"
+        f"scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=1,fps={FPS}"
+    )
+
     for idx, cand in enumerate(selected):
         start = cand["start"]
         out_clip = output_dir / f"{character_key}_gdrive_{idx:02d}_{int(start)}s.mp4"
+        
+        # Try 1: Probe-matched English Dub audio stream
         cmd = [
             "ffmpeg", "-y",
             "-ss", str(start),
-            "-t", str(clip_duration),
             "-i", str(video_path),
+            "-t", str(clip_duration),
         ] + eng_audio_map + [
-            "-vf", (
-                # 6% edge watermark crop to eliminate TV logos & studio credits
-                "crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06,"
-                "scale=1920:1080:force_original_aspect_ratio=decrease:flags=lanczos,"
-                f"setsar=1,fps={FPS}"
-            ),
+            "-vf", vf_chain,
             "-c:v", "libx264",
             "-preset", "veryfast",
             "-crf", "18",
+            "-pix_fmt", "yuv420p",
             "-c:a", "aac",
             "-b:a", "192k",
             "-ar", "48000",
             "-ac", "2",
             str(out_clip)
         ]
+        
+        sliced_successfully = False
         try:
             subprocess.run(cmd, capture_output=True, check=True, timeout=60)
-        except Exception:
-            # Fallback retry with generic optional audio mapping (0:a:0?)
+            if out_clip.exists() and out_clip.stat().st_size > 40_000:
+                sliced_successfully = True
+        except subprocess.CalledProcessError as e:
+            # Try 2: Generic optional audio mapping (0:v:0 + 0:a:0?)
             fallback_cmd = [
                 "ffmpeg", "-y",
                 "-ss", str(start),
-                "-t", str(clip_duration),
                 "-i", str(video_path),
+                "-t", str(clip_duration),
                 "-map", "0:v:0", "-map", "0:a:0?",
-                "-vf", (
-                    "crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06,"
-                    "scale=1920:1080:force_original_aspect_ratio=decrease:flags=lanczos,"
-                    f"setsar=1,fps={FPS}"
-                ),
+                "-vf", vf_chain,
                 "-c:v", "libx264",
                 "-preset", "veryfast",
                 "-crf", "18",
+                "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
                 "-b:a", "192k",
                 "-ar", "48000",
@@ -920,10 +926,35 @@ def slice_action_moments_from_source(
             ]
             try:
                 subprocess.run(fallback_cmd, capture_output=True, check=True, timeout=60)
-            except Exception as e:
-                print(f"  ⚠️ Error cutting clip at {start}s: {e}")
+                if out_clip.exists() and out_clip.stat().st_size > 40_000:
+                    sliced_successfully = True
+            except subprocess.CalledProcessError as e2:
+                # Try 3: Video-only stream extraction (-an) to guarantee real 1080p anime footage
+                video_only_cmd = [
+                    "ffmpeg", "-y",
+                    "-ss", str(start),
+                    "-i", str(video_path),
+                    "-t", str(clip_duration),
+                    "-map", "0:v:0", "-an",
+                    "-vf", vf_chain,
+                    "-c:v", "libx264",
+                    "-preset", "veryfast",
+                    "-crf", "18",
+                    "-pix_fmt", "yuv420p",
+                    str(out_clip)
+                ]
+                try:
+                    subprocess.run(video_only_cmd, capture_output=True, check=True, timeout=60)
+                    if out_clip.exists() and out_clip.stat().st_size > 40_000:
+                        sliced_successfully = True
+                except Exception as e3:
+                    err_msg = (e3.stderr.decode() if hasattr(e3, "stderr") and e3.stderr else str(e3))[-250:]
+                    print(f"  ⚠️ Error cutting clip at {start}s across all audio/video attempts: {err_msg}")
 
-        if out_clip.exists() and out_clip.stat().st_size > 40_000:
+        # Clean up any 0-byte or corrupted fragments so they don't pollute clip discovery
+        if not sliced_successfully:
+            out_clip.unlink(missing_ok=True)
+        else:
             generated_clips.append(out_clip)
             new_used_ts.append(start)
             role_tag = (

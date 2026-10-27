@@ -261,25 +261,31 @@ def get_character_scene_clips(
         universe_dir = JJK_DIR
     universe_dir.mkdir(parents=True, exist_ok=True)
     
-    # Search for character-specific clips in both dirs (including scratch)
+    # Search for character-specific clips in both dirs (including scratch, strictly validating size > 10KB)
     scratch_char_dir = SCRATCH_DIR / theme.get("universe", "jjk")
     scratch_char_dir.mkdir(parents=True, exist_ok=True)
     
-    raw_clips = (
-        list(universe_dir.glob(f"*{character_key}*.mp4")) +
-        list(scratch_char_dir.glob(f"*{character_key}*.mp4"))
-    )
+    raw_clips = [
+        p for p in (
+            list(universe_dir.glob(f"*{character_key}*.mp4")) +
+            list(scratch_char_dir.glob(f"*{character_key}*.mp4"))
+        )
+        if p.exists() and p.stat().st_size > 10_000 and not p.name.startswith("proc_")
+    ]
     
     # If forced refresh or missing, download fresh multi-query scenepack
     if (not raw_clips or force_refresh) and auto_fetch_online:
         print(f"🌐 Fetching fresh scenepack cuts for '{character_key}'...")
         fetched = fetch_character_scenepack(character_key, max_clips=len(segment_durations) + 6)
         if fetched:
-            raw_clips = fetched
+            raw_clips = [p for p in fetched if p.exists() and p.stat().st_size > 10_000 and not p.name.startswith("proc_")]
             
-    # Last resort: use any universe clips
+    # Last resort: use any real anime universe clips
     if not raw_clips:
-        raw_clips = list(universe_dir.glob("*.mp4")) + list(scratch_char_dir.glob("*.mp4"))
+        raw_clips = [
+            p for p in (list(universe_dir.glob("*.mp4")) + list(scratch_char_dir.glob("*.mp4")))
+            if p.exists() and p.stat().st_size > 10_000 and not p.name.startswith("proc_")
+        ]
 
     # Deduplicate paths, remove empties
     seen = set()
@@ -293,6 +299,7 @@ def get_character_scene_clips(
     n_segs = len(segment_durations)
     
     if not raw_clips:
+        print(f"⚠️ [ClipManager] Notice: 0 real footage clips found for '{character_key}'. Generating procedural scenes.")
         # Full procedural fallback
         clip_paths = []
         for idx, (dur, is_drop) in enumerate(zip(segment_durations, is_drop_flags)):

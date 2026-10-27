@@ -286,6 +286,9 @@ def render_cinematic_edit(
     if not clip_paths:
         raise RuntimeError("No clips available after all download attempts.")
 
+    real_clips_count = sum(1 for cp in clip_paths if not cp.name.startswith("proc_"))
+    is_procedural = (real_clips_count == 0)
+
     # Micro-flash inserts REMOVED — reference uses rare flashes as overlays, not segments.
     # Flashes are handled via build_beat_flash_filters (2-3 total per edit) as overlays.
 
@@ -372,6 +375,8 @@ def render_cinematic_edit(
                     "audio_used": Path(audio_path).name,
                     "subtitle_style": subtitle_style,
                     "cc_preset": active_cc,
+                    "is_procedural": is_procedural,
+                    "real_footage_count": real_clips_count,
                     "engine": "editly"
                 }
         print("⚠️ [OpenSourceEditor] editly render did not complete. Falling back to native FFmpeg xfade engine.")
@@ -498,5 +503,7 @@ def render_cinematic_edit(
         "file_size_kb": output_path.stat().st_size // 1024,
         "audio_used": Path(audio_path).name,
         "subtitle_style": subtitle_style,
-        "cc_preset": active_cc
+        "cc_preset": active_cc,
+        "is_procedural": is_procedural,
+        "real_footage_count": real_clips_count
     }

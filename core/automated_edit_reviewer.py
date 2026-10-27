@@ -196,6 +196,42 @@ def review_edit_and_benchmark(video_path: Path, expected_drop_time: float = 4.8)
     intro_cuts = [c for c in cuts if c < expected_drop_time]
     action_cuts = [c for c in cuts if c >= expected_drop_time]
     
+    # Quality Gate: Reject procedural placeholder videos that have 0 real anime clips
+    if telemetry.get("is_procedural", False) or (telemetry.get("real_footage_count") == 0):
+        print("🚨 [Reviewer] FATAL DEFECT: Telemetry confirms edit has 0 real anime footage clips (all procedural placeholders)!")
+        return {
+            "video_file": video_path.name,
+            "overall_score": 0.0,
+            "grade": "F",
+            "metadata": meta,
+            "pacing": {
+                "total_cuts": n_cuts,
+                "cuts_per_minute": round(cpm, 1),
+                "average_cut_seconds": avg_cut_len,
+                "intro_cuts": len(intro_cuts),
+                "action_cuts": len(action_cuts),
+                "cut_timestamps": cuts[:20]
+            },
+            "audio_sync": {
+                "drop_timestamp_expected": expected_drop_time,
+                "drop_alignment_delta_seconds": 99.0,
+                "drop_aligned": False
+            },
+            "color_and_lighting": luma,
+            "pillar_scores": {
+                "hook_and_buildup": 0,
+                "beat_drop_impact": 0,
+                "combat_velocity_sync": 0,
+                "color_grading_aesthetic": 0,
+                "motion_fidelity": 0,
+                "retention_and_format": 0
+            },
+            "strengths": [],
+            "opportunities": [
+                "🚨 CRITICAL DEFECT: Video contains 0 real anime footage clips. All scenes were synthetic procedural placeholders!"
+            ]
+        }
+
     # Beat Drop Alignment Check
     # A top anime edit MUST feature a cut or impact within 150ms of the drop
     drop_delta = min([abs(c - expected_drop_time) for c in cuts], default=99.0)

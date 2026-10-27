@@ -132,7 +132,9 @@ def main():
                 "duration": result["duration"],
                 "drop_time": result.get("drop_time", 4.80),
                 "cuts_count": result.get("cuts_count", 0),
-                "cut_timestamps": result.get("cut_timestamps", [])
+                "cut_timestamps": result.get("cut_timestamps", []),
+                "is_procedural": result.get("is_procedural", False),
+                "real_footage_count": result.get("real_footage_count", 0)
             }, f, indent=2)
         print(f"📊 [Telemetry] Saved assembly metrics to {telemetry_path.name}")
     except Exception as e:
@@ -151,17 +153,20 @@ def main():
     
     # Upload to YouTube if requested
     if args.upload:
-        upload_res = upload_video_to_youtube(
-            video_path=output_path,
-            title=metadata["title"],
-            description=metadata["description"],
-            tags=metadata["tags"],
-            privacy_status=args.privacy
-        )
-        if upload_res.get("status") == "success":
-            print(f"🌟 Published to YouTube: {upload_res.get('url')}")
+        if result.get("is_procedural", False):
+            print("❌ [Safety Guard] Slicing and all footage download tiers failed. Final video contains 0 real anime clips. REFUSING to upload procedural placeholder video to YouTube.")
         else:
-            print(f"⚠️ YouTube upload status: {upload_res.get('status')} ({upload_res.get('reason') or upload_res.get('error')})")
+            upload_res = upload_video_to_youtube(
+                video_path=output_path,
+                title=metadata["title"],
+                description=metadata["description"],
+                tags=metadata["tags"],
+                privacy_status=args.privacy
+            )
+            if upload_res.get("status") == "success":
+                print(f"🌟 Published to YouTube: {upload_res.get('url')}")
+            else:
+                print(f"⚠️ YouTube upload status: {upload_res.get('status')} ({upload_res.get('reason') or upload_res.get('error')})")
 
 if __name__ == "__main__":
     main()
