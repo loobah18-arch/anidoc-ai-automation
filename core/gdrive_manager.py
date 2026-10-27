@@ -38,15 +38,17 @@ HISTORY_FILE = SCRATCH_DIR / "gdrive_edit_history.json"
 
 CHARACTER_EPISODE_PREFERENCES = {
     # JJK Combat Preferences
-    "gojo": ["s02e09", "s02e04", "s01e07", "s02e03", "s02e08", "s02e05", "gojo"],       # Shibuya Curses, Awakened vs Toji, Subway Brawl
-    "sukuna": ["s02e17", "s02e16", "s02e15", "s01e04", "s01e05", "sukuna"],             # Sukuna vs Mahoraga, Sukuna vs Jogo Meteor, Shibuya Climax
+    "gojo": ["s02e09", "s02e04", "s01e07", "s02e03", "s02e08", "s02e05", "gojo"],       # Shibuya Curses, Awakened vs Toji, Subway Brawl (S1 & S2 ONLY)
+    "sukuna": ["s02e17", "s02e16", "s02e15", "s01e04", "s01e05", "sukuna"],             # Sukuna vs Mahoraga, Sukuna vs Jogo Meteor, Shibuya Climax (S2)
     "toji": ["s02e04", "s02e03", "s02e14", "s02e15", "toji"],                           # Toji vs Gojo Awakened, Toji vs Dagon, Toji vs Megumi (S2 ONLY)
-    "yuji": ["s02e21", "s02e20", "s02e13", "s01e24", "s01e19", "yuji"],                 # Yuji & Todo vs Mahito (Black Flash), Yuji vs Choso Brawl
+    "yuta": ["s03e01", "s03e02", "yuta", "okkotsu"],                                     # Yuta Execution of Yuji, Sendai Colony (S3 ONLY)
+    "yuji": ["s02e21", "s02e20", "s03e01", "s03e02", "s02e13", "s01e24", "s01e19"],     # Black Flash Climax, Yuta vs Yuji, Choso Brawl (S1-S3)
+    "choso": ["s03e01", "s03e02", "s02e13", "s01e24", "choso"],                          # Choso vs Naoya speed battle (S3), Choso vs Yuji (S2)
+    "maki": ["s03e05", "s03e06", "s02e14", "s01e17", "maki"],                           # Zen'in Clan massacre (S3), Dagon clash (S2)
     "megumi": ["s02e15", "s02e16", "s02e14", "s01e05", "megumi"],                       # Mahoraga Summon & Domain Clashes
     "mahito": ["s02e21", "s02e20", "s02e19", "s02e18", "s02e13", "s01e13", "mahito"],   # Yuji & Todo vs Mahito, Nanami vs Mahito
     "todo": ["s02e21", "s02e20", "s02e19", "s02e18", "s01e20", "todo"],                 # Double Black Flash, Boogie Woogie
     "nobara": ["s02e19", "s01e24", "s01e03", "nobara"],                                 # Resonance vs Mahito, Death Painting
-    "choso": ["s02e13", "s01e24", "choso", "shibuya"],                                   # Choso vs Yuji bathroom brawl, Death Painting
     # Demon Slayer (Kimetsu no Yaiba) Preferences - Prioritizes top combat episodes (Hinokami Kagura, Entertainment District, Mugen Train)
     "tanjiro": ["hinokami", "e19", "entertainment", "mugen", "swordsmith", "hashira", "e10", "e11", "e08"],
     "rengoku": ["mugen", "train", "akaza", "rengoku", "e07", "e06", "e05"],
@@ -117,13 +119,32 @@ def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
         seen = set()
         for name, raw_fid in matches:
             clean_fid = re.sub(r"-\d+-\d+$", "", raw_fid)
-            if clean_fid not in seen:
+            if clean_fid not in seen and not name.lower().startswith(("[deleted]", "_deleted")):
                 seen.add(clean_fid)
                 results.append({
                     "name": name,
                     "id": clean_fid,
                     "url": f"https://drive.google.com/uc?id={clean_fid}"
                 })
+
+        # Multi-page fallback: Google Drive web SSR caps at 50 items. Use gdown to fetch full folder index.
+        if len(results) < 60:
+            try:
+                import gdown
+                gdown_files = gdown.download_folder(id=folder_id, skip_download=True, quiet=True)
+                for gf in gdown_files:
+                    path_str = getattr(gf, "path", str(gf))
+                    fid = getattr(gf, "id", "")
+                    fname = Path(path_str).name
+                    if fid and fname not in seen and not fname.lower().startswith(("[deleted]", "_deleted")):
+                        seen.add(fname)
+                        results.append({
+                            "name": fname,
+                            "id": fid,
+                            "url": f"https://drive.google.com/uc?id={fid}"
+                        })
+            except Exception:
+                pass
 
         print(f"📋 [GoogleDrive] Found {len(results)} items in Google Drive folder index.")
         return results
@@ -225,9 +246,11 @@ def pick_best_file_for_character(
     eligible_files = []
 
     for pref in prefs:
+        pref_compact = re.sub(r"[^a-z0-9]", "", pref.lower())
         for f in universe_files:
             clean_name = re.sub(r"[_\.\-\[\]\(\)]+", " ", f["name"]).lower()
-            if (pref in clean_name or pref in f["name"].lower()) and f not in eligible_files:
+            compact_name = re.sub(r"[^a-z0-9]", "", f["name"].lower())
+            if (pref in clean_name or pref_compact in compact_name or pref in f["name"].lower()) and f not in eligible_files:
                 eligible_files.append(f)
         if len(eligible_files) >= 3:
             # Top-tier preference matches found (e.g. Hinokami Kagura or Shibuya Climax)
