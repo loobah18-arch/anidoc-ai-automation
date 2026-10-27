@@ -232,6 +232,7 @@ def build_velocity_clip_filter(
         filters.append(f"setpts={pts_mult:.4f}*PTS")
 
     filters.extend([
+        "tpad=stop_mode=clone:stop_duration=5",
         f"trim=duration={duration:.3f}",
         "setpts=PTS-STARTPTS"
     ])

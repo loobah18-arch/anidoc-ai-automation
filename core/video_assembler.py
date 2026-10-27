@@ -175,13 +175,15 @@ def render_cinematic_edit(
     if gdrive_target and len(clip_paths) < n_clips:
         print(f"📥 [GoogleDrive] Fetching uncompressed footage from Google Drive for '{character_key}'...")
         try:
+            max_needed_dur = max(durations) if durations else 4.0
             gdrive_clips = fetch_and_prepare_gdrive_footage(
                 gdrive_url_or_id=gdrive_target,
                 target_character=character_key,
                 output_dir=universe_dir,
                 n_clips=n_clips + 4,
                 title=title_text,
-                drop_index=drop_idx
+                drop_index=drop_idx,
+                clip_duration=max(5.5, max_needed_dur + 1.5)
             )
             if gdrive_clips:
                 clip_paths = gdrive_clips

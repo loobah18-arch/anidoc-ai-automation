@@ -416,7 +416,7 @@ def slice_action_moments_from_source(
     character_key: str,
     output_dir: Path,
     n_clips: int = 15,
-    clip_duration: float = 3.2,
+    clip_duration: float = 5.5,
     title: Optional[str] = None,
     drop_index: Optional[int] = None
 ) -> List[Path]:
@@ -920,7 +920,8 @@ def fetch_and_prepare_gdrive_footage(
     output_dir: Path,
     n_clips: int = 15,
     title: Optional[str] = None,
-    drop_index: Optional[int] = None
+    drop_index: Optional[int] = None,
+    clip_duration: float = 5.5
 ) -> List[Path]:
     """
     Lightning-Fast Non-Repetitive Google Drive Ingestion:
@@ -952,6 +953,7 @@ def fetch_and_prepare_gdrive_footage(
         character_key=target_character,
         output_dir=output_dir,
         n_clips=n_clips,
+        clip_duration=clip_duration,
         title=title,
         drop_index=drop_index
     )
