@@ -119,7 +119,7 @@ def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
         seen = set()
         for name, raw_fid in matches:
             clean_fid = re.sub(r"-\d+-\d+$", "", raw_fid)
-            if clean_fid not in seen and not name.lower().startswith(("[deleted]", "_deleted")):
+            if clean_fid not in seen and not name.lower().startswith(("[delete", "_deleted")):
                 seen.add(clean_fid)
                 results.append({
                     "name": name,
@@ -136,7 +136,7 @@ def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
                     path_str = getattr(gf, "path", str(gf))
                     fid = getattr(gf, "id", "")
                     fname = Path(path_str).name
-                    if fid and fname not in seen and not fname.lower().startswith(("[deleted]", "_deleted")):
+                    if fid and fname not in seen and not fname.lower().startswith(("[delete", "_deleted")):
                         seen.add(fname)
                         results.append({
                             "name": fname,
