@@ -368,23 +368,24 @@ def get_english_audio_map(video_path: Path) -> List[str]:
         data = json.loads(res.stdout)
         streams = data.get("streams", [])
         
-        eng_audio_idx = None
-        first_audio_idx = None
+        eng_audio_a_idx = None
+        first_audio_a_idx = None
+        audio_count = 0
         for s in streams:
             if s.get("codec_type") == "audio":
-                idx = s.get("index")
-                if first_audio_idx is None:
-                    first_audio_idx = idx
+                if first_audio_a_idx is None:
+                    first_audio_a_idx = audio_count
                 tags = s.get("tags", {})
                 lang = tags.get("language", "").lower()
                 title = tags.get("title", "").lower()
                 if "eng" in lang or "english" in title or "dub" in title:
-                    eng_audio_idx = idx
+                    eng_audio_a_idx = audio_count
                     break
+                audio_count += 1
         
-        chosen_idx = eng_audio_idx if eng_audio_idx is not None else first_audio_idx
-        if chosen_idx is not None:
-            return ["-map", "0:v:0", "-map", f"0:{chosen_idx}"]
+        chosen_a_idx = eng_audio_a_idx if eng_audio_a_idx is not None else first_audio_a_idx
+        if chosen_a_idx is not None:
+            return ["-map", "0:v:0", "-map", f"0:a:{chosen_a_idx}?"]
     except Exception:
         pass
     return ["-map", "0:v:0", "-map", "0:a:0?"]
@@ -861,18 +862,43 @@ def slice_action_moments_from_source(
         ]
         try:
             subprocess.run(cmd, capture_output=True, check=True, timeout=60)
-            if out_clip.exists() and out_clip.stat().st_size > 40_000:
-                generated_clips.append(out_clip)
-                new_used_ts.append(start)
-                role_tag = (
-                    "💥 BEAT DROP" if idx == drop_idx
-                    else ("⚡ SECONDARY DROP" if idx == bridge_idx
-                    else ("🔥 FINISHER" if idx == last_idx
-                    else "⚔️ Scene"))
-                )
-                print(f"  ✂️ Clip {idx+1:02d}/{len(selected)} sliced ({start:.1f}s - {start+clip_duration:.1f}s) [{role_tag}] {cand.get('tag', '')}")
-        except Exception as e:
-            print(f"  ⚠️ Error cutting clip at {start}s: {e}")
+        except Exception:
+            # Fallback retry with generic optional audio mapping (0:a:0?)
+            fallback_cmd = [
+                "ffmpeg", "-y",
+                "-ss", str(start),
+                "-t", str(clip_duration),
+                "-i", str(video_path),
+                "-map", "0:v:0", "-map", "0:a:0?",
+                "-vf", (
+                    "crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06,"
+                    "scale=1920:1080:force_original_aspect_ratio=decrease:flags=lanczos,"
+                    f"setsar=1,fps={FPS}"
+                ),
+                "-c:v", "libx264",
+                "-preset", "veryfast",
+                "-crf", "18",
+                "-c:a", "aac",
+                "-b:a", "192k",
+                "-ar", "48000",
+                "-ac", "2",
+                str(out_clip)
+            ]
+            try:
+                subprocess.run(fallback_cmd, capture_output=True, check=True, timeout=60)
+            except Exception as e:
+                print(f"  ⚠️ Error cutting clip at {start}s: {e}")
+
+        if out_clip.exists() and out_clip.stat().st_size > 40_000:
+            generated_clips.append(out_clip)
+            new_used_ts.append(start)
+            role_tag = (
+                "💥 BEAT DROP" if idx == drop_idx
+                else ("⚡ SECONDARY DROP" if idx == bridge_idx
+                else ("🔥 FINISHER" if idx == last_idx
+                else "⚔️ Scene"))
+            )
+            print(f"  ✂️ Clip {idx+1:02d}/{len(selected)} sliced ({start:.1f}s - {start+clip_duration:.1f}s) [{role_tag}] {cand.get('tag', '')}")
 
     # Record used timestamps in history
     if "used_timestamps" not in history:
