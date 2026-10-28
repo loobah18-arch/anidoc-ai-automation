@@ -7,7 +7,7 @@ Defines distinct configuration archetypes:
 - HYPE_BATTLE: Hyper pacing, rapid combat clashes, high motion tracking.
 - MINIMAL_CINEMATIC: Pure clean cuts, zero flashes, subtle typography, restrained.
 """
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 EDITING_PRESETS: Dict[str, Dict[str, Any]] = {
     "VIRAL_PHONK": {
