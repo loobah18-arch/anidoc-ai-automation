@@ -260,6 +260,9 @@ def render_cinematic_edit(
         while len(clip_paths) < n_clips:
             clip_paths.append(clip_paths[len(clip_paths) % len(clip_paths)])
 
+    # Strict guarantee: clip_paths MUST match EXACTLY n_clips (len(segments))
+    clip_paths = clip_paths[:n_clips]
+
     if not clip_paths:
         raise RuntimeError("No clips available after all download attempts.")
 

@@ -32,29 +32,35 @@ def _get_cascades() -> List[Any]:
         return _CACHED_CASCADES
 
     cascades = []
-    if not OPENCV_AVAILABLE:
+    if not OPENCV_AVAILABLE or not hasattr(cv2, "CascadeClassifier"):
         _CACHED_CASCADES = cascades
         return cascades
 
-    # 1. Anime face cascade (specifically trained for anime character eyes & faces)
-    anime_xml = MODELS_DIR / "lbpcascade_animeface.xml"
-    if anime_xml.exists():
-        c = cv2.CascadeClassifier(str(anime_xml))
-        if not c.empty():
-            cascades.append(("anime", c))
+    try:
+        # 1. Anime face cascade (specifically trained for anime character eyes & faces)
+        anime_xml = MODELS_DIR / "lbpcascade_animeface.xml"
+        if anime_xml.exists():
+            c = cv2.CascadeClassifier(str(anime_xml))
+            if not c.empty():
+                cascades.append(("anime", c))
+    except Exception as e:
+        print(f"⚠️ Notice loading anime face cascade: {e}")
 
-    # 2. General frontal face cascade
-    frontal_xml = MODELS_DIR / "haarcascade_frontalface_default.xml"
-    if frontal_xml.exists():
-        c = cv2.CascadeClassifier(str(frontal_xml))
-        if not c.empty():
-            cascades.append(("frontal", c))
-    elif hasattr(cv2, "data") and hasattr(cv2.data, "haarcascades"):
-        sys_xml = Path(cv2.data.haarcascades) / "haarcascade_frontalface_default.xml"
-        if sys_xml.exists():
-            c = cv2.CascadeClassifier(str(sys_xml))
+    try:
+        # 2. General frontal face cascade
+        frontal_xml = MODELS_DIR / "haarcascade_frontalface_default.xml"
+        if frontal_xml.exists():
+            c = cv2.CascadeClassifier(str(frontal_xml))
             if not c.empty():
                 cascades.append(("frontal", c))
+        elif hasattr(cv2, "data") and hasattr(cv2.data, "haarcascades"):
+            sys_xml = Path(cv2.data.haarcascades) / "haarcascade_frontalface_default.xml"
+            if sys_xml.exists():
+                c = cv2.CascadeClassifier(str(sys_xml))
+                if not c.empty():
+                    cascades.append(("frontal", c))
+    except Exception as e:
+        print(f"⚠️ Notice loading frontal face cascade: {e}")
 
     _CACHED_CASCADES = cascades
     return cascades
