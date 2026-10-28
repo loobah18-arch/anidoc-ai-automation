@@ -81,9 +81,14 @@ def build_xfade_transition_filter(
 
         next_v = f"[v{i}]"
         out_v = f"[xfade_v{i}]" if i < clip_count - 1 else "[xfade_vout]"
-        
+
+        # Ensure exact timebase match across all chained xfade input links
+        in_a = f"in_a_{i}"
+        in_b = f"in_b_{i}"
         filter_parts.append(
-            f"{last_v}{next_v}xfade=transition={t_effect}:duration={transition_duration:.2f}:offset={max(0.1, current_offset):.2f}{out_v}"
+            f"{last_v}settb=1/60[{in_a}];"
+            f"{next_v}settb=1/60[{in_b}];"
+            f"[{in_a}][in_b]xfade=transition={t_effect}:duration={transition_duration:.2f}:offset={max(0.1, current_offset):.2f}{out_v}"
         )
         last_v = out_v
         if i < len(durations) - 1:
