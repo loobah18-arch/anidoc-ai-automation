@@ -491,12 +491,11 @@ def slice_action_moments_from_source(
     history = _load_history()
     file_used_ts = set(history.get("used_timestamps", {}).get(video_path.name, []))
 
-    # Skip Opening (0-95s) and Ending/Preview credits:
+    # Skip Opening (0-165s) and Ending/Preview credits:
     # Full movies (>3600s): ending credits roll is 5-6 mins (360s)
-    # Standard 20-25 min episodes (>600s): ending song (ED) + credits roll + preview is 3.5 mins (210s)
-    # Medium clips (300-600s): skip last 90s
-    # Short clips (<=300s): skip last 15s
-    start_bound = 95.0 if total_duration > 600 else (10.0 if total_duration > 60 else 1.0)
+    # Standard 20-25 min episodes (>600s): opening song (OP) + title logo card is 2.5-3.0 mins (165s)
+    # ending song (ED) + credits roll + preview is 3.5 mins (210s)
+    start_bound = 165.0 if total_duration > 600 else (10.0 if total_duration > 60 else 1.0)
     if total_duration > 3600:
         end_bound = total_duration - 240.0
     elif total_duration > 600:

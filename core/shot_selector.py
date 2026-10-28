@@ -56,9 +56,17 @@ def is_title_card_or_bumper(frame: np.ndarray) -> bool:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         median_val = float(np.median(gray))
         flat_ratio = float(np.count_nonzero(np.abs(gray.astype(np.float32) - median_val) < 15.0)) / float(gray.size)
+        black_ratio = float(np.count_nonzero(gray < 35)) / float(gray.size)
+
+        edges = cv2.Canny(gray, 60, 150)
+        edge_ratio = float(np.count_nonzero(edges)) / float(gray.size)
 
         # Eyecatch bumper signature: high hue concentration (>0.58) AND high flatness (>0.45)
-        return bool(max_hue_ratio > 0.58 and flat_ratio > 0.45)
+        is_flat_bumper = bool(max_hue_ratio > 0.58 and flat_ratio > 0.45)
+        # Dark void logo card signature: dark background (>20% near-black) with text glyph edges
+        is_dark_title_card = bool(black_ratio > 0.20 and 0.012 < edge_ratio < 0.035 and flat_ratio > 0.30)
+
+        return is_flat_bumper or is_dark_title_card
     except Exception:
         return False
 
