@@ -253,6 +253,7 @@ def build_velocity_clip_filter(
     filters = [
         reframe_filter,
         f"fps={fps}",
+        f"settb=1/{fps}"
     ]
 
     # Speed remapping: Non-linear Bézier curve vs constant speed multiplier
@@ -270,7 +271,7 @@ def build_velocity_clip_filter(
     filters.extend([
         "tpad=stop_mode=clone:stop_duration=5",
         f"trim=duration={duration:.3f}",
-        "setpts=PTS-STARTPTS"
+        f"setpts=PTS-STARTPTS,settb=1/{fps}"
     ])
 
     if add_bars:
