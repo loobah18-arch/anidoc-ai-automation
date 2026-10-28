@@ -33,6 +33,36 @@ def compute_frame_color_histogram(frame: np.ndarray) -> np.ndarray:
     return hist / (norm + 1e-6)
 
 
+def is_title_card_or_bumper(frame: np.ndarray) -> bool:
+    """
+    Detects anime title cards, commercial eyecatches, and text bumper cards:
+    - Dominant single hue occupying > 55% of saturated pixels (e.g. solid cyan/red/black cards)
+    - High flatness (> 45% pixels within 15 units of median gray value)
+    """
+    if not OPENCV_AVAILABLE or frame is None or frame.size == 0:
+        return False
+    try:
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+        sat_mask = s > 30
+        sat_count = np.count_nonzero(sat_mask)
+        if sat_count > 0:
+            h_sat = h[sat_mask]
+            counts, _ = np.histogram(h_sat, bins=18, range=(0, 180))
+            max_hue_ratio = float(np.max(counts)) / float(sat_count)
+        else:
+            max_hue_ratio = 1.0
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        median_val = float(np.median(gray))
+        flat_ratio = float(np.count_nonzero(np.abs(gray.astype(np.float32) - median_val) < 15.0)) / float(gray.size)
+
+        # Eyecatch bumper signature: high hue concentration (>0.58) AND high flatness (>0.45)
+        return bool(max_hue_ratio > 0.58 and flat_ratio > 0.45)
+    except Exception:
+        return False
+
+
 def score_candidate_shot(clip_path: Union[str, Path], num_samples: int = 4) -> Dict[str, Any]:
     """
     Evaluates a candidate video shot across:
@@ -148,9 +178,14 @@ def score_candidate_shot(clip_path: Union[str, Path], num_samples: int = 4) -> D
         composition_score * 0.15
     )
 
+    # Detect anime title cards, commercial eyecatches, and text bumper cards
+    is_title_card = any(is_title_card_or_bumper(f) for f in frames)
+    if is_title_card:
+        total_score *= 0.05
+
     # Heavily penalize dead-air filler shots (static background walls/crowds with zero character action)
-    if action_score < 28.0 and subject_score < 50.0:
-        total_score *= 0.35
+    if action_score < 30.0 and subject_score < 55.0:
+        total_score *= 0.20
 
     return {
         "path": clip_p,
@@ -160,7 +195,8 @@ def score_candidate_shot(clip_path: Union[str, Path], num_samples: int = 4) -> D
         "subject_score": round(subject_score, 1),
         "composition_score": round(composition_score, 1),
         "fingerprint": fingerprint,
-        "duration": duration
+        "duration": duration,
+        "is_title_card": is_title_card
     }
 
 
@@ -196,11 +232,13 @@ def select_smart_shots(
         return candidate_paths[:num_shots]
 
     # Filter out visually duplicate shots (similarity > 0.88 with an already selected shot)
-    # Sort candidate pool by total score descending
+    # Sort candidate pool by total score descending, prioritizing real combat over title cards
     scored_pool.sort(key=lambda s: s["total_score"], reverse=True)
+    non_bumper_pool = [s for s in scored_pool if not s.get("is_title_card", False)]
+    candidate_ranking = non_bumper_pool if len(non_bumper_pool) >= num_shots else scored_pool
 
     unique_pool: List[Dict[str, Any]] = []
-    for cand in scored_pool:
+    for cand in candidate_ranking:
         is_dup = False
         for chosen in unique_pool:
             sim = compute_shot_similarity(cand["fingerprint"], chosen["fingerprint"])

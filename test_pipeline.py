@@ -741,6 +741,29 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertEqual(parsed.camera_motion, "push_in")
         self.assertTrue(parsed.no_sound_design)
 
+    def test_25_title_card_bumper_detection_and_duel_framing(self):
+        import numpy as np
+        from core.shot_selector import is_title_card_or_bumper
+        from core.smart_reframe import detect_subject_focus
+
+        # 1. Monochromatic flat frame with text (eyecatch title card)
+        flat_card = np.full((1080, 1920, 3), (255, 180, 0), dtype=np.uint8)  # Cyan BGR
+        # Add high-contrast black box (text logo)
+        flat_card[400:600, 700:1200] = 0
+        self.assertTrue(is_title_card_or_bumper(flat_card), "Flat title card should be detected as bumper")
+
+        # 2. Rich colorful anime combat scene
+        multi_color = np.random.randint(0, 255, (1080, 1920, 3), dtype=np.uint8)
+        self.assertFalse(is_title_card_or_bumper(multi_color), "Rich anime frame should NOT be detected as title card")
+
+        # 3. S02E04 timestamps audit
+        from core.timestamp_loader import load_episode_metadata
+        s02e04 = load_episode_metadata("S02E04")
+        self.assertIsNotNone(s02e04)
+        s1 = s02e04["scenes"][0]
+        self.assertEqual(s1["action_level"], "CALM")
+        self.assertLessEqual(s1["action_score"], 0.35)
+
 
 if __name__ == "__main__":
     unittest.main()

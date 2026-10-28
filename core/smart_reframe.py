@@ -141,8 +141,22 @@ def detect_subject_focus(frame: np.ndarray) -> Tuple[float, float, float]:
                 detected_faces.append((area, fx, fy, fw, fh, 1.0 if c_type == "anime" else 0.85))
 
     if detected_faces:
-        # Pick the most prominent / largest face
         detected_faces.sort(key=lambda item: item[0], reverse=True)
+        # Check if top 2 faces are a two-character clash / conversation
+        if len(detected_faces) >= 2:
+            f1, f2 = detected_faces[0], detected_faces[1]
+            cx1 = (f1[1] + f1[3] / 2.0) / float(proc_w)
+            cx2 = (f2[1] + f2[3] / 2.0) / float(proc_w)
+            # If both faces are prominent (second face >= 35% area of first face)
+            # and within 9:16 portrait framing width (< 0.34 of frame width)
+            if f2[0] >= f1[0] * 0.35 and abs(cx1 - cx2) < 0.34:
+                cx_mid = (cx1 + cx2) / 2.0
+                cy1 = (f1[2] + f1[4] / 2.0) / float(proc_h)
+                cy2 = (f2[2] + f2[4] / 2.0) / float(proc_h)
+                cy_mid = (cy1 + cy2) / 2.0
+                return (float(np.clip(cx_mid, 0.0, 1.0)), float(np.clip(cy_mid, 0.0, 1.0)), 1.0)
+
+        # Pick the most prominent / largest face
         _, fx, fy, fw, fh, conf = detected_faces[0]
         cx_norm = (fx + fw / 2.0) / float(proc_w)
         cy_norm = (fy + fh / 2.0) / float(proc_h)

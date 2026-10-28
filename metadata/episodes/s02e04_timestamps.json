@@ -31,13 +31,13 @@
     {
       "start": 120.0,
       "end": 360.0,
-      "action_level": "INTENSE",
-      "priority": "high",
-      "description": "Toji delivers Riko's body to Star Religious Group headquarters",
+      "action_level": "CALM",
+      "priority": "low",
+      "description": "Toji delivers Riko's body to Star Religious Group headquarters (dialogue scene)",
       "characters_present": [
         "toji"
       ],
-      "action_score": 0.75,
+      "action_score": 0.30,
       "duration": 240.0
     },
     {
