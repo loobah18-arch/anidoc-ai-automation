@@ -386,6 +386,54 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertGreater(test_out.stat().st_size, 5000)
         test_out.unlink(missing_ok=True)
 
+    def test_14_smart_9_16_reframing(self):
+        """
+        Phase 1: Validates intelligent 9:16 composition engine:
+        - Output fills 1080x1920 portrait canvas.
+        - Zero black letterbox pad filters.
+        - Fallback provides safe dynamic center crop.
+        - Moving subjects produce smooth cosine ease-in/ease-out panning.
+        - Static shots produce rock-solid stabilized crop coordinates.
+        """
+        from core.smart_reframe import build_smart_reframe_filter, analyze_clip_framing
+        from core.effects_engine import build_velocity_clip_filter
+
+        # 1. Fallback generates 9:16 fill without black bars
+        fb = build_smart_reframe_filter(clip_path=None)
+        self.assertIn("crop=", fb)
+        self.assertIn("scale=1080:1920", fb)
+        self.assertNotIn(",pad=", fb)
+
+        # 2. Velocity clip filter integration produces zero letterbox padding
+        vf = build_velocity_clip_filter(seg_idx=0, duration=1.2)
+        self.assertIn("crop=", vf)
+        self.assertIn("scale=1080:1920", vf)
+        self.assertNotIn(",pad=", vf)
+        self.assertNotIn("pad=1080", vf)
+        self.assertNotIn("color=black", vf)
+
+        # 3. Dynamic subject pan generates smooth easing curve
+        mock_dynamic = {
+            "in_w": 1920, "in_h": 1080,
+            "cx_start": 0.20, "cx_end": 0.80,
+            "cy_start": 0.50, "cy_end": 0.50,
+            "is_dynamic": True
+        }
+        dyn_filter = build_smart_reframe_filter(duration=2.0, framing_info=mock_dynamic)
+        self.assertIn("cos(PI*min", dyn_filter)
+        self.assertIn("crop=608:1080:", dyn_filter)
+
+        # 4. Static subject generates stable static crop
+        mock_static = {
+            "in_w": 1920, "in_h": 1080,
+            "cx_start": 0.50, "cx_end": 0.50,
+            "cy_start": 0.50, "cy_end": 0.50,
+            "is_dynamic": False
+        }
+        static_filter = build_smart_reframe_filter(duration=2.0, framing_info=mock_static)
+        self.assertNotIn("cos(", static_filter)
+        self.assertIn("crop=608:1080:656:0", static_filter)
+
 
 if __name__ == "__main__":
     unittest.main()

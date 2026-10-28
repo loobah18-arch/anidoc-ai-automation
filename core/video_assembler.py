@@ -400,7 +400,8 @@ def render_cinematic_edit(
             fps=FPS,
             add_bars=vel_profile.get("add_bars", False),
             is_intro_hook=is_intro_hook,
-            use_bezier_velocity=use_bezier
+            use_bezier_velocity=use_bezier,
+            clip_path=cp
         )
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)

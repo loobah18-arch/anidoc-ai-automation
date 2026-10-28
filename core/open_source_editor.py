@@ -40,11 +40,12 @@ def generate_editly_spec(
     width: int = VIDEO_WIDTH,
     height: int = VIDEO_HEIGHT,
     fps: int = FPS,
-    audio_offset: float = 0.0
+    audio_offset: float = 0.0,
+    resize_mode: str = "contain"
 ) -> Dict[str, Any]:
     """
     Constructs an Editly declarative JSON specification.
-    Preserves 100% widescreen 16:9 anime combat using resizeMode: 'contain'.
+    Supports resize_mode: 'contain' or 'cover'.
     Applies high-impact crosszoom on beat drop and alternating GL transitions on combat cuts.
     """
     clips = []
@@ -75,7 +76,7 @@ def generate_editly_spec(
                 {
                     "type": "video",
                     "path": str(Path(cp).resolve()),
-                    "resizeMode": "contain"
+                    "resizeMode": resize_mode
                 }
             ]
         }
@@ -94,7 +95,7 @@ def generate_editly_spec(
         "outputVolume": 1.0,
         "defaults": {
             "layer": {
-                "resizeMode": "contain"
+                "resizeMode": resize_mode
             },
             "transition": {
                 "duration": 0.12,

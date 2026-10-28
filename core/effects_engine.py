@@ -35,7 +35,7 @@ def get_segment_velocity_profile(
             "role": "intro_slowmo",
             "speed": 0.85,
             "scale_factor": 1.02,
-            "add_bars": True,
+            "add_bars": False,
             "add_flash": False
         }
 
@@ -202,21 +202,29 @@ def build_velocity_clip_filter(
     fps: int = FPS,
     add_bars: bool = False,
     is_intro_hook: bool = False,
-    use_bezier_velocity: bool = False
+    use_bezier_velocity: bool = False,
+    clip_path: Any = None,
+    framing_info: Any = None
 ) -> str:
     """
     Builds the per-clip video filter chain with modern velocity curves:
+    - Intelligent 9:16 portrait reframing (zero black bars, character tracking, smooth panning)
     - Non-linear Bézier 3-phase curves (fast snap-in -> slow-motion impact hold -> fast snap-out)
     - Dynamic PTS speed remapping (1.25x-1.30x snap acceleration vs 0.80x-0.85x slow-mo)
-    - Temporal frame blending (tblend) for motion blur on slow-mo segments
     - Snappy exponential decay zoom punch on beat cuts (1.12x -> 1.0x over first 0.15s / 9 frames at 60fps)
     - Smooth continuous zoom-in for intro hook (1.0x -> 1.15x)
     """
+    from core.smart_reframe import build_smart_reframe_filter
+    reframe_filter = build_smart_reframe_filter(
+        clip_path=clip_path,
+        duration=duration,
+        video_width=video_width,
+        video_height=video_height,
+        framing_info=framing_info
+    )
     filters = [
-        f"scale={video_width}:{video_height}:force_original_aspect_ratio=decrease:flags=lanczos",
-        f"pad={video_width}:{video_height}:(ow-iw)/2:(oh-ih)/2:color=black",
+        reframe_filter,
         f"fps={fps}",
-        "setsar=1",
     ]
 
     # Speed remapping: Non-linear Bézier curve vs constant speed multiplier
