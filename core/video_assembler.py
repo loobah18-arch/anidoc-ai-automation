@@ -94,7 +94,10 @@ def render_cinematic_edit(
     github_repo: Optional[str] = None,
     gdrive_folder: Optional[str] = None,
     auto_fetch_clips: bool = True,
-    force_refresh: bool = False
+    force_refresh: bool = False,
+    enable_sound_design: bool = True,
+    enable_loop: bool = True,
+    editing_preset: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
@@ -113,7 +116,16 @@ def render_cinematic_edit(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     print(f"\n🎬 [VideoAssembler] Starting 4K Edit for: {theme['name']} ({theme['universe'].upper()})")
-    
+
+    # 0. Load Editing Preset (Phase 10: VIRAL_PHONK, CINEMATIC_ANIME, DARK_ANIME, HYPE_BATTLE, MINIMAL_CINEMATIC)
+    from core.presets import get_editing_preset
+    preset_cfg = get_editing_preset(editing_preset)
+    print(f"🎨 [Preset] Active Editing Preset: {preset_cfg['name']} - {preset_cfg['description']}")
+    if not subtitle_style or subtitle_style == "spur_hook":
+        subtitle_style = preset_cfg.get("caption_preset", "spur_hook")
+    active_preset_cc = cc_preset or preset_cfg.get("cc_preset") or theme["cc_preset"]
+    enable_vel_ramping = preset_cfg.get("enable_velocity_ramping", True)
+
     # 1. Generate Metadata & Quotes
     metadata = generate_edit_metadata(character_key)
     quote_text = custom_quote or metadata.get("engagement_question") or metadata["quote"]
@@ -235,51 +247,16 @@ def render_cinematic_edit(
             )
             clip_paths.extend(extra)
 
-    # ── Thematic Narrative Arc Sequencing (Storytelling flow) ──
-    # Sort and map clips according to the 3-act structure:
-    # 1. Setup / Monologue intro (first clip)
-    # 2. Escalating combat exchanges (middle clips in chronological order)
-    # 3. Ultimate technique climax finisher (highest energy / final clip)
-    if len(clip_paths) >= n_clips:
-        n_intro = sum(1 for f in drop_flags if not f)
-        intro_c = clip_paths[:n_intro] if n_intro > 0 else [clip_paths[0]]
-        combat_pool = clip_paths[n_intro:n_clips - 1] if n_clips > n_intro + 1 else clip_paths[n_intro:]
-        finisher_c = clip_paths[-1]
+    # ── Thematic Narrative Arc Sequencing & Smart Shot Selection (Phase 2 & 7) ──
+    try:
+        from core.shot_selector import select_smart_shots
+        smart_selected = select_smart_shots(clip_paths, num_shots=n_clips, is_drop_flags=drop_flags)
+        if smart_selected and len(smart_selected) >= n_clips:
+            clip_paths = smart_selected[:n_clips]
+    except Exception as e:
+        print(f"⚠️ [VideoAssembler] Smart shot selection fallback: {e}")
 
-        if not combat_pool:
-            combat_pool = clip_paths[:]
-
-        # ── Dual-Timeline Parallel Contrast Cutting ──
-        # Interleaves Stream A (Character Intent / Face & Eye Close-Up) with Stream B (Wide Sakuga / Slashing VFX)
-        if len(combat_pool) >= 2:
-            stream_a = combat_pool[0::2]
-            stream_b = combat_pool[1::2]
-        else:
-            stream_a = combat_pool
-            stream_b = combat_pool
-
-        ordered_clips = []
-        in_i = 0
-        a_i = 0
-        b_i = 0
-        combat_step = 0
-
-        for idx, (dur, is_d) in enumerate(zip(durations, drop_flags)):
-            if not is_d:
-                ordered_clips.append(intro_c[in_i % len(intro_c)])
-                in_i += 1
-            elif idx == n_clips - 1:
-                ordered_clips.append(finisher_c)
-            else:
-                if combat_step % 2 == 0:
-                    ordered_clips.append(stream_a[a_i % len(stream_a)])
-                    a_i += 1
-                else:
-                    ordered_clips.append(stream_b[b_i % len(stream_b)])
-                    b_i += 1
-                combat_step += 1
-        clip_paths = ordered_clips
-    elif clip_paths:
+    if len(clip_paths) < n_clips and clip_paths:
         while len(clip_paths) < n_clips:
             clip_paths.append(clip_paths[len(clip_paths) % len(clip_paths)])
 
@@ -312,7 +289,7 @@ def render_cinematic_edit(
             print(f"⚠️ [Subtitles] Notice generating subtitles: {e}")
             ass_path = None
 
-    active_cc = cc_preset or theme["cc_preset"]
+    active_cc = cc_preset or active_preset_cc
     cc_cfg = CC_PRESETS.get(active_cc, CC_PRESETS["marvel_hdr"])
     
     # 6. Build Multi-Layer FFmpeg Filtergraph (OpenCut-Inspired)
@@ -385,7 +362,7 @@ def render_cinematic_edit(
     # Each clip (except final) receives +0.15s handle to perfectly maintain 100% beat sync without drift.
     trans_dur = 0.15
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
-        vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
+        vel_profile = get_segment_velocity_profile(seg, idx, len(segments), enable_velocity_ramping=enable_vel_ramping)
         is_intro_hook = (idx == 0)
         use_bezier = vel_profile.get("use_bezier_velocity", False)
         clip_render_dur = seg["duration"] + (trans_dur if idx < len(segments) - 1 else 0.0)
@@ -401,7 +378,8 @@ def render_cinematic_edit(
             add_bars=vel_profile.get("add_bars", False),
             is_intro_hook=is_intro_hook,
             use_bezier_velocity=use_bezier,
-            clip_path=cp
+            clip_path=cp,
+            narrative_role=seg.get("role")
         )
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
@@ -456,15 +434,36 @@ def render_cinematic_edit(
     # Pre-Drop Audio Vacuum (0.55s highpass riser + 0.16s dead silence + 808 drop sub-boost)
     # Katana Combat Foley transient presence on cut onsets
     # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
+    # Pre-Drop Audio Vacuum + Subtle Foley & Sound Design
+    from core.sound_design import build_sound_design_filter_chain
     audio_vacuum_fx = build_pre_drop_audio_vacuum_filter(drop_t)
     combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
     combat_foley_fx = build_combat_foley_audio_filter(combat_times, drop_t)
+    climax_t = next((s["start"] for s in segments if s.get("role") == "climax_finisher"), None)
+    sound_design_fx = build_sound_design_filter_chain(
+        drop_time=drop_t,
+        cut_timestamps=[s["start"] for s in segments],
+        climax_time=climax_t,
+        enable_sound_design=enable_sound_design
+    )
+    sd_part = f",{sound_design_fx}" if sound_design_fx != "anull" else ""
+
     filter_chains.append(
         f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=120,lowpass=f=12000[clip_sfx_balanced];"
-        f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.25[phonk_full];"
+        f"[{phonk_inp_idx}:a]{audio_vacuum_fx}{sd_part},volume=1.25[phonk_full];"
         f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=75 25:dropout_transition=2,"
         f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
+
+    # Phase 9: Loopable Ending (Seamless audio tail continuation & click-free looping)
+    if enable_loop and beat_grid.duration > 4.0:
+        loop_fade_start = max(0.1, beat_grid.duration - 0.12)
+        filter_chains.append(
+            f"[aout]afade=t=in:st=0:d=0.06,afade=t=out:st={loop_fade_start:.2f}:d=0.10[aout_final]"
+        )
+        final_a_map = "[aout_final]"
+    else:
+        final_a_map = "[aout]"
 
     full_filter_complex = ";".join(filter_chains)
 
@@ -473,7 +472,7 @@ def render_cinematic_edit(
         *cmd_inputs,
         "-filter_complex", full_filter_complex,
         "-map", "[vout]",
-        "-map", "[aout]",
+        "-map", final_a_map,
         "-c:v", "libx264",
         "-preset", "medium",
         "-crf", "18",

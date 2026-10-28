@@ -43,6 +43,10 @@ def main():
     parser.add_argument("--quote", type=str, default=None, help="Custom dialogue monologue quote")
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
     parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (jjk_void, sukuna_shrine, hinokami_flame, thunder_gold, water_breathing, flame_hashira, akaza_compass, cyber_phonk)")
+    parser.add_argument("--preset", type=str, default="VIRAL_PHONK", choices=["VIRAL_PHONK", "CINEMATIC_ANIME", "DARK_ANIME", "HYPE_BATTLE", "MINIMAL_CINEMATIC"], help="Editing engine style preset (VIRAL_PHONK, CINEMATIC_ANIME, DARK_ANIME, HYPE_BATTLE, MINIMAL_CINEMATIC)")
+    parser.add_argument("--camera-motion", type=str, default="auto", choices=["auto", "push_in", "pull_out", "punch_in", "pan_track", "static_steady"], help="Subject-aware camera motion style (default: auto)")
+    parser.add_argument("--no-sound-design", action="store_true", default=False, help="Disable synchronized subtle audio risers and sub-bass impacts")
+    parser.add_argument("--no-loop", action="store_true", default=False, help="Disable click-free seamless loopable ending")
     parser.add_argument("--gdrive-folder", type=str, default=None, help="Google Drive folder URL or ID to pull movie/episode footage from")
     parser.add_argument("--github-repo", type=str, default=None, help="GitHub repository URL or slug to fetch video clips from")
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
@@ -102,7 +106,10 @@ def main():
         github_repo=args.github_repo,
         gdrive_folder=args.gdrive_folder,
         auto_fetch_clips=True,
-        force_refresh=args.refresh_clips
+        force_refresh=args.refresh_clips,
+        editing_preset=args.preset,
+        enable_sound_design=not args.no_sound_design,
+        enable_loop=not args.no_loop
     )
     
     output_path = result["output_path"]

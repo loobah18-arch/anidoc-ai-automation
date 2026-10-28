@@ -21,6 +21,17 @@ on:
         required: false
         default: ''
         type: string
+      preset:
+        description: 'Editing Engine Style Preset (Phase 10)'
+        required: false
+        default: 'VIRAL_PHONK'
+        type: choice
+        options:
+          - 'VIRAL_PHONK'
+          - 'CINEMATIC_ANIME'
+          - 'DARK_ANIME'
+          - 'HYPE_BATTLE'
+          - 'MINIMAL_CINEMATIC'
       phonk:
         description: 'Phonk BGM Track (or random for auto-rotation)'
         required: false
@@ -148,6 +159,10 @@ jobs:
           
           if [ -n "${{ github.event.inputs.character }}" ]; then
             CMD="$CMD --character ${{ github.event.inputs.character }}"
+          fi
+
+          if [ -n "${{ github.event.inputs.preset }}" ]; then
+            CMD="$CMD --preset ${{ github.event.inputs.preset }}"
           fi
           
           if [ "${{ github.event.inputs.phonk }}" != "random" ] && [ -n "${{ github.event.inputs.phonk }}" ]; then

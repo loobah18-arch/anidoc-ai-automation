@@ -140,14 +140,21 @@ def generate_kinetic_subtitles(
     glow_color: Optional[str] = None,
     character_name: str = "SPIDER-MAN",
     chunk_size: int = 3,
-    drop_time: Optional[float] = None
+    drop_time: Optional[float] = None,
+    face_y: Optional[float] = None
 ) -> Path:
     """
-    Generates high-retention ASS subtitles for YouTube Shorts.
-    Supports both Upper-Third Viral Hook Statement Mode (spur_hook) and Kinetic Word Karaoke.
+    Generates dynamic high-retention ASS subtitles for YouTube Shorts (Phase 5).
+    Features:
+    - Short caption chunks (2-3 words per chunk, 0.8s - 1.6s duration)
+    - Face avoidance: automatically moves subtitles away from detected character faces
+    - YouTube Shorts safe zone padding (clear of right UI icons and bottom seek bar)
+    - Animated entrances and exits (\fad(80,80) with kinetic pop)
+    - Important-word emphasis with accent color highlighting
+    - Full karaoke mode support
     """
     output_ass_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     cfg = SUBTITLE_STYLE_PRESETS.get(style_preset, SUBTITLE_STYLE_PRESETS["spur_hook"]).copy()
     if primary_color:
         cfg["primary"] = primary_color
@@ -156,15 +163,28 @@ def generate_kinetic_subtitles(
     if glow_color:
         cfg["outline"] = glow_color
 
-    margin_lr = cfg.get("margin_lr", 80)
-        
+    # Shorts safe zone margins
+    margin_lr = max(90, cfg.get("margin_lr", 80))
+
+    # Face avoidance: adapt alignment based on character face position
+    alignment = cfg["alignment"]
+    margin_v = cfg["margin_v"]
+    if face_y is not None:
+        if face_y < 0.45:
+            # Face is in upper third -> put captions in lower third safe zone
+            alignment = 2
+            margin_v = 220
+        else:
+            # Face is in lower third/center -> put captions in upper third safe zone
+            alignment = 8
+            margin_v = 240
+
     words = [w.strip() for w in quote_text.strip().split() if w.strip()]
     if not words:
         words = ["HONORED", "ONE"]
-        
+
     total_dur = max(0.6, end_time - start_time)
-    word_dur = total_dur / len(words)
-    
+
     ass_header = f"""[Script Info]
 Title: AniDoc High-Retention Kinetic Subtitles
 ScriptType: v4.00+
@@ -176,75 +196,84 @@ PlayResY: {VIDEO_HEIGHT}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: BaseText,{cfg['font']},{cfg['fontsize']},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{cfg['outline_width']},{cfg['shadow_depth']},{cfg['alignment']},{margin_lr},{margin_lr},{cfg['margin_v']},1
+Style: BaseText,{cfg['font']},{cfg['fontsize']},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{cfg['outline_width']},{cfg['shadow_depth']},{alignment},{margin_lr},{margin_lr},{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-    
+
     events = []
 
-    if style_preset == "spur_hook":
-        # ── Viral Upper-Third Hook Statement Mode (Matches reference edit) ──
-        # Phase 1: Setup statement (plays continuously from start until beat drop)
-        # Phase 2: Climax punchline with Crimson Red keyword emphasis (drop to end)
-        t_drop = drop_time if drop_time and (start_time < drop_time < end_time) else (start_time + total_dur * 0.45)
+    # Calculate short caption chunks (2-3 words per chunk)
+    chunks: List[List[str]] = []
+    chunk_len = max(2, min(3, chunk_size))
+    for i in range(0, len(words), chunk_len):
+        chunks.append(words[i:i + chunk_len])
 
-        if " | " in quote_text:
-            setup_raw, punch_raw = quote_text.split(" | ", 1)
-            setup_words = [w.strip() for w in setup_raw.split() if w.strip()]
-            punch_words = [w.strip() for w in punch_raw.split() if w.strip()]
-            if punch_words and punch_words[0].upper() in ("OR", "BUT"):
-                punch_words = punch_words[1:]
-        elif len(words) >= 6:
-            mid = len(words) // 2
-            setup_words = words[:mid]
-            punch_words = words[mid:]
-        else:
-            setup_words = words
-            punch_words = words
+    if not chunks:
+        chunks = [words]
 
-        # Setup statement line (plays cleanly until the beat drop, no intrusive "BUT?" / "OR?")
-        setup_line = _format_spur_line(setup_words, cfg['active_word'], cfg['primary'])
-        ts_0 = format_ass_timestamp(start_time)
-        ts_drop = format_ass_timestamp(t_drop)
-        events.append(f"Dialogue: 1,{ts_0},{ts_drop},BaseText,,0,0,0,,{{\\fscx106\\fscy106\\t(0,100,\\fscx100\\fscy100)}}{setup_line}")
+    dur_per_chunk = min(1.6, max(0.75, total_dur / len(chunks)))
 
-        # Punchline statement line (with crimson red emphasis keywords, from drop to end)
-        punch_line = _format_spur_line(punch_words, cfg['active_word'], cfg['primary'])
-        ts_end = format_ass_timestamp(end_time)
-        events.append(f"Dialogue: 1,{ts_drop},{ts_end},BaseText,,0,0,0,,{{\\fscx110\\fscy110\\t(0,100,\\fscx100\\fscy100)}}{punch_line}")
-    else:
-        # Word-by-word karaoke lines
-        for chunk_idx in range(0, len(words), chunk_size):
-            chunk_words = words[chunk_idx:chunk_idx + chunk_size]
-            chunk_start = start_time + (chunk_idx * word_dur)
-            chunk_end = min(end_time, start_time + ((chunk_idx + len(chunk_words)) * word_dur))
-            
-            # Word-by-word highlight within this chunk
+    if style_preset == "viral_karaoke":
+        # Karaoke word-by-word timing within short chunks
+        word_dur = total_dur / len(words)
+        for chunk_idx, chunk_words in enumerate(chunks):
+            base_idx = chunk_idx * chunk_len
             for word_in_chunk_idx, active_word in enumerate(chunk_words):
-                global_word_idx = chunk_idx + word_in_chunk_idx
+                global_word_idx = base_idx + word_in_chunk_idx
                 w_start = start_time + (global_word_idx * word_dur)
                 w_end = min(end_time, w_start + word_dur)
-                
+
                 ts_start = format_ass_timestamp(w_start)
                 ts_end = format_ass_timestamp(w_end)
-                
-                # Construct chunk string with highlighted word
+
                 line_parts = []
                 for j, w in enumerate(chunk_words):
-                    w_upper = w.upper()
+                    w_clean = w.strip(".,!?:;\"'").upper()
+                    is_emphasized = w_clean in EMPHASIS_KEYWORDS
                     if j == word_in_chunk_idx:
-                        # Active word: Highlighted color + 118% dynamic bounce scale
                         line_parts.append(
-                            f"{{\\c{cfg['active_word']}\\t(0,100,\\fscx118\\fscy118)\\t(100,200,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
+                            f"{{\\fad(60,60)\\c{cfg['active_word']}\\t(0,80,\\fscx115\\fscy115)\\t(80,160,\\fscx100\\fscy100)}}{w.upper()}{{\\rBaseText}}"
                         )
+                    elif is_emphasized:
+                        line_parts.append(f"{{\\c{cfg['active_word']}}}{w.upper()}{{\\rBaseText}}")
                     else:
-                        # Inactive word: Clean white
-                        line_parts.append(f"{{\\c{cfg['primary']}}}{w_upper}")
-                        
-                formatted_line = " ".join(line_parts)
-                events.append(f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{formatted_line}")
+                        line_parts.append(f"{{\\c{cfg['primary']}}}{w.upper()}")
+
+                events.append(f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{' '.join(line_parts)}")
+    else:
+        # Dynamic short statement chunks with animated entrance/exit & keyword emphasis
+        for idx, chunk_words in enumerate(chunks):
+            c_start = start_time + (idx * dur_per_chunk)
+            c_end = min(end_time, c_start + dur_per_chunk)
+            if c_start >= end_time:
+                break
+
+            ts_start = format_ass_timestamp(c_start)
+            ts_end = format_ass_timestamp(c_end)
+
+            formatted_words = []
+            for w in chunk_words:
+                w_clean = w.strip(".,!?:;\"'").upper()
+                if w_clean in EMPHASIS_KEYWORDS or (len(chunk_words) == 1):
+                    formatted_words.append(
+                        f"{{\\c{cfg['active_word']}\\t(0,90,\\fscx114\\fscy114)\\t(90,180,\\fscx100\\fscy100)}}{w.upper()}{{\\rBaseText}}"
+                    )
+                else:
+                    formatted_words.append(w.upper())
+
+            chunk_line = " ".join(formatted_words)
+            # Animated entrance/exit with smooth 80ms alpha fade
+            events.append(
+                f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{{\\fad(80,80)\\t(0,90,\\fscx106\\fscy106)\\t(90,180,\\fscx100\\fscy100)}}{chunk_line}"
+            )
+
+    full_ass = ass_header + "\n".join(events) + "\n"
+    with open(output_ass_path, "w", encoding="utf-8") as f:
+        f.write(full_ass)
+
+    return output_ass_path
             
     full_ass = ass_header + "\n".join(events) + "\n"
     with open(output_ass_path, "w", encoding="utf-8") as f:

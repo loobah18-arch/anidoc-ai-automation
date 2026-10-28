@@ -308,10 +308,16 @@ def get_character_scene_clips(
             clip_paths.append(out_p)
         return clip_paths
     
-    # ── Thematic Narrative Arc Sequencing (matches reference edit storytelling) ──
-    # Act 1: Intro shots (setup, walking, stare, dialogue) from early clips
-    # Act 2: Combat cuts (escalating clashes, technique trades) from middle clips
-    # Act 3: Climax Finisher (ultimate strike, domain expansion, finishing hit) from peak clip
+    # ── Smart Shot Selection & Narrative Arc Sequencing (Phase 2 & Phase 7) ──
+    try:
+        from core.shot_selector import select_smart_shots
+        clip_paths = select_smart_shots(raw_clips, num_shots=n_segs, is_drop_flags=is_drop_flags)
+        if len(clip_paths) >= n_segs:
+            return clip_paths[:n_segs]
+    except Exception as e:
+        print(f"⚠️ [ClipManager] Smart shot selector fallback: {e}")
+
+    # Fallback sequencing if smart selection unavailable
     n_intro = sum(1 for f in is_drop_flags if not f)
 
     if len(raw_clips) >= n_segs:

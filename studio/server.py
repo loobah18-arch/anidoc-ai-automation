@@ -82,6 +82,7 @@ class AniDocStudioHandler(SimpleHTTPRequestHandler):
 
         # 2. REST API Endpoints
         if path == "/api/status":
+            from core.presets import list_available_presets
             self.send_json_response({
                 "render_state": RENDER_STATE,
                 "characters": CHARACTER_THEMES,
@@ -89,6 +90,7 @@ class AniDocStudioHandler(SimpleHTTPRequestHandler):
                 "popular_phonk_catalog": POPULAR_PHONK_CATALOG,
                 "subtitle_styles": list(SUBTITLE_STYLE_PRESETS.keys()),
                 "cc_presets": list(CC_PRESETS.keys()),
+                "editing_presets": list_available_presets(),
                 "outputs": self.get_output_videos()
             })
             return
@@ -159,10 +161,13 @@ class AniDocStudioHandler(SimpleHTTPRequestHandler):
                     title = body.get("custom_title")
                     cc = body.get("cc_preset")
                     repo = body.get("github_repo")
-                    
+                    preset = body.get("preset", "VIRAL_PHONK")
+                    sound_design = body.get("sound_design", True)
+                    loop = body.get("loop", True)
+
                     RENDER_STATE["progress"] = 30
-                    RENDER_STATE["status_message"] = f"Sourcing clips & audio for {char_key.upper()}..."
-                    
+                    RENDER_STATE["status_message"] = f"Sourcing clips & audio for {char_key.upper()} ({preset})..."
+
                     res = render_cinematic_edit(
                         character_key=char_key,
                         phonk_track=phonk,
@@ -172,7 +177,10 @@ class AniDocStudioHandler(SimpleHTTPRequestHandler):
                         custom_title=title,
                         cc_preset=cc,
                         github_repo=repo,
-                        auto_fetch_clips=True
+                        auto_fetch_clips=True,
+                        editing_preset=preset,
+                        enable_sound_design=sound_design,
+                        enable_loop=loop
                     )
                     
                     RENDER_STATE["progress"] = 100

@@ -311,14 +311,17 @@ def build_smart_reframe_filter(
     duration: float = 1.0,
     video_width: int = VIDEO_WIDTH,
     video_height: int = VIDEO_HEIGHT,
-    framing_info: Optional[Dict[str, Any]] = None
+    framing_info: Optional[Dict[str, Any]] = None,
+    camera_motion: str = "auto",
+    narrative_role: Optional[str] = None
 ) -> str:
     """
-    Builds the complete FFmpeg filter string for intelligent 9:16 reframing.
+    Builds the complete FFmpeg filter string for intelligent 9:16 reframing with
+    subject-aware camera movement (Phase 1 & Phase 4).
     - Fills the 1080x1920 portrait canvas without black bars.
     - Strips any baked-in letterbox black bars from source footage.
-    - Tracks subject focal points and pans smoothly with cosine easing.
-    - If clip_path is missing or fails, falls back to safe center crop to 9:16.
+    - Anchors camera motion to detected anime character faces/focal points.
+    - Restrained motion: subtle push-ins, pull-outs, punch-ins, and horizontal/vertical tracking.
     """
     target_ar = video_width / float(video_height)  # 1080 / 1920 = 0.5625 (9:16)
 
@@ -328,6 +331,22 @@ def build_smart_reframe_filter(
             framing_info = analyze_clip_framing(clip_path, duration=duration)
         except Exception:
             framing_info = None
+
+    # Resolve automatic camera motion based on narrative role
+    resolved_motion = camera_motion
+    if resolved_motion == "auto":
+        if narrative_role == "intro_buildup":
+            resolved_motion = "push_in"
+        elif narrative_role == "climax_finisher":
+            resolved_motion = "push_in"
+        elif narrative_role == "payoff_outro":
+            resolved_motion = "pull_out"
+        elif narrative_role in ("combat_strike", "combat_micro_rush"):
+            resolved_motion = "punch_in"
+        elif framing_info and framing_info.get("is_dynamic"):
+            resolved_motion = "pan_track"
+        else:
+            resolved_motion = "static_steady"
 
     # 2. Specific analyzed framing
     if framing_info is not None and framing_info.get("in_w", 0) > 0 and framing_info.get("in_h", 0) > 0:
@@ -340,52 +359,75 @@ def build_smart_reframe_filter(
 
         input_ar = act_w / float(act_h)
 
+        # Subject anchor focal point (normalized to pixel coords)
+        cx = framing_info.get("cx_start", 0.5)
+        cy = framing_info.get("cy_start", 0.5)
+        anchor_x = int(round(act_x + cx * act_w))
+        anchor_y = int(round(act_y + cy * act_h))
+
         # Case A: Active content is wider than 9:16 (widescreen / landscape)
         if input_ar >= target_ar:
-            crop_h = act_h
-            crop_w = int(round(act_h * target_ar / 2.0)) * 2
-            crop_w = min(crop_w, act_w)
-            max_scroll_x = act_w - crop_w
+            base_crop_h = act_h
+            base_crop_w = int(round(act_h * target_ar / 2.0)) * 2
+            base_crop_w = min(base_crop_w, act_w)
+            max_scroll_x = act_w - base_crop_w
 
-            if max_scroll_x <= 0:
-                crop_x_expr = str(act_x)
+            if resolved_motion == "push_in" and duration > 0.4:
+                # 1.00x -> 1.06x restrained subtle push-in anchored on subject
+                w_expr = f"({base_crop_w}*(1.0-0.06*min(t/{duration:.3f}\\,1)))"
+                h_expr = f"({base_crop_h}*(1.0-0.06*min(t/{duration:.3f}\\,1)))"
+                x_expr = f"clip({anchor_x}-{w_expr}/2\\,{act_x}\\,{act_x+act_w}-{w_expr})"
+                y_expr = f"clip({anchor_y}-{h_expr}/2\\,{act_y}\\,{act_y+act_h}-{h_expr})"
+                crop_filter = f"crop=w='{w_expr}':h='{h_expr}':x='{x_expr}':y='{y_expr}'"
+            elif resolved_motion == "pull_out" and duration > 0.4:
+                # 1.06x -> 1.00x subtle pull-out anchored on subject
+                w_expr = f"({base_crop_w}*(0.94+0.06*min(t/{duration:.3f}\\,1)))"
+                h_expr = f"({base_crop_h}*(0.94+0.06*min(t/{duration:.3f}\\,1)))"
+                x_expr = f"clip({anchor_x}-{w_expr}/2\\,{act_x}\\,{act_x+act_w}-{w_expr})"
+                y_expr = f"clip({anchor_y}-{h_expr}/2\\,{act_y}\\,{act_y+act_h}-{h_expr})"
+                crop_filter = f"crop=w='{w_expr}':h='{h_expr}':x='{x_expr}':y='{y_expr}'"
+            elif resolved_motion == "punch_in" and duration > 0.3:
+                # 1.08x -> 1.00x impact punch-in recovering over first 0.20s
+                w_expr = f"({base_crop_w}*(0.93+0.07*min(t/0.20\\,1)))"
+                h_expr = f"({base_crop_h}*(0.93+0.07*min(t/0.20\\,1)))"
+                x_expr = f"clip({anchor_x}-{w_expr}/2\\,{act_x}\\,{act_x+act_w}-{w_expr})"
+                y_expr = f"clip({anchor_y}-{h_expr}/2\\,{act_y}\\,{act_y+act_h}-{h_expr})"
+                crop_filter = f"crop=w='{w_expr}':h='{h_expr}':x='{x_expr}':y='{y_expr}'"
+            elif max_scroll_x <= 0:
+                crop_filter = f"crop={base_crop_w}:{base_crop_h}:{act_x}:{act_y}"
             else:
-                ideal_x_start = act_x + (framing_info["cx_start"] * act_w - (crop_w / 2.0))
-                ideal_x_end = act_x + (framing_info["cx_end"] * act_w - (crop_w / 2.0))
-
+                # Horizontal pan tracking subject
+                ideal_x_start = act_x + (framing_info["cx_start"] * act_w - (base_crop_w / 2.0))
+                ideal_x_end = act_x + (framing_info["cx_end"] * act_w - (base_crop_w / 2.0))
                 x_start = int(round(np.clip(ideal_x_start, act_x, act_x + max_scroll_x)))
                 x_end = int(round(np.clip(ideal_x_end, act_x, act_x + max_scroll_x)))
 
-                if x_start == x_end or duration <= 0.20:
+                if x_start == x_end or duration <= 0.20 or resolved_motion == "static_steady":
                     crop_x_expr = str(x_start)
                 else:
-                    # Smooth S-curve easing (ease-in-out cosine) for camera movement
                     crop_x_expr = f"'{x_start}+({x_end - x_start})*(0.5-0.5*cos(PI*min(t/{duration:.3f}\\,1)))'"
-
-            crop_filter = f"crop={crop_w}:{crop_h}:{crop_x_expr}:{act_y}"
+                crop_filter = f"crop={base_crop_w}:{base_crop_h}:{crop_x_expr}:{act_y}"
 
         # Case B: Active content is narrower than 9:16 (ultra-tall)
         else:
-            crop_w = act_w
-            crop_h = int(round(act_w / target_ar / 2.0)) * 2
-            crop_h = min(crop_h, act_h)
-            max_scroll_y = act_h - crop_h
+            base_crop_w = act_w
+            base_crop_h = int(round(act_w / target_ar / 2.0)) * 2
+            base_crop_h = min(base_crop_h, act_h)
+            max_scroll_y = act_h - base_crop_h
 
             if max_scroll_y <= 0:
                 crop_y_expr = str(act_y)
             else:
-                ideal_y_start = act_y + (framing_info["cy_start"] * act_h - (crop_h / 2.0))
-                ideal_y_end = act_y + (framing_info["cy_end"] * act_h - (crop_h / 2.0))
-
+                ideal_y_start = act_y + (framing_info["cy_start"] * act_h - (base_crop_h / 2.0))
+                ideal_y_end = act_y + (framing_info["cy_end"] * act_h - (base_crop_h / 2.0))
                 y_start = int(round(np.clip(ideal_y_start, act_y, act_y + max_scroll_y)))
                 y_end = int(round(np.clip(ideal_y_end, act_y, act_y + max_scroll_y)))
 
-                if y_start == y_end or duration <= 0.20:
+                if y_start == y_end or duration <= 0.20 or resolved_motion == "static_steady":
                     crop_y_expr = str(y_start)
                 else:
                     crop_y_expr = f"'{y_start}+({y_end - y_start})*(0.5-0.5*cos(PI*min(t/{duration:.3f}\\,1)))'"
-
-            crop_filter = f"crop={crop_w}:{crop_h}:{act_x}:{crop_y_expr}"
+            crop_filter = f"crop={base_crop_w}:{base_crop_h}:{act_x}:{crop_y_expr}"
 
         return f"{crop_filter},scale={video_width}:{video_height}:flags=lanczos,setsar=1"
 

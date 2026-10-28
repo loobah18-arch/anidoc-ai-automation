@@ -30,13 +30,62 @@ from core.phonk_manager import POPULAR_PHONK_CATALOG
 
 
 class BeatGrid:
-    def __init__(self, duration: float, drop_time: float, beat_times: List[float], bpm: float = 134.0, audio_offset: float = 0.0, heavy_drop_times: Optional[List[float]] = None):
+    def __init__(
+        self,
+        duration: float,
+        drop_time: float,
+        beat_times: List[float],
+        bpm: float = 134.0,
+        audio_offset: float = 0.0,
+        heavy_drop_times: Optional[List[float]] = None
+    ):
         self.duration = duration
         self.drop_time = drop_time
         self.beat_times = sorted(list(set([round(t, 2) for t in beat_times if 0.0 <= t <= duration])))
         self.bpm = bpm
         self.audio_offset = audio_offset
         self.heavy_drop_times = heavy_drop_times or []
+
+        # ── Phase 3: Music-Synced Event Hierarchy ──
+        self.drops = sorted(list(set([round(self.drop_time, 2)] + [round(t, 2) for t in self.heavy_drop_times if 0.0 <= t <= duration])))
+        beat_interval = 60.0 / max(60.0, min(240.0, bpm))
+        bar_interval = beat_interval * 4.0
+
+        # Major beats (bar downbeats, drop points, and loudest transients)
+        major = set(self.drops)
+        for t in self.beat_times:
+            if any(abs(t - (self.drop_time + k * bar_interval)) < 0.12 for k in range(-10, 30)):
+                major.add(t)
+        self.major_beats = sorted(list(major))
+        if not self.major_beats:
+            self.major_beats = self.beat_times[::2] if len(self.beat_times) >= 2 else self.beat_times
+
+        # Medium beats (syncopated 2-beat rhythmic pulses)
+        self.medium_beats = sorted([t for t in self.beat_times if t not in self.major_beats])
+
+        # High-energy sections vs atmospheric build-ups
+        self.build_ups = [(0.0, round(self.drop_time, 2))]
+        if self.duration > 25.0:
+            b_start = round(self.duration * 0.42, 2)
+            b_end = round(self.duration * 0.60, 2)
+            self.build_ups.append((b_start, b_end))
+
+        self.high_energy_sections = [
+            (round(self.drop_time, 2), round(min(self.duration * 0.42 if self.duration > 25.0 else self.duration - 2.8, self.duration), 2)),
+            (round(self.duration * 0.60, 2), round(self.duration * 0.92, 2))
+        ]
+
+    def is_major_beat(self, t: float, tolerance: float = 0.10) -> bool:
+        """Checks if timestamp t aligns with a major beat or bar downbeat."""
+        return any(abs(t - b) <= tolerance for b in self.major_beats)
+
+    def is_high_energy(self, t: float) -> bool:
+        """Checks if timestamp falls inside a high-energy combat section."""
+        return any(s <= t <= e for s, e in self.high_energy_sections)
+
+    def is_build_up(self, t: float) -> bool:
+        """Checks if timestamp falls inside a narrative build-up section."""
+        return any(s <= t <= e for s, e in self.build_ups)
 
     def get_heavy_drop_timestamps(self) -> List[float]:
         """Returns the top 30% loudest bass hit timestamps for shake & flash impact."""
@@ -57,13 +106,24 @@ class BeatGrid:
         return sorted(heavy[:count])
 
     def get_cut_segments(self) -> List[Dict[str, Any]]:
-        """Returns list of segments with start, end, duration, is_drop, and prev_is_drop flags.
+        """Returns list of segments with intentional narrative pacing and beat-locked cuts."""
+        try:
+            from core.shot_selector import calculate_variable_pacing
+            beats = self.major_beats if hasattr(self, "major_beats") and self.major_beats else self.beat_times
+            segments = calculate_variable_pacing(
+                total_duration=self.duration,
+                drop_time=self.drop_time,
+                major_beat_times=beats
+            )
+            for i, seg in enumerate(segments):
+                seg["prev_is_drop"] = segments[i - 1]["is_drop"] if i > 0 else False
+                seg["is_flash"] = False
+                seg["is_major_beat"] = self.is_major_beat(seg["start"])
+            if segments:
+                return segments
+        except Exception as e:
+            print(f"⚠️ [BeatGrid] Variable pacing fallback: {e}")
 
-        Reference video has ~20 major segments in 23s (avg ~1.15s each).
-        This targets 15-20 major segments for a 38s edit. Each segment is a
-        held shot — no micro-subdivision, no flash inserts between segments.
-        Flash moments are identified separately (2-3 per edit) at the biggest drops.
-        """
         # Ensure contiguous segment boundaries from 0.0 to duration
         all_points = [0.0] + self.beat_times
         if self.duration not in all_points:
@@ -86,9 +146,6 @@ class BeatGrid:
             e = merged_points[i+1]
             raw_segments.append({"start": s, "end": e})
 
-        # No subdivision — each beat-to-beat interval is one held shot.
-        # This matches the reference's narrative pacing where scenes are 1.0-2.0s.
-
         segments = []
         for seg in raw_segments:
             s, e = seg["start"], seg["end"]
@@ -100,7 +157,7 @@ class BeatGrid:
                 "duration": round(e - s, 3),
                 "is_drop": is_d,
                 "prev_is_drop": prev_d,
-                "is_flash": False,  # Flash is handled separately, not as segments
+                "is_flash": False,
                 "index": len(segments)
             })
         return segments

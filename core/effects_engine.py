@@ -28,9 +28,11 @@ def get_segment_velocity_profile(
     """
     is_drop = seg.get("is_drop", False)
     duration = seg.get("duration", 1.0)
+    is_major = seg.get("is_major_beat", False)
+    role = seg.get("role", "")
 
-    if not is_drop:
-        # Phase 1: Intro — slight slow-mo for cinematic weight & narrative buildup
+    if not is_drop or role == "intro_buildup":
+        # Act 1: Intro — cinematic weight, clean cut, no flash
         return {
             "role": "intro_slowmo",
             "speed": 0.85,
@@ -48,8 +50,8 @@ def get_segment_velocity_profile(
             "add_flash": False
         }
 
-    if seg_idx == total_segs - 1:
-        # Final Outro — held climax finisher, dramatic weight
+    if seg_idx == total_segs - 1 or role == "payoff_outro":
+        # Act 5: Payoff Outro — lingering hold on resolution
         return {
             "role": "climax_outro",
             "speed": 0.80,
@@ -58,7 +60,18 @@ def get_segment_velocity_profile(
             "add_flash": False
         }
 
-    # First drop segment: Explosive impact
+    if role == "climax_finisher":
+        # Act 4: Climax Finisher — weighty impact hold on ultimate technique
+        return {
+            "role": "climax_finisher",
+            "speed": 0.88,
+            "scale_factor": 1.10,
+            "add_bars": False,
+            "add_flash": False,
+            "use_bezier_velocity": True
+        }
+
+    # First drop segment: Explosive 808 drop impact (punch-in + brief flash)
     if seg.get("is_first_drop", False) or seg_idx == sum(1 for s in range(seg_idx) if not seg.get("is_drop", False)):
         return {
             "role": "drop_impact",
@@ -69,7 +82,18 @@ def get_segment_velocity_profile(
             "use_bezier_velocity": True
         }
 
-    # Alternating combat dynamics (fast attack snap vs slow-mo clash hold)
+    # Acts 2 & 3: High-Energy Combat Exchanges (Restrained: clean cuts without flashes)
+    if role == "combat_micro_rush":
+        return {
+            "role": "combat_micro_rush",
+            "speed": 1.30,
+            "scale_factor": 1.05 if is_major else 1.02,
+            "add_bars": False,
+            "add_flash": False,
+            "use_bezier_velocity": True
+        }
+
+    # Standard combat strike
     if seg_idx % 2 == 0:
         return {
             "role": "combat_snap",
@@ -204,15 +228,17 @@ def build_velocity_clip_filter(
     is_intro_hook: bool = False,
     use_bezier_velocity: bool = False,
     clip_path: Any = None,
-    framing_info: Any = None
+    framing_info: Any = None,
+    camera_motion: str = "auto",
+    narrative_role: Any = None
 ) -> str:
     """
     Builds the per-clip video filter chain with modern velocity curves:
     - Intelligent 9:16 portrait reframing (zero black bars, character tracking, smooth panning)
+    - Subject-aware camera movement (subtle push-in, pull-out, punch-in, tracking)
     - Non-linear Bézier 3-phase curves (fast snap-in -> slow-motion impact hold -> fast snap-out)
     - Dynamic PTS speed remapping (1.25x-1.30x snap acceleration vs 0.80x-0.85x slow-mo)
-    - Snappy exponential decay zoom punch on beat cuts (1.12x -> 1.0x over first 0.15s / 9 frames at 60fps)
-    - Smooth continuous zoom-in for intro hook (1.0x -> 1.15x)
+    - Snappy exponential decay zoom punch on beat cuts
     """
     from core.smart_reframe import build_smart_reframe_filter
     reframe_filter = build_smart_reframe_filter(
@@ -220,7 +246,9 @@ def build_velocity_clip_filter(
         duration=duration,
         video_width=video_width,
         video_height=video_height,
-        framing_info=framing_info
+        framing_info=framing_info,
+        camera_motion=camera_motion,
+        narrative_role=narrative_role
     )
     filters = [
         reframe_filter,

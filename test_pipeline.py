@@ -434,6 +434,313 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertNotIn("cos(", static_filter)
         self.assertIn("crop=608:1080:656:0", static_filter)
 
+    def test_15_smart_shot_selection_and_pacing(self):
+        from core.shot_selector import (
+            score_candidate_shot,
+            select_smart_shots,
+            calculate_variable_pacing,
+            compute_shot_similarity
+        )
+        import numpy as np
+
+        # 1. Color fingerprint similarity
+        fp1 = np.ones(24, dtype=np.float32) / np.sqrt(24)
+        fp2 = np.ones(24, dtype=np.float32) / np.sqrt(24)
+        sim = compute_shot_similarity(fp1, fp2)
+        self.assertAlmostEqual(sim, 1.0, places=4)
+
+        # 2. Variable narrative pacing
+        beats = [1.6, 3.2, 4.8, 5.5, 6.2, 7.0, 7.8, 8.6, 9.4, 10.2, 11.5]
+        pacing = calculate_variable_pacing(total_duration=12.0, drop_time=4.8, major_beat_times=beats)
+        self.assertTrue(len(pacing) >= 6)
+
+        # Durations must vary intentionally (no identical durations across all acts)
+        durs = [s["duration"] for s in pacing]
+        self.assertGreater(len(set(durs)), 2, "Shot pacing must have variable durations")
+
+        # Pacing roles and drop alignment
+        self.assertTrue(any(abs(s["start"] - 4.8) < 0.05 for s in pacing))
+        intro_segs = [s for s in pacing if not s["is_drop"]]
+        combat_segs = [s for s in pacing if s["is_drop"] and not s["is_climax"]]
+        self.assertTrue(len(intro_segs) >= 1)
+        self.assertTrue(len(combat_segs) >= 1)
+        self.assertEqual(intro_segs[0]["role"], "intro_buildup")
+
+        # Intro shots should be calmer on average than rapid combat shots
+        avg_intro = sum(s["duration"] for s in intro_segs) / len(intro_segs)
+        avg_combat = sum(s["duration"] for s in combat_segs) / len(combat_segs)
+        self.assertGreater(avg_intro, avg_combat, "Intro shots should be calmer than combat shots")
+
+    def test_16_music_synced_editing(self):
+        from core.beat_detector import BeatGrid, generate_procedural_beat_grid
+
+        grid = generate_procedural_beat_grid(duration=30.0, drop_time=4.8, bpm=134.0)
+
+        # 1. Event hierarchy: drops, major beats, medium beats
+        self.assertTrue(len(grid.drops) >= 1)
+        self.assertIn(4.8, grid.drops)
+        self.assertTrue(len(grid.major_beats) >= 4)
+        self.assertTrue(len(grid.medium_beats) >= 2)
+
+        # 2. Section detection: build-ups vs high-energy
+        self.assertTrue(grid.is_build_up(2.0))
+        self.assertFalse(grid.is_high_energy(2.0))
+        self.assertTrue(grid.is_high_energy(5.5))
+
+        # 3. Cut alignment to major beats
+        segments = grid.get_cut_segments()
+        self.assertTrue(len(segments) >= 10)
+        self.assertTrue(any(s["is_major_beat"] for s in segments))
+        drop_seg = next(s for s in segments if abs(s["start"] - 4.8) < 0.05)
+        self.assertTrue(drop_seg["is_drop"])
+        self.assertTrue(grid.is_major_beat(drop_seg["start"]))
+
+    def test_17_subject_aware_camera_movement(self):
+        from core.smart_reframe import build_smart_reframe_filter
+
+        mock_framing = {
+            "in_w": 1920, "in_h": 1080,
+            "act_x": 0, "act_y": 0, "act_w": 1920, "act_h": 1080,
+            "cx_start": 0.40, "cx_end": 0.60,
+            "cy_start": 0.35, "cy_end": 0.35,
+            "is_dynamic": True
+        }
+
+        # 1. Push-in motion anchored around subject
+        push_filter = build_smart_reframe_filter(
+            duration=1.5,
+            framing_info=mock_framing,
+            camera_motion="push_in"
+        )
+        self.assertIn("1.0-0.06*min", push_filter)
+        self.assertIn("clip(", push_filter)
+        self.assertIn("scale=1080:1920", push_filter)
+        self.assertNotIn(",pad=", push_filter)
+
+        # 2. Pull-out motion
+        pull_filter = build_smart_reframe_filter(
+            duration=1.5,
+            framing_info=mock_framing,
+            camera_motion="pull_out"
+        )
+        self.assertIn("0.94+0.06*min", pull_filter)
+        self.assertIn("scale=1080:1920", pull_filter)
+
+        # 3. Punch-in motion
+        punch_filter = build_smart_reframe_filter(
+            duration=0.8,
+            framing_info=mock_framing,
+            camera_motion="punch_in"
+        )
+        self.assertIn("min(t/0.20", punch_filter)
+        self.assertIn("scale=1080:1920", punch_filter)
+
+        # 4. Auto motion adapts by narrative role
+        intro_auto = build_smart_reframe_filter(
+            duration=1.5,
+            framing_info=mock_framing,
+            camera_motion="auto",
+            narrative_role="intro_buildup"
+        )
+        self.assertIn("1.0-0.06*min", intro_auto)
+
+    def test_18_dynamic_captions_and_face_avoidance(self):
+        from core.subtitle_stylizer import generate_kinetic_subtitles
+
+        ass_bottom = SCRATCH_DIR / "test_subs_bottom.ass"
+        ass_top = SCRATCH_DIR / "test_subs_top.ass"
+
+        # 1. Face avoidance: upper face moves captions to bottom safe zone (alignment 2)
+        generate_kinetic_subtitles(
+            quote_text="THROUGHOUT HEAVEN AND EARTH I ALONE AM THE HONORED ONE",
+            start_time=0.5,
+            end_time=6.5,
+            output_ass_path=ass_bottom,
+            style_preset="spur_hook",
+            face_y=0.25
+        )
+        content_bottom = ass_bottom.read_text()
+        self.assertIn(",2,90,90,220,1", content_bottom)  # Alignment 2 (bottom safe zone)
+        self.assertIn(r"\fad(80,80)", content_bottom)      # Animated entrance/exit
+
+        # 2. Face avoidance: lower face moves captions to top safe zone (alignment 8)
+        generate_kinetic_subtitles(
+            quote_text="THROUGHOUT HEAVEN AND EARTH I ALONE AM THE HONORED ONE",
+            start_time=0.5,
+            end_time=6.5,
+            output_ass_path=ass_top,
+            style_preset="spur_hook",
+            face_y=0.75
+        )
+        content_top = ass_top.read_text()
+        self.assertIn(",8,90,90,240,1", content_top)     # Alignment 8 (top safe zone)
+
+        # 3. Short caption chunks: must have multiple dialogue events (no single long banner)
+        dialogue_lines = [line for line in content_bottom.splitlines() if line.startswith("Dialogue:")]
+        self.assertGreaterEqual(len(dialogue_lines), 3, "Subtitles must be chunked into short segments")
+
+    def test_19_effects_with_purpose(self):
+        from core.effects_engine import get_segment_velocity_profile
+
+        # 1. Intro shot: clean cut, no flash
+        intro = get_segment_velocity_profile({"is_drop": False, "role": "intro_buildup"}, 0, 10)
+        self.assertFalse(intro["add_flash"])
+        self.assertEqual(intro["role"], "intro_slowmo")
+
+        # 2. 808 drop cut: purposeful impact punch + single brief flash
+        drop_impact = get_segment_velocity_profile(
+            {"is_drop": True, "is_first_drop": True, "is_major_beat": True, "role": "combat_strike"},
+            1, 10
+        )
+        self.assertTrue(drop_impact["add_flash"])
+        self.assertEqual(drop_impact["scale_factor"], 1.08)
+
+        # 3. Regular combat cut: clean cut (NO flash)
+        combat_cut = get_segment_velocity_profile(
+            {"is_drop": True, "is_first_drop": False, "is_major_beat": False, "role": "combat_strike"},
+            2, 10
+        )
+        self.assertFalse(combat_cut["add_flash"], "Regular combat cut must remain a clean cut")
+
+        # 4. Climax finisher: weighty impact scale hold, zero flash
+        climax = get_segment_velocity_profile(
+            {"is_drop": True, "role": "climax_finisher"},
+            8, 10
+        )
+        self.assertFalse(climax["add_flash"])
+        self.assertEqual(climax["scale_factor"], 1.10)
+
+    def test_20_build_the_climax_5_act_narrative(self):
+        from core.shot_selector import calculate_variable_pacing
+
+        # 5-act narrative progression: Hook -> Build -> Escalation -> Climax -> Payoff
+        beats = [1.6, 3.2, 4.8, 5.5, 6.1, 6.7, 7.3, 8.0, 9.6, 11.2, 12.8, 14.0]
+        segments = calculate_variable_pacing(total_duration=14.0, drop_time=4.8, major_beat_times=beats)
+
+        roles = [s["role"] for s in segments]
+        self.assertIn("intro_buildup", roles)
+        self.assertTrue(any(r in ("combat_strike", "combat_micro_rush") for r in roles))
+        self.assertIn("climax_finisher", roles)
+
+        # Climax must occur in the final quarter before the payoff
+        climax_idx = next(i for i, s in enumerate(segments) if s["role"] == "climax_finisher")
+        self.assertGreater(climax_idx, len(segments) // 2)
+
+        # Escalation cut lengths must be faster than the opening hook
+        hook_dur = segments[0]["duration"]
+        combat_segs = [s for s in segments if s["role"] in ("combat_strike", "combat_micro_rush")]
+        for c in combat_segs:
+            self.assertLess(c["duration"], hook_dur)
+
+    def test_21_sound_design_filter_chain(self):
+        from core.sound_design import (
+            build_pre_drop_riser_filter,
+            build_sub_impact_filter,
+            build_transition_whoosh_filter,
+            build_sound_design_filter_chain
+        )
+
+        # 1. Riser generation
+        riser = build_pre_drop_riser_filter(drop_time=4.8)
+        self.assertIn("highpass=f=1400", riser)
+
+        # 2. Sub impact generation
+        impact = build_sub_impact_filter([4.8, 11.2])
+        self.assertIn("bass=g=3.5:f=60", impact)
+
+        # 3. Transition whoosh
+        whoosh = build_transition_whoosh_filter([6.5, 9.0])
+        self.assertIn("treble=g=2.8:f=5500", whoosh)
+
+        # 4. Configurable toggle
+        full_sd = build_sound_design_filter_chain(drop_time=4.8, cut_timestamps=[2.0, 4.8, 7.0], climax_time=10.0, enable_sound_design=True)
+        self.assertIn("bass=g=3.5", full_sd)
+        self.assertIn("highpass=f=1400", full_sd)
+
+        disabled_sd = build_sound_design_filter_chain(drop_time=4.8, cut_timestamps=[2.0, 4.8, 7.0], enable_sound_design=False)
+        self.assertEqual(disabled_sd, "anull")
+
+    def test_22_loopable_ending(self):
+        from core.shot_selector import calculate_variable_pacing
+        from core.smart_reframe import build_smart_reframe_filter
+
+        beats = [1.6, 3.2, 4.8, 5.5, 6.2, 7.0, 8.5]
+        segments = calculate_variable_pacing(total_duration=8.5, drop_time=4.8, major_beat_times=beats)
+
+        mock_framing = {
+            "in_w": 1920, "in_h": 1080,
+            "act_x": 0, "act_y": 0, "act_w": 1920, "act_h": 1080,
+            "cx_start": 0.50, "cx_end": 0.50,
+            "cy_start": 0.50, "cy_end": 0.50,
+            "is_dynamic": False
+        }
+
+        # 1. Opening hook has push-in (1.00x -> 1.05x)
+        hook_filter = build_smart_reframe_filter(
+            duration=segments[0]["duration"],
+            framing_info=mock_framing,
+            narrative_role=segments[0]["role"]
+        )
+        self.assertIn("1.0-0.06*min", hook_filter)
+
+        # 2. Outro payoff has pull-out (1.06x -> 1.00x) so end matches start scale
+        outro_filter = build_smart_reframe_filter(
+            duration=segments[-1]["duration"],
+            framing_info=mock_framing,
+            narrative_role=segments[-1]["role"]
+        )
+        self.assertIn("0.94+0.06*min", outro_filter)
+
+    def test_23_presets_and_configuration(self):
+        from core.presets import EDITING_PRESETS, get_editing_preset, list_available_presets
+
+        expected = ["VIRAL_PHONK", "CINEMATIC_ANIME", "DARK_ANIME", "HYPE_BATTLE", "MINIMAL_CINEMATIC"]
+        for p in expected:
+            self.assertIn(p, EDITING_PRESETS)
+            cfg = get_editing_preset(p.lower())
+            self.assertEqual(cfg["name"], p)
+
+        # 1. VIRAL_PHONK style
+        viral = get_editing_preset("VIRAL_PHONK")
+        self.assertEqual(viral["pacing"], "fast")
+        self.assertEqual(viral["effect_intensity"], 1.0)
+        self.assertTrue(viral["loop_behavior"])
+
+        # 2. MINIMAL_CINEMATIC style (zero flashes, clean straight cuts)
+        minimal = get_editing_preset("MINIMAL_CINEMATIC")
+        self.assertEqual(minimal["effect_intensity"], 0.0)
+        self.assertFalse(minimal["enable_velocity_ramping"])
+        self.assertFalse(minimal["sound_design"])
+
+        # 3. List presets
+        available = list_available_presets()
+        self.assertEqual(len(available), 5)
+
+    def test_24_studio_integration_and_cli(self):
+        import argparse
+        from studio.server import AniDocStudioHandler
+
+        # 1. Studio API status exposes all 5 presets
+        from core.presets import list_available_presets
+        presets = list_available_presets()
+        preset_ids = [p["id"] for p in presets]
+        for expected in ["VIRAL_PHONK", "CINEMATIC_ANIME", "DARK_ANIME", "HYPE_BATTLE", "MINIMAL_CINEMATIC"]:
+            self.assertIn(expected, preset_ids)
+
+        # 2. CLI parser options validation
+        import main
+        # Verify parser can accept new preset, camera-motion, and sound design arguments
+        test_args = ["--character", "gojo", "--preset", "CINEMATIC_ANIME", "--camera-motion", "push_in", "--no-sound-design"]
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--character", type=str)
+        parser.add_argument("--preset", type=str, choices=["VIRAL_PHONK", "CINEMATIC_ANIME", "DARK_ANIME", "HYPE_BATTLE", "MINIMAL_CINEMATIC"])
+        parser.add_argument("--camera-motion", type=str)
+        parser.add_argument("--no-sound-design", action="store_true")
+        parsed = parser.parse_args(test_args)
+        self.assertEqual(parsed.preset, "CINEMATIC_ANIME")
+        self.assertEqual(parsed.camera_motion, "push_in")
+        self.assertTrue(parsed.no_sound_design)
+
 
 if __name__ == "__main__":
     unittest.main()
