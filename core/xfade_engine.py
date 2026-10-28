@@ -88,7 +88,7 @@ def build_xfade_transition_filter(
         filter_parts.append(
             f"{last_v}settb=1/60[{in_a}];"
             f"{next_v}settb=1/60[{in_b}];"
-            f"[{in_a}][in_b]xfade=transition={t_effect}:duration={transition_duration:.2f}:offset={max(0.1, current_offset):.2f}{out_v}"
+            f"[{in_a}][{in_b}]xfade=transition={t_effect}:duration={transition_duration:.2f}:offset={max(0.1, current_offset):.2f}{out_v}"
         )
         last_v = out_v
         if i < len(durations) - 1:
