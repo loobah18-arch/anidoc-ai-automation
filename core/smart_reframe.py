@@ -128,13 +128,13 @@ def detect_subject_focus(frame: np.ndarray) -> Tuple[float, float, float]:
     gray = cv2.cvtColor(proc_frame, cv2.COLOR_BGR2GRAY)
     gray_eq = cv2.equalizeHist(gray)
 
-    # 1. Face / Character Detection
+    # 1. Face / Character Detection (High sensitivity)
     cascades = _get_cascades()
     detected_faces = []
     for c_type, cascade in cascades:
         img_input = gray_eq if c_type == "anime" else gray
-        min_sz = (int(30 * scale), int(30 * scale))
-        faces = cascade.detectMultiScale(img_input, scaleFactor=1.1, minNeighbors=3, minSize=min_sz)
+        min_sz = (int(26 * scale), int(26 * scale))
+        faces = cascade.detectMultiScale(img_input, scaleFactor=1.08, minNeighbors=2, minSize=min_sz)
         if len(faces) > 0:
             for (fx, fy, fw, fh) in faces:
                 area = fw * fh
@@ -148,7 +148,7 @@ def detect_subject_focus(frame: np.ndarray) -> Tuple[float, float, float]:
         cy_norm = (fy + fh / 2.0) / float(proc_h)
         return (float(np.clip(cx_norm, 0.0, 1.0)), float(np.clip(cy_norm, 0.0, 1.0)), conf)
 
-    # 2. Visual Saliency & Energy Center of Mass (Edge detail + color saturation)
+    # 2. Multi-Modal Anime Character Saliency (Skin Tone + Saturation + Outline)
     try:
         small_w = 320
         small_h = int(round(orig_h * (320.0 / orig_w)))
@@ -156,22 +156,31 @@ def detect_subject_focus(frame: np.ndarray) -> Tuple[float, float, float]:
         small_gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
         small_hsv = cv2.cvtColor(small, cv2.COLOR_BGR2HSV)
 
-        # High-contrast line art / edges
-        laplacian = cv2.Laplacian(small_gray, cv2.CV_32F)
-        edges = np.abs(laplacian)
+        # 2a. Skin tone mask (YCrCb + HSV) - reliably flags anime characters
+        ycrcb = cv2.cvtColor(small, cv2.COLOR_BGR2YCrCb)
+        skin_ycrcb = cv2.inRange(ycrcb, np.array([0, 133, 77]), np.array([255, 173, 127]))
+        skin_hsv = cv2.inRange(small_hsv, np.array([0, 25, 50]), np.array([25, 185, 255]))
+        skin_mask = cv2.bitwise_and(skin_ycrcb, skin_hsv)
+        skin_px = np.count_nonzero(skin_mask)
 
-        # Vivid color saturation (anime characters vs muted backgrounds)
-        sat = small_hsv[:, :, 1].astype(np.float32)
+        # 2b. High-contrast line art / edges
+        lap = np.abs(cv2.Laplacian(small_gray, cv2.CV_32F))
+        edges = cv2.normalize(lap, None, 0, 1, cv2.NORM_MINMAX)
 
-        # Center-weighted Gaussian prior (slightly favors center to avoid edge letterbox artifacts)
-        y_indices, x_indices = np.indices((small_h, small_w))
-        center_x = small_w / 2.0
-        center_y = small_h / 2.0
-        sigma_x = small_w * 0.40
-        sigma_y = small_h * 0.40
-        gaussian_prior = np.exp(-0.5 * (((x_indices - center_x) / sigma_x) ** 2 + ((y_indices - center_y) / sigma_y) ** 2))
+        # 2c. Vivid anime color saturation
+        sat = small_hsv[:, :, 1].astype(np.float32) / 255.0
+        skin_weight = (skin_mask.astype(np.float32) / 255.0) * 3.5
 
-        energy_map = (edges * 0.60 + sat * 0.40) * gaussian_prior
+        combined = edges * 0.40 + sat * 0.70 + skin_weight
+
+        # 2d. Boundary-only guard (dampens outer 4% to ignore letterbox borders, zero artificial center bias)
+        margin = int(small_w * 0.04)
+        guard = np.ones((small_h, small_w), dtype=np.float32)
+        if margin > 0:
+            guard[:, :margin] = np.linspace(0.2, 1.0, margin)
+            guard[:, -margin:] = np.linspace(1.0, 0.2, margin)
+
+        energy_map = combined * guard
         total_energy = np.sum(energy_map)
 
         if total_energy > 1e-4:
@@ -183,7 +192,8 @@ def detect_subject_focus(frame: np.ndarray) -> Tuple[float, float, float]:
 
             cx_norm = cx / float(small_w)
             cy_norm = cy / float(small_h)
-            return (float(np.clip(cx_norm, 0.0, 1.0)), float(np.clip(cy_norm, 0.0, 1.0)), 0.60)
+            conf = 0.85 if skin_px > 100 else 0.65
+            return (float(np.clip(cx_norm, 0.0, 1.0)), float(np.clip(cy_norm, 0.0, 1.0)), conf)
     except Exception:
         pass
 
@@ -251,12 +261,13 @@ def analyze_clip_framing(
                         int(total_frames * (i + 1) / (num_samples + 1))
                         for i in range(num_samples)
                     ]
+                    prev_gray = None
                     for sample_idx, idx in enumerate(frame_indices):
                         cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
                         ret, frame = cap.read()
                         if ret and frame is not None:
-                            # Detect active bounds from the middle frame
-                            if sample_idx == len(frame_indices) // 2:
+                            # Detect active bounds early
+                            if act_w <= 0 or sample_idx == len(frame_indices) // 2:
                                 act_x, act_y, act_w, act_h = detect_active_content_bounds(frame)
                             
                             # Analyze active area for subject focus
@@ -266,6 +277,19 @@ def analyze_clip_framing(
                                 sub_frame = frame
                             
                             cx, cy, conf = detect_subject_focus(sub_frame)
+
+                            # Blend with inter-frame motion centroid if character is moving
+                            gray_curr = cv2.cvtColor(sub_frame, cv2.COLOR_BGR2GRAY)
+                            if prev_gray is not None and prev_gray.shape == gray_curr.shape:
+                                diff = cv2.absdiff(prev_gray, gray_curr)
+                                if np.mean(diff) > 8.0:
+                                    diff_sum = np.sum(diff, axis=0)
+                                    diff_tot = np.sum(diff_sum)
+                                    if diff_tot > 0:
+                                        cx_motion = float(np.sum(np.arange(sub_frame.shape[1]) * diff_sum) / (diff_tot * sub_frame.shape[1]))
+                                        cx = float(cx * 0.45 + cx_motion * 0.55)
+                                        conf = max(conf, 0.80)
+                            prev_gray = gray_curr
                             samples.append((cx, cy, conf))
             cap.release()
         except Exception:

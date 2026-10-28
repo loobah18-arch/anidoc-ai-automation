@@ -10,6 +10,7 @@ Fixes applied:
 - Text wraps within safe margins (MarginL/R widened to 80)
 - Bigger outline (5.5 → 7.0) for readability on any background
 """
+import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
@@ -163,12 +164,12 @@ def generate_kinetic_subtitles(
     if glow_color:
         cfg["outline"] = glow_color
 
-    # Shorts safe zone margins
+    # YouTube Shorts safe zone margins
     margin_lr = max(90, cfg.get("margin_lr", 80))
 
     # Face avoidance: adapt alignment based on character face position
     alignment = cfg["alignment"]
-    margin_v = cfg["margin_v"]
+    margin_v = cfg.get("margin_v", 200)
     if face_y is not None:
         if face_y < 0.45:
             # Face is in upper third -> put captions in lower third safe zone
@@ -179,7 +180,11 @@ def generate_kinetic_subtitles(
             alignment = 8
             margin_v = 240
 
-    words = [w.strip() for w in quote_text.strip().split() if w.strip()]
+    # Strip any formatting tokens, pipe characters, em-dashes, or raw quotation marks
+    clean_quote = re.sub(r"[|—–\"']+", " ", quote_text)
+    clean_quote = re.sub(r"\s+", " ", clean_quote).strip()
+
+    words = [w.strip() for w in clean_quote.split() if w.strip() and w.strip() != "|"]
     if not words:
         words = ["HONORED", "ONE"]
 

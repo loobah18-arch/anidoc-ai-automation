@@ -148,6 +148,10 @@ def score_candidate_shot(clip_path: Union[str, Path], num_samples: int = 4) -> D
         composition_score * 0.15
     )
 
+    # Heavily penalize dead-air filler shots (static background walls/crowds with zero character action)
+    if action_score < 28.0 and subject_score < 50.0:
+        total_score *= 0.35
+
     return {
         "path": clip_p,
         "total_score": round(total_score, 1),
@@ -186,9 +190,10 @@ def select_smart_shots(
         return []
 
     # Score all candidate clips
-    scored_pool = [score_candidate_shot(p) for p in candidate_clips if p.exists() and p.stat().st_size > 10_000]
+    candidate_paths = [Path(p) for p in candidate_clips]
+    scored_pool = [score_candidate_shot(p) for p in candidate_paths if p.exists() and p.stat().st_size > 10_000]
     if not scored_pool:
-        return candidate_clips[:num_shots]
+        return candidate_paths[:num_shots]
 
     # Filter out visually duplicate shots (similarity > 0.88 with an already selected shot)
     # Sort candidate pool by total score descending

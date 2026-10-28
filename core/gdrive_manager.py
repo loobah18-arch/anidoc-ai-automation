@@ -582,9 +582,9 @@ def slice_action_moments_from_source(
             if scene_len <= clip_duration * 1.5:
                 pts = [st]
             elif is_explosive:
-                # Sample up to 6 evenly spaced clips across the explosive scene
+                # Sample up to 2 evenly spaced clips across the explosive scene
                 # so NO single scene can monopolize the candidate pool!
-                max_clips_per_scene = 6
+                max_clips_per_scene = 2
                 step = max(clip_duration * 1.5, scene_len / max_clips_per_scene)
                 pts = []
                 cur_t = st
@@ -637,6 +637,9 @@ def slice_action_moments_from_source(
             end_bound=end_bound
         )
         for w in ranked_cv:
+            # Filter out low-motion civilian/ambient scenes (require true combat motion >= 18.0)
+            if w.get("avg_diff", 0) < 18.0:
+                continue
             if not any(abs(w["start"] - prev) < 5.0 for prev in file_used_ts):
                 cv_candidates.append({
                     "start": w["start"],

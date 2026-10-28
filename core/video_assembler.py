@@ -278,10 +278,11 @@ def render_cinematic_edit(
         try:
             ass_out = SCRATCH_DIR / f"subtitles_{character_key}.ass"
             quote_text = custom_quote or metadata.get("engagement_question") or metadata.get("quote") or metadata.get("title") or "WHO IS THE STRONGEST WARRIOR?"
+            hook_end_time = min(beat_grid.duration - 0.5, max(3.5, beat_grid.drop_time))
             ass_path = generate_kinetic_subtitles(
                 quote_text=quote_text,
                 start_time=0.2,
-                end_time=beat_grid.duration - 0.5,
+                end_time=hook_end_time,
                 output_ass_path=ass_out,
                 style_preset=subtitle_style or "spur_hook",
                 character_name=theme["name"],
