@@ -271,7 +271,7 @@ def build_velocity_clip_filter(
     filters.extend([
         "tpad=stop_mode=clone:stop_duration=5",
         f"trim=duration={duration:.3f}",
-        f"setpts=PTS-STARTPTS,settb=1/{fps}"
+        f"setpts=PTS-STARTPTS,fps={fps},settb=1/{fps}"
     ])
 
     if add_bars:
