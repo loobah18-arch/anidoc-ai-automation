@@ -764,6 +764,39 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertEqual(s1["action_level"], "CALM")
         self.assertLessEqual(s1["action_score"], 0.35)
 
+    def test_26_vertical_tracking_and_ending_boundary_audit(self):
+        from core.smart_reframe import build_smart_reframe_filter
+        from core.timestamp_loader import load_episode_metadata
+        from core.shot_selector import select_smart_shots
+
+        # 1. Vertical tracking in widescreen framing for off-center subject
+        framing_offcenter = {
+            "in_w": 1920, "in_h": 1080,
+            "act_x": 0, "act_y": 0, "act_w": 1920, "act_h": 1080,
+            "cx_start": 0.5, "cx_end": 0.5,
+            "cy_start": 0.85, "cy_end": 0.85,  # Subject in bottom third
+            "is_dynamic": False
+        }
+        filter_str = build_smart_reframe_filter(
+            duration=2.0,
+            video_width=1080,
+            video_height=1920,
+            framing_info=framing_offcenter,
+            camera_motion="static_steady"
+        )
+        self.assertIn("scale=1080:1920", filter_str)
+        # Should have non-zero crop y to vertically center the low-placed subject
+        self.assertTrue("crop=" in filter_str)
+        parts = filter_str.split(",")[0].split(":")
+        crop_y = int(parts[-1])
+        self.assertGreater(crop_y, 50, f"Expected crop_y to track lower subject, got {crop_y}")
+
+        # 2. S01E07 ending timestamp audit: must terminate before ending song and Juju stroll
+        s01e07 = load_episode_metadata("S01E07")
+        self.assertIsNotNone(s01e07)
+        last_scene = s01e07["scenes"][-1]
+        self.assertLessEqual(last_scene["end"], 1290.0, f"Scene end {last_scene['end']} must not extend into ED/bumpers")
+
 
 if __name__ == "__main__":
     unittest.main()

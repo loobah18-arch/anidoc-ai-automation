@@ -243,7 +243,7 @@ def select_smart_shots(
     # Sort candidate pool by total score descending, prioritizing real combat over title cards
     scored_pool.sort(key=lambda s: s["total_score"], reverse=True)
     non_bumper_pool = [s for s in scored_pool if not s.get("is_title_card", False)]
-    candidate_ranking = non_bumper_pool if len(non_bumper_pool) >= num_shots else scored_pool
+    candidate_ranking = non_bumper_pool if non_bumper_pool else scored_pool
 
     unique_pool: List[Dict[str, Any]] = []
     for cand in candidate_ranking:
@@ -256,13 +256,17 @@ def select_smart_shots(
         if not is_dup:
             unique_pool.append(cand)
 
-    # If deduplication was too aggressive, re-add remaining shots
+    # If deduplication was too aggressive, re-add remaining shots from non_bumper_pool first
     if len(unique_pool) < num_shots:
-        for cand in scored_pool:
+        source_replenish = non_bumper_pool if non_bumper_pool else scored_pool
+        for cand in source_replenish:
             if cand not in unique_pool:
                 unique_pool.append(cand)
             if len(unique_pool) >= num_shots:
                 break
+        # If still short, cycle non-bumper shots rather than picking bumpers
+        while len(unique_pool) < num_shots and source_replenish:
+            unique_pool.append(source_replenish[len(unique_pool) % len(source_replenish)])
 
     # Structure into 5-Act Narrative Arc (Phase 7: Build the Climax):
     # Act 1: HOOK (immediate subject intrigue)

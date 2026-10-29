@@ -176,8 +176,8 @@ def get_audio_energy_segments(
     if total_duration < 3.0:
         return [(0.0, window_secs, -20.0)]
 
-    start_bound = 90.0 if total_duration > 300 else 5.0
-    end_bound = (total_duration - 90.0) if total_duration > 300 else (total_duration - 5.0)
+    start_bound = 165.0 if total_duration > 600 else (90.0 if total_duration > 300 else 5.0)
+    end_bound = (total_duration - 150.0) if total_duration > 600 else ((total_duration - 90.0) if total_duration > 300 else (total_duration - 5.0))
 
     segments = []
     t = start_bound

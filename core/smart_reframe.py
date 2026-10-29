@@ -411,10 +411,18 @@ def build_smart_reframe_filter(
 
         # Case A: Active content is wider than 9:16 (widescreen / landscape)
         if input_ar >= target_ar:
-            base_crop_h = act_h
-            base_crop_w = int(round(act_h * target_ar / 2.0)) * 2
+            # Adaptive vertical framing: when subject is vertically off-center, adjust crop window
+            # to enable vertical tracking so the character is framed within the golden vertical third.
+            is_vert_offcenter = abs(cy - 0.5) > 0.08
+            v_scale = 0.85 if is_vert_offcenter else 1.0
+            base_crop_h = int(round(act_h * v_scale / 2.0)) * 2
+            base_crop_w = int(round(base_crop_h * target_ar / 2.0)) * 2
             base_crop_w = min(base_crop_w, act_w)
-            max_scroll_x = act_w - base_crop_w
+            max_scroll_x = max(0, act_w - base_crop_w)
+            max_scroll_y = max(0, act_h - base_crop_h)
+
+            ideal_y_start = act_y + (framing_info.get("cy_start", 0.5) * act_h - (base_crop_h / 2.0))
+            crop_y = int(round(np.clip(ideal_y_start, act_y, act_y + max_scroll_y)))
 
             if resolved_motion == "push_in" and duration > 0.4:
                 # 1.00x -> 1.06x restrained subtle push-in anchored on subject
@@ -438,7 +446,7 @@ def build_smart_reframe_filter(
                 y_expr = f"clip({anchor_y}-{h_expr}/2\\,{act_y}\\,{act_y+act_h}-{h_expr})"
                 crop_filter = f"crop=w='{w_expr}':h='{h_expr}':x='{x_expr}':y='{y_expr}'"
             elif max_scroll_x <= 0:
-                crop_filter = f"crop={base_crop_w}:{base_crop_h}:{act_x}:{act_y}"
+                crop_filter = f"crop={base_crop_w}:{base_crop_h}:{act_x}:{crop_y}"
             else:
                 # Horizontal pan tracking subject
                 ideal_x_start = act_x + (framing_info["cx_start"] * act_w - (base_crop_w / 2.0))
@@ -450,7 +458,7 @@ def build_smart_reframe_filter(
                     crop_x_expr = str(x_start)
                 else:
                     crop_x_expr = f"'{x_start}+({x_end - x_start})*(0.5-0.5*cos(PI*min(t/{duration:.3f}\\,1)))'"
-                crop_filter = f"crop={base_crop_w}:{base_crop_h}:{crop_x_expr}:{act_y}"
+                crop_filter = f"crop={base_crop_w}:{base_crop_h}:{crop_x_expr}:{crop_y}"
 
         # Case B: Active content is narrower than 9:16 (ultra-tall)
         else:

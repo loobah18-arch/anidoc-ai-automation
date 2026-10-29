@@ -114,7 +114,7 @@
     },
     {
       "start": 1260.0,
-      "end": 1380.0,
+      "end": 1290.0,
       "action_level": "INTENSE",
       "priority": "high",
       "description": "Sukuna vs Megumi standoff - Yuji regains control",
@@ -124,7 +124,7 @@
         "megumi"
       ],
       "action_score": 0.75,
-      "duration": 120.0
+      "duration": 30.0
     }
   ]
 }

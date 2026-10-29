@@ -499,7 +499,7 @@ def slice_action_moments_from_source(
     if total_duration > 3600:
         end_bound = total_duration - 240.0
     elif total_duration > 600:
-        end_bound = total_duration - 45.0  # Retain final 3.5 minutes so climax battles (Kamado song, decapitations) are never cut off
+        end_bound = total_duration - 150.0  # Strip ending theme song (ED), credit crawl, sponsor cards, and post-credits comedy bumpers
     elif total_duration > 300:
         end_bound = total_duration - 30.0
     elif total_duration > 60:

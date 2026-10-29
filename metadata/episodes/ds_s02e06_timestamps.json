@@ -84,7 +84,7 @@
     },
     {
       "start": 1140.0,
-      "end": 1380.0,
+      "end": 1290.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
       "description": "Flame Breathing Fifth Form Flame Tiger roaring clash against Destructive Death Disorder",
@@ -93,7 +93,7 @@
         "akaza"
       ],
       "action_score": 0.95,
-      "duration": 240.0
+      "duration": 150.0
     }
   ]
 }
