@@ -7,7 +7,8 @@ Replicates top viral anime/Marvel TikTok & Shorts editing styles:
 - Fast 0.07s optical white flashes on 808 bass drops.
 - High-contrast 4K HDR Color Grading with deep blacks and vibrant highlights.
 """
-from typing import List, Dict, Any
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Union, Tuple
 from config.settings import CC_PRESETS, VIDEO_WIDTH, VIDEO_HEIGHT, FPS
 
 
