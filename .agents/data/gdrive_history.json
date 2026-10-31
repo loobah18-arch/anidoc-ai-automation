@@ -1,6 +1,7 @@
 {
   "used_files": [
-    "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4"
+    "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4",
+    "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E06.mp4"
   ],
   "used_timestamps": {
     "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4": [
@@ -25,6 +26,33 @@
       1290.0,
       1335.629016804451,
       1302.5
+    ],
+    "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E06.mp4": [
+      104.5,
+      959.75,
+      1190.75,
+      1086.25,
+      1204.5,
+      1221.0,
+      1155.0,
+      1212.75,
+      1122.0,
+      143.0,
+      195.25,
+      170.5,
+      932.25,
+      134.75,
+      1350.25,
+      951.5,
+      1174.25,
+      1141.0,
+      896.5,
+      660.0,
+      921.25,
+      426.25,
+      1342.0,
+      121.0,
+      1023.9338614522683
     ]
   }
 }
