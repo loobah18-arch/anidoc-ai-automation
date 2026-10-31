@@ -582,28 +582,16 @@ def slice_action_moments_from_source(
             seen_ranges.add(key)
 
             scene_len = max(clip_duration, en - st)
-            action_lvl = str(s.get("action_level", "MODERATE")).upper()
-            is_explosive = action_lvl == "EXPLOSIVE" or float(s.get("action_score", 0.0)) >= 0.90
-
+            # Surgical, precise keyframe points matching benchmark favorites (max 1-2 distinct moments per scene)
             if scene_len <= clip_duration * 1.5:
                 pts = [st]
-            elif is_explosive:
-                # Sample up to 6 evenly spaced clips across the explosive scene
-                # so NO single scene can monopolize the candidate pool!
-                max_clips_per_scene = 6
-                step = max(clip_duration * 1.5, scene_len / max_clips_per_scene)
-                pts = []
-                cur_t = st
-                while cur_t + clip_duration <= en and len(pts) < max_clips_per_scene:
-                    pts.append(round(cur_t, 2))
-                    cur_t += step
             elif scene_len <= 15.0:
                 mid = st + (scene_len - clip_duration) * 0.45
-                pts = [mid]
+                pts = [round(mid, 2)]
             else:
                 pts = [
-                    st + 1.0,
-                    st + (scene_len - clip_duration) * 0.65
+                    round(st + 1.0, 2),
+                    round(st + (scene_len - clip_duration) * 0.65, 2)
                 ]
 
             for p in pts:
@@ -859,14 +847,44 @@ def slice_action_moments_from_source(
     selected[bridge_idx] = sec_drop
     selected[last_idx] = finisher
 
-    c_idx = 0
+    # Diverse combat pool selection with strict non-repetition and 15s minimum spacing
+    used_starts = {c["start"] for c in selected if c is not None}
+    available_combat = [
+        c for c in final_candidates
+        if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool
+    ]
+    # Prioritize highest action score scenes first
+    available_combat.sort(key=lambda x: x["score"], reverse=True)
+
     for i in range(n_clips):
         if selected[i] is None:
-            if combat_pool:
-                selected[i] = combat_pool[c_idx % len(combat_pool)]
-            else:
-                selected[i] = final_candidates[c_idx % len(final_candidates)]
-            c_idx += 1
+            prev_cand = selected[i - 1] if i > 0 else None
+            prev_st = prev_cand["start"] if prev_cand else -999.0
+
+            # 1. Best: Unused candidate with at least 15s distance from previous cut
+            chosen_c = None
+            for cand in available_combat:
+                if cand["start"] in used_starts:
+                    continue
+                if abs(cand["start"] - prev_st) < 15.0:
+                    continue
+                chosen_c = cand
+                break
+
+            # 2. Fallback: Any unused candidate
+            if not chosen_c:
+                for cand in available_combat:
+                    if cand["start"] not in used_starts:
+                        chosen_c = cand
+                        break
+
+            # 3. Fallback: Candidate with maximal distance from previous cut
+            if not chosen_c:
+                cand_pool = available_combat if available_combat else final_candidates
+                chosen_c = max(cand_pool, key=lambda c: abs(c["start"] - prev_st))
+
+            selected[i] = chosen_c
+            used_starts.add(chosen_c["start"])
 
     print(f"💥 [ActionSlicer] Mapped #1 CLIMAX scene ({drop_climax['start']:.1f}s, {drop_climax['tag']}) directly to Beat Drop (Clip {drop_idx+1})!")
 

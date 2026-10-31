@@ -384,9 +384,9 @@ def render_cinematic_edit(
                 }
         print("⚠️ [OpenSourceEditor] editly render did not complete. Falling back to native FFmpeg xfade engine.")
 
-    # 2026 Buttery-Smooth AMV Transitions with Zero-Drift Handle Compensation
-    # Each clip (except final) receives +0.15s handle to perfectly maintain 100% beat sync without drift.
-    trans_dur = 0.15
+    # 2026 Buttery-Smooth AMV Transitions with Zero-Drift Handle Compensation (0.18s punchy xfade)
+    # Each clip (except final) receives +0.18s handle to perfectly maintain 100% beat sync without drift.
+    trans_dur = 0.18
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         is_intro_hook = (idx == 0)

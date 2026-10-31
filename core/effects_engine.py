@@ -59,8 +59,8 @@ def get_segment_velocity_profile(
             "add_flash": False
         }
 
-    # First drop segment: Explosive impact
-    if seg.get("is_first_drop", False) or seg_idx == sum(1 for s in range(seg_idx) if not seg.get("is_drop", False)):
+    # First drop segment: Explosive impact matching benchmark favorites
+    if seg.get("is_first_drop", False) or (is_drop and not seg.get("prev_is_drop", False)):
         return {
             "role": "drop_impact",
             "speed": 1.30,

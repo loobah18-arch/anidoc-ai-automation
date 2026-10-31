@@ -72,7 +72,10 @@ class BeatGrid:
 
         merged_points = [all_points[0]]
         for pt in all_points[1:]:
-            if pt - merged_points[-1] >= 0.55:
+            # Never swallow or shift the beat drop cut
+            is_drop_boundary = abs(pt - self.drop_time) < 0.05 or abs(merged_points[-1] - self.drop_time) < 0.05
+            min_gap = 0.40 if is_drop_boundary else 0.55
+            if pt - merged_points[-1] >= min_gap:
                 merged_points.append(pt)
             elif pt == all_points[-1] and len(merged_points) > 1:
                 merged_points[-1] = pt
@@ -94,11 +97,13 @@ class BeatGrid:
             s, e = seg["start"], seg["end"]
             is_d = s >= self.drop_time
             prev_d = segments[-1]["is_drop"] if segments else False
+            is_first = is_d and not prev_d
             segments.append({
                 "start": s,
                 "end": e,
                 "duration": round(e - s, 3),
                 "is_drop": is_d,
+                "is_first_drop": is_first,
                 "prev_is_drop": prev_d,
                 "is_flash": False,  # Flash is handled separately, not as segments
                 "index": len(segments)
@@ -268,29 +273,30 @@ def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time:
     beat_times.append(round(effective_drop, 2))
 
     if duration < 30.0:
-        # Modern High-Energy 3-Act AMV for TikTok / Shorts:
-        # Act 1: Hook (0.0 to effective_drop) - 1 to 2 narrative/eye shots (~2.0s-2.4s)
-        # Act 2: Climax Beat Drop Strike (effective_drop to drop_hold) - held 1.8s-2.4s so full sakuga executes
-        # Act 3: Combat Velocity Rhythm (drop_hold to duration - 2.8s) - syncopated 2-beat & 3-beat cuts
+        # Modern High-Energy AMV synced to benchmark favorites (Gojo Hollow Purple & Rengoku Flame Tiger):
+        # Act 1: Hook (0.0 to effective_drop) - 1 to 2 narrative/eye buildup shots (~2.0s-2.7s)
+        # Act 2: Climax Beat Drop Strike (effective_drop) - explosive velocity punch on the 808 drop
+        # Act 3: Combat Velocity Rhythm - rapid, beat-synced 2-beat cuts (0.8s - 1.2s) matching musical onsets
         # Act 4: Climax Finisher (duration - 2.8s to duration) - dramatic held finisher
         climax_start = round(duration - 2.8, 2)
         curr = effective_drop
 
-        # On the 808 drop, HOLD the #1 climax action shot for 1.8s - 2.4s so the full choreography hits
-        drop_hold = min(2.4, max(1.8, beat_interval * 4))
+        # On the 808 drop, hold the #1 climax action shot for 1.1s - 1.5s
+        drop_hold = min(1.5, max(1.0, beat_interval * 2))
         curr += drop_hold
         if curr < climax_start - 0.5:
             beat_times.append(round(curr, 2))
 
-        # Alternate 2-beat (fast strike cut) and 3-beat (technique impact hold) cuts on musical rhythm
-        step_toggle = False
-        while curr < climax_start - 0.5:
-            step = (beat_interval * 2) if step_toggle else (beat_interval * 3)
-            step = max(0.85, min(1.60, step))
-            step_toggle = not step_toggle
-            curr += step
-            if curr < climax_start - 0.4:
-                beat_times.append(round(curr, 2))
+        # Rapid 2-beat cuts synced with the musical rhythm
+        cut_step = beat_interval * 2 if bpm < 140 else beat_interval * 4
+        if cut_step < 0.70:
+            cut_step = beat_interval * 4
+        if cut_step > 1.40:
+            cut_step = beat_interval * 2
+
+        while curr + cut_step < climax_start - 0.4:
+            curr += cut_step
+            beat_times.append(round(curr, 2))
 
         beat_times.append(climax_start)
     else:
