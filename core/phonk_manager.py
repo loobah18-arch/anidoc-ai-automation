@@ -24,6 +24,14 @@ from config.settings import PHONK_DIR, SCRATCH_DIR
 # giving the viewer a full 23+ seconds of intense, beat-synced combat action AFTER the drop!
 POPULAR_PHONK_CATALOG = [
     {
+        "id": "montagem_zora",
+        "title": "WUYS, KIT - MONTAGEM ZORA",
+        "genre": "Brazilian Phonk",
+        "bpm": 110.0,
+        "default_drop": 5.40,
+        "audio_offset": 0.00,
+    },
+    {
         "id": "rayelo_ultraslowed",
         "title": "IROKZ, TESOROX, DJ ZAREK - RAYELO (ULTRA SLOWED)",
         "genre": "Brazilian Phonk",
@@ -316,8 +324,8 @@ def _save_phonk_state(state: Dict[str, Any]):
 def get_random_or_specified_phonk(track_id: Optional[str] = None) -> Optional[Path]:
     """
     Returns a phonk audio Path. Priority:
-    1. If specific track_id given → return that exact curated track (supports 'rayalo' / 'rayelo' alias)
-    2. If 'random' or None → weighted priority for Rayelo (top priority, chosen often), while rotating other tracks
+    1. If specific track_id given → return that exact curated track (supports 'zora' / 'montagem_zora' / 'rayelo' alias)
+    2. If 'random' or None → weighted priority for Montagem Zora and Rayelo (chosen often), while rotating other tracks
     3. Fallback: live trending fetch or procedural audio
     """
     PHONK_DIR.mkdir(parents=True, exist_ok=True)
@@ -326,24 +334,30 @@ def get_random_or_specified_phonk(track_id: Optional[str] = None) -> Optional[Pa
     # 1. Specific track requested
     if track_id and track_id not in ("random", ""):
         clean_id = track_id.lower().replace("rayalo", "rayelo")
+        if clean_id in ("zora", "montagem_zora", "montagemzora"):
+            clean_id = "montagem_zora"
         direct = PHONK_DIR / f"{clean_id}.mp3"
         if direct.exists() and direct.stat().st_size > 50_000:
             return direct
         for f in curated_tracks:
             if clean_id in f.stem.lower() or clean_id.replace("rayelo", "rayalo") in f.stem.lower():
                 return f
+            if clean_id == "montagem_zora" and "zora" in f.stem.lower():
+                return f
 
-    # 2. Random Selection across Curated Tracks with Rayelo as Top Priority
+    # 2. Random Selection across Curated Tracks with Montagem Zora & Rayelo as Top Priority
     if curated_tracks:
         state = _load_phonk_state()
         last_track = state.get("last_track")
         candidates = [t for t in curated_tracks if t.stem != last_track] if (len(curated_tracks) > 1 and last_track) else curated_tracks
 
-        # Assign weights: Rayelo gets top priority (used often, ~35-40% probability) while keeping variety for other tracks
+        # Assign weights: Montagem Zora gets top priority on this branch, along with Rayelo
         weights = []
         for t in candidates:
-            if "rayelo" in t.stem.lower() or "rayalo" in t.stem.lower():
-                weights.append(18.0)  # Top priority weight
+            if "zora" in t.stem.lower():
+                weights.append(25.0)  # Top priority weight on this branch
+            elif "rayelo" in t.stem.lower() or "rayalo" in t.stem.lower():
+                weights.append(8.0)
             else:
                 weights.append(1.0)
 

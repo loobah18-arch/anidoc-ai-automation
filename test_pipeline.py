@@ -386,6 +386,54 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertGreater(test_out.stat().st_size, 5000)
         test_out.unlink(missing_ok=True)
 
+    def test_14_precise_motion_tracking_and_montagem_zora(self):
+        """Verifies Montagem Zora BGM catalog entry and precise motion tracking engine."""
+        # 1. Montagem Zora phonk retrieval & catalog verification
+        from core.phonk_manager import get_random_or_specified_phonk, POPULAR_PHONK_CATALOG
+        zora_catalog = [item for item in POPULAR_PHONK_CATALOG if item["id"] == "montagem_zora"]
+        self.assertEqual(len(zora_catalog), 1, "Montagem Zora should exist in catalog")
+        self.assertEqual(zora_catalog[0]["bpm"], 110.0)
+
+        zora_path = get_random_or_specified_phonk("zora")
+        self.assertIsNotNone(zora_path)
+        self.assertTrue(Path(zora_path).exists())
+        self.assertIn("montagem_zora", Path(zora_path).name)
+
+        # 2. Motion tracker cascade models
+        from core.motion_tracker import (
+            get_cascades,
+            detect_active_content_bounds,
+            detect_subject_focal_point,
+            extract_motion_trajectory,
+            build_precise_motion_tracking_filter
+        )
+        cascades = get_cascades()
+        self.assertIsInstance(cascades, list)
+
+        # 3. Content bounds detection (even dimensions)
+        import numpy as np
+        test_frame = np.zeros((1080, 1920, 3), dtype=np.uint8)
+        test_frame[60:1020, 120:1800] = 180  # Simulating active content
+        l, t, w, h = detect_active_content_bounds(test_frame)
+        self.assertEqual(w % 2, 0)
+        self.assertEqual(h % 2, 0)
+
+        # 4. Focal point detection
+        cx, cy, conf = detect_subject_focal_point(test_frame)
+        self.assertTrue(0.0 <= cx <= 1.0)
+        self.assertTrue(0.0 <= cy <= 1.0)
+
+        # 5. Precise motion tracking filter builder
+        filter_str = build_precise_motion_tracking_filter(
+            duration=1.5,
+            video_width=1080,
+            video_height=1920,
+            camera_motion="push_in"
+        )
+        self.assertIn("scale=1080:1920", filter_str)
+        self.assertIn("crop=", filter_str)
+        self.assertIn("setsar=1", filter_str)
+
 
 if __name__ == "__main__":
     unittest.main()

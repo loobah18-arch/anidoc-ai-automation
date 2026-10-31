@@ -25,11 +25,12 @@ on:
       phonk:
         description: 'Phonk BGM Track (or random for auto-rotation)'
         required: false
-        default: 'random'
+        default: 'montagem_zora'
         type: choice
         options:
-          - 'random'
+          - 'montagem_zora'
           - 'rayelo_ultraslowed'
+          - 'random'
           - 'montagem_vozes_profundas'
           - 'glxxmstrider_dont_stop_slowed'
           - 'rubikdice_montagem_pegadora_slowed'
@@ -56,9 +57,9 @@ on:
         default: false
         type: boolean
       upload:
-        description: 'Upload rendered Short to YouTube (enabled by default)'
+        description: 'Upload rendered Short to YouTube (disabled by default on this branch)'
         required: false
-        default: true
+        default: false
         type: boolean
 
 jobs:
@@ -161,16 +162,15 @@ jobs:
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
           
-          # YouTube uploads: enabled by default (unless explicitly set to false),
-          # and enabled for scheduled daily runs on the main branch.
+          # YouTube uploads: STRICTLY DISABLED on this feature branch! Output is intended for Phone Only delivery.
           if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.ref_name }}" = "main" ]; then
             echo "🚀 [Publish] Scheduled daily upload on main."
             CMD="$CMD --upload"
-          elif [ "${{ github.event.inputs.upload }}" != "false" ]; then
-            echo "🚀 [Publish] YouTube upload enabled."
+          elif [ "${{ github.event.inputs.upload }}" = "true" ] && [ "${{ github.ref_name }}" = "main" ]; then
+            echo "🚀 [Publish] Explicit upload requested on main."
             CMD="$CMD --upload"
           else
-            echo "🔒 [Testing Mode] Skipping YouTube upload for this run (upload=false requested)."
+            echo "🔒 [Testing/Phone Mode] Skipping YouTube upload (Phone Only delivery)."
           fi
           
           echo "Executing: $CMD"

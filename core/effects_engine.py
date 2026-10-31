@@ -202,22 +202,43 @@ def build_velocity_clip_filter(
     fps: int = FPS,
     add_bars: bool = False,
     is_intro_hook: bool = False,
-    use_bezier_velocity: bool = False
+    use_bezier_velocity: bool = False,
+    clip_path: Optional[Union[str, Path]] = None,
+    enable_motion_tracking: bool = True,
+    camera_motion: str = "auto",
+    narrative_role: Optional[str] = None
 ) -> str:
     """
-    Builds the per-clip video filter chain with modern velocity curves:
+    Builds the per-clip video filter chain with precise subject motion tracking
+    and modern velocity curves:
+    - Precise OpenCV subject & character tracking (locks on protagonist / combat duel)
+    - Zero black bars (fills 1080x1920 portrait canvas)
     - Non-linear Bézier 3-phase curves (fast snap-in -> slow-motion impact hold -> fast snap-out)
     - Dynamic PTS speed remapping (1.25x-1.30x snap acceleration vs 0.80x-0.85x slow-mo)
-    - Temporal frame blending (tblend) for motion blur on slow-mo segments
-    - Snappy exponential decay zoom punch on beat cuts (1.12x -> 1.0x over first 0.15s / 9 frames at 60fps)
+    - Snappy exponential decay zoom punch on beat cuts
     - Smooth continuous zoom-in for intro hook (1.0x -> 1.15x)
     """
-    filters = [
-        f"scale={video_width}:{video_height}:force_original_aspect_ratio=decrease:flags=lanczos",
-        f"pad={video_width}:{video_height}:(ow-iw)/2:(oh-ih)/2:color=black",
-        f"fps={fps}",
-        "setsar=1",
-    ]
+    if enable_motion_tracking:
+        from core.motion_tracker import build_precise_motion_tracking_filter
+        tracking_filter = build_precise_motion_tracking_filter(
+            clip_path=clip_path,
+            duration=duration,
+            video_width=video_width,
+            video_height=video_height,
+            camera_motion=camera_motion,
+            narrative_role=narrative_role
+        )
+        filters = [
+            tracking_filter,
+            f"fps={fps}"
+        ]
+    else:
+        filters = [
+            f"scale={video_width}:{video_height}:force_original_aspect_ratio=decrease:flags=lanczos",
+            f"pad={video_width}:{video_height}:(ow-iw)/2:(oh-ih)/2:color=black",
+            f"fps={fps}",
+            "setsar=1",
+        ]
 
     # Speed remapping: Non-linear Bézier curve vs constant speed multiplier
     # Clean anime frames without ghosting (tblend permanently removed per pro tutorials)

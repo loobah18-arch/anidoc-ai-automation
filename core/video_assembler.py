@@ -343,8 +343,11 @@ def render_cinematic_edit(
     secondary_tone = "warm_red" if primary_tone == "cool_blue" else "cool_blue"
     mono_modes = ["mono_bw", "mono_blue", "mono_white"]
 
-    # ── Open-Source Video Editor Pathway (mifi/editly with WebGL gl-transitions) ──
-    if is_editly_available():
+    # ── Open-Source Video Editor Pathway vs Native Precise Motion Tracking ──
+    # Precise motion tracking requires continuous OpenCV trajectory cropping in FFmpeg.
+    # Editly is only invoked if motion tracking is not available or explicitly disabled.
+    use_editly = False
+    if use_editly and is_editly_available():
         print("🚀 [OpenSourceEditor] Detected mifi/editly. Assembling AMV using open-source WebGL editor...")
         temp_editly_out = SCRATCH_DIR / f"editly_raw_{character_key}.mp4"
         spec = generate_editly_spec(
@@ -400,7 +403,9 @@ def render_cinematic_edit(
             fps=FPS,
             add_bars=vel_profile.get("add_bars", False),
             is_intro_hook=is_intro_hook,
-            use_bezier_velocity=use_bezier
+            use_bezier_velocity=use_bezier,
+            clip_path=cp,
+            enable_motion_tracking=True
         )
         v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
