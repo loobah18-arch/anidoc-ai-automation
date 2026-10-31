@@ -207,64 +207,115 @@ def build_velocity_clip_filter(
     clip_path: Optional[Union[str, Path]] = None,
     enable_motion_tracking: bool = True,
     camera_motion: str = "auto",
-    narrative_role: Optional[str] = None
+    narrative_role: Optional[str] = None,
+    input_tag: str = "",
+    output_tag: str = ""
 ) -> str:
     """
-    Builds the per-clip video filter chain with precise subject motion tracking
-    and modern velocity curves:
-    - Precise OpenCV subject & character tracking (locks on protagonist / combat duel)
-    - Zero black bars (fills 1080x1920 portrait canvas)
-    - Non-linear Bézier 3-phase curves (fast snap-in -> slow-motion impact hold -> fast snap-out)
-    - Dynamic PTS speed remapping (1.25x-1.30x snap acceleration vs 0.80x-0.85x slow-mo)
-    - Snappy exponential decay zoom punch on beat cuts
-    - Smooth continuous zoom-in for intro hook (1.0x -> 1.15x)
+    Builds the per-clip video filter chain with Adaptive Dual-Layer Framing & Motion Tracking:
+    - Solo Portraits / Character Close-ups: Full-bleed 9:16 OpenCV motion-tracked portrait crop
+      (keeps eyes in golden upper-third, dynamic pan-and-scan following character).
+    - Combat Duels (2+ fighters): Dual-Layer Ambient Background with uncropped 16:9 foreground,
+      preserving 100% of both combatants, martial arts strikes, and choreography.
+    - Wide Action (Domain expansions, explosions, landscapes): Dual-Layer Ambient Background with
+      centered 4:3 card, preserving 80%+ of the action window.
+    - Non-linear Bézier 3-phase velocity curves (fast snap-in -> slow-motion hold -> fast snap-out).
+    - Zero black bars (100% filled with color-graded anime ambiance).
     """
-    if enable_motion_tracking:
-        from core.motion_tracker import build_precise_motion_tracking_filter
-        tracking_filter = build_precise_motion_tracking_filter(
-            clip_path=clip_path,
-            duration=duration,
-            video_width=video_width,
-            video_height=video_height,
-            camera_motion=camera_motion,
-            narrative_role=narrative_role
-        )
-        filters = [
-            tracking_filter,
-            f"fps={fps}"
-        ]
-    else:
-        filters = [
-            f"scale={video_width}:{video_height}:force_original_aspect_ratio=decrease:flags=lanczos",
-            f"pad={video_width}:{video_height}:(ow-iw)/2:(oh-ih)/2:color=black",
-            f"fps={fps}",
-            "setsar=1",
-        ]
+    from core.motion_tracker import (
+        build_precise_motion_tracking_filter,
+        extract_motion_trajectory
+    )
 
-    # Speed remapping: Non-linear Bézier curve vs constant speed multiplier
-    # Clean anime frames without ghosting (tblend permanently removed per pro tutorials)
+    trajectory_info = None
+    shot_composition = "solo_portrait"
+    if enable_motion_tracking and clip_path is not None:
+        try:
+            trajectory_info = extract_motion_trajectory(clip_path, duration=duration)
+            shot_composition = trajectory_info.get("shot_composition", "solo_portrait")
+        except Exception as e:
+            print(f"⚠️ [EffectsEngine] Notice extracting composition: {e}")
+            shot_composition = "solo_portrait"
+
+    # Common speed remapping, duration trim, FPS, and SAR filters
+    post_filters = []
     if use_bezier_velocity and duration >= 0.40 and not is_intro_hook:
         bezier_pts = build_bezier_velocity_pts_expression(duration=duration, fast_speed=2.2, slow_speed=0.40)
-        filters.append(f"setpts='{bezier_pts}'")
+        post_filters.append(f"setpts='{bezier_pts}'")
     elif speed > 1.05:
         pts_mult = 1.0 / speed
-        filters.append(f"setpts={pts_mult:.4f}*PTS")
+        post_filters.append(f"setpts={pts_mult:.4f}*PTS")
     elif speed < 0.95:
         pts_mult = 1.0 / max(0.2, speed)
-        filters.append(f"setpts={pts_mult:.4f}*PTS")
+        post_filters.append(f"setpts={pts_mult:.4f}*PTS")
 
-    filters.extend([
+    post_filters.extend([
         "tpad=stop_mode=clone:stop_duration=5",
         f"trim=duration={duration:.3f}",
-        "setpts=PTS-STARTPTS"
+        "setpts=PTS-STARTPTS",
+        f"fps={fps}",
+        "setsar=1"
     ])
 
     if add_bars:
         bar_h = max(60, int(video_height * 0.125))
-        filters.append(f"drawbox=x=0:y=0:w=iw:h={bar_h}:color=black:t=fill")
-        filters.append(f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black:t=fill")
+        post_filters.append(f"drawbox=x=0:y=0:w=iw:h={bar_h}:color=black:t=fill")
+        post_filters.append(f"drawbox=x=0:y=ih-{bar_h}:w=iw:h={bar_h}:color=black:t=fill")
 
-    return ",".join(filters)
+    post_str = ",".join(post_filters)
+
+    # Adaptive Dual-Layer Framing vs Full-Bleed 9:16 Portrait
+    if input_tag and output_tag and shot_composition in ("combat_duel", "wide_action"):
+        bg_raw = f"bg_raw_{seg_idx}"
+        fg_raw = f"fg_raw_{seg_idx}"
+        bg_out = f"bg_{seg_idx}"
+        fg_out = f"fg_{seg_idx}"
+        comp_out = f"comp_{seg_idx}"
+
+        # Ambient bokeh background (fills 1080x1920 with blurred, color-matched motion)
+        bg_filter = (
+            f"scale=360:640:force_original_aspect_ratio=increase,crop=360:640,"
+            f"boxblur=16:3,scale={video_width}:{video_height}:flags=fast_bilinear,"
+            f"eq=brightness=-0.14:contrast=1.05,setsar=1"
+        )
+
+        if shot_composition == "combat_duel":
+            # 100% uncropped 16:9 widescreen action window so BOTH combatants are completely visible
+            fg_filter = (
+                f"scale={video_width}:-2:flags=lanczos,"
+                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
+            )
+            y_pos = f"({video_height}-h)/2"
+        else:
+            # 4:3 action window for wide action, domain expansions, and magic bursts
+            fg_filter = (
+                f"scale={video_width}:810:force_original_aspect_ratio=increase,crop={video_width}:810,"
+                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
+            )
+            y_pos = f"({video_height}-810)/2"
+
+        split_step = f"{input_tag}split=2[{bg_raw}][{fg_raw}]"
+        bg_step = f"[{bg_raw}]{bg_filter}[{bg_out}]"
+        fg_step = f"[{fg_raw}]{fg_filter}[{fg_out}]"
+        comp_step = f"[{bg_out}][{fg_out}]overlay=x=0:y={y_pos}:eval=init,setsar=1[{comp_out}]"
+        final_step = f"[{comp_out}]{post_str}{output_tag}"
+
+        return f"{split_step};{bg_step};{fg_step};{comp_step};{final_step}"
+
+    # Default / Solo Portrait: High-precision subject-locked 9:16 portrait crop
+    tracking_filter = build_precise_motion_tracking_filter(
+        clip_path=clip_path,
+        duration=duration,
+        video_width=video_width,
+        video_height=video_height,
+        trajectory_info=trajectory_info,
+        camera_motion=camera_motion,
+        narrative_role=narrative_role
+    )
+
+    if input_tag and output_tag:
+        return f"{input_tag}{tracking_filter},{post_str}{output_tag}"
+    return f"{tracking_filter},{post_str}"
 
 
 def build_vertical_dual_layer_chain(

@@ -434,6 +434,44 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("crop=", filter_str)
         self.assertIn("setsar=1", filter_str)
 
+    def test_15_adaptive_dual_layer_framing_and_dynamic_captions(self):
+        """Verifies adaptive dual-layer framing (Strategy A+B) and dynamic phrase subtitles."""
+        from core.effects_engine import build_velocity_clip_filter
+        from core.subtitle_stylizer import generate_kinetic_subtitles
+
+        # 1. Dual-layer chain with input/output tags
+        v_chain = build_velocity_clip_filter(
+            seg_idx=0,
+            duration=1.5,
+            video_width=1080,
+            video_height=1920,
+            input_tag="[0:v]",
+            output_tag="[v0]"
+        )
+        self.assertTrue(v_chain.startswith("[0:v]"))
+        self.assertTrue(v_chain.endswith("[v0]"))
+        self.assertIn("setsar=1", v_chain)
+
+        # 2. Dynamic subtitles with spur_hook and combat progression
+        ass_path = SCRATCH_DIR / "test_dynamic_subs.ass"
+        generate_kinetic_subtitles(
+            quote_text="IS SATORU GOJO TRULY | THE STRONGEST IN ANIME HISTORY?",
+            start_time=0.0,
+            end_time=25.0,
+            output_ass_path=ass_path,
+            style_preset="spur_hook",
+            character_name="gojo",
+            drop_time=5.4
+        )
+        self.assertTrue(ass_path.exists())
+        content = ass_path.read_text(encoding="utf-8")
+        self.assertIn("BaseText", content)
+        self.assertIn("LowerHype", content)
+        self.assertIn("TRULY", content)
+        self.assertIn("STRONGEST", content)
+        self.assertIn("INFINITY", content)
+        ass_path.unlink(missing_ok=True)
+
 
 if __name__ == "__main__":
     unittest.main()

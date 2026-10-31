@@ -108,6 +108,62 @@ EMPHASIS_KEYWORDS = {
 }
 
 
+CHARACTER_HYPE_PHRASES = {
+    "gojo": [
+        "UNTOUCHABLE",
+        "INFINITY UNLEASHED",
+        "DOMAIN EXPANSION",
+        "INFINITE VOID",
+        "HOLLOW PURPLE",
+        "THROUGHOUT HEAVEN AND EARTH",
+        "THE HONORED ONE 👑"
+    ],
+    "sukuna": [
+        "KING OF CURSES",
+        "MALEVOLENT SHRINE",
+        "CLEAVE & DISMANTLE",
+        "DIVINE FLAME",
+        "STAND PROUD 💀",
+        "ABSOLUTE POWER"
+    ],
+    "tanjiro": [
+        "HINOKAMI KAGURA",
+        "SUN BREATHING",
+        "SET YOUR HEART ABLAZE",
+        "TOTAL CONCENTRATION",
+        "DRAGON SUN HALO 🔥",
+        "NEVER GIVE UP"
+    ],
+    "rengoku": [
+        "FLAME BREATHING",
+        "NINTH FORM: RENGOKU",
+        "SET YOUR HEART ABLAZE",
+        "I WILL FULFILL MY DUTY ❤️‍🔥",
+        "HERO OF THE CORPS"
+    ],
+    "yuji": [
+        "BLACK FLASH ⚡",
+        "DIVERGENT FIST",
+        "HEAVY IMPACT",
+        "UNYIELDING WILL",
+        "LEFT RIGHT GOODNIGHT 🥊"
+    ],
+    "megumi": [
+        "CHIMERA SHADOW GARDEN",
+        "EIGHT-HANDLED SWORD",
+        "SACRED TREASURE SWING",
+        "WITH THIS TREASURE I SUMMON ⚡"
+    ],
+    "toji": [
+        "HEAVENLY RESTRICTION",
+        "ZERO CURSED ENERGY",
+        "SORCERER KILLER 🗡️",
+        "PURE SPEED",
+        "APEX PREDATOR"
+    ]
+}
+
+
 def _format_spur_line(words: List[str], red_hex: str, white_hex: str) -> str:
     """Formats words into 2 lines with red keyword emphasis matching the reference edit."""
     formatted = []
@@ -177,6 +233,7 @@ PlayResY: {VIDEO_HEIGHT}
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: BaseText,{cfg['font']},{cfg['fontsize']},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{cfg['outline_width']},{cfg['shadow_depth']},{cfg['alignment']},{margin_lr},{margin_lr},{cfg['margin_v']},1
+Style: LowerHype,Bebas Neue,62,&H00FFFFFF,&H00000000,&H00000000,&HA0000000,-1,0,0,0,100,100,2,0,1,6.5,3.5,2,80,80,140,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -185,9 +242,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     events = []
 
     if style_preset == "spur_hook":
-        # ── Viral Upper-Third Hook Statement Mode (Matches reference edit) ──
-        # Phase 1: Setup statement (plays continuously from start until beat drop)
-        # Phase 2: Climax punchline with Crimson Red keyword emphasis (drop to end)
+        # ── Viral Upper-Third Hook Statement Mode + Kinetic Combat Hype Progression ──
+        # Phase 1: Setup statement (plays cleanly until the beat drop)
+        # Phase 2: Climax punchline with Crimson Red keyword emphasis (drop to drop+2.8s, then dissolves)
+        # Phase 3: Dynamic lower-third kinetic combat hype phrases (drop+3.0s to end, synced with action)
         t_drop = drop_time if drop_time and (start_time < drop_time < end_time) else (start_time + total_dur * 0.45)
 
         if " | " in quote_text:
@@ -204,16 +262,40 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             setup_words = words
             punch_words = words
 
-        # Setup statement line (plays cleanly until the beat drop, no intrusive "BUT?" / "OR?")
+        # Phase 1: Setup statement line (plays cleanly until beat drop)
         setup_line = _format_spur_line(setup_words, cfg['active_word'], cfg['primary'])
         ts_0 = format_ass_timestamp(start_time)
         ts_drop = format_ass_timestamp(t_drop)
         events.append(f"Dialogue: 1,{ts_0},{ts_drop},BaseText,,0,0,0,,{{\\fscx106\\fscy106\\t(0,100,\\fscx100\\fscy100)}}{setup_line}")
 
-        # Punchline statement line (with crimson red emphasis keywords, from drop to end)
+        # Phase 2: Punchline statement (impact pop bounce at drop, fades out cleanly after 2.8s)
         punch_line = _format_spur_line(punch_words, cfg['active_word'], cfg['primary'])
-        ts_end = format_ass_timestamp(end_time)
-        events.append(f"Dialogue: 1,{ts_drop},{ts_end},BaseText,,0,0,0,,{{\\fscx110\\fscy110\\t(0,100,\\fscx100\\fscy100)}}{punch_line}")
+        t_punch_end = min(end_time, t_drop + 2.8)
+        ts_punch_end = format_ass_timestamp(t_punch_end)
+        events.append(f"Dialogue: 1,{ts_drop},{ts_punch_end},BaseText,,0,0,0,,{{\\fscx112\\fscy112\\t(0,120,\\fscx100\\fscy100)\\fad(0,350)}}{punch_line}")
+
+        # Phase 3: Kinetic Combat Hype Phrases in Lower Ambient Safe Area (drop + 3.0s to end)
+        char_key = (character_name or "").lower().strip()
+        matched_hype = None
+        for k, v in CHARACTER_HYPE_PHRASES.items():
+            if k in char_key:
+                matched_hype = v
+                break
+        if not matched_hype:
+            matched_hype = ["LIMITLESS POWER", "UNSTOPPABLE", "DOMAIN EXPANSION", "PEAK BATTLE", "THE STRONGEST 👑"]
+
+        t_curr = t_punch_end + 0.25
+        h_idx = 0
+        while t_curr < end_time - 0.4 and h_idx < len(matched_hype):
+            phrase_dur = min(1.6, end_time - t_curr)
+            p_end = t_curr + phrase_dur
+            ts_s = format_ass_timestamp(t_curr)
+            ts_e = format_ass_timestamp(p_end)
+            phrase = matched_hype[h_idx]
+            fmt_p = _format_spur_line(phrase.split(), cfg['active_word'], cfg['primary'])
+            events.append(f"Dialogue: 1,{ts_s},{ts_e},LowerHype,,0,0,0,,{{\\fscx112\\fscy112\\t(0,90,\\fscx100\\fscy100)\\fad(80,120)}}{fmt_p}")
+            t_curr = p_end + 0.15
+            h_idx += 1
     else:
         # Word-by-word karaoke lines
         for chunk_idx in range(0, len(words), chunk_size):

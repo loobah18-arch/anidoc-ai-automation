@@ -88,17 +88,18 @@ def detect_active_content_bounds(frame: np.ndarray, threshold: float = 12.0) -> 
     return (0, 0, orig_w, orig_h)
 
 
-def detect_subject_focal_point(frame: np.ndarray) -> Tuple[float, float, float]:
+def detect_subject_focal_point(frame: np.ndarray, return_details: bool = False) -> Union[Tuple[float, float, float], Tuple[float, float, float, int, float]]:
     """
     Detects the primary subject's normalized center coordinates (cx, cy) and confidence.
-    Returns (cx_norm, cy_norm, confidence) where values are normalized to [0.0, 1.0].
+    If return_details=True, returns (cx_norm, cy_norm, confidence, num_faces, max_face_ratio).
+    Otherwise returns (cx_norm, cy_norm, confidence) for backward compatibility.
     """
     if not OPENCV_AVAILABLE or frame is None or frame.size == 0:
-        return (0.5, 0.5, 0.0)
+        return (0.5, 0.5, 0.0, 0, 0.0) if return_details else (0.5, 0.5, 0.0)
 
     orig_h, orig_w = frame.shape[:2]
     if orig_h == 0 or orig_w == 0:
-        return (0.5, 0.5, 0.0)
+        return (0.5, 0.5, 0.0, 0, 0.0) if return_details else (0.5, 0.5, 0.0)
 
     # Downscale for high-speed detection (max width 640)
     scale = 1.0
@@ -132,6 +133,10 @@ def detect_subject_focal_point(frame: np.ndarray) -> Tuple[float, float, float]:
 
     if detected_faces:
         detected_faces.sort(key=lambda item: item[0], reverse=True)
+        num_faces = len(detected_faces)
+        max_face_area = detected_faces[0][0]
+        max_face_ratio = float(max_face_area) / float(proc_w * proc_h)
+
         # Check if top 2 faces are a two-character clash / conversation
         if len(detected_faces) >= 2:
             f1, f2 = detected_faces[0], detected_faces[1]
@@ -144,13 +149,17 @@ def detect_subject_focal_point(frame: np.ndarray) -> Tuple[float, float, float]:
                 cy1 = (f1[2] + f1[4] / 2.0) / float(proc_h)
                 cy2 = (f2[2] + f2[4] / 2.0) / float(proc_h)
                 cy_mid = (cy1 + cy2) / 2.0
-                return (float(np.clip(cx_mid, 0.0, 1.0)), float(np.clip(cy_mid, 0.0, 1.0)), 1.0)
+                ret_cx = float(np.clip(cx_mid, 0.0, 1.0))
+                ret_cy = float(np.clip(cy_mid, 0.0, 1.0))
+                return (ret_cx, ret_cy, 1.0, num_faces, max_face_ratio) if return_details else (ret_cx, ret_cy, 1.0)
 
         # Pick the most prominent / largest face
         _, fx, fy, fw, fh, conf = detected_faces[0]
         cx_norm = (fx + fw / 2.0) / float(proc_w)
         cy_norm = (fy + fh / 2.0) / float(proc_h)
-        return (float(np.clip(cx_norm, 0.0, 1.0)), float(np.clip(cy_norm, 0.0, 1.0)), conf)
+        ret_cx = float(np.clip(cx_norm, 0.0, 1.0))
+        ret_cy = float(np.clip(cy_norm, 0.0, 1.0))
+        return (ret_cx, ret_cy, conf, num_faces, max_face_ratio) if return_details else (ret_cx, ret_cy, conf)
 
     # 2. Multi-Modal Anime Character Saliency (Skin Tone + Saturation + High-contrast line art)
     try:
@@ -197,12 +206,14 @@ def detect_subject_focal_point(frame: np.ndarray) -> Tuple[float, float, float]:
             cx_norm = cx / float(small_w)
             cy_norm = cy / float(small_h)
             conf = 0.85 if skin_px > 80 else 0.65
-            return (float(np.clip(cx_norm, 0.0, 1.0)), float(np.clip(cy_norm, 0.0, 1.0)), conf)
+            ret_cx = float(np.clip(cx_norm, 0.0, 1.0))
+            ret_cy = float(np.clip(cy_norm, 0.0, 1.0))
+            return (ret_cx, ret_cy, conf, 0, 0.0) if return_details else (ret_cx, ret_cy, conf)
     except Exception:
         pass
 
     # Safe center fallback
-    return (0.5, 0.5, 0.0)
+    return (0.5, 0.5, 0.0, 0, 0.0) if return_details else (0.5, 0.5, 0.0)
 
 
 def extract_motion_trajectory(
@@ -225,7 +236,10 @@ def extract_motion_trajectory(
         "cx_start": 0.5, "cx_end": 0.5,
         "cy_start": 0.5, "cy_end": 0.5,
         "trajectory": [(0.0, 0.5, 0.5), (duration, 0.5, 0.5)],
-        "is_dynamic": False
+        "is_dynamic": False,
+        "shot_composition": "solo_portrait",
+        "max_faces": 1,
+        "peak_face_ratio": 0.10
     }
     if not clip_p.exists() or not OPENCV_AVAILABLE:
         return default_res
@@ -255,6 +269,8 @@ def extract_motion_trajectory(
         act_x, act_y, act_w, act_h = 0, 0, in_w, in_h
         raw_points = []
         prev_gray = None
+        max_faces_seen = 0
+        peak_face_ratio = 0.0
 
         for idx, frame_idx in enumerate(frame_indices):
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
@@ -274,7 +290,13 @@ def extract_motion_trajectory(
             else:
                 sub_frame = frame
 
-            cx, cy, conf = detect_subject_focal_point(sub_frame)
+            focal_res = detect_subject_focal_point(sub_frame, return_details=True)
+            cx, cy, conf = focal_res[0], focal_res[1], focal_res[2]
+            n_faces = focal_res[3]
+            f_ratio = focal_res[4]
+
+            max_faces_seen = max(max_faces_seen, n_faces)
+            peak_face_ratio = max(peak_face_ratio, f_ratio)
 
             # Optical flow & frame differencing for combat action tracking
             gray_curr = cv2.cvtColor(sub_frame, cv2.COLOR_BGR2GRAY)
@@ -319,13 +341,27 @@ def extract_motion_trajectory(
 
         is_dynamic = abs(cx_end - cx_start) >= 0.035
 
+        # Classify Shot Composition:
+        # 1. combat_duel: 2 or more characters present in the frame
+        # 2. solo_portrait: single prominent character face (close-up/medium close-up, >= 3.8% of frame)
+        # 3. wide_action: wide battle choreography, domain expansion, magic explosion, scenery
+        if max_faces_seen >= 2:
+            shot_composition = "combat_duel"
+        elif peak_face_ratio >= 0.038:
+            shot_composition = "solo_portrait"
+        else:
+            shot_composition = "wide_action"
+
         return {
             "in_w": in_w, "in_h": in_h,
             "act_x": act_x, "act_y": act_y, "act_w": act_w, "act_h": act_h,
             "cx_start": cx_start, "cx_end": cx_end,
             "cy_start": cy_start, "cy_end": cy_end,
             "trajectory": smoothed,
-            "is_dynamic": is_dynamic
+            "is_dynamic": is_dynamic,
+            "shot_composition": shot_composition,
+            "max_faces": max_faces_seen,
+            "peak_face_ratio": peak_face_ratio
         }
     except Exception as e:
         print(f"⚠️ [MotionTracker] Trajectory extraction notice: {e}")

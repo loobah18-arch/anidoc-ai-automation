@@ -393,7 +393,7 @@ def render_cinematic_edit(
         use_bezier = vel_profile.get("use_bezier_velocity", False)
         clip_render_dur = seg["duration"] + (trans_dur if idx < len(segments) - 1 else 0.0)
 
-        clip_vf = build_velocity_clip_filter(
+        v_chain = build_velocity_clip_filter(
             seg_idx=idx,
             duration=clip_render_dur,
             speed=vel_profile["speed"],
@@ -405,9 +405,11 @@ def render_cinematic_edit(
             is_intro_hook=is_intro_hook,
             use_bezier_velocity=use_bezier,
             clip_path=cp,
-            enable_motion_tracking=True
+            enable_motion_tracking=True,
+            narrative_role=seg.get("role"),
+            input_tag=f"[{idx}:v]",
+            output_tag=f"[v{idx}]"
         )
-        v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
 
