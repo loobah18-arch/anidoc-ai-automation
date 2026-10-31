@@ -2,8 +2,9 @@ name: Daily 4K Phonk / Scene Edit Generator & YouTube Auto-Upload
 
 on:
   schedule:
-    - cron: '30 6 * * *'   # Morning Slot (06:30 UTC): Daily Demon Slayer 4K Short
-    - cron: '30 18 * * *'  # Evening Slot (18:30 UTC): Daily Jujutsu Kaisen 4K Short
+    # 24-hour gap between uploads: runs once daily at 06:30 UTC (12:00 PM IST)
+    # Alternates daily between Demon Slayer and Jujutsu Kaisen
+    - cron: '30 6 * * *'
   workflow_dispatch:
     inputs:
       universe:
@@ -124,16 +125,15 @@ jobs:
 
 
 
-          # Scheduled runs: Upload both anime edits once per day at different times on the same day.
-          # Morning Slot (06:30 UTC): Demon Slayer daily edit for @jazzcreates
-          # Evening Slot (18:30 UTC): Jujutsu Kaisen daily edit for @jazzcreates
+          # Scheduled runs: 24-hour gap between uploads (runs once daily at 06:30 UTC).
+          # Alternates universe daily between Demon Slayer and Jujutsu Kaisen.
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            CURRENT_HOUR=$(date -u +%H)
-            if [ "$CURRENT_HOUR" -lt 12 ]; then
-              echo "🌅 [Scheduled Run: Morning Slot] Generating & Uploading Demon Slayer 4K Edit to @jazzcreates..."
+            DAY_OF_YEAR=$(date -u +%j)
+            if [ $((10#$DAY_OF_YEAR % 2)) -eq 0 ]; then
+              echo "🌅 [Scheduled Daily Run (24h gap)] Alternating Universe: Demon Slayer 4K Edit for @jazzcreates..."
               CMD="$CMD --universe demonslayer"
             else
-              echo "🌆 [Scheduled Run: Evening Slot] Generating & Uploading Jujutsu Kaisen 4K Edit to @jazzcreates..."
+              echo "🌆 [Scheduled Daily Run (24h gap)] Alternating Universe: Jujutsu Kaisen 4K Edit for @jazzcreates..."
               CMD="$CMD --universe jjk"
             fi
           elif [ "${{ github.event.inputs.universe }}" = "random" ]; then
