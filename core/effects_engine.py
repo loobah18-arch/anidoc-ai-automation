@@ -31,12 +31,12 @@ def get_segment_velocity_profile(
     duration = seg.get("duration", 1.0)
 
     if not is_drop:
-        # Phase 1: Intro — slight slow-mo for cinematic weight & narrative buildup
+        # Phase 1: Intro — slight slow-mo for cinematic weight & narrative buildup (zero artificial letterbox)
         return {
             "role": "intro_slowmo",
             "speed": 0.85,
             "scale_factor": 1.02,
-            "add_bars": True,
+            "add_bars": False,
             "add_flash": False
         }
 
