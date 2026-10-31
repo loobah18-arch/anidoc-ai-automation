@@ -452,7 +452,7 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(v_chain.endswith("[v0]"))
         self.assertIn("setsar=1", v_chain)
 
-        # 2. Dynamic subtitles with spur_hook and combat progression
+        # 2. Engaging question subtitles with spur_hook (setup -> punchline at drop, no random LowerHype phrases)
         ass_path = SCRATCH_DIR / "test_dynamic_subs.ass"
         generate_kinetic_subtitles(
             quote_text="IS SATORU GOJO TRULY | THE STRONGEST IN ANIME HISTORY?",
@@ -466,10 +466,9 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(ass_path.exists())
         content = ass_path.read_text(encoding="utf-8")
         self.assertIn("BaseText", content)
-        self.assertIn("LowerHype", content)
+        self.assertNotIn("LowerHype", content)
         self.assertIn("TRULY", content)
         self.assertIn("STRONGEST", content)
-        self.assertIn("INFINITY", content)
         ass_path.unlink(missing_ok=True)
 
 

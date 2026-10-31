@@ -34,7 +34,8 @@ from core.scene_scorer import SceneScorer
 SUPPORTED_VIDEO_EXTS = {".mp4", ".mkv", ".mov", ".avi", ".webm", ".ts", ".m4v"}
 SUPPORTED_ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".7z", ".rar"}
 
-HISTORY_FILE = SCRATCH_DIR / "gdrive_edit_history.json"
+HISTORY_FILE = Path(".agents/data/gdrive_history.json")
+FALLBACK_HISTORY_FILE = SCRATCH_DIR / "gdrive_edit_history.json"
 
 CHARACTER_EPISODE_PREFERENCES = {
     # JJK Combat Preferences
@@ -73,23 +74,26 @@ CHARACTER_EPISODE_PREFERENCES = {
 
 def _load_history() -> Dict[str, Any]:
     """Loads previously used episodes and timestamps."""
-    if HISTORY_FILE.exists():
-        try:
-            with open(HISTORY_FILE, "r") as f:
-                return json.load(f)
-        except Exception:
-            pass
+    for p in [HISTORY_FILE, FALLBACK_HISTORY_FILE]:
+        if p.exists():
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
     return {"used_files": [], "used_timestamps": {}}
 
 
 def _save_history(history: Dict[str, Any]):
     """Persists used episodes and timestamps."""
-    try:
-        HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(HISTORY_FILE, "w") as f:
-            json.dump(history, f, indent=2)
-    except Exception as e:
-        print(f"⚠️ [GoogleDrive] Failed to save history: {e}")
+    for p in [HISTORY_FILE, FALLBACK_HISTORY_FILE]:
+        try:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            with open(p, "w", encoding="utf-8") as f:
+                json.dump(history, f, indent=2)
+            break
+        except Exception as e:
+            print(f"⚠️ [GoogleDrive] Notice saving history to {p}: {e}")
 
 
 def list_gdrive_folder_items(folder_url_or_id: str) -> List[Dict[str, str]]:
@@ -232,12 +236,14 @@ def pick_best_file_for_character(
                         title_matches.append(f)
                 if title_matches:
                     unused_title = [f for f in title_matches if f["name"] not in used_files]
-                    cand_pool = unused_title if unused_title else title_matches
-                    chosen = random.choice(cand_pool)
-                    print(f"🎯 [GoogleDrive] Selected title-optimized episode ({intent['scene_type']}) for '{character_key}' ({char_universe.upper()}): {chosen['name']}")
-                    history["used_files"].append(chosen["name"])
-                    _save_history(history)
-                    return chosen
+                    if unused_title:
+                        chosen = random.choice(unused_title)
+                        print(f"🎯 [GoogleDrive] Selected fresh title-optimized episode ({intent['scene_type']}) for '{character_key}' ({char_universe.upper()}): {chosen['name']}")
+                        history["used_files"].append(chosen["name"])
+                        _save_history(history)
+                        return chosen
+                    else:
+                        print(f"ℹ️ [GoogleDrive] All title-matched episodes for '{intent['scene_type']}' already used in current cycle. Falling back to diverse episode rotation.")
         except Exception as e:
             print(f"⚠️ [GoogleDrive] Title-based file matching error: {e}")
 
