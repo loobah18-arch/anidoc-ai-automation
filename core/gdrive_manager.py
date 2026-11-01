@@ -621,11 +621,12 @@ def slice_action_moments_from_source(
                 # Clamp within video bounds
                 if p < start_bound or p + clip_duration > end_bound:
                     continue
-                # Skip if timestamp was recently used
-                if not any(abs(p - prev) < 5.0 for prev in file_used_ts):
+                # Skip if timestamp was recently used (never skip essential dialogue scenes)
+                is_conv = any(kw in desc.lower() for kw in ["dialogue", "conversation", "talk", "speak", "recruit", "demonhood", "monologue", "speech", "ideological"])
+                if is_conv or not any(abs(p - prev) < 5.0 for prev in file_used_ts):
                     curated_candidates.append({
                         "start": p,
-                        "score": base_score,
+                        "score": base_score + (30.0 if is_conv else 0.0),
                         "description": desc,
                         "tag": f"💎 {tag_prefix}: {desc[:42]}",
                         "is_curated": True
@@ -787,10 +788,18 @@ def slice_action_moments_from_source(
     bridge_idx = min(n_clips - 4, max(drop_idx + 2, int(n_clips * 0.7))) if n_clips > 6 else max(0, n_clips - 2)
     last_idx = n_clips - 1
 
+    # Define pure dialogue keywords to cleanly isolate conversation from combat
+    pure_conv_keywords = [
+        "dialogue", "conversation", "talk", "speak", "recruit", "demonhood",
+        "monologue", "speech", "words", "ideological"
+    ]
+
     # Find the drop climax: signature primary attack (e.g. Fire Dragon, Domain Expansion, Sixfold Lightning)
     drop_candidates = [
         c for c in final_candidates
-        if any(kw in c.get("description", "").lower() for kw in ["dragon", "enbu", "giant fire", "domain expansion", "hollow purple", "sixfold", "musical score", "ninth form"])
+        if any(kw in c.get("description", "").lower() for kw in ["dragon", "enbu", "giant fire", "domain expansion", "hollow purple", "sixfold", "musical score", "ninth form", "first form", "sea of fire"])
+        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+        and (c["start"] >= 540.0 if matched_ep_code == "DS_S02E06" else True)
     ]
     if drop_candidates:
         drop_climax = max(drop_candidates, key=lambda x: x["score"])
@@ -800,7 +809,9 @@ def slice_action_moments_from_source(
     # Find the true finisher: scene with 'decapitation', 'neck', 'slash', or latest timestamp among explosive candidates
     finisher_candidates = [
         c for c in final_candidates
-        if c != drop_climax and any(kw in c.get("description", "").lower() for kw in ["decapitat", "neck", "sever", "cleave", "circular slash", "kamado song", "wolf hunt"])
+        if c != drop_climax and any(kw in c.get("description", "").lower() for kw in ["decapitat", "neck", "sever", "cleave", "circular slash", "kamado song", "wolf hunt", "flame tiger", "disorder"])
+        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+        and (c["start"] >= 540.0 if matched_ep_code == "DS_S02E06" else True)
     ]
     if finisher_candidates:
         finisher = max(finisher_candidates, key=lambda x: x["start"])
@@ -809,44 +820,45 @@ def slice_action_moments_from_source(
     else:
         finisher = final_candidates[0]
 
-    # Find secondary drop (bridge drop)
+    # Find secondary drop (bridge drop) - strictly combat only
     sec_candidates = [
         c for c in final_candidates
-        if c != drop_climax and c != finisher and any(kw in c.get("description", "").lower() for kw in ["exploding blood", "bakketsu", "pink", "boogie woogie", "godspeed", "destructive death"])
+        if c != drop_climax and c != finisher
+        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+        and (c["start"] >= 540.0 if matched_ep_code == "DS_S02E06" else True)
+        and any(kw in c.get("description", "").lower() for kw in ["exploding blood", "bakketsu", "pink", "boogie woogie", "godspeed", "destructive death", "tiger", "fifth form", "air type"])
     ]
     if sec_candidates:
         sec_drop = max(sec_candidates, key=lambda x: x["score"])
     elif len(final_candidates) > 1:
-        other_candidates = [c for c in final_candidates if c != drop_climax and c != finisher]
+        other_candidates = [
+            c for c in final_candidates
+            if c != drop_climax and c != finisher
+            and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+            and (c["start"] >= 540.0 if matched_ep_code == "DS_S02E06" else True)
+        ]
         sec_drop = other_candidates[0] if other_candidates else final_candidates[1]
     else:
         sec_drop = drop_climax
 
-    # Find intro candidates: pre-fight dialogue, verbal confrontation, or ideological clash before the battle
-    pure_conv_keywords = [
-        "dialogue", "conversation", "talk", "speak", "recruit", "demonhood",
-        "monologue", "speech", "words", "ideological"
-    ]
-    conv_keywords = pure_conv_keywords + [
-        "confront", "praise", "intent", "stare", "eye", "face", "challenge", "threat", "duty"
-    ]
-    intro_candidates = [
+    # Find intro candidates: strictly pre-fight dialogue/conversation scenes
+    intro_dialogue = [
         c for c in final_candidates
-        if c not in (drop_climax, sec_drop, finisher) and (
-            any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-            or (matched_ep_code == "DS_S02E06" and c["start"] < 540.0)
-            or (c["start"] < drop_climax["start"] and any(kw in c.get("description", "").lower() for kw in conv_keywords))
-        )
+        if any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+        and (360.0 <= c["start"] < 540.0 if matched_ep_code == "DS_S02E06" else True)
     ]
-    # Sort strictly chronologically by start time so the conversation unfolds naturally
-    intro_candidates.sort(key=lambda x: x["start"])
+    intro_dialogue.sort(key=lambda x: x["start"])
 
-    if len(intro_candidates) >= drop_idx:
-        intro_pool = intro_candidates[:drop_idx]
+    if len(intro_dialogue) >= drop_idx:
+        intro_pool = intro_dialogue[:drop_idx]
     else:
-        remaining_cand = [c for c in final_candidates if c not in (drop_climax, sec_drop, finisher)]
-        sorted_by_energy = sorted(remaining_cand, key=lambda x: x["score"])
-        intro_pool = sorted_by_energy[:drop_idx]
+        other_intro = [
+            c for c in final_candidates
+            if c not in (drop_climax, sec_drop, finisher) and c not in intro_dialogue
+            and c["start"] >= 90.0
+            and (c["start"] < 540.0 if matched_ep_code == "DS_S02E06" else True)
+        ]
+        intro_pool = (intro_dialogue + other_intro)[:drop_idx]
     intro_pool.sort(key=lambda x: x["start"])
 
     # Combat pool for clips AFTER the drop: strictly exclude any dialogue/conversation scenes
