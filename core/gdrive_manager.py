@@ -815,22 +815,23 @@ def slice_action_moments_from_source(
         sec_drop = drop_climax
 
     # Find intro candidates: pre-fight dialogue, verbal confrontation, or ideological clash before the battle
-    conv_keywords = [
-        "confront", "talk", "speak", "dialogue", "conversation", "recruit", "demonhood",
-        "monologue", "speech", "words", "stand", "arrival", "lands", "praise", "intent",
-        "stare", "eye", "face", "challenge", "threat", "duty", "breath", "ignit", "blade"
+    pure_conv_keywords = [
+        "dialogue", "conversation", "talk", "speak", "recruit", "demonhood",
+        "monologue", "speech", "words", "ideological"
+    ]
+    conv_keywords = pure_conv_keywords + [
+        "confront", "praise", "intent", "stare", "eye", "face", "challenge", "threat", "duty"
     ]
     intro_candidates = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and (
-            c["start"] < drop_climax["start"] or any(kw in c.get("description", "").lower() for kw in conv_keywords)
+            any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+            or (matched_ep_code == "DS_S02E06" and c["start"] < 540.0)
+            or (c["start"] < drop_climax["start"] and any(kw in c.get("description", "").lower() for kw in conv_keywords))
         )
     ]
-    # Sort with dialogue/confrontation first, then chronologically so the pre-fight conversation unfolds naturally
-    intro_candidates.sort(key=lambda x: (
-        0 if any(kw in x.get("description", "").lower() for kw in conv_keywords[:14]) else 1,
-        x["start"]
-    ))
+    # Sort strictly chronologically by start time so the conversation unfolds naturally
+    intro_candidates.sort(key=lambda x: x["start"])
 
     if len(intro_candidates) >= drop_idx:
         intro_pool = intro_candidates[:drop_idx]
@@ -840,16 +841,20 @@ def slice_action_moments_from_source(
         intro_pool = sorted_by_energy[:drop_idx]
     intro_pool.sort(key=lambda x: x["start"])
 
-    # Combat pool for clips AFTER the drop: prefer clips chronologically >= drop_climax['start']
+    # Combat pool for clips AFTER the drop: strictly exclude any dialogue/conversation scenes
     post_drop_candidates = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c["start"] >= drop_climax["start"]
+        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+        and not (matched_ep_code == "DS_S02E06" and c["start"] < 540.0)
     ]
     post_drop_candidates.sort(key=lambda x: x["start"])
 
     other_combat = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c not in post_drop_candidates
+        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+        and not (matched_ep_code == "DS_S02E06" and c["start"] < 540.0)
     ]
     other_combat.sort(key=lambda x: x["start"])
     combat_pool = post_drop_candidates + other_combat
@@ -874,10 +879,13 @@ def slice_action_moments_from_source(
     selected[last_idx] = finisher
 
     # Diverse combat pool selection with strict non-repetition and 15s minimum spacing
+    # CRITICAL: strictly ensure zero conversation/dialogue scenes are in post-drop combat
     used_starts = {c["start"] for c in selected if c is not None}
     available_combat = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool
+        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+        and not (matched_ep_code == "DS_S02E06" and c["start"] < 540.0)
     ]
     # Prioritize highest action score scenes first
     available_combat.sort(key=lambda x: x["score"], reverse=True)

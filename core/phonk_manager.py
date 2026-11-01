@@ -29,6 +29,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Brazilian Phonk",
         "bpm": 110.0,
         "default_drop": 5.40,
+        "conversation_drop": 14.128,
         "audio_offset": 0.00,
     },
     {

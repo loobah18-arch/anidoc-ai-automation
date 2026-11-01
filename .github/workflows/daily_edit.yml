@@ -60,6 +60,11 @@ on:
           - '1440p'
           - '4k'
           - '1080p'
+      duration:
+        description: 'Target Video Duration in seconds (e.g. 42.0 for proper conversation buildup, or 28.0)'
+        required: false
+        default: '42.0'
+        type: string
       refresh_clips:
         description: 'Download & slice fresh scenepack cuts (multi-source: yt-dlp → Archive.org → Pixabay)'
         required: false
@@ -131,7 +136,8 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
-          CMD="python main.py --duration 28.0"
+          TARGET_DUR="${{ github.event.inputs.duration || '42.0' }}"
+          CMD="python main.py --duration $TARGET_DUR"
 
 
 

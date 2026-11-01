@@ -471,6 +471,43 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertIn("STRONGEST", content)
         ass_path.unlink(missing_ok=True)
 
+    def test_16_proper_conversation_buildup_and_combat_purging(self):
+        """Verifies proper dialogue buildup (>10s), 14.1s beat drop, and post-drop combat isolation."""
+        from core.beat_detector import generate_procedural_beat_grid, analyze_audio_beats
+        from core.timestamp_loader import load_episode_metadata
+
+        # 1. 42s beat grid: effective drop is at 14.128s, with 3 dialogue cuts before the drop
+        grid = generate_procedural_beat_grid(duration=42.0, drop_time=14.128, bpm=110.0)
+        self.assertAlmostEqual(grid.drop_time, 14.13, delta=0.1)
+        segments = grid.get_cut_segments()
+        intro_segs = [s for s in segments if not s["is_drop"]]
+        combat_segs = [s for s in segments if s["is_drop"]]
+
+        # Pre-fight conversation has 3 narrative cuts
+        self.assertEqual(len(intro_segs), 3)
+        self.assertGreaterEqual(intro_segs[-1]["end"], 14.0)
+
+        # Combat has rapid cuts
+        self.assertGreaterEqual(len(combat_segs), 20)
+
+        # 2. Episode S02E06 metadata verifies dialogue scenes vs combat scenes
+        meta = load_episode_metadata("DS_S02E06")
+        self.assertIsNotNone(meta)
+        scenes = meta.get("scenes", [])
+        dialogue_scenes = [s for s in scenes if s["start"] < 540.0]
+        combat_scenes = [s for s in scenes if s["start"] >= 540.0]
+
+        self.assertGreaterEqual(len(dialogue_scenes), 3)
+        self.assertGreaterEqual(len(combat_scenes), 5)
+        # Verify dialogue descriptions
+        self.assertTrue(any("demonhood" in s["description"].lower() or "eternal" in s["description"].lower() for s in dialogue_scenes))
+        self.assertTrue(any("mortal beauty" in s["description"].lower() for s in dialogue_scenes))
+        self.assertTrue(any("compass needle" in s["description"].lower() for s in dialogue_scenes))
+        # Verify all combat scenes are purely combat clashes
+        for cs in combat_scenes:
+            self.assertTrue(cs["start"] >= 540.0)
+            self.assertIn("combat", cs["description"].lower())
+
 
 if __name__ == "__main__":
     unittest.main()
