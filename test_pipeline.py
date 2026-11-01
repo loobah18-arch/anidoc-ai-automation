@@ -530,11 +530,14 @@ class TestAniDocPipeline(unittest.TestCase):
         dialogue_events = [l for l in sub_text.splitlines() if "Dialogue: 2" in l]
         self.assertGreaterEqual(len(dialogue_events), 15)
         # Subtitles contain ONLY what characters speak in clean ALL CAPS with pop tag
-        self.assertIn("TECHNIQUE DEVELOPMENT", sub_text)
-        self.assertIn("COMPASS NEEDLE", sub_text)
+        self.assertIn("TECHNIQUE", sub_text)
+        self.assertIn("DEVELOPMENT", sub_text)
+        self.assertIn("COMPASS", sub_text)
+        self.assertIn("NEEDLE", sub_text)
         self.assertIn("BECOME A DEMON", sub_text)
-        self.assertIn("SEA OF FIRE", sub_text)
-        self.assertIn(r"\fscx110", sub_text)
+        self.assertIn("SEA OF", sub_text)
+        self.assertIn("FIRE", sub_text)
+        self.assertIn(r"\fscx112", sub_text)
         # Zero speaker tags or badges (Akaza:, Rengoku:, [Akaza])
         self.assertFalse(any("akaza:" in line.lower() or "rengoku:" in line.lower() for line in sub_text.splitlines()))
         self.assertFalse(any("[akaza]" in line.lower() or "[rengoku]" in line.lower() for line in sub_text.splitlines()))

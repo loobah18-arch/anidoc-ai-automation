@@ -356,26 +356,57 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 continue
 
             total_dur = max(0.5, en_val - st_val)
-            step_dur = total_dur / len(all_words)
+            # Natural speech pacing: reserve 0.8s - 1.2s at the end so the viewer comfortably absorbs the completed sentence
+            hold_dur = min(1.2, max(0.6, total_dur * 0.25))
+            speech_dur = max(0.3, total_dur - hold_dur)
 
+            # Weight each word by character length and natural punctuation pauses (colons, commas, ellipses)
+            weights = []
+            for w, _ in all_words:
+                wt = max(1.0, len(w) * 0.2)
+                if w.endswith(":") or w.endswith(","):
+                    wt += 1.8
+                elif w.endswith("...") or w.endswith("…"):
+                    wt += 2.2
+                elif w.endswith("!") or w.endswith("?"):
+                    wt += 1.5
+                weights.append(wt)
+
+            total_wt = sum(weights)
+            word_durs = [(wt / total_wt) * speech_dur for wt in weights]
+
+            curr_t = st_val
             for w_idx in range(len(all_words)):
-                w_start = st_val + (w_idx * step_dur)
-                w_end = st_val + ((w_idx + 1) * step_dur) if w_idx < len(all_words) - 1 else en_val
+                w_start = curr_t
+                dur = word_durs[w_idx]
+                if w_idx == len(all_words) - 1:
+                    w_end = en_val  # Final completed line holds through the sentence duration
+                else:
+                    w_end = curr_t + dur
+                curr_t += dur
+
                 d_start = format_ass_timestamp(w_start)
                 d_end = format_ass_timestamp(w_end)
 
                 current_words = all_words[:w_idx + 1]
-                line0 = " ".join([w for w, l_idx in current_words if l_idx == 0])
-                line1 = " ".join([w for w, l_idx in current_words if l_idx == 1])
+                # Isolate energetic scale pop ONLY to the newly added word; previous words remain rock-solid and stable
+                lines_formatted = [[], []]
+                for idx_w, (w, l_idx) in enumerate(current_words):
+                    if idx_w == w_idx:
+                        lines_formatted[l_idx].append(rf"{{\fscx112\fscy112\t(0,70,\fscx100\fscy100)}}{w}")
+                    else:
+                        lines_formatted[l_idx].append(w)
+
+                line0 = " ".join(lines_formatted[0])
+                line1 = " ".join(lines_formatted[1]) if lines_formatted[1] else ""
 
                 full_text = line0
                 if line1:
                     full_text += r"\N" + line1
 
-                # Pop animation on newly added word
-                fade_tag = r"{\fad(60,60)}" if (w_idx == 0 or w_idx == len(all_words) - 1) else ""
-                pop_tag = r"{\fscx110\fscy110\t(0,75,\fscx100\fscy100)}"
-                events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{fade_tag}{pop_tag}{full_text}")
+                # Smooth fade transitions at line boundary
+                fade_tag = r"{\fad(80,0)}" if w_idx == 0 else (r"{\fad(0,80)}" if w_idx == len(all_words) - 1 else "")
+                events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{fade_tag}{full_text}")
             
     full_ass = ass_header + "\n".join(events) + "\n"
     with open(output_ass_path, "w", encoding="utf-8") as f:

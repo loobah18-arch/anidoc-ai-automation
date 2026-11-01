@@ -189,6 +189,18 @@ def render_cinematic_edit(
             if gdrive_clips:
                 clip_paths = gdrive_clips
                 print(f"✅ [GoogleDrive] Using {len(clip_paths)} high-definition action clips with original audio.")
+                # Quality Upgrade: If GDrive footage is low-res 480p, augment with genuine 1080p/4K scenepack for combat cuts
+                if any("480p" in str(p).lower() for p in gdrive_clips) and auto_fetch_clips:
+                    print(f"⚠️ [Resolution] Detected 480p low-res Google Drive footage. Sourcing genuine 1080p/4K scenepack for combat cuts...")
+                    try:
+                        from core.public_api_fetcher import fetch_character_scenepack
+                        hd_combat = fetch_character_scenepack(character_key, max_clips=n_clips)
+                        if hd_combat and len(hd_combat) >= 3:
+                            # Keep Clip 0 (pre-fight dialogue intro) from Google Drive for canon audio & dialogue alignment
+                            clip_paths = [gdrive_clips[0]] + hd_combat[:n_clips - 1]
+                            print(f"✨ [Resolution] Upgraded {len(clip_paths)-1} combat clips to genuine 1080p/4K footage!")
+                    except Exception as e_hd:
+                        print(f"ℹ️ [Resolution] Scenepack fetch notice: {e_hd}")
         except Exception as e:
             print(f"⚠️  [GoogleDrive] Extraction failed: {e}")
 

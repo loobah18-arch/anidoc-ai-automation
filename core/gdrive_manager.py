@@ -599,9 +599,9 @@ def slice_action_moments_from_source(
 
             # Strictly reject end credits, ending theme songs, next-episode previews, and bumpers
             end_credit_keywords = [
-                "credit", "ending", "ed", "preview", "next episode", "taisho secret", "recap", "bumper", "staff", "cast"
+                "credits", "ending theme", "ending song", "preview", "next episode", "taisho secret", "recap", "bumper", "staff roll", "cast roll"
             ]
-            if any(kw in desc.lower() for kw in end_credit_keywords):
+            if any(kw in desc.lower() for kw in end_credit_keywords) or bool(re.search(r"\b(ed|ending)\b", desc.lower())):
                 return
 
             base_score = float(s.get("action_score", 0.8)) * 100.0 + bonus
@@ -804,15 +804,18 @@ def slice_action_moments_from_source(
         "monologue", "speech", "words", "ideological"
     ]
     end_credit_keywords = [
-        "credit", "ending", "ed", "preview", "next episode", "taisho secret", "recap", "bumper", "staff", "cast"
+        "credits", "ending theme", "ending song", "preview", "next episode", "taisho secret", "recap", "bumper", "staff roll", "cast roll"
     ]
+    def _is_credit(desc_text: str) -> bool:
+        low = desc_text.lower()
+        return any(kw in low for kw in end_credit_keywords) or bool(re.search(r"\b(ed|ending)\b", low))
 
     # Find the drop climax: signature primary attack (e.g. Fire Dragon, Domain Expansion, Sixfold Lightning)
     drop_candidates = [
         c for c in final_candidates
         if any(kw in c.get("description", "").lower() for kw in ["dragon", "enbu", "giant fire", "domain expansion", "hollow purple", "sixfold", "musical score", "ninth form", "first form", "sea of fire"])
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+        and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
     ]
@@ -822,7 +825,7 @@ def slice_action_moments_from_source(
         valid_drops = [
             c for c in final_candidates
             if not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-            and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+            and not _is_credit(c.get("description", ""))
             and (c["start"] + clip_duration <= end_bound)
             and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
         ]
@@ -833,7 +836,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c != drop_climax and any(kw in c.get("description", "").lower() for kw in ["decapitat", "neck", "sever", "cleave", "circular slash", "kamado song", "wolf hunt", "flame tiger", "disorder"])
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+        and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
     ]
@@ -844,7 +847,7 @@ def slice_action_moments_from_source(
             c for c in final_candidates
             if c != drop_climax
             and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-            and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+            and not _is_credit(c.get("description", ""))
             and (c["start"] + clip_duration <= end_bound)
             and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
         ]
@@ -857,7 +860,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c != drop_climax and c != finisher
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+        and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
         and any(kw in c.get("description", "").lower() for kw in ["exploding blood", "bakketsu", "pink", "boogie woogie", "godspeed", "destructive death", "tiger", "fifth form", "air type"])
@@ -869,7 +872,7 @@ def slice_action_moments_from_source(
             c for c in final_candidates
             if c != drop_climax and c != finisher
             and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-            and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+            and not _is_credit(c.get("description", ""))
             and (c["start"] + clip_duration <= end_bound)
             and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
         ]
@@ -881,12 +884,15 @@ def slice_action_moments_from_source(
     intro_dialogue = [
         c for c in final_candidates
         if any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+        and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and (740.0 <= c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
     ]
-    # For a continuous conversation buildup leading directly into the fight, prioritize scene right before clash
-    intro_dialogue.sort(key=lambda x: x["start"], reverse=True)
+    # For Mugen Train S02E06, strictly prioritize the 872.0s Destructive Death Compass Needle confrontation scene
+    if matched_ep_code == "DS_S02E06":
+        intro_dialogue.sort(key=lambda x: (abs(x["start"] - 872.0), -x["start"]))
+    else:
+        intro_dialogue.sort(key=lambda x: x["start"], reverse=True)
 
     if len(intro_dialogue) >= drop_idx:
         intro_pool = intro_dialogue[:drop_idx]
@@ -894,21 +900,22 @@ def slice_action_moments_from_source(
         other_intro = [
             c for c in final_candidates
             if c not in (drop_climax, sec_drop, finisher) and c not in intro_dialogue
-            and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+            and not _is_credit(c.get("description", ""))
             and c["start"] >= 90.0
             and (c["start"] + clip_duration <= end_bound)
             and (c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
         ]
         other_intro.sort(key=lambda x: x["start"], reverse=True)
         intro_pool = (intro_dialogue + other_intro)[:drop_idx]
-    intro_pool.sort(key=lambda x: x["start"])
+    if matched_ep_code != "DS_S02E06":
+        intro_pool.sort(key=lambda x: x["start"])
 
     # Combat pool for clips AFTER the drop: strictly exclude any dialogue/conversation or credit scenes
     post_drop_candidates = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c["start"] >= drop_climax["start"]
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+        and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
     ]
@@ -918,7 +925,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c not in post_drop_candidates
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+        and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
     ]
@@ -954,7 +961,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+        and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
     ]
@@ -1019,12 +1026,11 @@ def slice_action_moments_from_source(
     generated_clips = []
     new_used_ts = []
 
-    # High-clarity watermark-free super-resolution crop filter (even width & height guaranteed)
+    # High-clarity super-resolution upscaling & edge reconstruction (retains 100% frame data without destructive border crop)
     target_slice_w = max(1920, VIDEO_WIDTH)
     vf_chain = (
-        "crop=trunc(in_w*0.88/2)*2:trunc(in_h*0.88/2)*2:trunc(in_w*0.06/2)*2:trunc(in_h*0.06/2)*2,"
-        f"scale={target_slice_w}:-2:force_original_aspect_ratio=decrease:flags=lanczos+accurate_rnd,"
-        f"scale=trunc(iw/2)*2:trunc(ih/2)*2,cas=0.55,unsharp=5:5:1.2:5:5:0.0,setsar=1,fps={FPS}"
+        f"scale={target_slice_w}:-2:flags=lanczos+accurate_rnd+full_chroma_int+full_chroma_inp,"
+        f"scale=trunc(iw/2)*2:trunc(ih/2)*2,cas=0.60,unsharp=5:5:1.3:5:5:0.0,setsar=1,fps={FPS}"
     )
 
     for idx, cand in enumerate(selected):

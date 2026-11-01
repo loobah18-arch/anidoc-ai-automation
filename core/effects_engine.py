@@ -329,8 +329,9 @@ def build_velocity_clip_filter(
         )
 
         eff_scale = max(1.0, scale_factor)
-        if shot_composition == "combat_duel":
-            # 100% uncropped 16:9 widescreen action window so BOTH combatants are completely visible
+        # For conversation intros or combat duels, preserve 100% of widescreen action resolution (0% width cropped)
+        if is_intro_hook or shot_composition == "combat_duel":
+            # 100% uncropped widescreen action window so BOTH combatants and dialogue are completely visible in full sharpness
             if eff_scale > 1.05:
                 scaled_w = int(round(video_width * eff_scale / 2) * 2)
                 fg_filter = (
@@ -358,17 +359,22 @@ def build_velocity_clip_filter(
             )
             y_pos = f"({video_height}-{fg_h})/2"
         else:
-            # Solo Portrait / Focus: High-retention 4:5 tall character action frame with dynamic punch zoom
-            fg_h = int(round(video_width * 5 / 4 / 2) * 2)
-            scaled_w = int(round(video_width * eff_scale / 2) * 2)
-            scaled_h = int(round(fg_h * eff_scale / 2) * 2)
-            fg_filter = (
-                f"scale={scaled_w}:{scaled_h}:force_original_aspect_ratio=increase,"
-                f"crop={video_width}:{fg_h}:(in_w-{video_width})/2:(in_h-{fg_h})/2,"
-                f"cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
-                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
-            )
-            y_pos = f"({video_height}-{fg_h})/2"
+            # High-retention cinematic action frame with dynamic punch zoom (preserves 85%-100% native horizontal clarity)
+            # Avoids destructive 66% width crop so visuals stay crisp 1080p/720p without 240p digital blur
+            if eff_scale > 1.05:
+                scaled_w = int(round(video_width * eff_scale / 2) * 2)
+                fg_filter = (
+                    f"scale={scaled_w}:-2:flags=lanczos+accurate_rnd,"
+                    f"crop={video_width}:ih/(iw/{video_width}):(in_w-{video_width})/2:(in_h-out_h)/2,"
+                    f"cas=0.60,unsharp=5:5:1.3:5:5:0.0,"
+                    f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
+                )
+            else:
+                fg_filter = (
+                    f"scale={video_width}:-2:flags=lanczos+accurate_rnd,cas=0.60,unsharp=5:5:1.3:5:5:0.0,"
+                    f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
+                )
+            y_pos = f"({video_height}-h)/2"
 
         split_step = f"{input_tag}split=2[{bg_raw}][{fg_raw}]"
         bg_step = f"[{bg_raw}]{bg_filter}[{bg_out}]"
