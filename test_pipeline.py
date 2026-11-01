@@ -509,7 +509,7 @@ class TestAniDocPipeline(unittest.TestCase):
             self.assertTrue(cs["start"] >= 885.0)
             self.assertIn("combat", cs["description"].lower())
 
-        # 3. Verify reference dialogue subtitles integration (matching reference XeqGgslY3h0: English ALL CAPS, no speaker tags, no top hook clutter)
+        # 3. Verify reference dialogue subtitles integration (matching reference XeqGgslY3h0: English ALL CAPS, word-by-word accumulation, no speaker tags, no top hook clutter)
         self.assertIn("intro_dialogue", meta)
         self.assertGreaterEqual(len(meta["intro_dialogue"]), 3)
         ass_path = SCRATCH_DIR / "test_dialogue_subs.ass"
@@ -526,17 +526,35 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(ass_path.exists())
         sub_text = ass_path.read_text(encoding="utf-8")
         self.assertIn("DialogueSub", sub_text)
-        # Subtitles contain ONLY what characters speak in clean ALL CAPS
+        # Dynamic word-by-word accumulation events
+        dialogue_events = [l for l in sub_text.splitlines() if "Dialogue: 2" in l]
+        self.assertGreaterEqual(len(dialogue_events), 15)
+        # Subtitles contain ONLY what characters speak in clean ALL CAPS with pop tag
         self.assertIn("TECHNIQUE DEVELOPMENT", sub_text)
         self.assertIn("COMPASS NEEDLE", sub_text)
         self.assertIn("BECOME A DEMON", sub_text)
         self.assertIn("SEA OF FIRE", sub_text)
+        self.assertIn(r"\fscx110", sub_text)
         # Zero speaker tags or badges (Akaza:, Rengoku:, [Akaza])
         self.assertFalse(any("akaza:" in line.lower() or "rengoku:" in line.lower() for line in sub_text.splitlines()))
         self.assertFalse(any("[akaza]" in line.lower() or "[rengoku]" in line.lower() for line in sub_text.splitlines()))
         # Zero distracting top hook clutter during dialogue
         self.assertNotIn("CAN RENGOKU DEFEAT AKAZA", sub_text)
         ass_path.unlink(missing_ok=True)
+
+        # 4. Verify dynamic zoom in / zoom out velocity profiles matching reference FtImSrL2DOg
+        from core.effects_engine import get_segment_velocity_profile
+        drop_prof = get_segment_velocity_profile({"is_drop": True, "duration": 1.2, "is_first_drop": True}, 1, 25)
+        self.assertGreaterEqual(drop_prof["scale_factor"], 1.30)
+
+        repeat_punch = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0, "is_repeat": True, "repeat_count": 1}, 5, 25)
+        self.assertGreaterEqual(repeat_punch["scale_factor"], 1.35)
+        repeat_out = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0, "is_repeat": True, "repeat_count": 2}, 6, 25)
+        self.assertLessEqual(repeat_out["scale_factor"], 1.15)
+
+        combat_zoom_in = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0}, 2, 25)
+        combat_zoom_out = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0}, 3, 25)
+        self.assertGreater(combat_zoom_in["scale_factor"], combat_zoom_out["scale_factor"])
 
 
 if __name__ == "__main__":

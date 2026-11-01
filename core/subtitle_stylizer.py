@@ -247,11 +247,11 @@ def generate_kinetic_subtitles(
     margin_v = int(round(cfg['margin_v'] * scale_y))
     margin_l = int(round(margin_lr * scale_y))
 
-    # Reference-Matched Dialogue Subtitle Sizing & Placement (Safe zone lower-third)
-    d_fontsize = int(round(46 * scale_y))
-    d_outline = round(5.0 * scale_y, 1)
-    d_shadow = round(2.0 * scale_y, 1)
-    d_margin_v = int(round(240 * scale_y))
+    # Reference-Matched Dialogue Subtitle Sizing & Placement (Sweet-spot lower-middle zone, above UI chrome)
+    d_fontsize = int(round(54 * scale_y))
+    d_outline = round(6.0 * scale_y, 1)
+    d_shadow = round(3.0 * scale_y, 1)
+    d_margin_v = int(round(500 * scale_y))
     d_margin_lr = int(round(80 * scale_y))
 
     ass_header = f"""[Script Info]
@@ -335,20 +335,47 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     events.append(f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{formatted_line}")
 
     # ── Dialogue Subtitles during pre-fight conversation ──
-    # Clean, lower-third translated dialogue matching reference XeqGgslY3h0:
-    # Strictly what the characters say, ALL CAPS, bold sans-serif, solid white with black outline.
-    # Zero speaker name tags, zero quote clutter, finishes strictly before the beat drop.
+    # Dynamic word-by-word accumulation matching reference XeqGgslY3h0:
+    # Strictly what the characters say, ALL CAPS, bold sans-serif, solid white with heavy black outline.
+    # Each word pops in dynamically as spoken, zero speaker name tags, zero quote clutter, finishes strictly before beat drop.
     if dialogue_lines:
         for dl in dialogue_lines:
-            st_val = dl.get("start") if "start" in dl else dl.get("start_rel", 0.0)
-            en_val = dl.get("end") if "end" in dl else dl.get("end_rel", float(st_val) + 3.0)
-            d_start = format_ass_timestamp(float(st_val))
-            d_end = format_ass_timestamp(float(en_val))
+            st_val = float(dl.get("start") if "start" in dl else dl.get("start_rel", 0.0))
+            en_val = float(dl.get("end") if "end" in dl else dl.get("end_rel", st_val + 3.0))
             raw_txt = dl.get("text", "")
-            txt = _format_dialogue_text(raw_txt)
+            cleaned = _format_dialogue_text(raw_txt)
 
-            d_text = rf"{{\fad(80,80)}}{txt}"
-            events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{d_text}")
+            # Split by line breaks to maintain visual lines
+            raw_lines = [l.strip() for l in cleaned.replace(r"\N", "\n").split("\n") if l.strip()]
+            all_words = []
+            for l_idx, line in enumerate(raw_lines):
+                for w in line.split():
+                    all_words.append((w.upper(), l_idx))
+
+            if not all_words:
+                continue
+
+            total_dur = max(0.5, en_val - st_val)
+            step_dur = total_dur / len(all_words)
+
+            for w_idx in range(len(all_words)):
+                w_start = st_val + (w_idx * step_dur)
+                w_end = st_val + ((w_idx + 1) * step_dur) if w_idx < len(all_words) - 1 else en_val
+                d_start = format_ass_timestamp(w_start)
+                d_end = format_ass_timestamp(w_end)
+
+                current_words = all_words[:w_idx + 1]
+                line0 = " ".join([w for w, l_idx in current_words if l_idx == 0])
+                line1 = " ".join([w for w, l_idx in current_words if l_idx == 1])
+
+                full_text = line0
+                if line1:
+                    full_text += r"\N" + line1
+
+                # Pop animation on newly added word
+                fade_tag = r"{\fad(60,60)}" if (w_idx == 0 or w_idx == len(all_words) - 1) else ""
+                pop_tag = r"{\fscx110\fscy110\t(0,75,\fscx100\fscy100)}"
+                events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{fade_tag}{pop_tag}{full_text}")
             
     full_ass = ass_header + "\n".join(events) + "\n"
     with open(output_ass_path, "w", encoding="utf-8") as f:

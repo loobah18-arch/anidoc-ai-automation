@@ -83,31 +83,44 @@ def get_segment_velocity_profile(
         }
 
     # First drop segment: Explosive impact matching benchmark favorites
-    if seg.get("is_first_drop", False) or (is_drop and not seg.get("prev_is_drop", False)):
+    if seg.get("is_first_drop", False) or (is_drop and (seg_idx == 0 or seg.get("prev_is_drop") is False)):
         return {
             "role": "drop_impact",
             "speed": 1.30,
-            "scale_factor": 1.08,
+            "scale_factor": 1.35,  # Explosive punch zoom in on beat drop
             "add_bars": False,
             "add_flash": True,
             "use_bezier_velocity": True
         }
 
-    # Alternating combat dynamics (fast attack snap vs slow-mo clash hold)
+    # If this segment is a repeat of a previous clip, apply dynamic punch zoom in / zoom out matching reference FtImSrL2DOg
+    if seg.get("is_repeat", False):
+        repeat_idx = seg.get("repeat_count", 1)
+        repeat_scale = 1.40 if repeat_idx % 2 == 1 else 1.10
+        return {
+            "role": "repeat_zoom_punch",
+            "speed": 1.25,
+            "scale_factor": repeat_scale,
+            "add_bars": False,
+            "add_flash": False,
+            "use_bezier_velocity": True
+        }
+
+    # Alternating combat dynamics matching reference FtImSrL2DOg (Zoom-in punch vs Zoom-out reveal)
     if seg_idx % 2 == 0:
         return {
-            "role": "combat_snap",
+            "role": "combat_zoom_in",
             "speed": 1.25,
-            "scale_factor": 1.04,
+            "scale_factor": 1.32,  # Punch Zoom-in on action strike
             "add_bars": False,
             "add_flash": False,
             "use_bezier_velocity": True
         }
     else:
         return {
-            "role": "combat_slowmo_hold",
+            "role": "combat_zoom_out",
             "speed": 0.85,
-            "scale_factor": 1.02,
+            "scale_factor": 1.05,  # Zoom-out reveal for full choreography
             "add_bars": False,
             "add_flash": False,
             "use_bezier_velocity": True,
@@ -315,28 +328,43 @@ def build_velocity_clip_filter(
             f"eq=brightness=0.02:contrast=1.05,setsar=1"
         )
 
+        eff_scale = max(1.0, scale_factor)
         if shot_composition == "combat_duel":
             # 100% uncropped 16:9 widescreen action window so BOTH combatants are completely visible
-            fg_filter = (
-                f"scale={video_width}:-2:flags=lanczos+accurate_rnd,cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
-                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
-            )
+            if eff_scale > 1.05:
+                scaled_w = int(round(video_width * eff_scale / 2) * 2)
+                fg_filter = (
+                    f"scale={scaled_w}:-2:flags=lanczos+accurate_rnd,"
+                    f"crop={video_width}:ih/(iw/{video_width}):(in_w-{video_width})/2:(in_h-out_h)/2,"
+                    f"cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
+                    f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
+                )
+            else:
+                fg_filter = (
+                    f"scale={video_width}:-2:flags=lanczos+accurate_rnd,cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
+                    f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
+                )
             y_pos = f"({video_height}-h)/2"
         elif shot_composition == "wide_action":
             # 4:3 action window for wide action, domain expansions, and magic bursts
             fg_h = int(round(video_width * 3 / 4 / 2) * 2)
+            scaled_w = int(round(video_width * eff_scale / 2) * 2)
+            scaled_h = int(round(fg_h * eff_scale / 2) * 2)
             fg_filter = (
-                f"scale={video_width}:{fg_h}:force_original_aspect_ratio=increase,crop={video_width}:{fg_h},"
+                f"scale={scaled_w}:{scaled_h}:force_original_aspect_ratio=increase,"
+                f"crop={video_width}:{fg_h}:(in_w-{video_width})/2:(in_h-{fg_h})/2,"
                 f"cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
                 f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
             )
             y_pos = f"({video_height}-{fg_h})/2"
         else:
-            # Solo Portrait / Focus: High-retention 4:5 tall character action frame
-            # Retains 80% native width (eliminates blurry 2.37x narrow 9:16 digital stretch)
+            # Solo Portrait / Focus: High-retention 4:5 tall character action frame with dynamic punch zoom
             fg_h = int(round(video_width * 5 / 4 / 2) * 2)
+            scaled_w = int(round(video_width * eff_scale / 2) * 2)
+            scaled_h = int(round(fg_h * eff_scale / 2) * 2)
             fg_filter = (
-                f"scale={video_width}:{fg_h}:force_original_aspect_ratio=increase,crop={video_width}:{fg_h},"
+                f"scale={scaled_w}:{scaled_h}:force_original_aspect_ratio=increase,"
+                f"crop={video_width}:{fg_h}:(in_w-{video_width})/2:(in_h-{fg_h})/2,"
                 f"cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
                 f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
             )

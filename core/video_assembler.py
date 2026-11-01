@@ -418,13 +418,26 @@ def render_cinematic_edit(
     # 2026 Buttery-Smooth AMV Transitions with Zero-Drift Handle Compensation (0.18s punchy xfade)
     # Each clip (except final) receives +0.18s handle to perfectly maintain 100% beat sync without drift.
     trans_dur = 0.18
+    first_drop_found = False
     for idx, seg in enumerate(segments):
+        if idx > 0 and segments[idx - 1].get("is_drop", False):
+            seg.setdefault("prev_is_drop", True)
+        if seg.get("is_drop", False) and not first_drop_found:
+            seg.setdefault("is_first_drop", True)
+            first_drop_found = True
         if not seg.get("is_drop", False):
             if idx < len(segments) - 1 and segments[idx + 1].get("is_drop", False):
                 seg["next_is_drop"] = True
                 seg["is_pre_drop"] = True
 
+    seen_clip_paths = {}
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
+        cp_key = str(cp.name) if hasattr(cp, "name") else str(cp)
+        seen_clip_paths[cp_key] = seen_clip_paths.get(cp_key, 0) + 1
+        if seen_clip_paths[cp_key] > 1:
+            seg["is_repeat"] = True
+            seg["repeat_count"] = seen_clip_paths[cp_key]
+
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         is_intro_hook = (idx == 0)
         use_bezier = vel_profile.get("use_bezier_velocity", False)

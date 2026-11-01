@@ -16,6 +16,7 @@ import re
 import json
 import random
 import shutil
+import collections
 import subprocess
 import requests
 from pathlib import Path
@@ -613,25 +614,26 @@ def slice_action_moments_from_source(
             seen_ranges.add(key)
 
             scene_len = max(clip_duration, en - st)
-            # Surgical, precise keyframe points matching benchmark favorites (max 1-2 distinct moments per scene)
+            is_conv = any(kw in desc.lower() for kw in ["dialogue", "conversation", "talk", "speak", "recruit", "demonhood", "monologue", "speech", "ideological"])
             if scene_len <= clip_duration * 1.5:
                 pts = [st]
-            elif scene_len <= 15.0:
-                mid = st + (scene_len - clip_duration) * 0.45
-                pts = [round(mid, 2)]
+            elif is_conv or scene_len <= 12.0:
+                pts = [st, round(st + (scene_len - clip_duration) * 0.5, 2)]
             else:
-                pts = [
-                    round(st + 1.0, 2),
-                    round(st + (scene_len - clip_duration) * 0.65, 2)
-                ]
+                # Dense action slicing across the entire fight scene duration (generates 6 to 15 unique combat cuts per scene)
+                step = max(clip_duration * 1.1, 5.5)
+                pts = []
+                curr = st + 0.5
+                while curr + clip_duration <= en:
+                    pts.append(round(curr, 2))
+                    curr += step
 
             for p in pts:
                 # Clamp within video bounds
                 if p < start_bound or p + clip_duration > end_bound:
                     continue
-                # Skip if timestamp was recently used (never skip essential dialogue scenes)
-                is_conv = any(kw in desc.lower() for kw in ["dialogue", "conversation", "talk", "speak", "recruit", "demonhood", "monologue", "speech", "ideological"])
-                if is_conv or not any(abs(p - prev) < 5.0 for prev in file_used_ts):
+                # Skip if timestamp was recently used (never skip essential dialogue scenes or when building full edit pool)
+                if is_conv or len(curated_candidates) < n_clips * 2 or not any(abs(p - prev) < 4.0 for prev in file_used_ts):
                     curated_candidates.append({
                         "start": p,
                         "score": base_score + (30.0 if is_conv else 0.0),
@@ -941,9 +943,13 @@ def slice_action_moments_from_source(
     selected[bridge_idx] = sec_drop
     selected[last_idx] = finisher
 
-    # Diverse combat pool selection with strict non-repetition and 15s minimum spacing
+    # Diverse combat pool selection with strict non-repetition and distance spacing
     # CRITICAL: strictly ensure zero conversation/dialogue scenes and zero credits are in post-drop combat
-    used_starts = {c["start"] for c in selected if c is not None}
+    used_counts = collections.Counter()
+    for c in selected:
+        if c is not None:
+            used_counts[c["start"]] += 1
+
     available_combat = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool
@@ -960,24 +966,32 @@ def slice_action_moments_from_source(
             prev_cand = selected[i - 1] if i > 0 else None
             prev_st = prev_cand["start"] if prev_cand else -999.0
 
-            # 1. Best: Unused candidate with at least 15s distance from previous cut
+            # 1. Best: Completely unused candidate with at least 12s distance from previous cut
             chosen_c = None
             for cand in available_combat:
-                if cand["start"] in used_starts:
+                if used_counts[cand["start"]] > 0:
                     continue
-                if abs(cand["start"] - prev_st) < 15.0:
+                if abs(cand["start"] - prev_st) < 12.0:
                     continue
                 chosen_c = cand
                 break
 
-            # 2. Fallback: Any unused candidate
+            # 2. Any completely unused candidate with distance >= 5s
             if not chosen_c:
                 for cand in available_combat:
-                    if cand["start"] not in used_starts:
+                    if used_counts[cand["start"]] == 0 and abs(cand["start"] - prev_st) >= 5.0:
                         chosen_c = cand
                         break
 
-            # 3. Fallback: Candidate with maximal distance from previous cut (strictly combat, no credits)
+            # 3. Any completely unused candidate
+            if not chosen_c:
+                for cand in available_combat:
+                    if used_counts[cand["start"]] == 0:
+                        chosen_c = cand
+                        break
+
+            # 4. If all candidates used at least once: pick least frequently used candidate,
+            # breaking ties by distance from previous cut, to strictly avoid back-to-back repeats!
             if not chosen_c:
                 cand_pool = available_combat if available_combat else [
                     c for c in final_candidates
@@ -986,10 +1000,16 @@ def slice_action_moments_from_source(
                     and (c["start"] + clip_duration <= end_bound)
                     and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
                 ]
-                chosen_c = max(cand_pool, key=lambda c: abs(c["start"] - prev_st)) if cand_pool else final_candidates[0]
+                if cand_pool:
+                    non_adjacent = [c for c in cand_pool if abs(c["start"] - prev_st) >= 10.0]
+                    pool_to_sort = non_adjacent if non_adjacent else cand_pool
+                    pool_to_sort.sort(key=lambda c: (used_counts[c["start"]], -abs(c["start"] - prev_st)))
+                    chosen_c = pool_to_sort[0]
+                else:
+                    chosen_c = final_candidates[0]
 
             selected[i] = chosen_c
-            used_starts.add(chosen_c["start"])
+            used_counts[chosen_c["start"]] += 1
 
     print(f"💥 [ActionSlicer] Mapped #1 CLIMAX scene ({drop_climax['start']:.1f}s, {drop_climax['tag']}) directly to Beat Drop (Clip {drop_idx+1})!")
 
