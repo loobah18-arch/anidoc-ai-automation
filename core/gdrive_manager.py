@@ -799,13 +799,24 @@ def slice_action_moments_from_source(
     else:
         sec_drop = drop_climax
 
-    # Find intro candidates: clips chronologically before drop_climax, or intent/breath/blade
+    # Find intro candidates: pre-fight dialogue, verbal confrontation, or ideological clash before the battle
+    conv_keywords = [
+        "confront", "talk", "speak", "dialogue", "conversation", "recruit", "demonhood",
+        "monologue", "speech", "words", "stand", "arrival", "lands", "praise", "intent",
+        "stare", "eye", "face", "challenge", "threat", "duty", "breath", "ignit", "blade"
+    ]
     intro_candidates = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and (
-            c["start"] < drop_climax["start"] or any(kw in c.get("description", "").lower() for kw in ["shift", "breath", "ignit", "awaken", "flame sword", "blade", "intent", "eye"])
+            c["start"] < drop_climax["start"] or any(kw in c.get("description", "").lower() for kw in conv_keywords)
         )
     ]
+    # Sort with dialogue/confrontation first, then chronologically so the pre-fight conversation unfolds naturally
+    intro_candidates.sort(key=lambda x: (
+        0 if any(kw in x.get("description", "").lower() for kw in conv_keywords[:14]) else 1,
+        x["start"]
+    ))
+
     if len(intro_candidates) >= drop_idx:
         intro_pool = intro_candidates[:drop_idx]
     else:

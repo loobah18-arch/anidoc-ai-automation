@@ -387,10 +387,17 @@ def render_cinematic_edit(
     # 2026 Buttery-Smooth AMV Transitions with Zero-Drift Handle Compensation (0.18s punchy xfade)
     # Each clip (except final) receives +0.18s handle to perfectly maintain 100% beat sync without drift.
     trans_dur = 0.18
+    for idx, seg in enumerate(segments):
+        if not seg.get("is_drop", False):
+            if idx < len(segments) - 1 and segments[idx + 1].get("is_drop", False):
+                seg["next_is_drop"] = True
+                seg["is_pre_drop"] = True
+
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         is_intro_hook = (idx == 0)
         use_bezier = vel_profile.get("use_bezier_velocity", False)
+        use_slowmo = vel_profile.get("use_smooth_slowmo", False)
         clip_render_dur = seg["duration"] + (trans_dur if idx < len(segments) - 1 else 0.0)
 
         v_chain = build_velocity_clip_filter(
@@ -404,6 +411,7 @@ def render_cinematic_edit(
             add_bars=vel_profile.get("add_bars", False),
             is_intro_hook=is_intro_hook,
             use_bezier_velocity=use_bezier,
+            use_smooth_slowmo=use_slowmo,
             clip_path=cp,
             enable_motion_tracking=True,
             narrative_role=seg.get("role"),
@@ -458,7 +466,7 @@ def render_cinematic_edit(
     )
 
     # Audio Dynamic Structure:
-    # 75% Dominant Phonk BGM / 25% Crisp Anime Combat SFX
+    # Pre-Fight Dialogue Phase: Phonk heavily ducked (0.20x) & lowpass filtered (380Hz); dialogue loud & clear (volume 1.60)
     # Pre-Drop Audio Vacuum (0.55s highpass riser + 0.16s dead silence + 808 drop sub-boost)
     # Katana Combat Foley transient presence on cut onsets
     # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
@@ -466,9 +474,9 @@ def render_cinematic_edit(
     combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
     combat_foley_fx = build_combat_foley_audio_filter(combat_times, drop_t)
     filter_chains.append(
-        f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=120,lowpass=f=12000[clip_sfx_balanced];"
-        f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.25[phonk_full];"
-        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=75 25:dropout_transition=2,"
+        f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=80,lowpass=f=14000[clip_sfx_balanced];"
+        f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.0[phonk_full];"
+        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=60 40:dropout_transition=2,"
         f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
 

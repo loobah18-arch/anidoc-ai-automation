@@ -31,14 +31,34 @@ def get_segment_velocity_profile(
     duration = seg.get("duration", 1.0)
 
     if not is_drop:
-        # Phase 1: Intro — slight slow-mo for cinematic weight & narrative buildup (zero artificial letterbox)
-        return {
-            "role": "intro_slowmo",
-            "speed": 0.85,
-            "scale_factor": 1.02,
-            "add_bars": False,
-            "add_flash": False
-        }
+        # Pre-drop transition into fight: buttery smooth slow-motion hold right before beat drop
+        if seg.get("next_is_drop", False) or seg.get("is_pre_drop", False) or seg.get("role") == "transition_slowmo":
+            return {
+                "role": "transition_slowmo",
+                "speed": 0.40,
+                "scale_factor": 1.05,
+                "add_bars": False,
+                "add_flash": False,
+                "use_smooth_slowmo": True
+            }
+        elif seg.get("is_conversation", False) or seg.get("role") == "conversation_dialogue":
+            return {
+                "role": "conversation_dialogue",
+                "speed": 1.0,
+                "scale_factor": 1.02,
+                "add_bars": False,
+                "add_flash": False
+            }
+        else:
+            # Default intro slow-mo for cinematic weight & narrative buildup
+            return {
+                "role": "intro_slowmo",
+                "speed": 0.85,
+                "scale_factor": 1.02,
+                "add_bars": False,
+                "add_flash": False,
+                "use_smooth_slowmo": True
+            }
 
     if not enable_velocity_ramping:
         return {
@@ -56,7 +76,8 @@ def get_segment_velocity_profile(
             "speed": 0.80,
             "scale_factor": 1.03,
             "add_bars": False,
-            "add_flash": False
+            "add_flash": False,
+            "use_smooth_slowmo": True
         }
 
     # First drop segment: Explosive impact matching benchmark favorites
@@ -87,7 +108,8 @@ def get_segment_velocity_profile(
             "scale_factor": 1.02,
             "add_bars": False,
             "add_flash": False,
-            "use_bezier_velocity": True
+            "use_bezier_velocity": True,
+            "use_smooth_slowmo": True
         }
 
 
@@ -144,11 +166,17 @@ def build_pre_drop_audio_vacuum_filter(
     vac_start = max(0.1, drop_time - vacuum_duration)
     vac_end = drop_time
     riser_start = max(0.05, vac_start - riser_duration)
+    intro_end = riser_start
     impact_end = drop_time + 1.40
 
     filters = [
+        # 1. Pre-fight conversation ducking & lowpass: phonk acts as a moody sub-bass drone under dialogue
+        f"volume=enable='between(t\\,0\\,{intro_end:.3f})':volume=0.20",
+        f"lowpass=f=380:enable='between(t\\,0\\,{intro_end:.3f})'",
+        # 2. Pre-drop riser & vacuum: sweep into dead silence
         f"highpass=f=1200:enable='between(t\\,{riser_start:.3f}\\,{vac_start:.3f})'",
         f"volume=enable='between(t\\,{vac_start:.3f}\\,{vac_end:.3f})':volume=0.0",
+        # 3. Explosive Beat Drop impact
         f"volume=enable='between(t\\,{drop_time:.3f}\\,{impact_end:.3f})':volume=1.35",
         f"bass=g=4:f=65:enable='gte(t\\,{drop_time:.3f})'",
         f"treble=g=2.5:f=4500:enable='between(t\\,{drop_time:.3f}\\,{drop_time+0.80:.3f})'"
@@ -164,7 +192,7 @@ def build_combat_foley_audio_filter(
     """
     Constructs dynamic transient shaping for anime combat Foley sound design:
     1. Vocal Dialogue Clarity (0.0s to drop_time - 0.55s):
-       Boosts dialogue volume to 0.45 with highpass at 100Hz for crisp monologue intelligibility.
+       Boosts dialogue volume to 1.60 with highpass at 80Hz and speech treble lift for crisp monologue intelligibility.
     2. Katana / Combat Clash Transients (on peak combat cut onsets):
        - High-treble presence boost (4800Hz, +3.5dB) to make blade clashes and sparks slice through.
        - Mid-bass impact boost (85Hz, +3.0dB) for kinetic weight on technique strikes.
@@ -172,10 +200,11 @@ def build_combat_foley_audio_filter(
     """
     filters = []
 
-    # 1. Dialogue clarity during intro
+    # 1. Dialogue clarity during pre-fight conversation: loud, rich, and crisp voices
     intro_end = max(0.1, drop_time - 0.55)
-    filters.append(f"volume=enable='between(t\\,0\\,{intro_end:.3f})':volume=0.45")
-    filters.append(f"highpass=f=100:enable='between(t\\,0\\,{intro_end:.3f})'")
+    filters.append(f"volume=enable='between(t\\,0\\,{intro_end:.3f})':volume=1.60")
+    filters.append(f"highpass=f=80:enable='between(t\\,0\\,{intro_end:.3f})'")
+    filters.append(f"treble=g=2.5:f=3200:enable='between(t\\,0\\,{intro_end:.3f})'")
 
     # 2. Combat Foley boosts on cut timestamps after drop
     valid_cuts = [t for t in combat_cut_times if t >= drop_time - 0.10]
@@ -204,6 +233,7 @@ def build_velocity_clip_filter(
     add_bars: bool = False,
     is_intro_hook: bool = False,
     use_bezier_velocity: bool = False,
+    use_smooth_slowmo: bool = False,
     clip_path: Optional[Union[str, Path]] = None,
     enable_motion_tracking: bool = True,
     camera_motion: str = "auto",
@@ -242,12 +272,16 @@ def build_velocity_clip_filter(
     if use_bezier_velocity and duration >= 0.40 and not is_intro_hook:
         bezier_pts = build_bezier_velocity_pts_expression(duration=duration, fast_speed=2.2, slow_speed=0.40)
         post_filters.append(f"setpts='{bezier_pts}'")
+        # Silky smooth motion frame blending during the slow-mo hold of the bezier curve
+        post_filters.append("minterpolate=fps=60:mi_mode=blend")
     elif speed > 1.05:
         pts_mult = 1.0 / speed
         post_filters.append(f"setpts={pts_mult:.4f}*PTS")
     elif speed < 0.95:
         pts_mult = 1.0 / max(0.2, speed)
         post_filters.append(f"setpts={pts_mult:.4f}*PTS")
+        if use_smooth_slowmo or speed <= 0.65:
+            post_filters.append("minterpolate=fps=60:mi_mode=blend")
 
     post_filters.extend([
         "tpad=stop_mode=clone:stop_duration=5",
