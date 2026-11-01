@@ -31,19 +31,19 @@
   "intro_dialogue": [
     {
       "speaker": "Akaza",
-      "text": "If you refuse to become a demon, I'll kill you.",
+      "text": "If you refuse to become a demon,\nI'll kill you.",
       "start_rel": 0.5,
       "end_rel": 5.0
     },
     {
       "speaker": "Akaza",
-      "text": "Technique Development: Destructive Death: Compass Needle!",
+      "text": "Destructive Death:\nCompass Needle!",
       "start_rel": 5.5,
       "end_rel": 9.5
     },
     {
       "speaker": "Rengoku",
-      "text": "Flame Breathing, First Form: Sea of Fire!",
+      "text": "Flame Breathing, First Form:\nSea of Fire!",
       "start_rel": 10.0,
       "end_rel": 13.8
     }

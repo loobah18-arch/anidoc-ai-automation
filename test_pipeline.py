@@ -526,7 +526,7 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(ass_path.exists())
         sub_text = ass_path.read_text(encoding="utf-8")
         self.assertIn("DialogueSub", sub_text)
-        self.assertIn("AKAZA", sub_text)
+        self.assertTrue(any("akaza" in line.lower() for line in sub_text.splitlines()))
         self.assertIn("Compass Needle", sub_text)
         self.assertIn("Sea of Fire", sub_text)
         ass_path.unlink(missing_ok=True)

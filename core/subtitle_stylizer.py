@@ -29,16 +29,16 @@ def format_ass_timestamp(seconds: float) -> str:
 SUBTITLE_STYLE_PRESETS = {
     "spur_hook": {
         "font": "Bebas Neue",
-        "fontsize": 68,
+        "fontsize": 58,
         "primary": "&H00FFFFFF",         # Pure Crisp White
         "active_word": "&H001E27FF",     # Crimson Red Highlight (&HAABBGGRR in ASS)
         "outline": "&H00000000",         # Deep Solid Black Outline
         "shadow": "&HA0000000",          # Dark Drop Shadow
-        "outline_width": 7.5,
-        "shadow_depth": 4.0,
+        "outline_width": 6.5,
+        "shadow_depth": 3.0,
         "alignment": 8,                  # Top-Center (Upper Third Header Zone)
-        "margin_v": 200,                 # 200px from top of 1080x1920 canvas
-        "margin_lr": 80,
+        "margin_v": 180,                 # 180px from top of 1080x1920 canvas
+        "margin_lr": 90,
     },
     "viral_karaoke": {
         "font": "Arial",
@@ -110,23 +110,23 @@ EMPHASIS_KEYWORDS = {
 
 DEFAULT_CHARACTER_DIALOGUE = {
     "rengoku": [
-        {"speaker": "Akaza", "text": "If you refuse to become a demon, I'll kill you.", "start_rel": 0.5, "end_rel": 5.0},
-        {"speaker": "Akaza", "text": "Technique Development: Destructive Death: Compass Needle!", "start_rel": 5.5, "end_rel": 9.5},
-        {"speaker": "Rengoku", "text": "Flame Breathing, First Form: Sea of Fire!", "start_rel": 10.0, "end_rel": 13.8}
+        {"speaker": "Akaza", "text": "If you refuse to become a demon,\nI'll kill you.", "start_rel": 0.5, "end_rel": 5.0},
+        {"speaker": "Akaza", "text": "Destructive Death:\nCompass Needle!", "start_rel": 5.5, "end_rel": 9.5},
+        {"speaker": "Rengoku", "text": "Flame Breathing, First Form:\nSea of Fire!", "start_rel": 10.0, "end_rel": 13.8}
     ],
     "akaza": [
-        {"speaker": "Akaza", "text": "If you refuse to become a demon, I'll kill you.", "start_rel": 0.5, "end_rel": 5.0},
-        {"speaker": "Akaza", "text": "Technique Development: Destructive Death: Compass Needle!", "start_rel": 5.5, "end_rel": 9.5},
-        {"speaker": "Rengoku", "text": "Flame Breathing, First Form: Sea of Fire!", "start_rel": 10.0, "end_rel": 13.8}
+        {"speaker": "Akaza", "text": "If you refuse to become a demon,\nI'll kill you.", "start_rel": 0.5, "end_rel": 5.0},
+        {"speaker": "Akaza", "text": "Destructive Death:\nCompass Needle!", "start_rel": 5.5, "end_rel": 9.5},
+        {"speaker": "Rengoku", "text": "Flame Breathing, First Form:\nSea of Fire!", "start_rel": 10.0, "end_rel": 13.8}
     ],
     "gojo": [
         {"speaker": "Gojo", "text": "Throughout heaven and earth...", "start_rel": 0.5, "end_rel": 4.5},
         {"speaker": "Gojo", "text": "I alone am the honored one.", "start_rel": 5.0, "end_rel": 9.0},
-        {"speaker": "Gojo", "text": "Hollow Technique: Purple.", "start_rel": 9.5, "end_rel": 13.8}
+        {"speaker": "Gojo", "text": "Hollow Technique:\nPurple.", "start_rel": 9.5, "end_rel": 13.8}
     ],
     "sukuna": [
         {"speaker": "Sukuna", "text": "Let us see if you can entertain me.", "start_rel": 0.5, "end_rel": 6.0},
-        {"speaker": "Sukuna", "text": "Domain Expansion: Malevolent Shrine!", "start_rel": 7.0, "end_rel": 13.8}
+        {"speaker": "Sukuna", "text": "Domain Expansion:\nMalevolent Shrine!", "start_rel": 7.0, "end_rel": 13.8}
     ],
     "toji": [
         {"speaker": "Toji", "text": "You were blessed with power and instincts.", "start_rel": 0.5, "end_rel": 6.5},
@@ -134,10 +134,10 @@ DEFAULT_CHARACTER_DIALOGUE = {
     ],
     "tanjiro": [
         {"speaker": "Tanjiro", "text": "I must protect Nezuko with my life!", "start_rel": 0.5, "end_rel": 6.0},
-        {"speaker": "Tanjiro", "text": "Hinokami Kagura: Dance of the Fire God!", "start_rel": 7.0, "end_rel": 13.8}
+        {"speaker": "Tanjiro", "text": "Hinokami Kagura:\nDance of the Fire God!", "start_rel": 7.0, "end_rel": 13.8}
     ],
     "zenitsu": [
-        {"speaker": "Zenitsu", "text": "Thunder Breathing, First Form: Thunderclap and Flash...", "start_rel": 0.5, "end_rel": 8.0},
+        {"speaker": "Zenitsu", "text": "Thunder Breathing, First Form:\nThunderclap and Flash...", "start_rel": 0.5, "end_rel": 8.0},
         {"speaker": "Zenitsu", "text": "Sixfold!", "start_rel": 9.0, "end_rel": 13.8}
     ]
 }
@@ -158,10 +158,37 @@ def _format_spur_line(words: List[str], red_hex: str, white_hex: str) -> str:
         last = words[-1]
         formatted[-1] = r"{\c" + red_hex + r"&}" + last.upper() + r"{\c" + white_hex + r"&}"
 
-    if len(words) > 4:
+    if len(words) >= 3:
         mid = len(words) // 2
         return " ".join(formatted[:mid]) + r"\N" + " ".join(formatted[mid:])
     return " ".join(formatted)
+
+
+def _format_dialogue_text(raw_text: str) -> str:
+    """
+    Cleans and formats dialogue subtitles:
+    - Strips surrounding quotes, double quotes, and accidental backslashes.
+    - Preserves or inserts clean ASS linebreaks (\\N) at natural punctuation pauses
+      so lines fit comfortably and never get cut off at canvas margins.
+    """
+    cleaned = raw_text.strip().strip('"\'').replace('\\"', '"').replace('\\', '')
+    cleaned = cleaned.strip('"\'')
+    if r"\N" in cleaned:
+        return cleaned
+    if "\n" in cleaned:
+        return cleaned.replace("\n", r"\N")
+
+    if len(cleaned) > 28:
+        for delim in [": ", ", ", " - ", "; ", "! ", "? "]:
+            if delim in cleaned:
+                idx = cleaned.find(delim) + len(delim.strip())
+                if 8 <= idx <= len(cleaned) - 8:
+                    return cleaned[:idx].strip() + r"\N" + cleaned[idx:].strip()
+        words = cleaned.split()
+        if len(words) > 3:
+            mid = len(words) // 2
+            return " ".join(words[:mid]) + r"\N" + " ".join(words[mid:])
+    return cleaned
 
 
 def generate_kinetic_subtitles(
@@ -208,11 +235,11 @@ def generate_kinetic_subtitles(
     margin_v = int(round(cfg['margin_v'] * scale_y))
     margin_l = int(round(margin_lr * scale_y))
 
-    d_fontsize = int(round(50 * scale_y))
+    d_fontsize = int(round(42 * scale_y))
     d_outline = round(4.5 * scale_y, 1)
-    d_shadow = round(2.5 * scale_y, 1)
-    d_margin_v = int(round(240 * scale_y))
-    d_margin_lr = int(round(70 * scale_y))
+    d_shadow = round(2.0 * scale_y, 1)
+    d_margin_v = int(round(220 * scale_y))
+    d_margin_lr = int(round(90 * scale_y))
 
     ass_header = f"""[Script Info]
 Title: AniDoc High-Retention Kinetic Subtitles
@@ -304,13 +331,16 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             en_val = dl.get("end") if "end" in dl else dl.get("end_rel", float(st_val) + 3.0)
             d_start = format_ass_timestamp(float(st_val))
             d_end = format_ass_timestamp(float(en_val))
-            spk = dl.get("speaker", "")
-            txt = dl.get("text", "")
+            spk = dl.get("speaker", "").strip()
+            raw_txt = dl.get("text", "")
+            txt = _format_dialogue_text(raw_txt)
+
             spk_color = "&H002BF5FF" if any(k in spk.lower() for k in ["akaza", "sukuna", "toji", "demon", "villain"]) else "&H001E27FF"
             if spk:
-                d_text = rf"{{\fad(120,120)}}{{\b1\c{spk_color}&}}[{spk.upper()}]{{\b0\c&H00FFFFFF&}} \"{txt}\""
+                spk_name = spk.capitalize()
+                d_text = rf"{{\fad(150,150)}}{{\c{spk_color}&}}{spk_name}: {{\c&H00FFFFFF&}}{txt}"
             else:
-                d_text = rf"{{\fad(120,120)}}\"{txt}\""
+                d_text = rf"{{\fad(150,150)}}{txt}"
             events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{d_text}")
             
     full_ass = ass_header + "\n".join(events) + "\n"
