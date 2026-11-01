@@ -34,7 +34,7 @@
       "end": 300.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Upper Moon 3 Akaza lands with crushing ground shockwave",
+      "description": "Upper Moon 3 Akaza lands with crushing ground shockwave and initiates confrontation dialogue with Rengoku",
       "characters_present": [
         "akaza",
         "rengoku",
@@ -48,8 +48,9 @@
       "end": 540.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Akaza activates Destructive Death Compass Needle snowflake martial grid",
+      "description": "Pre-fight ideological conversation: Akaza tries recruiting Rengoku into demonhood, Rengoku delivers mortal beauty speech, Akaza activates Compass Needle",
       "characters_present": [
+        "rengoku",
         "akaza"
       ],
       "action_score": 0.95,

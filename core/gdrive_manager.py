@@ -52,8 +52,8 @@ CHARACTER_EPISODE_PREFERENCES = {
     "nobara": ["s02e19", "s01e24", "s01e03", "nobara"],                                 # Resonance vs Mahito, Death Painting
     # Demon Slayer (Kimetsu no Yaiba) Preferences - Prioritizes top combat episodes (Hinokami Kagura, Entertainment District, Mugen Train)
     "tanjiro": ["hinokami", "e19", "entertainment", "mugen", "swordsmith", "hashira", "e10", "e11", "e08"],
-    "rengoku": ["mugen", "train", "akaza", "rengoku", "e07", "e06", "e05"],
-    "akaza": ["mugen", "train", "akaza", "rengoku", "e06", "e07", "hashira"],
+    "rengoku": ["s02e06", "s02e07", "s02_e06", "s02_e07", "mugen", "train", "akaza", "rengoku"],
+    "akaza": ["s02e06", "s02e07", "s02_e06", "s02_e07", "mugen", "train", "akaza", "rengoku"],
     "zenitsu": ["thunder", "zenitsu", "e12", "e17", "entertainment", "e10", "spider"],
     "tengen": ["entertainment", "uzui", "tengen", "gyutaro", "e08", "e09", "e10"],
     "gyutaro": ["entertainment", "gyutaro", "daki", "e08", "e09", "e10"],
@@ -220,6 +220,21 @@ def pick_best_file_for_character(
     if clean_pool:
         universe_files = clean_pool
 
+    # Character Presence Verification: If episode metadata exists, guarantee character appears
+    verified_files = []
+    for f in universe_files:
+        code = match_episode_code_from_filename(f["name"])
+        if code:
+            meta = load_episode_metadata(code)
+            if meta:
+                chars = [c.get("name", "").lower() for c in meta.get("characters", [])]
+                scenes = meta.get("scenes", [])
+                in_scenes = any(character_key.lower() in [c.lower() for c in s.get("characters_present", [])] for s in scenes)
+                if character_key.lower() in chars or in_scenes:
+                    verified_files.append(f)
+    if verified_files:
+        universe_files = verified_files
+
     history = _load_history()
     used_files = set(history.get("used_files", []))
 
@@ -270,8 +285,8 @@ def pick_best_file_for_character(
 
     if not unused_eligible:
         # Reset cycle if all eligible episodes in this universe have been used
-        print(f"🔄 [GoogleDrive] All '{char_universe}' episodes in library have been used once. Resetting history cycle.")
-        history["used_files"] = [f for f in history.get("used_files", []) if f not in [u["name"] for u in universe_files]]
+        print(f"🔄 [GoogleDrive] All '{character_key}' episodes in library have been used once. Resetting history cycle.")
+        history["used_files"] = [f for f in history.get("used_files", []) if f not in [u["name"] for u in eligible_files]]
         unused_eligible = eligible_files
 
     # 5. Pick a random unused file from the correct universe
