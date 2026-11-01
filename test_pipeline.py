@@ -494,18 +494,18 @@ class TestAniDocPipeline(unittest.TestCase):
         meta = load_episode_metadata("DS_S02E06")
         self.assertIsNotNone(meta)
         scenes = meta.get("scenes", [])
-        dialogue_scenes = [s for s in scenes if s["start"] < 540.0]
-        combat_scenes = [s for s in scenes if s["start"] >= 540.0]
+        dialogue_scenes = [s for s in scenes if s["start"] < 885.0]
+        combat_scenes = [s for s in scenes if s["start"] >= 885.0]
 
         self.assertGreaterEqual(len(dialogue_scenes), 3)
-        self.assertGreaterEqual(len(combat_scenes), 5)
+        self.assertGreaterEqual(len(combat_scenes), 4)
         # Verify dialogue descriptions
         self.assertTrue(any("demonhood" in s["description"].lower() or "eternal" in s["description"].lower() for s in dialogue_scenes))
         self.assertTrue(any("mortal beauty" in s["description"].lower() for s in dialogue_scenes))
         self.assertTrue(any("compass needle" in s["description"].lower() for s in dialogue_scenes))
         # Verify all combat scenes are purely combat clashes
         for cs in combat_scenes:
-            self.assertTrue(cs["start"] >= 540.0)
+            self.assertTrue(cs["start"] >= 885.0)
             self.assertIn("combat", cs["description"].lower())
 
 

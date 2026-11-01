@@ -799,7 +799,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if any(kw in c.get("description", "").lower() for kw in ["dragon", "enbu", "giant fire", "domain expansion", "hollow purple", "sixfold", "musical score", "ninth form", "first form", "sea of fire"])
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and (c["start"] >= 540.0 if matched_ep_code == "DS_S02E06" else True)
+        and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
     ]
     if drop_candidates:
         drop_climax = max(drop_candidates, key=lambda x: x["score"])
@@ -811,7 +811,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c != drop_climax and any(kw in c.get("description", "").lower() for kw in ["decapitat", "neck", "sever", "cleave", "circular slash", "kamado song", "wolf hunt", "flame tiger", "disorder"])
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and (c["start"] >= 540.0 if matched_ep_code == "DS_S02E06" else True)
+        and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
     ]
     if finisher_candidates:
         finisher = max(finisher_candidates, key=lambda x: x["start"])
@@ -825,7 +825,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c != drop_climax and c != finisher
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and (c["start"] >= 540.0 if matched_ep_code == "DS_S02E06" else True)
+        and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
         and any(kw in c.get("description", "").lower() for kw in ["exploding blood", "bakketsu", "pink", "boogie woogie", "godspeed", "destructive death", "tiger", "fifth form", "air type"])
     ]
     if sec_candidates:
@@ -835,7 +835,7 @@ def slice_action_moments_from_source(
             c for c in final_candidates
             if c != drop_climax and c != finisher
             and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-            and (c["start"] >= 540.0 if matched_ep_code == "DS_S02E06" else True)
+            and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
         ]
         sec_drop = other_candidates[0] if other_candidates else final_candidates[1]
     else:
@@ -845,7 +845,7 @@ def slice_action_moments_from_source(
     intro_dialogue = [
         c for c in final_candidates
         if any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and (360.0 <= c["start"] < 540.0 if matched_ep_code == "DS_S02E06" else True)
+        and (740.0 <= c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
     ]
     intro_dialogue.sort(key=lambda x: x["start"])
 
@@ -856,7 +856,7 @@ def slice_action_moments_from_source(
             c for c in final_candidates
             if c not in (drop_climax, sec_drop, finisher) and c not in intro_dialogue
             and c["start"] >= 90.0
-            and (c["start"] < 540.0 if matched_ep_code == "DS_S02E06" else True)
+            and (c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
         ]
         intro_pool = (intro_dialogue + other_intro)[:drop_idx]
     intro_pool.sort(key=lambda x: x["start"])
@@ -866,7 +866,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c["start"] >= drop_climax["start"]
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not (matched_ep_code == "DS_S02E06" and c["start"] < 540.0)
+        and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
     ]
     post_drop_candidates.sort(key=lambda x: x["start"])
 
@@ -874,7 +874,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c not in post_drop_candidates
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not (matched_ep_code == "DS_S02E06" and c["start"] < 540.0)
+        and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
     ]
     other_combat.sort(key=lambda x: x["start"])
     combat_pool = post_drop_candidates + other_combat
@@ -904,7 +904,7 @@ def slice_action_moments_from_source(
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not (matched_ep_code == "DS_S02E06" and c["start"] < 540.0)
+        and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
     ]
     # Prioritize highest action score scenes first
     available_combat.sort(key=lambda x: x["score"], reverse=True)
