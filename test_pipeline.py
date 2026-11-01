@@ -509,7 +509,7 @@ class TestAniDocPipeline(unittest.TestCase):
             self.assertTrue(cs["start"] >= 885.0)
             self.assertIn("combat", cs["description"].lower())
 
-        # 3. Verify dialogue subtitles integration
+        # 3. Verify reference dialogue subtitles integration (matching reference XeqGgslY3h0: English ALL CAPS, no speaker tags, no top hook clutter)
         self.assertIn("intro_dialogue", meta)
         self.assertGreaterEqual(len(meta["intro_dialogue"]), 3)
         ass_path = SCRATCH_DIR / "test_dialogue_subs.ass"
@@ -526,9 +526,16 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(ass_path.exists())
         sub_text = ass_path.read_text(encoding="utf-8")
         self.assertIn("DialogueSub", sub_text)
-        self.assertTrue(any("akaza" in line.lower() for line in sub_text.splitlines()))
-        self.assertIn("Compass Needle", sub_text)
-        self.assertIn("Sea of Fire", sub_text)
+        # Subtitles contain ONLY what characters speak in clean ALL CAPS
+        self.assertIn("TECHNIQUE DEVELOPMENT", sub_text)
+        self.assertIn("COMPASS NEEDLE", sub_text)
+        self.assertIn("BECOME A DEMON", sub_text)
+        self.assertIn("SEA OF FIRE", sub_text)
+        # Zero speaker tags or badges (Akaza:, Rengoku:, [Akaza])
+        self.assertFalse(any("akaza:" in line.lower() or "rengoku:" in line.lower() for line in sub_text.splitlines()))
+        self.assertFalse(any("[akaza]" in line.lower() or "[rengoku]" in line.lower() for line in sub_text.splitlines()))
+        # Zero distracting top hook clutter during dialogue
+        self.assertNotIn("CAN RENGOKU DEFEAT AKAZA", sub_text)
         ass_path.unlink(missing_ok=True)
 
 

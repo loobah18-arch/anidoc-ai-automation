@@ -31,19 +31,19 @@
   "intro_dialogue": [
     {
       "speaker": "Akaza",
-      "text": "If you refuse to become a demon,\nI'll kill you.",
+      "text": "TECHNIQUE DEVELOPMENT:\nDESTRUCTIVE DEATH: COMPASS NEEDLE!",
       "start_rel": 0.5,
-      "end_rel": 5.0
+      "end_rel": 4.8
     },
     {
       "speaker": "Akaza",
-      "text": "Destructive Death:\nCompass Needle!",
-      "start_rel": 5.5,
-      "end_rel": 9.5
+      "text": "IF YOU REFUSE TO BECOME A DEMON...\nI'LL KILL YOU.",
+      "start_rel": 5.0,
+      "end_rel": 9.8
     },
     {
       "speaker": "Rengoku",
-      "text": "Flame Breathing, First Form:\nSea of Fire!",
+      "text": "FLAME BREATHING, FIRST FORM:\nSEA OF FIRE!",
       "start_rel": 10.0,
       "end_rel": 13.8
     }
@@ -129,7 +129,7 @@
     },
     {
       "start": 1180.0,
-      "end": 1350.0,
+      "end": 1300.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
       "description": "Combat clash: Flame Breathing Fifth Form Flame Tiger roaring clash against Destructive Death Disorder",
@@ -138,7 +138,7 @@
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 170.0
+      "duration": 120.0
     }
   ]
 }
