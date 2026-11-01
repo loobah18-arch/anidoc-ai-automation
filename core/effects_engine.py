@@ -272,27 +272,28 @@ def build_velocity_clip_filter(
         fg_out = f"fg_{seg_idx}"
         comp_out = f"comp_{seg_idx}"
 
-        # Ambient bokeh background (fills 1080x1920 with blurred, color-matched motion)
+        # Ambient bokeh background (fills video canvas with blurred, color-matched motion)
         bg_filter = (
             f"scale=360:640:force_original_aspect_ratio=increase,crop=360:640,"
             f"boxblur=16:3,scale={video_width}:{video_height}:flags=fast_bilinear,"
-            f"eq=brightness=-0.14:contrast=1.05,setsar=1"
+            f"eq=brightness=-0.04:contrast=1.05,setsar=1"
         )
 
         if shot_composition == "combat_duel":
             # 100% uncropped 16:9 widescreen action window so BOTH combatants are completely visible
             fg_filter = (
-                f"scale={video_width}:-2:flags=lanczos,"
+                f"scale={video_width}:-2:flags=lanczos+accurate_rnd,"
                 f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
             )
             y_pos = f"({video_height}-h)/2"
         else:
             # 4:3 action window for wide action, domain expansions, and magic bursts
+            fg_h = int(round(video_width * 3 / 4 / 2) * 2)
             fg_filter = (
-                f"scale={video_width}:810:force_original_aspect_ratio=increase,crop={video_width}:810,"
+                f"scale={video_width}:{fg_h}:force_original_aspect_ratio=increase,crop={video_width}:{fg_h},"
                 f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
             )
-            y_pos = f"({video_height}-810)/2"
+            y_pos = f"({video_height}-{fg_h})/2"
 
         split_step = f"{input_tag}split=2[{bg_raw}][{fg_raw}]"
         bg_step = f"[{bg_raw}]{bg_filter}[{bg_out}]"
@@ -391,22 +392,22 @@ def build_vertical_dual_layer_chain(
 def build_cc_filter(preset_name: str = "vibrant_anime_glow", is_dark_scene: bool = False) -> str:
     """
     Builds clean HDR-style Anime Glow Color Grading:
-    1. Auto-Exposure Lift: If scene is dark, applies gamma=1.20 and brightness=0.03.
-    2. S-curve contrast boost (1.15x) and saturation boost (1.25x).
+    1. Auto-Exposure Lift: If scene is dark, applies gamma=1.28 and brightness=0.08.
+    2. S-curve contrast boost (1.18x) and high-vibrance saturation boost (1.48x-1.50x).
     3. Eliminates dark-red vignette that crushes shadows.
     """
-    cfg = CC_PRESETS.get(preset_name, CC_PRESETS.get("vibrant_anime_glow", CC_PRESETS.get("cool_blue")))
-    contrast = cfg.get("contrast", 1.15)
-    saturation = cfg.get("saturation", 1.25)
-    brightness = cfg.get("brightness", 0.02)
-    gamma = cfg.get("gamma", 1.15)
+    cfg = CC_PRESETS.get(preset_name, CC_PRESETS.get("vibrant_anime_glow", CC_PRESETS.get("flame_hashira")))
+    contrast = cfg.get("contrast", 1.18)
+    saturation = cfg.get("saturation", 1.48)
+    brightness = cfg.get("brightness", 0.06)
+    gamma = cfg.get("gamma", 1.24)
 
     if is_dark_scene:
-        gamma = max(1.20, gamma)
-        brightness = max(0.03, brightness)
+        gamma = max(1.28, gamma)
+        brightness = max(0.08, brightness)
 
     eq_part = f"eq=contrast={contrast}:brightness={brightness}:saturation={saturation}:gamma={gamma}"
-    unsharp_part = f"unsharp={cfg.get('unsharp', '5:5:1.0:5:5:0.0')}"
+    unsharp_part = f"unsharp={cfg.get('unsharp', '5:5:1.2:5:5:0.0')}"
 
     parts = [eq_part]
     if cfg.get("colorbalance"):

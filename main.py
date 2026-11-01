@@ -47,6 +47,7 @@ def main():
     parser.add_argument("--github-repo", type=str, default=None, help="GitHub repository URL or slug to fetch video clips from")
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
+    parser.add_argument("--resolution", type=str, choices=["1080p", "1440p", "2k", "4k"], default=None, help="Output resolution preset (default: 1440p)")
     parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts")
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
     parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
@@ -54,6 +55,23 @@ def main():
     parser.add_argument("--port", type=int, default=7860, help="Port for AniDoc Studio server (default: 7860)")
     
     args = parser.parse_args()
+
+    # Apply resolution configuration if explicitly provided
+    if args.resolution:
+        import config.settings as settings
+        res_key = args.resolution.lower()
+        if res_key in settings.RESOLUTION_PRESETS:
+            w, h = settings.RESOLUTION_PRESETS[res_key]
+            settings.VIDEO_WIDTH = w
+            settings.VIDEO_HEIGHT = h
+            settings.FOREGROUND_WIDTH = w
+            settings.FOREGROUND_HEIGHT = int(w * 5 / 4)
+            settings.FOREGROUND_Y_OFFSET = (h - settings.FOREGROUND_HEIGHT) // 2
+            settings.ACTIVE_FRAME_HEIGHT = settings.FOREGROUND_HEIGHT
+            settings.LETTERBOX_TOP_BAR = settings.FOREGROUND_Y_OFFSET
+            settings.LETTERBOX_BOT_BAR = settings.FOREGROUND_Y_OFFSET
+            settings.LETTERBOX_BAR_HEIGHT = settings.FOREGROUND_Y_OFFSET
+            print(f"📐 [Resolution] Configured output resolution to {res_key.upper()} ({w}x{h}, 9:16 portrait)")
     
     # If --studio is specified, launch web video editor
     if args.studio:

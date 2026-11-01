@@ -165,6 +165,13 @@ def generate_kinetic_subtitles(
     total_dur = max(0.6, end_time - start_time)
     word_dur = total_dur / len(words)
     
+    scale_y = VIDEO_HEIGHT / 1920.0
+    fontsize = int(round(cfg['fontsize'] * scale_y))
+    outline_w = round(cfg['outline_width'] * scale_y, 1)
+    shadow_d = round(cfg['shadow_depth'] * scale_y, 1)
+    margin_v = int(round(cfg['margin_v'] * scale_y))
+    margin_l = int(round(margin_lr * scale_y))
+
     ass_header = f"""[Script Info]
 Title: AniDoc High-Retention Kinetic Subtitles
 ScriptType: v4.00+
@@ -176,7 +183,7 @@ PlayResY: {VIDEO_HEIGHT}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: BaseText,{cfg['font']},{cfg['fontsize']},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{cfg['outline_width']},{cfg['shadow_depth']},{cfg['alignment']},{margin_lr},{margin_lr},{cfg['margin_v']},1
+Style: BaseText,{cfg['font']},{fontsize},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{outline_w},{shadow_d},{cfg['alignment']},{margin_l},{margin_l},{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text

@@ -894,11 +894,12 @@ def slice_action_moments_from_source(
     generated_clips = []
     new_used_ts = []
 
-    # Resilient watermark-free 1080p crop filter that GUARANTEES even width & height (no exit 187)
+    # High-clarity watermark-free super-resolution crop filter (even width & height guaranteed)
+    target_slice_w = max(1920, VIDEO_WIDTH)
     vf_chain = (
         "crop=trunc(in_w*0.88/2)*2:trunc(in_h*0.88/2)*2:trunc(in_w*0.06/2)*2:trunc(in_h*0.06/2)*2,"
-        "scale=1920:1080:force_original_aspect_ratio=decrease:flags=lanczos,"
-        f"scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=1,fps={FPS}"
+        f"scale={target_slice_w}:-2:force_original_aspect_ratio=decrease:flags=lanczos+accurate_rnd,"
+        f"scale=trunc(iw/2)*2:trunc(ih/2)*2,unsharp=5:5:1.0:5:5:0.0,setsar=1,fps={FPS}"
     )
 
     for idx, cand in enumerate(selected):

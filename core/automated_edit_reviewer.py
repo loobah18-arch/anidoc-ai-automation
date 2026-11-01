@@ -277,9 +277,11 @@ def review_edit_and_benchmark(video_path: Path, expected_drop_time: float = 4.8)
     p5_score = 92 if meta.get("fps", 30) >= 55 else 82
     
     # Pillar 6: Format & Retention Optimization
-    # Modern standard: 9:16 portrait (1080x1920), duration 24s-32s, zero outro dead time
+    # Modern standard: 9:16 portrait (1080x1920, 1440x2560, 2160x3840), duration 24s-32s, zero outro dead time
     p6_score = 95
-    if meta.get("width") != 1080 or meta.get("height") != 1920:
+    w, h = meta.get("width", 0), meta.get("height", 0)
+    is_9_16 = (w > 0 and h > 0 and abs((w / h) - (9 / 16)) < 0.02)
+    if not is_9_16:
         p6_score -= 20
     if dur < 20.0 or dur > 35.0:
         p6_score -= 15
@@ -368,7 +370,7 @@ def generate_markdown_report(review: Dict[str, Any]) -> str:
 | **3. Combat Velocity & Rhythm** | **{ps['combat_velocity_sync']}/100** | 35–65 cuts/min, 0.4s–0.8s combat cuts | {'✅ High-Energy' if ps['combat_velocity_sync'] >= 85 else '⚠️ Pacing Gap'} |
 | **4. Color Grading (Anime CC)** | **{ps['color_grading_aesthetic']}/100** | Deep S-curve contrast, crushed blacks, vibrant sakuga | {'✅ Cinematic' if ps['color_grading_aesthetic'] >= 85 else '⚠️ Flat'} |
 | **5. Motion Fidelity** | **{ps['motion_fidelity']}/100** | 60fps optical flow / RSMB motion blur | {'✅ 60 FPS' if m.get('fps', 30) >= 55 else 'ℹ️ 30 FPS Standard'} |
-| **6. Retention & Format** | **{ps['retention_and_format']}/100** | 9:16 (1080x1920), 24–32s duration, zero credit rolls | {'✅ Optimized' if ps['retention_and_format'] >= 85 else '⚠️ Warning'} |
+| **6. Retention & Format** | **{ps['retention_and_format']}/100** | 9:16 ({m.get('width', 1440)}x{m.get('height', 2560)}), 24–32s duration, zero credit rolls | {'✅ Optimized' if ps['retention_and_format'] >= 85 else '⚠️ Warning'} |
 
 ---
 

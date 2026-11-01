@@ -29,31 +29,39 @@ CHANNEL_ID = "UCW-tzdlwTcHHCwNWlyLQ1hQ"
 TITLE_HISTORY_FILE = AGENTS_DATA_DIR / "title_history.json"
 
 # Video Rendering Config (9:16 Portrait, matching viral anime short sweet spot)
-VIDEO_WIDTH = 1080
-VIDEO_HEIGHT = 1920
-FOREGROUND_WIDTH = 1080
-FOREGROUND_HEIGHT = 1350  # 4:5 tall centered foreground
-FOREGROUND_Y_OFFSET = 285   # (1920 - 1350) / 2 = 285
+# Supported presets: 1080p (1080x1920), 1440p / 2k (1440x2560), 4k (2160x3840)
+RESOLUTION_PRESETS = {
+    "1080p": (1080, 1920),
+    "1440p": (1440, 2560),
+    "2k": (1440, 2560),
+    "4k": (2160, 3840),
+}
+
+DEFAULT_RES = os.environ.get("RENDER_RESOLUTION", "1440p").lower()
+VIDEO_WIDTH, VIDEO_HEIGHT = RESOLUTION_PRESETS.get(DEFAULT_RES, (1440, 2560))
+FOREGROUND_WIDTH = VIDEO_WIDTH
+FOREGROUND_HEIGHT = int(VIDEO_WIDTH * 5 / 4)  # 4:5 tall centered foreground
+FOREGROUND_Y_OFFSET = (VIDEO_HEIGHT - FOREGROUND_HEIGHT) // 2
 FPS = 60  # High-bitrate 60fps export
 DEFAULT_DURATION = 28.0  # Perfect 28.0s duration: 5s buildup + 23s drop combat rush & finisher
 
 # Clean Cinematic Widescreen Framing (Preserves 100% anime choreography with letterbox bars)
 FRAMING_MODE = "cinematic_widescreen"
-LETTERBOX_TOP_BAR = 285
-LETTERBOX_BOT_BAR = 285
-ACTIVE_FRAME_HEIGHT = 1350
-LETTERBOX_BAR_HEIGHT = 285
+LETTERBOX_TOP_BAR = FOREGROUND_Y_OFFSET
+LETTERBOX_BOT_BAR = FOREGROUND_Y_OFFSET
+ACTIVE_FRAME_HEIGHT = FOREGROUND_HEIGHT
+LETTERBOX_BAR_HEIGHT = FOREGROUND_Y_OFFSET
 
 # Color Grading (CC) Presets — Vibrant Anime Glow (HDR-style highlights, no crushed-black mud)
 CC_PRESETS = {
     # ── Vibrant Anime Glow (2026 AMV Standard) ──
     "vibrant_anime_glow": {
-        "contrast": 1.15,
-        "brightness": 0.02,
-        "saturation": 1.25,
-        "gamma": 1.15,
-        "colorbalance": "rs=0.03:gs=0.01:bs=0.04",
-        "unsharp": "5:5:1.0:5:5:0.0",
+        "contrast": 1.18,
+        "brightness": 0.06,
+        "saturation": 1.48,
+        "gamma": 1.24,
+        "colorbalance": "rs=0.04:gs=0.02:bs=0.05",
+        "unsharp": "5:5:1.2:5:5:0.0",
         "vignette": "0",  # Clean edges, no dark crushing
         "primary_color": "&H00FFFFFF",
         "accent_color": "#FFD700"
@@ -61,11 +69,11 @@ CC_PRESETS = {
     # ── Modern 2025/2026 TikTok & Shorts AMV Preset ──
     "anime_hdr_vibrant": {
         "contrast": 1.18,
-        "brightness": 0.01,
-        "saturation": 1.25,
-        "gamma": 1.12,
-        "colorbalance": "rs=0.03:gs=0.01:bs=0.04",
-        "unsharp": "5:5:1.0:5:5:0.0",
+        "brightness": 0.06,
+        "saturation": 1.48,
+        "gamma": 1.24,
+        "colorbalance": "rs=0.04:gs=0.02:bs=0.05",
+        "unsharp": "5:5:1.2:5:5:0.0",
         "vignette": "0",
         "primary_color": "&H00FFFFFF",
         "accent_color": "#FFD700"
@@ -264,23 +272,23 @@ CC_PRESETS = {
         "accent_color": "#00FFFF"
     },
     "flame_hashira": {
-        "contrast": 1.15,
-        "brightness": 0.01,
-        "saturation": 1.25,
-        "gamma": 1.12,
-        "colorbalance": "rs=0.12:gs=-0.02:bs=-0.08:rm=0.10:gm=-0.01:bm=-0.05",
-        "unsharp": "3:3:0.6:3:3:0.0",
+        "contrast": 1.18,
+        "brightness": 0.07,
+        "saturation": 1.50,
+        "gamma": 1.25,
+        "colorbalance": "rs=0.08:gs=0.01:bs=0.02:rm=0.04:gm=0.01:bm=0.02",
+        "unsharp": "5:5:1.2:5:5:0.0",
         "vignette": "0",
         "primary_color": "&H001133FF",  # Fiery Crimson Flame
         "accent_color": "#FF3311"
     },
     "akaza_compass": {
-        "contrast": 1.15,
-        "brightness": 0.01,
-        "saturation": 1.25,
-        "gamma": 1.12,
-        "colorbalance": "rs=0.04:gs=-0.03:bs=0.10:rm=0.03:gm=-0.02:bm=0.08",
-        "unsharp": "3:3:0.6:3:3:0.0",
+        "contrast": 1.18,
+        "brightness": 0.06,
+        "saturation": 1.48,
+        "gamma": 1.24,
+        "colorbalance": "rs=0.04:gs=-0.01:bs=0.08:rm=0.02:gm=-0.01:bm=0.05",
+        "unsharp": "5:5:1.2:5:5:0.0",
         "vignette": "0",
         "primary_color": "&H00E020D0",  # Snowflake Cyan / Magenta
         "accent_color": "#D020E0"

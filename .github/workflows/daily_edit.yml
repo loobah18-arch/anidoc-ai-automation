@@ -51,6 +51,15 @@ on:
         required: false
         default: ''
         type: string
+      resolution:
+        description: 'Output Resolution (1440p QHD upscale, 4k UHD, or 1080p FHD)'
+        required: false
+        default: '1440p'
+        type: choice
+        options:
+          - '1440p'
+          - '4k'
+          - '1080p'
       refresh_clips:
         description: 'Download & slice fresh scenepack cuts (multi-source: yt-dlp → Archive.org → Pixabay)'
         required: false
@@ -157,6 +166,12 @@ jobs:
           
           if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
             CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
+          fi
+
+          if [ -n "${{ github.event.inputs.resolution }}" ]; then
+            CMD="$CMD --resolution ${{ github.event.inputs.resolution }}"
+          else
+            CMD="$CMD --resolution 1440p"
           fi
           
           # Always refresh clips to get diverse sources each run
