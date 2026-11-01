@@ -238,6 +238,14 @@ def pick_best_file_for_character(
     history = _load_history()
     used_files = set(history.get("used_files", []))
 
+    # 1.5 Strict Character Episode Priority for Pre-Fight Confrontation:
+    # For Rengoku, S02E06 contains the canonical pre-fight conversation between Akaza and Rengoku.
+    if character_key == "rengoku":
+        s02e06_match = next((f for f in universe_files if "s02_e06" in f["name"].lower() or "s02e06" in f["name"].lower()), None)
+        if s02e06_match:
+            print(f"🎯 [GoogleDrive] Strict Priority: Selected Mugen Train S02E06 for Rengoku pre-fight confrontation: {s02e06_match['name']}")
+            return s02e06_match
+
     # 2. Check if title prefers specific episodes within the character's universe
     if title:
         try:
@@ -863,16 +871,15 @@ def slice_action_moments_from_source(
     for i in range(min(drop_idx, len(intro_pool))):
         selected[i] = intro_pool[i]
 
-    # Force active intro hook only if no curated intro exists
-    if intro_hook_cand and (not selected[0] or not selected[0].get("is_curated")):
-        if not any(c.get("is_curated") for c in selected if c):
-            selected[0] = {
-                "start": intro_hook_cand["start"],
-                "score": intro_hook_cand["score"],
-                "description": "Active Intro Hook Shot",
-                "tag": "🎯 Intro Hook",
-                "is_curated": False
-            }
+    # Force active intro hook only if no intro candidate was chosen
+    if intro_hook_cand and selected[0] is None:
+        selected[0] = {
+            "start": intro_hook_cand["start"],
+            "score": intro_hook_cand["score"],
+            "description": "Active Intro Hook Shot",
+            "tag": "🎯 Intro Hook",
+            "is_curated": False
+        }
 
     selected[drop_idx] = drop_climax
     selected[bridge_idx] = sec_drop
