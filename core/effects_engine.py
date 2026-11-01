@@ -264,8 +264,8 @@ def build_velocity_clip_filter(
 
     post_str = ",".join(post_filters)
 
-    # Adaptive Dual-Layer Framing vs Full-Bleed 9:16 Portrait
-    if input_tag and output_tag and shot_composition in ("combat_duel", "wide_action"):
+    # Adaptive Dual-Layer Framing vs Full-Bleed 9:16 Portrait (0 Black Bars, Crystal Clear Foreground)
+    if input_tag and output_tag:
         bg_raw = f"bg_raw_{seg_idx}"
         fg_raw = f"fg_raw_{seg_idx}"
         bg_out = f"bg_{seg_idx}"
@@ -276,21 +276,32 @@ def build_velocity_clip_filter(
         bg_filter = (
             f"scale=360:640:force_original_aspect_ratio=increase,crop=360:640,"
             f"boxblur=16:3,scale={video_width}:{video_height}:flags=fast_bilinear,"
-            f"eq=brightness=-0.04:contrast=1.05,setsar=1"
+            f"eq=brightness=0.02:contrast=1.05,setsar=1"
         )
 
         if shot_composition == "combat_duel":
             # 100% uncropped 16:9 widescreen action window so BOTH combatants are completely visible
             fg_filter = (
-                f"scale={video_width}:-2:flags=lanczos+accurate_rnd,"
+                f"scale={video_width}:-2:flags=lanczos+accurate_rnd,cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
                 f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
             )
             y_pos = f"({video_height}-h)/2"
-        else:
+        elif shot_composition == "wide_action":
             # 4:3 action window for wide action, domain expansions, and magic bursts
             fg_h = int(round(video_width * 3 / 4 / 2) * 2)
             fg_filter = (
                 f"scale={video_width}:{fg_h}:force_original_aspect_ratio=increase,crop={video_width}:{fg_h},"
+                f"cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
+                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
+            )
+            y_pos = f"({video_height}-{fg_h})/2"
+        else:
+            # Solo Portrait / Focus: High-retention 4:5 tall character action frame
+            # Retains 80% native width (eliminates blurry 2.37x narrow 9:16 digital stretch)
+            fg_h = int(round(video_width * 5 / 4 / 2) * 2)
+            fg_filter = (
+                f"scale={video_width}:{fg_h}:force_original_aspect_ratio=increase,crop={video_width}:{fg_h},"
+                f"cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
                 f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
             )
             y_pos = f"({video_height}-{fg_h})/2"
@@ -391,29 +402,31 @@ def build_vertical_dual_layer_chain(
 
 def build_cc_filter(preset_name: str = "vibrant_anime_glow", is_dark_scene: bool = False) -> str:
     """
-    Builds clean HDR-style Anime Glow Color Grading:
-    1. Auto-Exposure Lift: If scene is dark, applies gamma=1.28 and brightness=0.08.
-    2. S-curve contrast boost (1.18x) and high-vibrance saturation boost (1.48x-1.50x).
-    3. Eliminates dark-red vignette that crushes shadows.
+    Builds clean HDR-style Anime Glow Color Grading with Contrast Adaptive Sharpening (CAS):
+    1. Auto-Exposure Lift: If scene is dark, applies gamma=1.35 and brightness=0.14.
+    2. S-curve contrast (1.15x) and high-vibrance saturation boost (1.65x).
+    3. AMD CAS (Contrast Adaptive Sharpening) + unsharp mask for crystal clear anime line art.
+    4. Eliminates dark-red vignette that crushes shadows.
     """
     cfg = CC_PRESETS.get(preset_name, CC_PRESETS.get("vibrant_anime_glow", CC_PRESETS.get("flame_hashira")))
-    contrast = cfg.get("contrast", 1.18)
-    saturation = cfg.get("saturation", 1.48)
-    brightness = cfg.get("brightness", 0.06)
-    gamma = cfg.get("gamma", 1.24)
+    contrast = cfg.get("contrast", 1.15)
+    saturation = cfg.get("saturation", 1.65)
+    brightness = cfg.get("brightness", 0.12)
+    gamma = cfg.get("gamma", 1.32)
 
     if is_dark_scene:
-        gamma = max(1.28, gamma)
-        brightness = max(0.08, brightness)
+        gamma = max(1.35, gamma)
+        brightness = max(0.14, brightness)
 
     eq_part = f"eq=contrast={contrast}:brightness={brightness}:saturation={saturation}:gamma={gamma}"
-    unsharp_part = f"unsharp={cfg.get('unsharp', '5:5:1.2:5:5:0.0')}"
+    unsharp_part = f"unsharp={cfg.get('unsharp', '5:5:1.4:5:5:0.0')}"
+    cas_part = "cas=0.55"
 
     parts = [eq_part]
     if cfg.get("colorbalance"):
         parts.append(f"colorbalance={cfg['colorbalance']}")
 
-    parts.append(unsharp_part)
+    parts.extend([cas_part, unsharp_part])
     vig = cfg.get("vignette", "0")
     if vig and vig != "0":
         parts.append(f"vignette={vig}")

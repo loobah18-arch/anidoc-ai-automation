@@ -56,24 +56,24 @@ LETTERBOX_BAR_HEIGHT = FOREGROUND_Y_OFFSET
 CC_PRESETS = {
     # ── Vibrant Anime Glow (2026 AMV Standard) ──
     "vibrant_anime_glow": {
-        "contrast": 1.18,
-        "brightness": 0.06,
-        "saturation": 1.48,
-        "gamma": 1.24,
+        "contrast": 1.15,
+        "brightness": 0.12,
+        "saturation": 1.65,
+        "gamma": 1.32,
         "colorbalance": "rs=0.04:gs=0.02:bs=0.05",
-        "unsharp": "5:5:1.2:5:5:0.0",
+        "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "0",  # Clean edges, no dark crushing
         "primary_color": "&H00FFFFFF",
         "accent_color": "#FFD700"
     },
     # ── Modern 2025/2026 TikTok & Shorts AMV Preset ──
     "anime_hdr_vibrant": {
-        "contrast": 1.18,
-        "brightness": 0.06,
-        "saturation": 1.48,
-        "gamma": 1.24,
+        "contrast": 1.15,
+        "brightness": 0.12,
+        "saturation": 1.65,
+        "gamma": 1.32,
         "colorbalance": "rs=0.04:gs=0.02:bs=0.05",
-        "unsharp": "5:5:1.2:5:5:0.0",
+        "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "0",
         "primary_color": "&H00FFFFFF",
         "accent_color": "#FFD700"
@@ -272,23 +272,23 @@ CC_PRESETS = {
         "accent_color": "#00FFFF"
     },
     "flame_hashira": {
-        "contrast": 1.18,
-        "brightness": 0.07,
-        "saturation": 1.50,
-        "gamma": 1.25,
-        "colorbalance": "rs=0.08:gs=0.01:bs=0.02:rm=0.04:gm=0.01:bm=0.02",
-        "unsharp": "5:5:1.2:5:5:0.0",
+        "contrast": 1.15,
+        "brightness": 0.12,
+        "saturation": 1.65,
+        "gamma": 1.32,
+        "colorbalance": "rs=0.06:gs=0.01:bs=0.02:rm=0.03:gm=0.01:bm=0.01",
+        "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "0",
         "primary_color": "&H001133FF",  # Fiery Crimson Flame
         "accent_color": "#FF3311"
     },
     "akaza_compass": {
-        "contrast": 1.18,
-        "brightness": 0.06,
-        "saturation": 1.48,
-        "gamma": 1.24,
+        "contrast": 1.15,
+        "brightness": 0.10,
+        "saturation": 1.55,
+        "gamma": 1.30,
         "colorbalance": "rs=0.04:gs=-0.01:bs=0.08:rm=0.02:gm=-0.01:bm=0.05",
-        "unsharp": "5:5:1.2:5:5:0.0",
+        "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "0",
         "primary_color": "&H00E020D0",  # Snowflake Cyan / Magenta
         "accent_color": "#D020E0"

@@ -899,7 +899,7 @@ def slice_action_moments_from_source(
     vf_chain = (
         "crop=trunc(in_w*0.88/2)*2:trunc(in_h*0.88/2)*2:trunc(in_w*0.06/2)*2:trunc(in_h*0.06/2)*2,"
         f"scale={target_slice_w}:-2:force_original_aspect_ratio=decrease:flags=lanczos+accurate_rnd,"
-        f"scale=trunc(iw/2)*2:trunc(ih/2)*2,unsharp=5:5:1.0:5:5:0.0,setsar=1,fps={FPS}"
+        f"scale=trunc(iw/2)*2:trunc(ih/2)*2,cas=0.55,unsharp=5:5:1.2:5:5:0.0,setsar=1,fps={FPS}"
     )
 
     for idx, cand in enumerate(selected):

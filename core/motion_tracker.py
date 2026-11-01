@@ -496,4 +496,4 @@ def build_precise_motion_tracking_filter(
                 crop_y_expr = f"'{y_start}+({y_end - y_start})*(0.5-0.5*cos(PI*min(t/{duration:.3f}\\,1)))'"
         crop_filter = f"crop={base_crop_w}:{base_crop_h}:{act_x}:{crop_y_expr}"
 
-    return f"{crop_filter},scale={video_width}:{video_height}:flags=lanczos,setsar=1"
+    return f"{crop_filter},scale={video_width}:{video_height}:flags=lanczos+accurate_rnd,cas=0.55,unsharp=5:5:1.2:5:5:0.0,setsar=1"
