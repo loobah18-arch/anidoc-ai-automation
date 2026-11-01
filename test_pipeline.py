@@ -472,20 +472,21 @@ class TestAniDocPipeline(unittest.TestCase):
         ass_path.unlink(missing_ok=True)
 
     def test_16_proper_conversation_buildup_and_combat_purging(self):
-        """Verifies proper dialogue buildup (>10s), 14.1s beat drop, and post-drop combat isolation."""
+        """Verifies proper continuous dialogue buildup (>10s), 14.1s beat drop, and post-drop combat isolation."""
         from core.beat_detector import generate_procedural_beat_grid, analyze_audio_beats
         from core.timestamp_loader import load_episode_metadata
+        from core.subtitle_stylizer import generate_kinetic_subtitles
 
-        # 1. 42s beat grid: effective drop is at 14.128s, with 3 dialogue cuts before the drop
+        # 1. 42s beat grid: effective drop is at 14.128s, with single continuous dialogue shot before drop
         grid = generate_procedural_beat_grid(duration=42.0, drop_time=14.128, bpm=110.0)
         self.assertAlmostEqual(grid.drop_time, 14.13, delta=0.1)
         segments = grid.get_cut_segments()
         intro_segs = [s for s in segments if not s["is_drop"]]
         combat_segs = [s for s in segments if s["is_drop"]]
 
-        # Pre-fight conversation has 3 narrative cuts
-        self.assertEqual(len(intro_segs), 3)
-        self.assertGreaterEqual(intro_segs[-1]["end"], 14.0)
+        # Pre-fight conversation is a single continuous unbroken shot before the drop
+        self.assertEqual(len(intro_segs), 1)
+        self.assertGreaterEqual(intro_segs[0]["duration"], 14.0)
 
         # Combat has rapid cuts
         self.assertGreaterEqual(len(combat_segs), 20)
@@ -507,6 +508,28 @@ class TestAniDocPipeline(unittest.TestCase):
         for cs in combat_scenes:
             self.assertTrue(cs["start"] >= 885.0)
             self.assertIn("combat", cs["description"].lower())
+
+        # 3. Verify dialogue subtitles integration
+        self.assertIn("intro_dialogue", meta)
+        self.assertGreaterEqual(len(meta["intro_dialogue"]), 3)
+        ass_path = SCRATCH_DIR / "test_dialogue_subs.ass"
+        generate_kinetic_subtitles(
+            quote_text="CAN RENGOKU DEFEAT AKAZA? | OR DIE PROTECTING EVERYONE?",
+            start_time=0.0,
+            end_time=42.0,
+            output_ass_path=ass_path,
+            style_preset="spur_hook",
+            character_name="rengoku",
+            drop_time=14.128,
+            dialogue_lines=meta["intro_dialogue"]
+        )
+        self.assertTrue(ass_path.exists())
+        sub_text = ass_path.read_text(encoding="utf-8")
+        self.assertIn("DialogueSub", sub_text)
+        self.assertIn("AKAZA", sub_text)
+        self.assertIn("Compass Needle", sub_text)
+        self.assertIn("Sea of Fire", sub_text)
+        ass_path.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

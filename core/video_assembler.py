@@ -50,7 +50,8 @@ from core.effects_engine import (
     build_pre_drop_audio_vacuum_filter,
     build_combat_foley_audio_filter
 )
-from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
+from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS, DEFAULT_CHARACTER_DIALOGUE
+from core.timestamp_loader import load_episode_metadata, match_episode_code_from_filename
 from core.quote_ai import generate_edit_metadata, format_anime_description
 from core.opencut_engine import build_clip_audio_fade
 from core.smart_downloader import smart_fetch_clips
@@ -292,12 +293,41 @@ def render_cinematic_edit(
     # Micro-flash inserts REMOVED — reference uses rare flashes as overlays, not segments.
     # Flashes are handled via build_beat_flash_filters (2-3 total per edit) as overlays.
 
-    # 5. Viral Upper-Third Statement Subtitles (Spur World / Reference Style)
+    # 5. Viral Upper-Third Statement Subtitles (Spur World / Reference Style) + Dialogue Subtitles
     ass_path = None
     if enable_subtitles or burn_subtitles or subtitle_style == "spur_hook":
         try:
             ass_out = SCRATCH_DIR / f"subtitles_{character_key}.ass"
             quote_text = custom_quote or metadata.get("engagement_question") or metadata.get("quote") or metadata.get("title") or "WHO IS THE STRONGEST WARRIOR?"
+            
+            # Fetch pre-fight dialogue lines from metadata or fallback catalog
+            dialogue_lines = []
+            ep_meta = None
+            for cp in clip_paths:
+                code = match_episode_code_from_filename(cp.name)
+                if code:
+                    ep_meta = load_episode_metadata(code)
+                    if ep_meta:
+                        break
+            if not ep_meta:
+                default_ep = "DS_S02E06" if character_key in ("rengoku", "akaza") else ("JJK_S02E17" if character_key in ("sukuna", "mahoraga") else None)
+                if default_ep:
+                    ep_meta = load_episode_metadata(default_ep)
+
+            raw_dialogue = (ep_meta.get("intro_dialogue") if ep_meta else None) or DEFAULT_CHARACTER_DIALOGUE.get(character_key)
+            if raw_dialogue:
+                drop_t = beat_grid.drop_time
+                for item in raw_dialogue:
+                    s_rel = float(item.get("start_rel", 0.0))
+                    e_rel = float(item.get("end_rel", s_rel + 3.0))
+                    scale_f = min(1.0, drop_t / 14.0)
+                    dialogue_lines.append({
+                        "speaker": item.get("speaker", ""),
+                        "text": item.get("text", ""),
+                        "start": round(s_rel * scale_f, 2),
+                        "end": round(min(drop_t - 0.2, e_rel * scale_f), 2)
+                    })
+
             ass_path = generate_kinetic_subtitles(
                 quote_text=quote_text,
                 start_time=0.2,
@@ -305,9 +335,10 @@ def render_cinematic_edit(
                 output_ass_path=ass_out,
                 style_preset=subtitle_style or "spur_hook",
                 character_name=theme["name"],
-                drop_time=beat_grid.drop_time
+                drop_time=beat_grid.drop_time,
+                dialogue_lines=dialogue_lines
             )
-            print(f"✨ [Subtitles] Generated viral '{subtitle_style}' ASS subtitles: {ass_path.name}")
+            print(f"✨ [Subtitles] Generated viral '{subtitle_style}' ASS subtitles with {len(dialogue_lines)} dialogue lines: {ass_path.name}")
         except Exception as e:
             print(f"⚠️ [Subtitles] Notice generating subtitles: {e}")
             ass_path = None
@@ -421,12 +452,13 @@ def render_cinematic_edit(
         filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
 
-        # Clip audio fades + extraction (all segments use source audio)
+        # Clip audio fades + extraction (dialogue boosted during conversation intro, normal during combat)
         audio_fade = build_clip_audio_fade(seg["duration"])
+        clip_vol = 1.60 if not seg.get("is_drop", False) else 1.00
         if has_aud:
             a_chain = (
                 f"[{idx}:a]atrim=duration={seg['duration']:.3f},asetpts=PTS-STARTPTS,"
-                f"{audio_fade},volume=1.00,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+                f"{audio_fade},volume={clip_vol:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
             )
         else:
             a_chain = f"aevalsrc=0:d={seg['duration']:.3f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"

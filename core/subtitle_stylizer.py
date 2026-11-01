@@ -108,6 +108,41 @@ EMPHASIS_KEYWORDS = {
 }
 
 
+DEFAULT_CHARACTER_DIALOGUE = {
+    "rengoku": [
+        {"speaker": "Akaza", "text": "If you refuse to become a demon, I'll kill you.", "start_rel": 0.5, "end_rel": 5.0},
+        {"speaker": "Akaza", "text": "Technique Development: Destructive Death: Compass Needle!", "start_rel": 5.5, "end_rel": 9.5},
+        {"speaker": "Rengoku", "text": "Flame Breathing, First Form: Sea of Fire!", "start_rel": 10.0, "end_rel": 13.8}
+    ],
+    "akaza": [
+        {"speaker": "Akaza", "text": "If you refuse to become a demon, I'll kill you.", "start_rel": 0.5, "end_rel": 5.0},
+        {"speaker": "Akaza", "text": "Technique Development: Destructive Death: Compass Needle!", "start_rel": 5.5, "end_rel": 9.5},
+        {"speaker": "Rengoku", "text": "Flame Breathing, First Form: Sea of Fire!", "start_rel": 10.0, "end_rel": 13.8}
+    ],
+    "gojo": [
+        {"speaker": "Gojo", "text": "Throughout heaven and earth...", "start_rel": 0.5, "end_rel": 4.5},
+        {"speaker": "Gojo", "text": "I alone am the honored one.", "start_rel": 5.0, "end_rel": 9.0},
+        {"speaker": "Gojo", "text": "Hollow Technique: Purple.", "start_rel": 9.5, "end_rel": 13.8}
+    ],
+    "sukuna": [
+        {"speaker": "Sukuna", "text": "Let us see if you can entertain me.", "start_rel": 0.5, "end_rel": 6.0},
+        {"speaker": "Sukuna", "text": "Domain Expansion: Malevolent Shrine!", "start_rel": 7.0, "end_rel": 13.8}
+    ],
+    "toji": [
+        {"speaker": "Toji", "text": "You were blessed with power and instincts.", "start_rel": 0.5, "end_rel": 6.5},
+        {"speaker": "Toji", "text": "Now show me what the Six Eyes can do.", "start_rel": 7.5, "end_rel": 13.8}
+    ],
+    "tanjiro": [
+        {"speaker": "Tanjiro", "text": "I must protect Nezuko with my life!", "start_rel": 0.5, "end_rel": 6.0},
+        {"speaker": "Tanjiro", "text": "Hinokami Kagura: Dance of the Fire God!", "start_rel": 7.0, "end_rel": 13.8}
+    ],
+    "zenitsu": [
+        {"speaker": "Zenitsu", "text": "Thunder Breathing, First Form: Thunderclap and Flash...", "start_rel": 0.5, "end_rel": 8.0},
+        {"speaker": "Zenitsu", "text": "Sixfold!", "start_rel": 9.0, "end_rel": 13.8}
+    ]
+}
+
+
 def _format_spur_line(words: List[str], red_hex: str, white_hex: str) -> str:
     """Formats words into 2 lines with red keyword emphasis matching the reference edit."""
     formatted = []
@@ -140,7 +175,8 @@ def generate_kinetic_subtitles(
     glow_color: Optional[str] = None,
     character_name: str = "SPIDER-MAN",
     chunk_size: int = 3,
-    drop_time: Optional[float] = None
+    drop_time: Optional[float] = None,
+    dialogue_lines: Optional[List[Dict[str, Any]]] = None
 ) -> Path:
     """
     Generates high-retention ASS subtitles for YouTube Shorts.
@@ -172,6 +208,12 @@ def generate_kinetic_subtitles(
     margin_v = int(round(cfg['margin_v'] * scale_y))
     margin_l = int(round(margin_lr * scale_y))
 
+    d_fontsize = int(round(50 * scale_y))
+    d_outline = round(4.5 * scale_y, 1)
+    d_shadow = round(2.5 * scale_y, 1)
+    d_margin_v = int(round(240 * scale_y))
+    d_margin_lr = int(round(70 * scale_y))
+
     ass_header = f"""[Script Info]
 Title: AniDoc High-Retention Kinetic Subtitles
 ScriptType: v4.00+
@@ -184,6 +226,7 @@ PlayResY: {VIDEO_HEIGHT}
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: BaseText,{cfg['font']},{fontsize},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{outline_w},{shadow_d},{cfg['alignment']},{margin_l},{margin_l},{margin_v},1
+Style: DialogueSub,Arial,{d_fontsize},&H00FFFFFF,&H00000000,&H00000000,&HA0000000,-1,0,0,0,100,100,1,0,1,{d_outline},{d_shadow},2,{d_margin_lr},{d_margin_lr},{d_margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -252,6 +295,23 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                         
                 formatted_line = " ".join(line_parts)
                 events.append(f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{formatted_line}")
+
+    # ── Dialogue Subtitles during pre-fight conversation ──
+    # Clean, lower-third translated dialogue that finishes strictly before the beat drop
+    if dialogue_lines:
+        for dl in dialogue_lines:
+            st_val = dl.get("start") if "start" in dl else dl.get("start_rel", 0.0)
+            en_val = dl.get("end") if "end" in dl else dl.get("end_rel", float(st_val) + 3.0)
+            d_start = format_ass_timestamp(float(st_val))
+            d_end = format_ass_timestamp(float(en_val))
+            spk = dl.get("speaker", "")
+            txt = dl.get("text", "")
+            spk_color = "&H002BF5FF" if any(k in spk.lower() for k in ["akaza", "sukuna", "toji", "demon", "villain"]) else "&H001E27FF"
+            if spk:
+                d_text = rf"{{\fad(120,120)}}{{\b1\c{spk_color}&}}[{spk.upper()}]{{\b0\c&H00FFFFFF&}} \"{txt}\""
+            else:
+                d_text = rf"{{\fad(120,120)}}\"{txt}\""
+            events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{d_text}")
             
     full_ass = ass_header + "\n".join(events) + "\n"
     with open(output_ass_path, "w", encoding="utf-8") as f:

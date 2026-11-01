@@ -31,8 +31,18 @@ def get_segment_velocity_profile(
     duration = seg.get("duration", 1.0)
 
     if not is_drop:
-        # Pre-drop transition into fight: buttery smooth slow-motion hold right before beat drop
-        if seg.get("next_is_drop", False) or seg.get("is_pre_drop", False) or seg.get("role") == "transition_slowmo":
+        # Pre-fight conversation scene (>3.0s): play at natural 1.0x speed for crystal-clear spoken dialogue & lip-sync
+        if duration > 3.0 or seg.get("is_conversation", False) or seg.get("role") == "conversation_dialogue":
+            return {
+                "role": "conversation_dialogue",
+                "speed": 1.0,
+                "scale_factor": 1.02,
+                "add_bars": False,
+                "add_flash": False,
+                "use_smooth_slowmo": False
+            }
+        # Pre-drop transition into fight: buttery smooth slow-motion hold right before beat drop (for short cuts <= 3.0s)
+        elif seg.get("next_is_drop", False) or seg.get("is_pre_drop", False) or seg.get("role") == "transition_slowmo":
             return {
                 "role": "transition_slowmo",
                 "speed": 0.40,
@@ -40,14 +50,6 @@ def get_segment_velocity_profile(
                 "add_bars": False,
                 "add_flash": False,
                 "use_smooth_slowmo": True
-            }
-        elif seg.get("is_conversation", False) or seg.get("role") == "conversation_dialogue":
-            return {
-                "role": "conversation_dialogue",
-                "speed": 1.0,
-                "scale_factor": 1.02,
-                "add_bars": False,
-                "add_flash": False
             }
         else:
             # Default intro slow-mo for cinematic weight & narrative buildup

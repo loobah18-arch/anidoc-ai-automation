@@ -847,7 +847,8 @@ def slice_action_moments_from_source(
         if any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and (740.0 <= c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
     ]
-    intro_dialogue.sort(key=lambda x: x["start"])
+    # For a continuous conversation buildup leading directly into the fight, prioritize scene right before clash
+    intro_dialogue.sort(key=lambda x: x["start"], reverse=True)
 
     if len(intro_dialogue) >= drop_idx:
         intro_pool = intro_dialogue[:drop_idx]
@@ -858,6 +859,7 @@ def slice_action_moments_from_source(
             and c["start"] >= 90.0
             and (c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
         ]
+        other_intro.sort(key=lambda x: x["start"], reverse=True)
         intro_pool = (intro_dialogue + other_intro)[:drop_idx]
     intro_pool.sort(key=lambda x: x["start"])
 
@@ -959,12 +961,15 @@ def slice_action_moments_from_source(
         start = cand["start"]
         out_clip = output_dir / f"{character_key}_gdrive_{idx:02d}_{int(start)}s.mp4"
         
+        # Duration: intro clip needs the full continuous intro duration (at least 16s), combat clips need 4.5s
+        target_dur = max(clip_duration, 16.0) if idx < drop_idx else min(clip_duration, 5.0)
+
         # Try 1: Probe-matched English Dub audio stream
         cmd = [
             "ffmpeg", "-y",
             "-ss", str(start),
             "-i", str(video_path),
-            "-t", str(clip_duration),
+            "-t", str(target_dur),
         ] + eng_audio_map + [
             "-vf", vf_chain,
             "-c:v", "libx264",
@@ -989,7 +994,7 @@ def slice_action_moments_from_source(
                 "ffmpeg", "-y",
                 "-ss", str(start),
                 "-i", str(video_path),
-                "-t", str(clip_duration),
+                "-t", str(target_dur),
                 "-map", "0:v:0", "-map", "0:a:0?",
                 "-vf", vf_chain,
                 "-c:v", "libx264",
@@ -1012,7 +1017,7 @@ def slice_action_moments_from_source(
                     "ffmpeg", "-y",
                     "-ss", str(start),
                     "-i", str(video_path),
-                    "-t", str(clip_duration),
+                    "-t", str(target_dur),
                     "-map", "0:v:0", "-an",
                     "-vf", vf_chain,
                     "-c:v", "libx264",

@@ -28,6 +28,26 @@
   "scene_count": 7,
   "source": "Google Drive - Demon Slayer Collection",
   "notes": "DEMONSLAYER Mugen Train Akaza vs Rengoku definitive pre-fight dialogue and combat",
+  "intro_dialogue": [
+    {
+      "speaker": "Akaza",
+      "text": "If you refuse to become a demon, I'll kill you.",
+      "start_rel": 0.5,
+      "end_rel": 5.0
+    },
+    {
+      "speaker": "Akaza",
+      "text": "Technique Development: Destructive Death: Compass Needle!",
+      "start_rel": 5.5,
+      "end_rel": 9.5
+    },
+    {
+      "speaker": "Rengoku",
+      "text": "Flame Breathing, First Form: Sea of Fire!",
+      "start_rel": 10.0,
+      "end_rel": 13.8
+    }
+  ],
   "scenes": [
     {
       "start": 752.0,
@@ -56,8 +76,8 @@
       "duration": 22.0
     },
     {
-      "start": 858.0,
-      "end": 880.0,
+      "start": 872.0,
+      "end": 886.5,
       "action_level": "EXPLOSIVE",
       "priority": "high",
       "description": "Pre-fight dialogue conversation: Akaza activates Destructive Death Compass Needle, Rengoku draws Nichirin sword in slow-mo",
@@ -66,10 +86,10 @@
         "rengoku"
       ],
       "action_score": 0.95,
-      "duration": 22.0
+      "duration": 14.5
     },
     {
-      "start": 886.0,
+      "start": 886.5,
       "end": 940.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",

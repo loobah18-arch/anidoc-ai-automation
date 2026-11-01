@@ -267,16 +267,9 @@ def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time:
     bar = beat_interval * 4
 
     # ── Act 1: Atmospheric Hook / Dialogue Build ──
-    # Uncapped to support proper dialogue/conversation builds before the battle
+    # Unbroken, single continuous conversation scene leading directly into the beat drop
     effective_drop = min(drop_time, max(1.5, duration - 4.0))
-    if effective_drop >= 10.0:
-        c1 = round(effective_drop * 0.35, 2)
-        c2 = round(effective_drop * 0.70, 2)
-        beat_times.extend([c1, c2, round(effective_drop, 2)])
-    elif effective_drop > 3.5:
-        beat_times.extend([round(effective_drop * 0.5, 2), round(effective_drop, 2)])
-    else:
-        beat_times.append(round(effective_drop, 2))
+    beat_times.append(round(effective_drop, 2))
 
     # Modern High-Energy AMV: Rapid 2-beat combat cuts (0.8s - 1.3s) matching musical onsets
     climax_start = round(duration - 2.8, 2)
