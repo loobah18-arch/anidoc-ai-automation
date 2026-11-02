@@ -19,6 +19,7 @@ Phonk: Live trending August 2026 fetch via yt-dlp YouTube search.
 import os
 import subprocess
 import random
+import re
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
