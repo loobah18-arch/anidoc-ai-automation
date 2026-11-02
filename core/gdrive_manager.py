@@ -186,6 +186,91 @@ def get_file_universe(filename: str) -> Optional[str]:
     return None
 
 
+def pick_character_episodes(
+    files: List[Dict[str, str]],
+    character_key: str,
+    max_episodes: int = 2,
+    title: Optional[str] = None
+) -> List[Dict[str, str]]:
+    """
+    Selects up to max_episodes diverse, non-repetitive episodes/movies for the character.
+    Guarantees multi-episode story progression (e.g. S02E06 dialogue + S02E07 climax for Rengoku).
+    """
+    if not files:
+        return []
+
+    char_theme = CHARACTER_THEMES.get(character_key)
+    if not char_theme:
+        return []
+    char_universe = char_theme["universe"]
+
+    universe_files = [f for f in files if get_file_universe(f["name"]) == char_universe]
+    if not universe_files:
+        print(f"⚠️ [GoogleDrive] No Google Drive files match universe '{char_universe}' for character '{character_key}'.")
+        return []
+
+    # Clean pool of piracy-dub / corrupt files
+    clean_pool = [
+        f for f in universe_files
+        if not any(b in f["name"].lower() for b in ["hindi", "dual audio", "pikahd"])
+    ]
+    if clean_pool:
+        universe_files = clean_pool
+
+    # Special multi-episode pairs for iconic anime arcs:
+    # 1. Rengoku: S02E06 (Compass Needle & dialogue) + S02E07 (Flame Tiger, Ninth Form & Annihilation Type)
+    if character_key == "rengoku":
+        e6 = next((f for f in universe_files if "s02_e06" in f["name"].lower() or "s02e06" in f["name"].lower()), None)
+        e7 = next((f for f in universe_files if "s02_e07" in f["name"].lower() or "s02e07" in f["name"].lower()), None)
+        chosen = []
+        if e6:
+            chosen.append(e6)
+        if e7 and len(chosen) < max_episodes:
+            chosen.append(e7)
+        if chosen:
+            print(f"🎯 [GoogleDrive] Multi-Episode Selection for Rengoku: {[c['name'] for c in chosen]}")
+            return chosen
+
+    # 2. Gojo: S02E09 (Subway Domain Expansion) + S02E04 (Awakened Hollow Purple)
+    if character_key == "gojo":
+        e9 = next((f for f in universe_files if "s02e09" in f["name"].lower() or "s02_e09" in f["name"].lower()), None)
+        e4 = next((f for f in universe_files if "s02e04" in f["name"].lower() or "s02_e04" in f["name"].lower()), None)
+        chosen = []
+        if e9:
+            chosen.append(e9)
+        if e4 and len(chosen) < max_episodes:
+            chosen.append(e4)
+        if chosen:
+            return chosen
+
+    # 3. Sukuna: S02E17 (Mahoraga) + S02E16 (Jogo Meteor)
+    if character_key == "sukuna":
+        e17 = next((f for f in universe_files if "s02e17" in f["name"].lower() or "s02_e17" in f["name"].lower()), None)
+        e16 = next((f for f in universe_files if "s02e16" in f["name"].lower() or "s02_e16" in f["name"].lower()), None)
+        chosen = []
+        if e17:
+            chosen.append(e17)
+        if e16 and len(chosen) < max_episodes:
+            chosen.append(e16)
+        if chosen:
+            return chosen
+
+    # 4. Tanjiro: S01E19 (Hinokami Kagura) + S02E10 (Gyutaro Climax)
+    if character_key == "tanjiro":
+        e19 = next((f for f in universe_files if "s01_e19" in f["name"].lower() or "s01e19" in f["name"].lower() or "e19" in f["name"].lower()), None)
+        e10 = next((f for f in universe_files if "s02_e10" in f["name"].lower() or "s02e10" in f["name"].lower() or "e10" in f["name"].lower()), None)
+        chosen = []
+        if e19:
+            chosen.append(e19)
+        if e10 and len(chosen) < max_episodes:
+            chosen.append(e10)
+        if chosen:
+            return chosen
+
+    best = pick_best_file_for_character(universe_files, character_key, title=title)
+    return [best] if best else []
+
+
 def pick_best_file_for_character(
     files: List[Dict[str, str]],
     character_key: str,
@@ -482,7 +567,9 @@ def slice_action_moments_from_source(
     n_clips: int = 15,
     clip_duration: float = 5.5,
     title: Optional[str] = None,
-    drop_index: Optional[int] = None
+    drop_index: Optional[int] = None,
+    clip_prefix: Optional[str] = None,
+    clean_old: bool = True
 ) -> List[Path]:
     """
     Hybrid Action Slicer: Combines curated iconic/epic episode timestamps from metadata analysis
@@ -496,13 +583,15 @@ def slice_action_moments_from_source(
     4. Intelligent beat drop synchronization (#1 climax placed at Beat Drop).
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+    prefix = clip_prefix or f"{character_key}_gdrive"
 
     # Clean old slices for this character to ensure 100% fresh clips
-    for old in output_dir.glob(f"{character_key}_gdrive_*.mp4"):
-        try:
-            old.unlink()
-        except Exception:
-            pass
+    if clean_old:
+        for old in output_dir.glob(f"{character_key}_gdrive_*.mp4"):
+            try:
+                old.unlink()
+            except Exception:
+                pass
 
     probe_cmd = [
         "ffprobe", "-v", "quiet", "-print_format", "json",
@@ -1035,7 +1124,7 @@ def slice_action_moments_from_source(
 
     for idx, cand in enumerate(selected):
         start = cand["start"]
-        out_clip = output_dir / f"{character_key}_gdrive_{idx:02d}_{int(start)}s.mp4"
+        out_clip = output_dir / f"{prefix}_{idx:02d}_{int(start)}s.mp4"
         
         # Duration: intro clip needs the full continuous intro duration (at least 16s), combat clips need 4.5s
         target_dur = max(clip_duration, 16.0) if idx < drop_idx else min(clip_duration, 5.0)
@@ -1148,11 +1237,11 @@ def fetch_and_prepare_gdrive_footage(
     clip_duration: float = 5.5
 ) -> List[Path]:
     """
-    Lightning-Fast Non-Repetitive Google Drive Ingestion:
+    Lightning-Fast Non-Repetitive Multi-Episode Google Drive Ingestion:
     1. Parses Google Drive folder index in 1s.
-    2. Rotates to a DIFFERENT episode/movie for the character that hasn't been used yet (or title-matched).
-    3. Downloads only that 1 video (~10s).
-    4. Slices hybrid curated epic climax scenes + dynamic audio moments into 9:16 portrait clips.
+    2. Identifies canonical episodes for the character (e.g. S02E06 dialogue + S02E07 climax for Rengoku).
+    3. Downloads up to 2 distinct episodes for rich arc storytelling.
+    4. Slices dialogue intro from Ep 1, and peak sakuga/ultimate forms from Ep 2 into 4:5 tall action clips.
     """
     gdrive_workdir = SCRATCH_DIR / "gdrive_workspace"
     gdrive_workdir.mkdir(parents=True, exist_ok=True)
@@ -1162,35 +1251,109 @@ def fetch_and_prepare_gdrive_footage(
         print("⚠️ [GoogleDrive] No files retrieved from Google Drive folder index.")
         return []
 
-    raw_video = None
-    attempted_names = set()
-    for _ in range(min(5, len(items))):
-        available_items = [it for it in items if it["name"] not in attempted_names]
-        if not available_items:
-            break
-        best_file = pick_best_file_for_character(available_items, target_character, title=title)
-        if not best_file:
-            break
-        attempted_names.add(best_file["name"])
-        raw_video = download_single_gdrive_file(best_file, gdrive_workdir)
-        if raw_video and raw_video.exists() and raw_video.stat().st_size > 15_000_000:
-            break
-        print(f"⚠️ [GoogleDrive] '{best_file['name']}' was unavailable or incomplete (<15MB). Trying next candidate episode...")
-        raw_video = None
+    # Select candidate episodes (up to 2 for rich multi-episode combat arcs)
+    candidate_episodes = pick_character_episodes(items, target_character, max_episodes=2, title=title)
+    if not candidate_episodes:
+        print(f"⚠️ [GoogleDrive] No matching episodes found for '{target_character}'.")
+        return []
 
-    if not raw_video:
+    downloaded_videos = []
+    for ep_info in candidate_episodes:
+        raw_vid = download_single_gdrive_file(ep_info, gdrive_workdir)
+        if raw_vid and raw_vid.exists() and raw_vid.stat().st_size > 15_000_000:
+            downloaded_videos.append(raw_vid)
+        if len(downloaded_videos) >= 2:
+            break
+
+    # If primary download failed, fallback search loop
+    if not downloaded_videos:
+        attempted_names = {ep["name"] for ep in candidate_episodes}
+        for _ in range(min(5, len(items))):
+            avail = [it for it in items if it["name"] not in attempted_names]
+            if not avail:
+                break
+            best = pick_best_file_for_character(avail, target_character, title=title)
+            if not best:
+                break
+            attempted_names.add(best["name"])
+            raw = download_single_gdrive_file(best, gdrive_workdir)
+            if raw and raw.exists() and raw.stat().st_size > 15_000_000:
+                downloaded_videos.append(raw)
+                break
+
+    if not downloaded_videos:
         print(f"⚠️ [GoogleDrive] Could not download any valid (>15MB) episode for '{target_character}'.")
         return []
 
-    sliced_clips = slice_action_moments_from_source(
-        video_path=raw_video,
+    # Single-episode path
+    if len(downloaded_videos) == 1:
+        return slice_action_moments_from_source(
+            video_path=downloaded_videos[0],
+            character_key=target_character,
+            output_dir=output_dir,
+            n_clips=n_clips,
+            clip_duration=clip_duration,
+            title=title,
+            drop_index=drop_index,
+            clean_old=True
+        )
+
+    # Multi-Episode Ingestion: Combine Ep 1 (Setup/Intro) with Ep 2 (Peak Sakuga Climax & Finisher)
+    vid_1, vid_2 = downloaded_videos[0], downloaded_videos[1]
+    n_half = max(5, n_clips // 2 + 1)
+    print(f"🎬 [MultiEpisode] Ingesting multi-episode arc: Ep1 '{vid_1.name}' + Ep2 '{vid_2.name}'")
+
+    slices_1 = slice_action_moments_from_source(
+        video_path=vid_1,
         character_key=target_character,
         output_dir=output_dir,
-        n_clips=n_clips,
+        n_clips=n_half,
         clip_duration=clip_duration,
         title=title,
-        drop_index=drop_index
+        drop_index=drop_index,
+        clip_prefix=f"{target_character}_gdrive_ep1",
+        clean_old=True
     )
 
-    return sliced_clips
+    slices_2 = slice_action_moments_from_source(
+        video_path=vid_2,
+        character_key=target_character,
+        output_dir=output_dir,
+        n_clips=max(6, n_clips - len(slices_1) + 4),
+        clip_duration=clip_duration,
+        title=title,
+        drop_index=0,
+        clip_prefix=f"{target_character}_gdrive_ep2",
+        clean_old=False
+    )
+
+    if not slices_1 and not slices_2:
+        return []
+    if not slices_2:
+        return slices_1
+    if not slices_1:
+        return slices_2
+
+    # Blend multi-episode clips:
+    # 1. Clip 0: Always from Ep 1 (pre-fight conversation hook)
+    # 2. Climax / Finisher: from Ep 2 (peak sakuga, e.g. Ninth Form / Annihilation Type)
+    # 3. Middle combat cuts: Interleave Ep 1 and Ep 2
+    combined = [slices_1[0]]
+    pool_1 = slices_1[1:]
+    pool_2 = slices_2[1:]
+    finisher = slices_2[0] if slices_2 else (pool_1[-1] if pool_1 else combined[0])
+
+    p1_i = 0
+    p2_i = 0
+    while len(combined) < n_clips - 1 and (p1_i < len(pool_1) or p2_i < len(pool_2)):
+        if p2_i < len(pool_2):
+            combined.append(pool_2[p2_i])
+            p2_i += 1
+        if len(combined) < n_clips - 1 and p1_i < len(pool_1):
+            combined.append(pool_1[p1_i])
+            p1_i += 1
+
+    combined.append(finisher)
+    print(f"✨ [MultiEpisode] Created diverse multi-episode pool of {len(combined)} cuts across {vid_1.name} & {vid_2.name}!")
+    return combined
 

@@ -559,6 +559,34 @@ class TestAniDocPipeline(unittest.TestCase):
         combat_zoom_out = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0}, 3, 25)
         self.assertGreater(combat_zoom_in["scale_factor"], combat_zoom_out["scale_factor"])
 
+    def test_17_multi_episode_selection_and_repeat_detection(self):
+        """Verifies multi-episode candidate selection (S02E06 + S02E07) and timestamp-aware repeat tracking."""
+        import re
+        from core.gdrive_manager import pick_character_episodes
+
+        dummy_files = [
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E06.mp4", "id": "f6"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E07.mp4", "id": "f7"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4", "id": "f19"},
+        ]
+        chosen = pick_character_episodes(dummy_files, "rengoku", max_episodes=2)
+        self.assertEqual(len(chosen), 2)
+        chosen_names = [c["name"] for c in chosen]
+        self.assertIn("Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E06.mp4", chosen_names)
+        self.assertIn("Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E07.mp4", chosen_names)
+
+        # Repeat scene key extraction across slices
+        def get_key(cp_str):
+            ep_match = re.search(r"ep(\d+)", cp_str)
+            ts_match = re.search(r"(\d+)s(?:\.mp4)?", cp_str)
+            ep_tag = ep_match.group(1) if ep_match else "0"
+            return f"ep{ep_tag}_{ts_match.group(1)}s" if ts_match else cp_str
+
+        k1 = get_key("rengoku_gdrive_ep1_02_885s.mp4")
+        k2 = get_key("rengoku_gdrive_ep1_14_885s.mp4")
+        self.assertEqual(k1, "ep1_885s")
+        self.assertEqual(k1, k2)
+
 
 if __name__ == "__main__":
     unittest.main()

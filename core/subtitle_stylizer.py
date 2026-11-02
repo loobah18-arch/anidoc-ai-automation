@@ -248,10 +248,11 @@ def generate_kinetic_subtitles(
     margin_l = int(round(margin_lr * scale_y))
 
     # Reference-Matched Dialogue Subtitle Sizing & Placement (Sweet-spot lower-middle zone, above UI chrome)
+    # Pure solid black outline with zero drop-shadow blur matching reference XeqGgslY3h0
     d_fontsize = int(round(54 * scale_y))
-    d_outline = round(6.0 * scale_y, 1)
-    d_shadow = round(3.0 * scale_y, 1)
-    d_margin_v = int(round(500 * scale_y))
+    d_outline = round(6.5 * scale_y, 1)
+    d_shadow = 0.0
+    d_margin_v = int(round(440 * scale_y))
     d_margin_lr = int(round(80 * scale_y))
 
     ass_header = f"""[Script Info]

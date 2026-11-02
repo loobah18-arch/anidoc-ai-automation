@@ -189,16 +189,28 @@ def render_cinematic_edit(
             if gdrive_clips:
                 clip_paths = gdrive_clips
                 print(f"✅ [GoogleDrive] Using {len(clip_paths)} high-definition action clips with original audio.")
-                # Quality Upgrade: If GDrive footage is low-res 480p, augment with genuine 1080p/4K scenepack for combat cuts
-                if any("480p" in str(p).lower() for p in gdrive_clips) and auto_fetch_clips:
-                    print(f"⚠️ [Resolution] Detected 480p low-res Google Drive footage. Sourcing genuine 1080p/4K scenepack for combat cuts...")
+                # Quality Upgrade: If GDrive footage is low-res (<720p), augment with genuine 1080p/4K scenepack for combat cuts
+                is_low_res = any("480p" in str(p).lower() for p in gdrive_clips)
+                if not is_low_res and gdrive_clips:
+                    try:
+                        probe_res = subprocess.run(
+                            ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=height", "-of", "csv=p=0", str(gdrive_clips[0])],
+                            capture_output=True, text=True, timeout=5
+                        ).stdout.strip()
+                        if probe_res.isdigit() and int(probe_res) < 720:
+                            is_low_res = True
+                    except Exception:
+                        pass
+
+                if is_low_res and auto_fetch_clips:
+                    print(f"⚠️ [Resolution] Detected low-res footage (<720p). Sourcing genuine 1080p/4K scenepack for combat cuts...")
                     try:
                         from core.public_api_fetcher import fetch_character_scenepack
                         hd_combat = fetch_character_scenepack(character_key, max_clips=n_clips)
                         if hd_combat and len(hd_combat) >= 3:
                             # Keep Clip 0 (pre-fight dialogue intro) from Google Drive for canon audio & dialogue alignment
                             clip_paths = [gdrive_clips[0]] + hd_combat[:n_clips - 1]
-                            print(f"✨ [Resolution] Upgraded {len(clip_paths)-1} combat clips to genuine 1080p/4K footage!")
+                            print(f"✨ [Resolution] Upgraded {len(clip_paths)-1} combat cuts to genuine 1080p/4K footage!")
                     except Exception as e_hd:
                         print(f"ℹ️ [Resolution] Scenepack fetch notice: {e_hd}")
         except Exception as e:
@@ -445,10 +457,19 @@ def render_cinematic_edit(
     seen_clip_paths = {}
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         cp_key = str(cp.name) if hasattr(cp, "name") else str(cp)
-        seen_clip_paths[cp_key] = seen_clip_paths.get(cp_key, 0) + 1
-        if seen_clip_paths[cp_key] > 1:
+        # Extract unique scene identifier: match timestamp tag (e.g. 885s) and episode tag (ep1)
+        ep_match = re.search(r"ep(\d+)", cp_key)
+        ts_match = re.search(r"(\d+)s(?:\.mp4)?", cp_key)
+        if ts_match:
+            ep_tag = ep_match.group(1) if ep_match else "0"
+            scene_key = f"ep{ep_tag}_{ts_match.group(1)}s"
+        else:
+            scene_key = cp_key
+
+        seen_clip_paths[scene_key] = seen_clip_paths.get(scene_key, 0) + 1
+        if seen_clip_paths[scene_key] > 1:
             seg["is_repeat"] = True
-            seg["repeat_count"] = seen_clip_paths[cp_key]
+            seg["repeat_count"] = seen_clip_paths[scene_key]
 
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         is_intro_hook = (idx == 0)

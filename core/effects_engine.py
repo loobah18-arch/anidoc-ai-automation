@@ -96,13 +96,13 @@ def get_segment_velocity_profile(
     # If this segment is a repeat of a previous clip, apply dynamic punch zoom in / zoom out matching reference FtImSrL2DOg
     if seg.get("is_repeat", False):
         repeat_idx = seg.get("repeat_count", 1)
-        repeat_scale = 1.40 if repeat_idx % 2 == 1 else 1.10
+        repeat_scale = 1.42 if repeat_idx % 2 == 1 else 1.08
         return {
             "role": "repeat_zoom_punch",
-            "speed": 1.25,
+            "speed": 1.30 if repeat_idx % 2 == 1 else 0.90,
             "scale_factor": repeat_scale,
             "add_bars": False,
-            "add_flash": False,
+            "add_flash": (repeat_idx % 2 == 1),
             "use_bezier_velocity": True
         }
 
@@ -111,7 +111,7 @@ def get_segment_velocity_profile(
         return {
             "role": "combat_zoom_in",
             "speed": 1.25,
-            "scale_factor": 1.32,  # Punch Zoom-in on action strike
+            "scale_factor": 1.35,  # Punch Zoom-in on action strike
             "add_bars": False,
             "add_flash": False,
             "use_bezier_velocity": True
@@ -329,52 +329,29 @@ def build_velocity_clip_filter(
         )
 
         eff_scale = max(1.0, scale_factor)
-        # For conversation intros or combat duels, preserve 100% of widescreen action resolution (0% width cropped)
-        if is_intro_hook or shot_composition == "combat_duel":
-            # 100% uncropped widescreen action window so BOTH combatants and dialogue are completely visible in full sharpness
-            if eff_scale > 1.05:
-                scaled_w = int(round(video_width * eff_scale / 2) * 2)
-                fg_filter = (
-                    f"scale={scaled_w}:-2:flags=lanczos+accurate_rnd,"
-                    f"crop={video_width}:ih/(iw/{video_width}):(in_w-{video_width})/2:(in_h-out_h)/2,"
-                    f"cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
-                    f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
-                )
-            else:
-                fg_filter = (
-                    f"scale={video_width}:-2:flags=lanczos+accurate_rnd,cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
-                    f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
-                )
-            y_pos = f"({video_height}-h)/2"
-        elif shot_composition == "wide_action":
-            # 4:3 action window for wide action, domain expansions, and magic bursts
-            fg_h = int(round(video_width * 3 / 4 / 2) * 2)
+        # 4:5 Tall Action Framing (1440x1800 on 1440x2560 canvas, filling 70.3% of screen height)
+        # Guarantees characters and choreography dominate mobile vertical screens without 70% blurry background blobs
+        fg_h = int(round(video_width * 5 / 4 / 2) * 2)
+
+        if eff_scale > 1.05:
+            # Dynamic Punch Zoom-in (1.35x - 1.45x) into character face/action focal point (FtImSrL2DOg)
             scaled_w = int(round(video_width * eff_scale / 2) * 2)
             scaled_h = int(round(fg_h * eff_scale / 2) * 2)
             fg_filter = (
                 f"scale={scaled_w}:{scaled_h}:force_original_aspect_ratio=increase,"
                 f"crop={video_width}:{fg_h}:(in_w-{video_width})/2:(in_h-{fg_h})/2,"
-                f"cas=0.55,unsharp=5:5:1.2:5:5:0.0,"
-                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
+                f"cas=0.60,unsharp=5:5:1.3:5:5:0.0,"
+                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.30:t=2,setsar=1"
             )
-            y_pos = f"({video_height}-{fg_h})/2"
         else:
-            # High-retention cinematic action frame with dynamic punch zoom (preserves 85%-100% native horizontal clarity)
-            # Avoids destructive 66% width crop so visuals stay crisp 1080p/720p without 240p digital blur
-            if eff_scale > 1.05:
-                scaled_w = int(round(video_width * eff_scale / 2) * 2)
-                fg_filter = (
-                    f"scale={scaled_w}:-2:flags=lanczos+accurate_rnd,"
-                    f"crop={video_width}:ih/(iw/{video_width}):(in_w-{video_width})/2:(in_h-out_h)/2,"
-                    f"cas=0.60,unsharp=5:5:1.3:5:5:0.0,"
-                    f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
-                )
-            else:
-                fg_filter = (
-                    f"scale={video_width}:-2:flags=lanczos+accurate_rnd,cas=0.60,unsharp=5:5:1.3:5:5:0.0,"
-                    f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.35:t=2,setsar=1"
-                )
-            y_pos = f"({video_height}-h)/2"
+            # Reveal Zoom-out (1.05x - 1.10x) for full wide action choreography
+            fg_filter = (
+                f"scale={video_width}:{fg_h}:force_original_aspect_ratio=increase,"
+                f"crop={video_width}:{fg_h}:(in_w-{video_width})/2:(in_h-{fg_h})/2,"
+                f"cas=0.60,unsharp=5:5:1.3:5:5:0.0,"
+                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.30:t=2,setsar=1"
+            )
+        y_pos = f"({video_height}-{fg_h})/2"
 
         split_step = f"{input_tag}split=2[{bg_raw}][{fg_raw}]"
         bg_step = f"[{bg_raw}]{bg_filter}[{bg_out}]"
