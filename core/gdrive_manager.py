@@ -893,7 +893,8 @@ def slice_action_moments_from_source(
         "monologue", "speech", "words", "ideological"
     ]
     end_credit_keywords = [
-        "credits", "ending theme", "ending song", "preview", "next episode", "taisho secret", "recap", "bumper", "staff roll", "cast roll"
+        "credits", "ending theme", "ending song", "preview", "next episode", "taisho secret", "recap", "bumper", "staff roll", "cast roll",
+        "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning", "funeral"
     ]
     def _is_credit(desc_text: str) -> bool:
         low = desc_text.lower()
@@ -977,9 +978,9 @@ def slice_action_moments_from_source(
         and (c["start"] + clip_duration <= end_bound)
         and (740.0 <= c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
     ]
-    # For Mugen Train S02E06, strictly prioritize the 872.0s Destructive Death Compass Needle confrontation scene
+    # For Mugen Train S02E06, strictly prioritize the 752.0s continuous pre-fight dialogue confrontation scene
     if matched_ep_code == "DS_S02E06":
-        intro_dialogue.sort(key=lambda x: (abs(x["start"] - 872.0), -x["start"]))
+        intro_dialogue.sort(key=lambda x: (abs(x["start"] - 752.0), -x["start"]))
     else:
         intro_dialogue.sort(key=lambda x: x["start"], reverse=True)
 
@@ -999,7 +1000,7 @@ def slice_action_moments_from_source(
     if matched_ep_code != "DS_S02E06":
         intro_pool.sort(key=lambda x: x["start"])
 
-    # Combat pool for clips AFTER the drop: strictly exclude any dialogue/conversation or credit scenes
+    # Combat pool for clips AFTER the drop: strictly exclude any dialogue/conversation, credit, or non-combat aftermath scenes
     post_drop_candidates = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c["start"] >= drop_climax["start"]
@@ -1007,6 +1008,7 @@ def slice_action_moments_from_source(
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
+        and not (matched_ep_code == "DS_S02E07" and c["start"] >= 1180.0)
     ]
     post_drop_candidates.sort(key=lambda x: x["start"])
 
@@ -1017,6 +1019,7 @@ def slice_action_moments_from_source(
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
+        and not (matched_ep_code == "DS_S02E07" and c["start"] >= 1180.0)
     ]
     other_combat.sort(key=lambda x: x["start"])
     combat_pool = post_drop_candidates + other_combat

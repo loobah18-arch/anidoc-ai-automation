@@ -4,6 +4,7 @@ Validates Phonk Audio Library, Public API / GitHub Clip Fetcher, Subtitle Styliz
 """
 import unittest
 import subprocess
+import re
 from pathlib import Path
 
 from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, CC_PRESETS, PHONK_DIR
@@ -248,8 +249,8 @@ class TestAniDocPipeline(unittest.TestCase):
         # Blurred synced background (1080x1920, boxblur=28:5, brightness 0.45)
         self.assertIn("boxblur=28:5", dual_chain)
         self.assertIn("colorchannelmixer=aa=1.0:rr=0.45:gg=0.45:bb=0.45", dual_chain)
-        # 4:5 Foreground (1080x1350) with 4px border at y=285
-        self.assertIn("drawbox=x=0:y=0:w=1080:h=1350:color=white@0.65:t=4", dual_chain)
+        # 4:5 Foreground (1080x1350) clean borderless action framing at y=285
+        self.assertNotIn("drawbox=", dual_chain)
         self.assertIn("overlay=x=0:y=285", dual_chain)
 
         # 4. Selective Bloom / Glow (Highlights > 185, additive 30%)
@@ -529,14 +530,14 @@ class TestAniDocPipeline(unittest.TestCase):
         # Dynamic word-by-word accumulation events
         dialogue_events = [l for l in sub_text.splitlines() if "Dialogue: 2" in l]
         self.assertGreaterEqual(len(dialogue_events), 15)
-        # Subtitles contain ONLY what characters speak in clean ALL CAPS with pop tag
-        self.assertIn("TECHNIQUE", sub_text)
-        self.assertIn("DEVELOPMENT", sub_text)
-        self.assertIn("COMPASS", sub_text)
-        self.assertIn("NEEDLE", sub_text)
-        self.assertIn("BECOME A DEMON", sub_text)
-        self.assertIn("SEA OF", sub_text)
-        self.assertIn("FIRE", sub_text)
+        # Subtitles contain ONLY what characters speak in clean ALL CAPS with pop tag and signature neon glow
+        clean_text = re.sub(r"\{.*?\}", "", sub_text)
+        self.assertIn("BECOME A DEMON", clean_text)
+        self.assertIn("I WILL NOT", clean_text)
+        self.assertIn("STRENGTH", clean_text)
+        self.assertIn("HASHIRA", clean_text)
+        self.assertNotIn("SEA OF FIRE", clean_text)
+        self.assertIn(r"\blur4", sub_text)
         self.assertIn(r"\fscx112", sub_text)
         # Zero speaker tags or badges (Akaza:, Rengoku:, [Akaza])
         self.assertFalse(any("akaza:" in line.lower() or "rengoku:" in line.lower() for line in sub_text.splitlines()))

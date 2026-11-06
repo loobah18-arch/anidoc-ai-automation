@@ -110,14 +110,16 @@ EMPHASIS_KEYWORDS = {
 
 DEFAULT_CHARACTER_DIALOGUE = {
     "rengoku": [
-        {"speaker": "Akaza", "text": "TECHNIQUE DEVELOPMENT:\nDESTRUCTIVE DEATH: COMPASS NEEDLE!", "start_rel": 0.5, "end_rel": 4.8},
-        {"speaker": "Akaza", "text": "IF YOU REFUSE TO BECOME A DEMON...\nI'LL KILL YOU.", "start_rel": 5.0, "end_rel": 9.8},
-        {"speaker": "Rengoku", "text": "FLAME BREATHING, FIRST FORM:\nSEA OF FIRE!", "start_rel": 10.0, "end_rel": 13.8}
+        {"speaker": "Akaza", "text": "WHY DON'T YOU BECOME A DEMON TOO?", "start_rel": 0.6, "end_rel": 3.6, "glow_color": "&H001E27FF"},
+        {"speaker": "Rengoku", "text": "I WILL NOT.", "start_rel": 3.8, "end_rel": 5.1, "glow_color": "&H0000C8FF"},
+        {"speaker": "Akaza", "text": "I CAN SENSE YOUR INCREDIBLE STRENGTH.", "start_rel": 5.4, "end_rel": 8.8, "glow_color": "&H001E27FF"},
+        {"speaker": "Akaza", "text": "YOU'RE A HASHIRA, AREN'T YOU?", "start_rel": 9.1, "end_rel": 13.6, "glow_color": "&H001E27FF"}
     ],
     "akaza": [
-        {"speaker": "Akaza", "text": "TECHNIQUE DEVELOPMENT:\nDESTRUCTIVE DEATH: COMPASS NEEDLE!", "start_rel": 0.5, "end_rel": 4.8},
-        {"speaker": "Akaza", "text": "IF YOU REFUSE TO BECOME A DEMON...\nI'LL KILL YOU.", "start_rel": 5.0, "end_rel": 9.8},
-        {"speaker": "Rengoku", "text": "FLAME BREATHING, FIRST FORM:\nSEA OF FIRE!", "start_rel": 10.0, "end_rel": 13.8}
+        {"speaker": "Akaza", "text": "WHY DON'T YOU BECOME A DEMON TOO?", "start_rel": 0.6, "end_rel": 3.6, "glow_color": "&H001E27FF"},
+        {"speaker": "Rengoku", "text": "I WILL NOT.", "start_rel": 3.8, "end_rel": 5.1, "glow_color": "&H0000C8FF"},
+        {"speaker": "Akaza", "text": "I CAN SENSE YOUR INCREDIBLE STRENGTH.", "start_rel": 5.4, "end_rel": 8.8, "glow_color": "&H001E27FF"},
+        {"speaker": "Akaza", "text": "YOU'RE A HASHIRA, AREN'T YOU?", "start_rel": 9.1, "end_rel": 13.6, "glow_color": "&H001E27FF"}
     ],
     "gojo": [
         {"speaker": "Gojo", "text": "THROUGHOUT HEAVEN AND EARTH...", "start_rel": 0.5, "end_rel": 4.5},
@@ -247,11 +249,10 @@ def generate_kinetic_subtitles(
     margin_v = int(round(cfg['margin_v'] * scale_y))
     margin_l = int(round(margin_lr * scale_y))
 
-    # Reference-Matched Dialogue Subtitle Sizing & Placement (Sweet-spot lower-middle zone, above UI chrome)
-    # Pure solid black outline with zero drop-shadow blur matching reference XeqGgslY3h0
+    # Reference-Matched Dialogue Subtitle Sizing & Placement (Signature anime neon glow matching reference XeqGgslY3h0)
     d_fontsize = int(round(54 * scale_y))
-    d_outline = round(6.5 * scale_y, 1)
-    d_shadow = 0.0
+    d_outline = round(5.0 * scale_y, 1)
+    d_shadow = round(2.0 * scale_y, 1)
     d_margin_v = int(round(440 * scale_y))
     d_margin_lr = int(round(80 * scale_y))
 
@@ -267,7 +268,7 @@ PlayResY: {VIDEO_HEIGHT}
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: BaseText,{cfg['font']},{fontsize},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{outline_w},{shadow_d},{cfg['alignment']},{margin_l},{margin_l},{margin_v},1
-Style: DialogueSub,Arial,{d_fontsize},&H00FFFFFF,&H00000000,&H00000000,&HA0000000,-1,0,0,0,100,100,1,0,1,{d_outline},{d_shadow},2,{d_margin_lr},{d_margin_lr},{d_margin_v},1
+Style: DialogueSub,Montserrat,Arial,{d_fontsize},&H00FFFFFF,&H00000000,&H001E27FF,&HA0000000,-1,0,0,0,100,100,1,0,1,{d_outline},{d_shadow},2,{d_margin_lr},{d_margin_lr},{d_margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -377,6 +378,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             word_durs = [(wt / total_wt) * speech_dur for wt in weights]
 
             curr_t = st_val
+            glow_hex = dl.get("glow_color") or ("&H0000C8FF" if dl.get("speaker") == "Rengoku" else "&H001E27FF")
+            neon_tag = rf"{{\blur4\3c{glow_hex}\4c&HA0000000}}"
+
             for w_idx in range(len(all_words)):
                 w_start = curr_t
                 dur = word_durs[w_idx]
@@ -407,7 +411,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
                 # Smooth fade transitions at line boundary
                 fade_tag = r"{\fad(80,0)}" if w_idx == 0 else (r"{\fad(0,80)}" if w_idx == len(all_words) - 1 else "")
-                events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{fade_tag}{full_text}")
+                events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{fade_tag}{neon_tag}{full_text}")
             
     full_ass = ass_header + "\n".join(events) + "\n"
     with open(output_ass_path, "w", encoding="utf-8") as f:

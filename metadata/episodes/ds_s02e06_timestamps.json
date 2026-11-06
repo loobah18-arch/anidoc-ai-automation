@@ -31,21 +31,31 @@
   "intro_dialogue": [
     {
       "speaker": "Akaza",
-      "text": "TECHNIQUE DEVELOPMENT:\nDESTRUCTIVE DEATH: COMPASS NEEDLE!",
-      "start_rel": 0.5,
-      "end_rel": 4.8
-    },
-    {
-      "speaker": "Akaza",
-      "text": "IF YOU REFUSE TO BECOME A DEMON...\nI'LL KILL YOU.",
-      "start_rel": 5.0,
-      "end_rel": 9.8
+      "text": "WHY DON'T YOU BECOME A DEMON TOO?",
+      "start_rel": 0.6,
+      "end_rel": 3.6,
+      "glow_color": "&H001E27FF"
     },
     {
       "speaker": "Rengoku",
-      "text": "FLAME BREATHING, FIRST FORM:\nSEA OF FIRE!",
-      "start_rel": 10.0,
-      "end_rel": 13.8
+      "text": "I WILL NOT.",
+      "start_rel": 3.8,
+      "end_rel": 5.1,
+      "glow_color": "&H0000C8FF"
+    },
+    {
+      "speaker": "Akaza",
+      "text": "I CAN SENSE YOUR INCREDIBLE STRENGTH.",
+      "start_rel": 5.4,
+      "end_rel": 8.8,
+      "glow_color": "&H001E27FF"
+    },
+    {
+      "speaker": "Akaza",
+      "text": "YOU'RE A HASHIRA, AREN'T YOU?",
+      "start_rel": 9.1,
+      "end_rel": 13.6,
+      "glow_color": "&H001E27FF"
     }
   ],
   "scenes": [

@@ -418,11 +418,10 @@ def build_vertical_dual_layer_chain(
         f"colorchannelmixer=aa=1.0:rr=0.45:gg=0.45:bb=0.45,setsar=1[{bg_out}]"
     )
 
-    # 3. 4:5 Foreground Frame (1080x1350) with 4px border
+    # 3. 4:5 Foreground Frame (1080x1350) - Clean borderless action framing matching reference XeqGgslY3h0
     fg_chain = (
         f"[{fg_raw}]scale={video_width}:{fg_height}:force_original_aspect_ratio=increase,"
-        f"crop={video_width}:{fg_height},"
-        f"drawbox=x=0:y=0:w={video_width}:h={fg_height}:color=white@0.65:t=4,setsar=1[{fg_out}]"
+        f"crop={video_width}:{fg_height},setsar=1[{fg_out}]"
     )
 
     # 4. Composite Overlay
