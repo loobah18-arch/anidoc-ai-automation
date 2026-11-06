@@ -340,16 +340,14 @@ def build_velocity_clip_filter(
             fg_filter = (
                 f"scale={scaled_w}:{scaled_h}:force_original_aspect_ratio=increase,"
                 f"crop={video_width}:{fg_h}:(in_w-{video_width})/2:(in_h-{fg_h})/2,"
-                f"cas=0.60,unsharp=5:5:1.3:5:5:0.0,"
-                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.30:t=2,setsar=1"
+                f"cas=0.60,unsharp=5:5:1.3:5:5:0.0,setsar=1"
             )
         else:
             # Reveal Zoom-out (1.05x - 1.10x) for full wide action choreography
             fg_filter = (
                 f"scale={video_width}:{fg_h}:force_original_aspect_ratio=increase,"
                 f"crop={video_width}:{fg_h}:(in_w-{video_width})/2:(in_h-{fg_h})/2,"
-                f"cas=0.60,unsharp=5:5:1.3:5:5:0.0,"
-                f"drawbox=x=0:y=0:w=iw:h=ih:color=white@0.30:t=2,setsar=1"
+                f"cas=0.60,unsharp=5:5:1.3:5:5:0.0,setsar=1"
             )
         y_pos = f"({video_height}-{fg_h})/2"
 

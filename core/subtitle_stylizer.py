@@ -250,9 +250,9 @@ def generate_kinetic_subtitles(
     margin_l = int(round(margin_lr * scale_y))
 
     # Reference-Matched Dialogue Subtitle Sizing & Placement (Signature anime neon glow matching reference XeqGgslY3h0)
-    d_fontsize = int(round(54 * scale_y))
-    d_outline = round(5.0 * scale_y, 1)
-    d_shadow = round(2.0 * scale_y, 1)
+    d_fontsize = int(round(58 * scale_y))
+    d_outline = round(6.0 * scale_y, 1)
+    d_shadow = round(2.5 * scale_y, 1)
     d_margin_v = int(round(440 * scale_y))
     d_margin_lr = int(round(80 * scale_y))
 
@@ -268,7 +268,7 @@ PlayResY: {VIDEO_HEIGHT}
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: BaseText,{cfg['font']},{fontsize},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{outline_w},{shadow_d},{cfg['alignment']},{margin_l},{margin_l},{margin_v},1
-Style: DialogueSub,Montserrat,Arial,{d_fontsize},&H00FFFFFF,&H00000000,&H001E27FF,&HA0000000,-1,0,0,0,100,100,1,0,1,{d_outline},{d_shadow},2,{d_margin_lr},{d_margin_lr},{d_margin_v},1
+Style: DialogueSub,Montserrat,{d_fontsize},&H00FFFFFF,&H00000000,&H001E27FF,&HA0000000,-1,0,0,0,100,100,1,0,1,{d_outline},{d_shadow},2,{d_margin_lr},{d_margin_lr},{d_margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -379,7 +379,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
             curr_t = st_val
             glow_hex = dl.get("glow_color") or ("&H0000C8FF" if dl.get("speaker") == "Rengoku" else "&H001E27FF")
-            neon_tag = rf"{{\blur4\3c{glow_hex}\4c&HA0000000}}"
+            neon_tag = rf"{{\1c&H00FFFFFF\blur4\3c{glow_hex}\4c&HA0000000}}"
 
             for w_idx in range(len(all_words)):
                 w_start = curr_t

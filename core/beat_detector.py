@@ -271,6 +271,55 @@ def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time:
     effective_drop = min(drop_time, max(1.5, duration - 4.0))
     beat_times.append(round(effective_drop, 2))
 
+    # Extended Full Musical Arc (>= 60.0s, e.g. 71s/76s full Lady Gaga Poker Face / AMV arc)
+    if duration >= 60.0:
+        climax_start = round(duration - 4.0, 2)
+        # Stage 1: Intro hold subdivisions if drop is long (e.g. 16s intro)
+        if effective_drop >= 12.0:
+            intro_step = bar if bar >= 3.0 else bar * 2
+            t_intro = intro_step
+            while t_intro < effective_drop - 1.5:
+                if t_intro not in beat_times:
+                    beat_times.append(round(t_intro, 2))
+                t_intro += intro_step
+
+        curr = effective_drop
+        # Stage 2: Verse Combat Exchanges (2-beat rapid cuts ~1.0s)
+        verse_end = min(curr + (duration * 0.35), climax_start - 12.0)
+        cut_step = beat_interval * 2
+        while curr + cut_step < verse_end:
+            curr += cut_step
+            beat_times.append(round(curr, 2))
+
+        # Stage 3: Pre-Chorus Accelerating Build (accelerates from 2-beat to 1-beat cuts)
+        pre_chorus_end = min(curr + (duration * 0.20), climax_start - 6.0)
+        # First half of pre-chorus: 2-beat cuts
+        mid_pre = (curr + pre_chorus_end) / 2.0
+        while curr + cut_step < mid_pre:
+            curr += cut_step
+            beat_times.append(round(curr, 2))
+        # Second half of pre-chorus: accelerating 1-beat snappy cuts (~0.5s)
+        snappy_step = max(0.40, beat_interval)
+        while curr + snappy_step < pre_chorus_end:
+            curr += snappy_step
+            beat_times.append(round(curr, 2))
+
+        # Stage 4: Chorus Climax Drop (Major Drop Strike Hold 1.8s - 2.4s)
+        chorus_drop_hold = min(2.4, max(1.8, beat_interval * 4))
+        curr += chorus_drop_hold
+        if curr < climax_start - 1.0:
+            beat_times.append(round(curr, 2))
+
+        # Combat rush through climax
+        while curr + cut_step < climax_start - 0.5:
+            curr += cut_step
+            beat_times.append(round(curr, 2))
+
+        beat_times.append(climax_start)
+        beat_times = sorted(list(set(beat_times)))
+        return BeatGrid(duration=duration, drop_time=effective_drop, beat_times=beat_times, bpm=bpm)
+
+    # Standard Short / Medium AMV (< 60.0s)
     # Modern High-Energy AMV: Rapid 2-beat combat cuts (0.8s - 1.3s) matching musical onsets
     climax_start = round(duration - 2.8, 2)
     curr = effective_drop

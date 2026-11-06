@@ -350,7 +350,8 @@ def render_cinematic_edit(
                         "speaker": item.get("speaker", ""),
                         "text": item.get("text", ""),
                         "start": round(s_rel * scale_f, 2),
-                        "end": round(min(drop_t - 0.2, e_rel * scale_f), 2)
+                        "end": round(min(drop_t - 0.2, e_rel * scale_f), 2),
+                        "glow_color": item.get("glow_color", "")
                     })
 
             ass_path = generate_kinetic_subtitles(
@@ -538,8 +539,7 @@ def render_cinematic_edit(
     sub_filter = ""
     if ass_path and ass_path.exists():
         escaped_ass = str(ass_path).replace("\\", "/").replace(":", "\\:")
-        fonts_arg = f":fontsdir='{FONTS_DIR}'" if FONTS_DIR.exists() else ""
-        sub_filter = f",subtitles='{escaped_ass}'{fonts_arg}"
+        sub_filter = f",subtitles='{escaped_ass}'"
     filter_chains.append(
         f"{video_src_tag}{vibrant_cc}{sub_filter}[vout]"
     )
@@ -552,11 +552,13 @@ def render_cinematic_edit(
     audio_vacuum_fx = build_pre_drop_audio_vacuum_filter(drop_t)
     combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
     combat_foley_fx = build_combat_foley_audio_filter(combat_times, drop_t)
+    audio_fade_start = max(0.1, beat_grid.duration - 3.5)
+    audio_fade_dur = min(3.0, beat_grid.duration - audio_fade_start)
     filter_chains.append(
         f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=80,lowpass=f=14000[clip_sfx_balanced];"
         f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.0[phonk_full];"
         f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=60 40:dropout_transition=2,"
-        f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
+        f"volume=1.20,afade=t=out:st={audio_fade_start:.2f}:d={audio_fade_dur:.2f},loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
 
     full_filter_complex = ";".join(filter_chains)

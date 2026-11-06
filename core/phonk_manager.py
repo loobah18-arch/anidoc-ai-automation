@@ -24,6 +24,15 @@ from config.settings import PHONK_DIR, SCRATCH_DIR
 # giving the viewer a full 23+ seconds of intense, beat-synced combat action AFTER the drop!
 POPULAR_PHONK_CATALOG = [
     {
+        "id": "poker_face",
+        "title": "Lady Gaga - Poker Face (AMV Reference Master)",
+        "genre": "Pro AMV Reference",
+        "bpm": 120.0,
+        "default_drop": 16.0,
+        "conversation_drop": 16.0,
+        "audio_offset": 0.00,
+    },
+    {
         "id": "montagem_zora",
         "title": "WUYS, KIT - MONTAGEM ZORA",
         "genre": "Brazilian Phonk",

@@ -29,6 +29,7 @@ on:
         type: choice
         options:
           - 'montagem_zora'
+          - 'poker_face'
           - 'rayelo_ultraslowed'
           - 'random'
           - 'montagem_vozes_profundas'

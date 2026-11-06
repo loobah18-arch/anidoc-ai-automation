@@ -588,6 +588,44 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertEqual(k1, "ep1_885s")
         self.assertEqual(k1, k2)
 
+    def test_18_reference_benchmark_and_full_arc_pacing(self):
+        """Verifies reference metrics loading (including 9-vT3Vmzp-8 Reze Poker Face),
+        full musical arc pacing (71.0s), and reference comparison score."""
+        from core.automated_edit_reviewer import load_reference_benchmarks, review_edit_and_benchmark, generate_markdown_report
+        from core.beat_detector import generate_procedural_beat_grid
+
+        # 1. Load reference benchmarks
+        ref_data = load_reference_benchmarks()
+        self.assertIn("reference_02", ref_data)
+        ref_02 = ref_data["reference_02"]
+        self.assertAlmostEqual(ref_02["signal_metrics"]["yavg"], 75.6203, places=2)
+        self.assertAlmostEqual(ref_02["signal_metrics"]["satavg"], 18.1086, places=2)
+        self.assertAlmostEqual(ref_02["signal_metrics"]["ydif"], 39.3458, places=2)
+        self.assertEqual(ref_02["scene_cut_count"], 28)
+
+        # 2. Test full 71.0s musical arc grid (Poker Face reference pacing)
+        grid_71 = generate_procedural_beat_grid(duration=71.0, drop_time=16.0, bpm=120.0)
+        self.assertEqual(grid_71.duration, 71.0)
+        self.assertEqual(grid_71.drop_time, 16.0)
+        segs_71 = grid_71.get_cut_segments()
+        self.assertGreaterEqual(len(segs_71), 25, "Full 71s arc should produce 25+ cuts")
+
+        # Verify that cuts exist in intro, verse, pre-chorus build, and climax
+        cut_starts = [s["start"] for s in segs_71]
+        self.assertTrue(any(s >= 16.0 and s < 40.0 for s in cut_starts))
+        self.assertTrue(any(s >= 40.0 and s < 56.0 for s in cut_starts))
+        self.assertTrue(any(s >= 56.0 for s in cut_starts))
+
+        # 3. Test reviewer with reference benchmark integration
+        out_video = SCRATCH_DIR / "test_assembled_edit.mp4"
+        if out_video.exists():
+            review = review_edit_and_benchmark(out_video, expected_drop_time=1.5)
+            self.assertIn("reference_benchmark", review)
+            if review["reference_benchmark"]:
+                self.assertIn("similarity_score", review["reference_benchmark"])
+                report = generate_markdown_report(review)
+                self.assertIn("Pro Reference Benchmark Comparison", report)
+
 
 if __name__ == "__main__":
     unittest.main()
