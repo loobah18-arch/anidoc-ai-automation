@@ -894,7 +894,7 @@ def slice_action_moments_from_source(
     ]
     end_credit_keywords = [
         "credits", "ending theme", "ending song", "preview", "next episode", "taisho secret", "recap", "bumper", "staff roll", "cast roll",
-        "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning", "funeral"
+        "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning", "funeral", "sunrise", "carriage", "passenger", "fleeing"
     ]
     def _is_credit(desc_text: str) -> bool:
         low = desc_text.lower()
@@ -1008,7 +1008,7 @@ def slice_action_moments_from_source(
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
-        and not (matched_ep_code == "DS_S02E07" and c["start"] >= 1180.0)
+        and not (matched_ep_code == "DS_S02E07" and c["start"] >= 885.0)
     ]
     post_drop_candidates.sort(key=lambda x: x["start"])
 
@@ -1019,7 +1019,7 @@ def slice_action_moments_from_source(
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
         and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
-        and not (matched_ep_code == "DS_S02E07" and c["start"] >= 1180.0)
+        and not (matched_ep_code == "DS_S02E07" and c["start"] >= 885.0)
     ]
     other_combat.sort(key=lambda x: x["start"])
     combat_pool = post_drop_candidates + other_combat
@@ -1337,26 +1337,32 @@ def fetch_and_prepare_gdrive_footage(
     if not slices_1:
         return slices_2
 
-    # Blend multi-episode clips:
-    # 1. Clip 0: Always from Ep 1 (pre-fight conversation hook)
-    # 2. Climax / Finisher: from Ep 2 (peak sakuga, e.g. Ninth Form / Annihilation Type)
-    # 3. Middle combat cuts: Interleave Ep 1 and Ep 2
+    # Chronological Multi-Episode Narrative Arc:
+    # 1. Intro / Standoff: S02E06 dialogue hook (slices_1[0])
+    # 2. Early & Mid Combat: S02E06 combat clashes (pool_1: Sea of Fire, Air clashes, Flame Tiger)
+    # 3. Climax & Finisher: S02E07 Ninth Form dragon escalation (pool_2: Dragon launch & collision finisher)
+    # Never interleave backwards across episodes to prevent injury continuity fractures!
     combined = [slices_1[0]]
-    pool_1 = slices_1[1:]
-    pool_2 = slices_2[1:]
-    finisher = slices_2[0] if slices_2 else (pool_1[-1] if pool_1 else combined[0])
+    finisher = slices_2[-1] if slices_2 else (slices_1[-1] if len(slices_1) > 1 else combined[0])
+    pool_1 = [c for c in slices_1[1:] if c != finisher]
+    pool_2 = [c for c in slices_2 if c != finisher]
 
-    p1_i = 0
-    p2_i = 0
-    while len(combined) < n_clips - 1 and (p1_i < len(pool_1) or p2_i < len(pool_2)):
-        if p2_i < len(pool_2):
-            combined.append(pool_2[p2_i])
-            p2_i += 1
-        if len(combined) < n_clips - 1 and p1_i < len(pool_1):
-            combined.append(pool_1[p1_i])
-            p1_i += 1
+    n_needed = max(1, n_clips - 2)
+    n_ep1 = max(1, min(len(pool_1), n_needed // 2))
+    n_ep2 = max(1, min(len(pool_2), n_needed - n_ep1))
+
+    combined.extend(pool_1[:n_ep1])
+    combined.extend(pool_2[:n_ep2])
+
+    # Fill remaining from pool_2 then pool_1 without interleaving backwards
+    rem_2 = pool_2[n_ep2:]
+    rem_1 = pool_1[n_ep1:]
+    while len(combined) < n_clips - 1 and rem_2:
+        combined.append(rem_2.pop(0))
+    while len(combined) < n_clips - 1 and rem_1:
+        combined.append(rem_1.pop(0))
 
     combined.append(finisher)
-    print(f"✨ [MultiEpisode] Created diverse multi-episode pool of {len(combined)} cuts across {vid_1.name} & {vid_2.name}!")
+    print(f"✨ [MultiEpisode] Created chronologically escalated pool of {len(combined)} cuts across {vid_1.name} & {vid_2.name}!")
     return combined
 

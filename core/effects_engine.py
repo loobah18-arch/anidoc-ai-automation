@@ -325,13 +325,12 @@ def build_velocity_clip_filter(
         bg_filter = (
             f"scale=360:640:force_original_aspect_ratio=increase,crop=360:640,"
             f"boxblur=16:3,scale={video_width}:{video_height}:flags=fast_bilinear,"
-            f"eq=brightness=0.02:contrast=1.05,setsar=1"
+            f"eq=brightness=-0.04:contrast=1.18,setsar=1"
         )
 
         eff_scale = max(1.0, scale_factor)
-        # 4:5 Tall Action Framing (1440x1800 on 1440x2560 canvas, filling 70.3% of screen height)
-        # Guarantees characters and choreography dominate mobile vertical screens without 70% blurry background blobs
-        fg_h = int(round(video_width * 5 / 4 / 2) * 2)
+        # 3:4 Cinematic Action Framing (filling 75-80% of screen height, characters dominate frame)
+        fg_h = int(round(video_width * 4 / 3 / 2) * 2)
 
         if eff_scale > 1.05:
             # Dynamic Punch Zoom-in (1.35x - 1.45x) into character face/action focal point (FtImSrL2DOg)
@@ -404,9 +403,9 @@ def build_vertical_dual_layer_chain(
     fg_out = f"fg_{seg_idx}"
     comp_out = f"comp_{seg_idx}"
 
-    # 1. 6% Edge Crop & split into background and foreground
+    # 1. 3% Watermark Edge Crop & split into background and foreground (strictly centered)
     crop_split = (
-        f"{input_tag}crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06,split=2[{bg_raw}][{fg_raw}]"
+        f"{input_tag}crop=in_w*0.94:in_h*0.94:(in_w-in_w*0.94)/2:(in_h-in_h*0.94)/2,split=2[{bg_raw}][{fg_raw}]"
     )
 
     # 2. Ambient Blurred Background (1080x1920)

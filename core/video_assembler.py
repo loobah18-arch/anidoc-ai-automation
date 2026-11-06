@@ -96,7 +96,9 @@ def render_cinematic_edit(
     github_repo: Optional[str] = None,
     gdrive_folder: Optional[str] = None,
     auto_fetch_clips: bool = True,
-    force_refresh: bool = False
+    force_refresh: bool = False,
+    exclude_clip_paths: Optional[List[str]] = None,
+    remove_copyrighted_clip: bool = False,
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
@@ -261,6 +263,16 @@ def render_cinematic_edit(
             )
             clip_paths.extend(extra)
 
+    # ── Copyright Shield: Exclude or Remove Flagged/Copyrighted Clips ──
+    if exclude_clip_paths:
+        exclude_set = {str(Path(p).resolve()) for p in exclude_clip_paths} | {Path(p).name for p in exclude_clip_paths}
+        clip_paths = [p for p in clip_paths if str(Path(p).resolve()) not in exclude_set and Path(p).name not in exclude_set]
+        print(f"✂️ [ClipRemover] Excluded {len(exclude_clip_paths)} flagged clip(s). Remaining: {len(clip_paths)}")
+
+    if remove_copyrighted_clip and clip_paths:
+        removed = clip_paths.pop(0) if len(clip_paths) > 1 else None
+        print(f"✂️ [ClipRemover] Removed suspected copyrighted clip from timeline: {getattr(removed, 'name', str(removed))}")
+
     # ── Thematic Narrative Arc Sequencing (Storytelling flow) ──
     # Sort and map clips according to the 3-act structure:
     # 1. Setup / Monologue intro (first clip)
@@ -275,20 +287,12 @@ def render_cinematic_edit(
         if not combat_pool:
             combat_pool = clip_paths[:]
 
-        # ── Dual-Timeline Parallel Contrast Cutting ──
-        # Interleaves Stream A (Character Intent / Face & Eye Close-Up) with Stream B (Wide Sakuga / Slashing VFX)
-        if len(combat_pool) >= 2:
-            stream_a = combat_pool[0::2]
-            stream_b = combat_pool[1::2]
-        else:
-            stream_a = combat_pool
-            stream_b = combat_pool
-
+        # ── Chronological Narrative Progression ──
+        # Preserves strict 3-act escalation (Intro -> Combat Clashes -> Climax Finisher)
+        # without alternating back-and-forth between different battle states or injuries.
         ordered_clips = []
         in_i = 0
-        a_i = 0
-        b_i = 0
-        combat_step = 0
+        combat_i = 0
 
         for idx, (dur, is_d) in enumerate(zip(durations, drop_flags)):
             if not is_d:
@@ -297,13 +301,8 @@ def render_cinematic_edit(
             elif idx == n_clips - 1:
                 ordered_clips.append(finisher_c)
             else:
-                if combat_step % 2 == 0:
-                    ordered_clips.append(stream_a[a_i % len(stream_a)])
-                    a_i += 1
-                else:
-                    ordered_clips.append(stream_b[b_i % len(stream_b)])
-                    b_i += 1
-                combat_step += 1
+                ordered_clips.append(combat_pool[combat_i % len(combat_pool)])
+                combat_i += 1
         clip_paths = ordered_clips
     elif clip_paths:
         while len(clip_paths) < n_clips:

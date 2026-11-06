@@ -250,10 +250,10 @@ def generate_kinetic_subtitles(
     margin_l = int(round(margin_lr * scale_y))
 
     # Reference-Matched Dialogue Subtitle Sizing & Placement (Signature anime neon glow matching reference XeqGgslY3h0)
-    d_fontsize = int(round(58 * scale_y))
-    d_outline = round(6.0 * scale_y, 1)
-    d_shadow = round(2.5 * scale_y, 1)
-    d_margin_v = int(round(440 * scale_y))
+    d_fontsize = int(round(62 * scale_y))
+    d_outline = round(6.5 * scale_y, 1)
+    d_shadow = round(3.0 * scale_y, 1)
+    d_margin_v = int(round(720 * scale_y))  # Golden center-lower safe zone (above all YouTube mobile UI)
     d_margin_lr = int(round(80 * scale_y))
 
     ass_header = f"""[Script Info]
@@ -378,8 +378,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             word_durs = [(wt / total_wt) * speech_dur for wt in weights]
 
             curr_t = st_val
-            glow_hex = dl.get("glow_color") or ("&H0000C8FF" if dl.get("speaker") == "Rengoku" else "&H001E27FF")
-            neon_tag = rf"{{\1c&H00FFFFFF\blur4\3c{glow_hex}\4c&HA0000000}}"
+            glow_hex = dl.get("glow_color") or ("&H0000D4FF" if dl.get("speaker") == "Rengoku" else "&H00D946EF")
+            neon_tag = rf"{{\1c&H00FFFFFF\blur4\3c{glow_hex}\4c&HA0000000\fsp3}}"
 
             for w_idx in range(len(all_words)):
                 w_start = curr_t

@@ -56,10 +56,10 @@ LETTERBOX_BAR_HEIGHT = FOREGROUND_Y_OFFSET
 CC_PRESETS = {
     # ── Vibrant Anime Glow (2026 AMV Standard) ──
     "vibrant_anime_glow": {
-        "contrast": 1.15,
-        "brightness": 0.12,
-        "saturation": 1.65,
-        "gamma": 1.32,
+        "contrast": 1.25,
+        "brightness": 0.02,
+        "saturation": 1.45,
+        "gamma": 1.08,
         "colorbalance": "rs=0.04:gs=0.02:bs=0.05",
         "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "0",  # Clean edges, no dark crushing
@@ -68,10 +68,10 @@ CC_PRESETS = {
     },
     # ── Modern 2025/2026 TikTok & Shorts AMV Preset ──
     "anime_hdr_vibrant": {
-        "contrast": 1.15,
-        "brightness": 0.12,
-        "saturation": 1.65,
-        "gamma": 1.32,
+        "contrast": 1.25,
+        "brightness": 0.02,
+        "saturation": 1.45,
+        "gamma": 1.08,
         "colorbalance": "rs=0.04:gs=0.02:bs=0.05",
         "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "0",
@@ -272,10 +272,10 @@ CC_PRESETS = {
         "accent_color": "#00FFFF"
     },
     "flame_hashira": {
-        "contrast": 1.15,
-        "brightness": 0.12,
-        "saturation": 1.65,
-        "gamma": 1.32,
+        "contrast": 1.25,
+        "brightness": 0.02,
+        "saturation": 1.45,
+        "gamma": 1.08,
         "colorbalance": "rs=0.06:gs=0.01:bs=0.02:rm=0.03:gm=0.01:bm=0.01",
         "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "0",
@@ -283,10 +283,10 @@ CC_PRESETS = {
         "accent_color": "#FF3311"
     },
     "akaza_compass": {
-        "contrast": 1.15,
-        "brightness": 0.10,
-        "saturation": 1.55,
-        "gamma": 1.30,
+        "contrast": 1.25,
+        "brightness": 0.02,
+        "saturation": 1.45,
+        "gamma": 1.08,
         "colorbalance": "rs=0.04:gs=-0.01:bs=0.08:rm=0.02:gm=-0.01:bm=0.05",
         "unsharp": "5:5:1.4:5:5:0.0",
         "vignette": "0",

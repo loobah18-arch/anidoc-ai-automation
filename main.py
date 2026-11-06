@@ -179,10 +179,83 @@ def main():
                 title=metadata["title"],
                 description=metadata["description"],
                 tags=metadata["tags"],
-                privacy_status=args.privacy
+                privacy_status=args.privacy,
+                bgm_track=result.get("audio_used", ""),
             )
             if upload_res.get("status") == "success":
                 print(f"🌟 Published to YouTube: {upload_res.get('url')}")
+            elif upload_res.get("status") == "blocked":
+                block_type = upload_res.get("block_type", "both")
+                print(f"🛑 [YouTube] Upload blocked by YouTube: reason='{upload_res.get('rejection_reason')}', identified_cause='{block_type}'.")
+                print("🔄 [Pipeline Restart] Restarting workflow with cause-specific copyright remediation...")
+
+                ncs_track_path = Path(__file__).resolve().parent / "assets/audio/ncs/cradles.mp3"
+                if not ncs_track_path.exists():
+                    ncs_track_path = Path(__file__).resolve().parent / "assets/audio/ncs/aerohead_fragments_recap.mp3"
+
+                alt_audio_path = None
+                alt_phonk = None
+                should_remove_clip = False
+
+                if block_type == "audio":
+                    print("🎵 [NCS Audio Swarm] BGM was identified as copyrighted. Switching to verified copyright-free NCS song (Sub Urban - Cradles [NCS Release])...")
+                    alt_audio_path = ncs_track_path if ncs_track_path.exists() else None
+                    alt_phonk = "ncs_cradles"
+                elif block_type == "clip":
+                    print("✂️ [Clip Remover] Video clip was identified as copyrighted. Removing the offending clip from the timeline...")
+                    should_remove_clip = True
+                    curr_phonk = args.phonk or result.get("audio_used", "")
+                    alt_phonk = curr_phonk
+                else:  # both
+                    print("🛡️ [Dual Remediation] Both clip and audio require remediation. Removing copyrighted clip AND switching to NCS copyright-free song...")
+                    should_remove_clip = True
+                    alt_audio_path = ncs_track_path if ncs_track_path.exists() else None
+                    alt_phonk = "ncs_cradles"
+
+                # Style adaptation
+                curr_sub_style = sub_style or "spur_hook"
+                alt_sub_style = "viral_karaoke" if curr_sub_style == "spur_hook" else "spur_hook"
+                cc_choices = ["cyber_phonk", "hinokami_flame", "cool_blue", "marvel_hdr", "thunder_gold"]
+                current_cc = args.cc or result.get("cc_preset", "")
+                alt_cc = next((c for c in cc_choices if c != current_cc), "cyber_phonk")
+
+                print(f"🎨 [Remediated Style] Cause='{block_type}' | Subtitles='{alt_sub_style}' | CC='{alt_cc}' | ClipRemoved={should_remove_clip}")
+
+                alt_output_file = output_path.parent / f"{output_path.stem}_remediated.mp4"
+                alt_result = render_cinematic_edit(
+                    character_key=chosen_char,
+                    audio_path=alt_audio_path,
+                    phonk_track=alt_phonk,
+                    output_path=alt_output_file,
+                    target_duration=args.duration,
+                    subtitle_style=alt_sub_style,
+                    burn_subtitles=burn_subs,
+                    enable_subtitles=burn_subs,
+                    custom_quote=args.quote,
+                    custom_title=args.title,
+                    cc_preset=alt_cc,
+                    github_repo=args.github_repo,
+                    gdrive_folder=args.gdrive_folder,
+                    auto_fetch_clips=True,
+                    force_refresh=False,
+                    remove_copyrighted_clip=should_remove_clip,
+                )
+                alt_output_path = alt_result["output_path"]
+                alt_meta = alt_result["metadata"]
+
+                print(f"🚀 [YouTube] Re-attempting upload with remediated Short: {alt_output_path.name}...")
+                alt_upload_res = upload_video_to_youtube(
+                    video_path=alt_output_path,
+                    title=f"{alt_meta['title']}",
+                    description=alt_meta["description"],
+                    tags=alt_meta["tags"],
+                    privacy_status=args.privacy,
+                    bgm_track="ncs_cradles" if alt_audio_path else "",
+                )
+                if alt_upload_res.get("status") == "success":
+                    print(f"🌟 Published remediated video to YouTube: {alt_upload_res.get('url')}")
+                else:
+                    print(f"⚠️ Remediated upload status: {alt_upload_res.get('status')} ({alt_upload_res.get('reason') or alt_upload_res.get('error')})")
             else:
                 print(f"⚠️ YouTube upload status: {upload_res.get('status')} ({upload_res.get('reason') or upload_res.get('error')})")
 
