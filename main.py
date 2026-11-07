@@ -44,6 +44,7 @@ def main():
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
     parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (jjk_void, sukuna_shrine, hinokami_flame, thunder_gold, water_breathing, flame_hashira, akaza_compass, cyber_phonk)")
     parser.add_argument("--gdrive-folder", type=str, default=None, help="Google Drive folder URL or ID to pull movie/episode footage from")
+    parser.add_argument("--episode", type=str, default=None, help="Specific episode code or filename substring from Google Drive (e.g. S01E19, S02E10, S01E17, S02E07, S02E16, S02E21)")
     parser.add_argument("--github-repo", type=str, default=None, help="GitHub repository URL or slug to fetch video clips from")
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
@@ -84,6 +85,21 @@ def main():
         target_universe = "demonslayer"
 
     chosen_char = args.character
+    target_episode = args.episode
+
+    # If episode is explicitly provided, infer character & universe if not set
+    if target_episode:
+        from core.timestamp_loader import match_episode_code_from_filename, load_episode_metadata
+        ep_code = match_episode_code_from_filename(target_episode) or target_episode.upper()
+        ep_meta = load_episode_metadata(ep_code)
+        if ep_meta:
+            if not target_universe:
+                target_universe = ep_meta.get("universe", "demonslayer")
+            if not chosen_char and ep_meta.get("characters"):
+                # Pick the lead protagonist/fighter
+                chosen_char = ep_meta["characters"][0].get("name", "").lower()
+                print(f"🎬 [Main] Inferred character '{chosen_char}' and universe '{target_universe}' from episode '{ep_code}'")
+
     if chosen_char:
         if chosen_char not in CHARACTER_THEMES:
             raise ValueError(f"Unknown character '{chosen_char}'. Valid options: {list(CHARACTER_THEMES.keys())}")
@@ -120,7 +136,8 @@ def main():
         github_repo=args.github_repo,
         gdrive_folder=args.gdrive_folder,
         auto_fetch_clips=True,
-        force_refresh=args.refresh_clips
+        force_refresh=args.refresh_clips,
+        target_episode=args.episode
     )
     
     output_path = result["output_path"]

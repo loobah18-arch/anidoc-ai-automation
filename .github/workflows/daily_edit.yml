@@ -22,6 +22,11 @@ on:
         required: false
         default: ''
         type: string
+      episode:
+        description: 'Specific episode code from Google Drive (e.g. S01E19, S02E10, S01E17, S02E07, S02E16, S02E21, or leave empty for auto-rotation)'
+        required: false
+        default: ''
+        type: string
       phonk:
         description: 'Phonk BGM Track (or random for auto-rotation)'
         required: false
@@ -165,6 +170,10 @@ jobs:
           
           if [ -n "${{ github.event.inputs.character }}" ]; then
             CMD="$CMD --character ${{ github.event.inputs.character }}"
+          fi
+
+          if [ -n "${{ github.event.inputs.episode }}" ]; then
+            CMD="$CMD --episode '${{ github.event.inputs.episode }}'"
           fi
           
           if [ "${{ github.event.inputs.phonk }}" != "random" ] && [ -n "${{ github.event.inputs.phonk }}" ]; then

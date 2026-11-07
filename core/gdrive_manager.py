@@ -190,11 +190,16 @@ def pick_character_episodes(
     files: List[Dict[str, str]],
     character_key: str,
     max_episodes: int = 2,
-    title: Optional[str] = None
+    title: Optional[str] = None,
+    target_episode: Optional[str] = None
 ) -> List[Dict[str, str]]:
     """
     Selects up to max_episodes diverse, non-repetitive episodes/movies for the character.
     Guarantees multi-episode story progression (e.g. S02E06 dialogue + S02E07 climax for Rengoku).
+    Supports:
+      - Explicit target_episode selection (CLI/workflow parameter)
+      - Title-driven episode routing
+      - Autonomous rotation across all episodes in the Google Drive library
     """
     if not files:
         return []
@@ -217,64 +222,96 @@ def pick_character_episodes(
     if clean_pool:
         universe_files = clean_pool
 
-    # Special multi-episode pairs for iconic anime arcs:
-    # 1. Rengoku: S02E06 (Compass Needle & dialogue) + S02E07 (Flame Tiger, Ninth Form & Annihilation Type)
+    # 1. Direct explicit episode targeting (CLI --episode or config)
+    if target_episode:
+        ep_norm = target_episode.lower().strip()
+        matched = []
+        for f in universe_files:
+            fn = f["name"].lower()
+            code = (match_episode_code_from_filename(f["name"]) or "").lower()
+            if ep_norm in fn or ep_norm in code or ep_norm.replace("_", "") in fn.replace("_", ""):
+                matched.append(f)
+        if matched:
+            print(f"🎯 [GoogleDrive] Explicit Episode Matched: {[m['name'] for m in matched[:max_episodes]]}")
+            return matched[:max_episodes]
+        else:
+            print(f"⚠️ [GoogleDrive] Target episode '{target_episode}' not found in clean pool for {char_universe}. Falling back to smart selector.")
+
+    # 2. Check title-driven preferred episodes
+    history = _load_history()
+    used_files = set(history.get("used_files", []))
+
+    if title:
+        try:
+            intent = parse_title_intent(title)
+            preferred_eps = intent.get("preferred_episodes") or []
+            if preferred_eps:
+                title_matches = []
+                for ep_pref in preferred_eps:
+                    for f in universe_files:
+                        code = match_episode_code_from_filename(f["name"])
+                        if code == ep_pref and f not in title_matches:
+                            title_matches.append(f)
+                if title_matches:
+                    unused_title = [f for f in title_matches if f["name"] not in used_files]
+                    chosen_title = unused_title if unused_title else title_matches
+                    print(f"🎯 [GoogleDrive] Title-matched episode selection for '{intent['scene_type']}': {[c['name'] for c in chosen_title[:max_episodes]]}")
+                    return chosen_title[:max_episodes]
+        except Exception as e:
+            print(f"⚠️ [GoogleDrive] Title episode intent resolution notice: {e}")
+
+    # 3. Special multi-episode pairs for iconic anime arcs (only if unused in current rotation cycle):
+    # 1. Rengoku: S02E06 + S02E07
     if character_key == "rengoku":
         e6 = next((f for f in universe_files if "s02_e06" in f["name"].lower() or "s02e06" in f["name"].lower()), None)
         e7 = next((f for f in universe_files if "s02_e07" in f["name"].lower() or "s02e07" in f["name"].lower()), None)
-        chosen = []
-        if e6:
-            chosen.append(e6)
-        if e7 and len(chosen) < max_episodes:
-            chosen.append(e7)
-        if chosen:
+        if e6 and e7 and (e6["name"] not in used_files or e7["name"] not in used_files):
+            chosen = [e6, e7][:max_episodes]
             print(f"🎯 [GoogleDrive] Multi-Episode Selection for Rengoku: {[c['name'] for c in chosen]}")
             return chosen
 
-    # 2. Gojo: S02E09 (Subway Domain Expansion) + S02E04 (Awakened Hollow Purple)
+    # 2. Gojo: S02E09 + S02E04
     if character_key == "gojo":
         e9 = next((f for f in universe_files if "s02e09" in f["name"].lower() or "s02_e09" in f["name"].lower()), None)
         e4 = next((f for f in universe_files if "s02e04" in f["name"].lower() or "s02_e04" in f["name"].lower()), None)
-        chosen = []
-        if e9:
-            chosen.append(e9)
-        if e4 and len(chosen) < max_episodes:
-            chosen.append(e4)
-        if chosen:
-            return chosen
+        if e9 and e4 and (e9["name"] not in used_files or e4["name"] not in used_files):
+            return [e9, e4][:max_episodes]
 
-    # 3. Sukuna: S02E17 (Mahoraga) + S02E16 (Jogo Meteor)
+    # 3. Sukuna: S02E17 + S02E16
     if character_key == "sukuna":
         e17 = next((f for f in universe_files if "s02e17" in f["name"].lower() or "s02_e17" in f["name"].lower()), None)
         e16 = next((f for f in universe_files if "s02e16" in f["name"].lower() or "s02_e16" in f["name"].lower()), None)
-        chosen = []
-        if e17:
-            chosen.append(e17)
-        if e16 and len(chosen) < max_episodes:
-            chosen.append(e16)
-        if chosen:
-            return chosen
+        if e17 and e16 and (e17["name"] not in used_files or e16["name"] not in used_files):
+            return [e17, e16][:max_episodes]
 
-    # 4. Tanjiro: S01E19 (Hinokami Kagura) + S02E10 (Gyutaro Climax)
+    # 4. Tanjiro: S01E19 + S02E10
     if character_key == "tanjiro":
         e19 = next((f for f in universe_files if "s01_e19" in f["name"].lower() or "s01e19" in f["name"].lower() or "e19" in f["name"].lower()), None)
         e10 = next((f for f in universe_files if "s02_e10" in f["name"].lower() or "s02e10" in f["name"].lower() or "e10" in f["name"].lower()), None)
-        chosen = []
-        if e19:
-            chosen.append(e19)
-        if e10 and len(chosen) < max_episodes:
-            chosen.append(e10)
-        if chosen:
-            return chosen
+        if e19 and e10 and (e19["name"] not in used_files or e10["name"] not in used_files):
+            return [e19, e10][:max_episodes]
 
-    best = pick_best_file_for_character(universe_files, character_key, title=title)
-    return [best] if best else []
+    # 4. Universal multi-episode rotation across ALL available episodes for the character / universe
+    best = pick_best_file_for_character(universe_files, character_key, title=title, target_episode=target_episode)
+    if not best:
+        return []
+
+    chosen_list = [best]
+    if max_episodes > 1:
+        other_candidates = [f for f in universe_files if f["name"] != best["name"]]
+        unused_others = [f for f in other_candidates if f["name"] not in used_files]
+        cand_pool = unused_others if unused_others else other_candidates
+        if cand_pool:
+            chosen_list.append(random.choice(cand_pool))
+
+    return chosen_list
 
 
 def pick_best_file_for_character(
     files: List[Dict[str, str]],
     character_key: str,
-    title: Optional[str] = None
+    title: Optional[str] = None,
+    target_episode: Optional[str] = None
 ) -> Optional[Dict[str, str]]:
     """
     Selects a DIVERSE, non-repetitive episode or movie for the target character.
@@ -306,6 +343,16 @@ def pick_best_file_for_character(
     if clean_pool:
         universe_files = clean_pool
 
+    # 1.1 Direct explicit episode targeting (CLI --episode or config)
+    if target_episode:
+        ep_norm = target_episode.lower().strip()
+        for f in universe_files:
+            fn = f["name"].lower()
+            code = (match_episode_code_from_filename(f["name"]) or "").lower()
+            if ep_norm in fn or ep_norm in code or ep_norm.replace("_", "") in fn.replace("_", ""):
+                print(f"🎯 [GoogleDrive] Explicit Episode Selection: {f['name']}")
+                return f
+
     # Character Presence Verification: If episode metadata exists, guarantee character appears
     verified_files = []
     for f in universe_files:
@@ -324,12 +371,13 @@ def pick_best_file_for_character(
     history = _load_history()
     used_files = set(history.get("used_files", []))
 
-    # 1.5 Strict Character Episode Priority for Pre-Fight Confrontation:
-    # For Rengoku, S02E06 contains the canonical pre-fight conversation between Akaza and Rengoku.
+    # 1.5 Rengoku pre-fight preference (only if unused in current rotation)
     if character_key == "rengoku":
-        s02e06_match = next((f for f in universe_files if "s02_e06" in f["name"].lower() or "s02e06" in f["name"].lower()), None)
+        s02e06_match = next((f for f in universe_files if ("s02_e06" in f["name"].lower() or "s02e06" in f["name"].lower()) and f["name"] not in used_files), None)
         if s02e06_match:
-            print(f"🎯 [GoogleDrive] Strict Priority: Selected Mugen Train S02E06 for Rengoku pre-fight confrontation: {s02e06_match['name']}")
+            print(f"🎯 [GoogleDrive] Selected Mugen Train S02E06 for Rengoku pre-fight confrontation: {s02e06_match['name']}")
+            history["used_files"].append(s02e06_match["name"])
+            _save_history(history)
             return s02e06_match
 
     # 2. Check if title prefers specific episodes within the character's universe
@@ -1374,12 +1422,13 @@ def fetch_and_prepare_gdrive_footage(
     n_clips: int = 15,
     title: Optional[str] = None,
     drop_index: Optional[int] = None,
-    clip_duration: float = 5.5
+    clip_duration: float = 5.5,
+    target_episode: Optional[str] = None
 ) -> List[Path]:
     """
     Lightning-Fast Non-Repetitive Multi-Episode Google Drive Ingestion:
     1. Parses Google Drive folder index in 1s.
-    2. Identifies canonical episodes for the character (e.g. S02E06 dialogue + S02E07 climax for Rengoku).
+    2. Identifies canonical episodes for the character (or uses target_episode if specified).
     3. Downloads up to 2 distinct episodes for rich arc storytelling.
     4. Slices dialogue intro from Ep 1, and peak sakuga/ultimate forms from Ep 2 into 4:5 tall action clips.
     """
@@ -1392,7 +1441,7 @@ def fetch_and_prepare_gdrive_footage(
         return []
 
     # Select candidate episodes (up to 2 for rich multi-episode combat arcs)
-    candidate_episodes = pick_character_episodes(items, target_character, max_episodes=2, title=title)
+    candidate_episodes = pick_character_episodes(items, target_character, max_episodes=2, title=title, target_episode=target_episode)
     if not candidate_episodes:
         print(f"⚠️ [GoogleDrive] No matching episodes found for '{target_character}'.")
         return []
@@ -1412,7 +1461,7 @@ def fetch_and_prepare_gdrive_footage(
             avail = [it for it in items if it["name"] not in attempted_names]
             if not avail:
                 break
-            best = pick_best_file_for_character(avail, target_character, title=title)
+            best = pick_best_file_for_character(avail, target_character, title=title, target_episode=target_episode)
             if not best:
                 break
             attempted_names.add(best["name"])

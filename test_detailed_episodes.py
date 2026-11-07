@@ -268,6 +268,50 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         self.assertNotIn(120.0, combat_st_zen, "Running through forest at 120s must be excluded from combat")
         self.assertNotIn(780.0, combat_st_zen, "Gramps flashback at 780s must be excluded from combat")
 
+    def test_10_target_episode_and_dynamic_gdrive_rotation(self):
+        """Verify explicit target_episode matching and multi-episode rotation across Google Drive files."""
+        from core.gdrive_manager import pick_character_episodes, pick_best_file_for_character
+
+        mock_gdrive_files = [
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E17.mp4", "id": "id_s01e17"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4", "id": "id_s01e19"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E06.mp4", "id": "id_s02e06"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E07.mp4", "id": "id_s02e07"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E10.mp4", "id": "id_s02e10"},
+            {"name": "Jujutsu_Kaisen-S02E03-720p.mkv", "id": "id_jjk_03"},
+            {"name": "Jujutsu_Kaisen-S02E04-720p.mkv", "id": "id_jjk_04"},
+            {"name": "Jujutsu_Kaisen-S02E16-720p.mkv", "id": "id_jjk_16"},
+            {"name": "Jujutsu_Kaisen-S02E17-720p.mkv", "id": "id_jjk_17"},
+            {"name": "Jujutsu_Kaisen-S02E21-720p.mkv", "id": "id_jjk_21"},
+        ]
+
+        # 1. Explicit target_episode selection works directly
+        t17 = pick_character_episodes(mock_gdrive_files, "zenitsu", target_episode="s01e17")
+        self.assertEqual(len(t17), 1)
+        self.assertIn("S01_E17", t17[0]["name"])
+
+        t19 = pick_character_episodes(mock_gdrive_files, "tanjiro", target_episode="s01e19")
+        self.assertEqual(len(t19), 1)
+        self.assertIn("S01_E19", t19[0]["name"])
+
+        t10 = pick_character_episodes(mock_gdrive_files, "tengen", target_episode="s02e10")
+        self.assertEqual(len(t10), 1)
+        self.assertIn("S02_E10", t10[0]["name"])
+
+        t_jjk17 = pick_character_episodes(mock_gdrive_files, "sukuna", target_episode="s02e17")
+        self.assertEqual(len(t_jjk17), 1)
+        self.assertIn("S02E17", t_jjk17[0]["name"])
+
+        # 2. pick_best_file_for_character with target_episode
+        best_e21 = pick_best_file_for_character(mock_gdrive_files, "yuji", target_episode="s02e21")
+        self.assertIsNotNone(best_e21)
+        self.assertIn("S02E21", best_e21["name"])
+
+        # 3. Dynamic multi-episode rotation: Zenitsu can select multiple episodes in Demon Slayer
+        zen_eps = pick_character_episodes(mock_gdrive_files, "zenitsu", max_episodes=2)
+        self.assertTrue(len(zen_eps) >= 1)
+        self.assertTrue(all("Demon_Slayer" in ep["name"] for ep in zen_eps))
+
 if __name__ == "__main__":
     unittest.main()
 

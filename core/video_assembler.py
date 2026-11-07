@@ -99,6 +99,7 @@ def render_cinematic_edit(
     force_refresh: bool = False,
     exclude_clip_paths: Optional[List[str]] = None,
     remove_copyrighted_clip: bool = False,
+    target_episode: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
@@ -187,7 +188,8 @@ def render_cinematic_edit(
                 n_clips=max(n_clips + 10, 30),
                 title=title_text,
                 drop_index=drop_idx,
-                clip_duration=max(5.5, max_needed_dur + 1.5)
+                clip_duration=max(5.5, max_needed_dur + 1.5),
+                target_episode=target_episode
             )
             if gdrive_clips:
                 clip_paths = gdrive_clips
