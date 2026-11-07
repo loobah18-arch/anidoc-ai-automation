@@ -594,13 +594,15 @@ def get_episode_phase_boundaries(
 
     pure_conv_keywords = [
         "dialogue", "conversation", "talk", "speak", "recruit", "demonhood",
-        "refusal", "standoff", "pre-fight dialogue"
+        "refusal", "standoff", "pre-fight", "monologue"
     ]
     end_credit_keywords = [
         "credits", "ending theme", "ending song", "preview", "next episode",
         "taisho secret", "recap", "bumper", "staff roll", "cast roll",
-        "aftermath", "mourning", "funeral", "sunrise", "carriage", "passenger",
-        "fleeing", "corpse", "crying", "tears", "weep"
+        "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning",
+        "funeral", "sunrise", "dawn", "carriage", "passenger", "fleeing",
+        "corpse", "tears", "flashback", "bystander", "reaction", "spectator",
+        "injured", "kneeling", "impal"
     ]
 
     ep_meta = load_episode_metadata(matched_ep_code) if matched_ep_code else None
@@ -762,13 +764,15 @@ def slice_action_moments_from_source(
 
     pure_conv_keywords = [
         "dialogue", "conversation", "talk", "speak", "recruit", "demonhood",
-        "refusal", "standoff", "pre-fight dialogue"
+        "refusal", "standoff", "pre-fight", "monologue"
     ]
     end_credit_keywords = [
         "credits", "ending theme", "ending song", "preview", "next episode",
         "taisho secret", "recap", "bumper", "staff roll", "cast roll",
         "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning",
-        "funeral", "sunrise", "carriage", "passenger", "fleeing", "corpse", "tears"
+        "funeral", "sunrise", "dawn", "carriage", "passenger", "fleeing",
+        "corpse", "tears", "flashback", "bystander", "reaction", "spectator",
+        "injured", "kneeling", "impal"
     ]
     def _is_credit(desc_text: str) -> bool:
         low = desc_text.lower()
@@ -955,12 +959,12 @@ def slice_action_moments_from_source(
             if matching_cv:
                 best_cv = max(matching_cv, key=lambda w: w.get("score", 0))
                 # High-energy sakuga or impact collision (high motion or high particle saturation) - definitely KEEP!
-                if best_cv.get("avg_diff", 0.0) >= 5.0 or best_cv.get("avg_highlight", 0.0) >= 2.5:
-                    c["score"] += best_cv.get("score", 0.0) * 0.4
-                elif best_cv.get("rejected", False) or (best_cv.get("avg_diff", 0.0) < 4.5 and best_cv.get("avg_highlight", 0.0) < 2.0):
-                    # Reject static spectator reaction cutaways & dark void frames
+                if best_cv.get("rejected", False) or (best_cv.get("avg_diff", 0.0) < 4.5 and best_cv.get("avg_highlight", 0.0) < 2.5):
+                    # Reject static spectator reaction cutaways, crying shots & dark void frames
                     dropped_cutaways += 1
                     continue
+                elif best_cv.get("avg_diff", 0.0) >= 5.0 or best_cv.get("avg_highlight", 0.0) >= 2.5:
+                    c["score"] += best_cv.get("score", 0.0) * 0.4
         filtered_curated.append(c)
 
     if dropped_cutaways > 0:

@@ -8,75 +8,78 @@
       "name": "Rengoku",
       "role": "Flame Hashira",
       "key_moments": [
-        "Ignites flaming battle aura: Set your heart ablaze",
-        "Esoteric Art Ninth Form: Rengoku dragon charge",
-        "Supreme clash against Destructive Death Annihilation Type"
+        "Pre-fight standoff & monologue: Set your heart ablaze",
+        "Esoteric Art Ninth Form: Rengoku dragon battle stance & ignition",
+        "Ninth Form high-speed dragon flight & destructive terrain charge",
+        "Supreme clash: Ninth Form vs Destructive Death Annihilation Type explosive collision"
       ]
     },
     {
       "name": "Akaza",
       "role": "Upper Moon 3",
       "key_moments": [
+        "Attempts to recruit Rengoku into demonhood before final clash",
         "Destructive Death: Annihilation Type",
-        "Clashes with Ninth Form Flame Dragon"
+        "Supreme collision clash against Ninth Form Flame Dragon"
       ]
     }
   ],
   "scene_count": 4,
   "source": "Google Drive - Demon Slayer Collection",
-  "notes": "DEMONSLAYER combat episode - pure action sakuga strictly ending before impalement/sunrise (sub-826s)",
+  "notes": "DEMONSLAYER combat episode - pure action sakuga strictly ending at 290.0s before impalement/aftermath/crying/sunrise",
   "scenes": [
     {
-      "start": 480.0,
-      "end": 520.0,
-      "action_level": "EXPLOSIVE",
+      "start": 130.0,
+      "end": 175.0,
+      "action_level": "CALM",
       "priority": "high",
-      "description": "Set your heart ablaze monologue & flaming battle aura ignition",
+      "description": "Pre-fight standoff & monologue: Set your heart ablaze and fulfill Hashira duty",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
-      "action_score": 0.95,
-      "duration": 40.0
+      "action_score": 0.65,
+      "is_conversation": true,
+      "duration": 45.0
     },
     {
-      "start": 720.0,
-      "end": 738.0,
+      "start": 175.0,
+      "end": 235.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Esoteric Art Ninth Form: Rengoku dragon flame aura & launch",
+      "description": "Esoteric Art Ninth Form: Rengoku dragon battle stance & flame aura ignition",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 18.0
+      "duration": 60.0
     },
     {
-      "start": 748.0,
-      "end": 782.0,
+      "start": 235.0,
+      "end": 268.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Ninth Form high-speed dragon flight & destructive charge",
+      "description": "Ninth Form high-speed dragon flight & destructive terrain charge",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 34.0
+      "duration": 33.0
     },
     {
-      "start": 795.0,
-      "end": 826.0,
+      "start": 268.0,
+      "end": 290.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Supreme clash: Ninth Form terrain cleave & explosive collision vs Destructive Death Annihilation Type",
+      "description": "Supreme clash: Ninth Form vs Destructive Death Annihilation Type explosive collision",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 31.0
+      "duration": 22.0
     }
   ]
 }

@@ -231,13 +231,17 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         """Verify universal production scene selector bounds and bystander/aftermath rejection."""
         from core.gdrive_manager import get_episode_phase_boundaries
 
-        # 1. Demon Slayer S02E07 (Rengoku climax): Pure combat [480.0, 826.0] strictly ending before impalement/crying
+        # 1. Demon Slayer S02E07 (Rengoku climax): Dialogue [130.0, 175.0] & Pure combat [175.0, 290.0] strictly ending before impalement/crying
         bounds_s02e07 = get_episode_phase_boundaries("DS_S02E07", "rengoku", 1440.0)
-        self.assertEqual(bounds_s02e07["combat_window"], (480.0, 826.0))
-        self.assertIsNone(bounds_s02e07["conv_window"])
+        self.assertEqual(bounds_s02e07["conv_window"], (130.0, 175.0))
+        self.assertEqual(bounds_s02e07["combat_window"], (175.0, 290.0))
         combat_st_07 = [s["start"] for s in bounds_s02e07["curated_combat_scenes"]]
-        # Ground truth audits: strictly reject 273s Inosuke tear, 1000s sunrise, 1140s crow/Obanai, 1234s credits, 1266s Giyu, 1398s Tanjiro
-        self.assertNotIn(273.0, combat_st_07, "Inosuke weeping boar mask at 273s must be excluded")
+        self.assertTrue(all(s["start"] >= 175.0 and s["end"] <= 290.0 for s in bounds_s02e07["curated_combat_scenes"]))
+        # Ground truth audits: strictly reject 300s impalement, 360s mother flashback, 480s sunrise, 800s dying smile, 1000s sunrise, 1140s crow/Obanai, 1234s credits, 1266s Giyu, 1398s Tanjiro
+        self.assertNotIn(300.0, combat_st_07, "Akaza impalement at 300s must be excluded from combat")
+        self.assertNotIn(360.0, combat_st_07, "Mother flashback at 360s must be excluded from combat")
+        self.assertNotIn(480.0, combat_st_07, "Sunrise monologue at 480s must be excluded from combat")
+        self.assertNotIn(800.0, combat_st_07, "Rengoku dying smile at 800s must be excluded from combat")
         self.assertNotIn(1000.0, combat_st_07, "Sunrise monologue at 1000s must be excluded")
         self.assertNotIn(1140.0, combat_st_07, "Obanai daytime crow at 1140s must be excluded")
         self.assertNotIn(1234.0, combat_st_07, "Anime end credits at 1234s must be excluded")

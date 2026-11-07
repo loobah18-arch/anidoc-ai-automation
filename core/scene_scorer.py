@@ -105,15 +105,14 @@ class SceneScorer:
                 avg_diff = float(np.mean([s["diff"] for s in samples]))
                 avg_high = float(np.mean([s["highlight"] for s in samples]))
 
-                # Strict Black/Dark Frame Rejection:
-                # mean_luma < 28 (fade-to-black/dark void) or avg_diff < 2.0 (frozen/static frame)
-                is_rejected = (min_luma < 28.0) or (avg_diff < 2.0)
+                # Universal Sakuga Combat Rejection Gate:
+                # mean_luma < 28 (fade-to-black/dark void) or low motion + low highlight (static bystander/spectator/dialogue shots)
+                is_rejected = (min_luma < 28.0) or (avg_diff < 4.5 and avg_high < 2.5)
 
-                # Timeline Weighting: Multiply scores in 40%-90% mark by 1.35x
-                climax_boost = 1.35 if (0.40 * self.duration <= t_win <= 0.90 * self.duration) else 1.0
-
-                # Base excitement: motion diff (fast combat) + highlight saturation (fire/slashes) + ambient luma
-                excitement = ((avg_diff * 2.5) + (avg_high * 1.8) + (avg_luma * 0.10)) * climax_boost
+                # Pure Physical Dynamic Energy Scoring:
+                # High optical flow velocity (motion diff) + intense weapon effects (fire/slashes/lighting)
+                # Does NOT bias towards late-episode crying or artificial timeline percentages.
+                excitement = (avg_diff * 3.0) + (avg_high * 2.5) + (avg_luma * 0.05)
                 if is_rejected:
                     excitement = -100.0
 
@@ -126,7 +125,7 @@ class SceneScorer:
                     "avg_diff": round(avg_diff, 2),
                     "avg_highlight": round(avg_high, 2),
                     "rejected": is_rejected,
-                    "climax_boost": climax_boost > 1.0
+                    "climax_boost": False
                 })
 
             t_win += step_time
