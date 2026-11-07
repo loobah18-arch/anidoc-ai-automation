@@ -72,7 +72,10 @@ class BeatGrid:
 
         merged_points = [all_points[0]]
         for pt in all_points[1:]:
-            if pt - merged_points[-1] >= 0.55:
+            # Never swallow or shift the beat drop cut
+            is_drop_boundary = abs(pt - self.drop_time) < 0.05 or abs(merged_points[-1] - self.drop_time) < 0.05
+            min_gap = 0.40 if is_drop_boundary else 0.55
+            if pt - merged_points[-1] >= min_gap:
                 merged_points.append(pt)
             elif pt == all_points[-1] and len(merged_points) > 1:
                 merged_points[-1] = pt
@@ -94,11 +97,13 @@ class BeatGrid:
             s, e = seg["start"], seg["end"]
             is_d = s >= self.drop_time
             prev_d = segments[-1]["is_drop"] if segments else False
+            is_first = is_d and not prev_d
             segments.append({
                 "start": s,
                 "end": e,
                 "duration": round(e - s, 3),
                 "is_drop": is_d,
+                "is_first_drop": is_first,
                 "prev_is_drop": prev_d,
                 "is_flash": False,  # Flash is handled separately, not as segments
                 "index": len(segments)
@@ -262,65 +267,81 @@ def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time:
     bar = beat_interval * 4
 
     # ── Act 1: Atmospheric Hook / Dialogue Build ──
-    effective_drop = min(drop_time, max(1.5, min(8.0, duration - 4.0)))
-    if effective_drop > 3.5:
-        beat_times.append(round(effective_drop * 0.5, 2))
+    # Unbroken, single continuous conversation scene leading directly into the beat drop
+    effective_drop = min(drop_time, max(1.5, duration - 4.0))
     beat_times.append(round(effective_drop, 2))
 
-    if duration < 30.0:
-        # Modern High-Energy 3-Act AMV for TikTok / Shorts:
-        # Act 1: Hook (0.0 to effective_drop) - 1 to 2 narrative/eye shots (~2.0s-2.4s)
-        # Act 2: Climax Beat Drop Strike (effective_drop to drop_hold) - held 1.8s-2.4s so full sakuga executes
-        # Act 3: Combat Velocity Rhythm (drop_hold to duration - 2.8s) - syncopated 2-beat & 3-beat cuts
-        # Act 4: Climax Finisher (duration - 2.8s to duration) - dramatic held finisher
-        climax_start = round(duration - 2.8, 2)
-        curr = effective_drop
+    # Extended Full Musical Arc (>= 60.0s, e.g. 71s/76s full Lady Gaga Poker Face / AMV arc)
+    if duration >= 60.0:
+        climax_start = round(duration - 4.0, 2)
+        # Stage 1: Intro hold subdivisions if drop is long (e.g. 16s intro)
+        if effective_drop >= 12.0:
+            intro_step = bar if bar >= 3.0 else bar * 2
+            t_intro = intro_step
+            while t_intro < effective_drop - 1.5:
+                if t_intro not in beat_times:
+                    beat_times.append(round(t_intro, 2))
+                t_intro += intro_step
 
-        # On the 808 drop, HOLD the #1 climax action shot for 1.8s - 2.4s so the full choreography hits
-        drop_hold = min(2.4, max(1.8, beat_interval * 4))
-        curr += drop_hold
-        if curr < climax_start - 0.5:
+        curr = effective_drop
+        # Stage 2: Verse Combat Exchanges (2-beat rapid cuts ~1.0s)
+        verse_end = min(curr + (duration * 0.35), climax_start - 12.0)
+        cut_step = beat_interval * 2
+        while curr + cut_step < verse_end:
+            curr += cut_step
             beat_times.append(round(curr, 2))
 
-        # Alternate 2-beat (fast strike cut) and 3-beat (technique impact hold) cuts on musical rhythm
-        step_toggle = False
-        while curr < climax_start - 0.5:
-            step = (beat_interval * 2) if step_toggle else (beat_interval * 3)
-            step = max(0.85, min(1.60, step))
-            step_toggle = not step_toggle
-            curr += step
-            if curr < climax_start - 0.4:
-                beat_times.append(round(curr, 2))
+        # Stage 3: Pre-Chorus Accelerating Build (accelerates from 2-beat to 1-beat cuts)
+        pre_chorus_end = min(curr + (duration * 0.20), climax_start - 6.0)
+        # First half of pre-chorus: 2-beat cuts
+        mid_pre = (curr + pre_chorus_end) / 2.0
+        while curr + cut_step < mid_pre:
+            curr += cut_step
+            beat_times.append(round(curr, 2))
+        # Second half of pre-chorus: accelerating 1-beat snappy cuts (~0.5s)
+        snappy_step = max(0.40, beat_interval)
+        while curr + snappy_step < pre_chorus_end:
+            curr += snappy_step
+            beat_times.append(round(curr, 2))
+
+        # Stage 4: Chorus Climax Drop (Major Drop Strike Hold 1.8s - 2.4s)
+        chorus_drop_hold = min(2.4, max(1.8, beat_interval * 4))
+        curr += chorus_drop_hold
+        if curr < climax_start - 1.0:
+            beat_times.append(round(curr, 2))
+
+        # Combat rush through climax
+        while curr + cut_step < climax_start - 0.5:
+            curr += cut_step
+            beat_times.append(round(curr, 2))
 
         beat_times.append(climax_start)
-    else:
-        # 5-act for 1-minute / longer edits
-        # Act 2: Wave 1 Combat (drop to ~42% duration)
-        wave1_end = duration * 0.42
-        curr = effective_drop
-        step = bar
-        while curr + step < wave1_end:
-            curr += step
-            beat_times.append(round(curr, 2))
+        beat_times = sorted(list(set(beat_times)))
+        return BeatGrid(duration=duration, drop_time=effective_drop, beat_times=beat_times, bpm=bpm)
 
-        # Act 3: Mid-Song Emotional Bridge (~42% to ~62% duration)
-        bridge_end = duration * 0.62
-        bridge_step = bar * 1.5
-        while curr + bridge_step < bridge_end:
-            curr += bridge_step
-            beat_times.append(round(curr, 2))
+    # Standard Short / Medium AMV (< 60.0s)
+    # Modern High-Energy AMV: Rapid 2-beat combat cuts (0.8s - 1.3s) matching musical onsets
+    climax_start = round(duration - 2.8, 2)
+    curr = effective_drop
 
-        # Act 4: Climax Overdrive Combat Rush (~62% to ~92% duration)
-        rush_end = duration * 0.92
-        rush_step = bar * 0.75
-        while curr + rush_step < rush_end:
-            curr += rush_step
-            beat_times.append(round(curr, 2))
+    # On the 808 drop, hold the #1 climax action shot for 1.1s - 1.5s
+    drop_hold = min(1.5, max(1.0, beat_interval * 2))
+    curr += drop_hold
+    if curr < climax_start - 0.5:
+        beat_times.append(round(curr, 2))
 
-        # Act 5: Climax Finisher & Outro Ringout (held 3.5-5.0s)
-        finisher_time = round(duration - min(5.0, max(2.5, (duration - effective_drop) * 0.08)), 2)
-        if finisher_time > (beat_times[-1] if beat_times else 0.0) + 1.2 and finisher_time < duration - 1.0:
-            beat_times.append(finisher_time)
+    # Rapid 2-beat cuts synced with the musical rhythm
+    cut_step = beat_interval * 2 if bpm < 140 else beat_interval * 4
+    if cut_step < 0.70:
+        cut_step = beat_interval * 4
+    if cut_step > 1.40:
+        cut_step = beat_interval * 2
+
+    while curr + cut_step < climax_start - 0.4:
+        curr += cut_step
+        beat_times.append(round(curr, 2))
+
+    beat_times.append(climax_start)
 
     return BeatGrid(duration=duration, drop_time=effective_drop, beat_times=beat_times, bpm=bpm)
 
@@ -342,7 +363,10 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
     matched_entry = next((item for item in POPULAR_PHONK_CATALOG if item["id"] == track_stem or item["id"] in track_stem), None)
 
     calibrated_bpm = matched_entry.get("bpm", 134.0) if matched_entry else 134.0
-    calibrated_drop = matched_entry.get("default_drop", 4.80) if matched_entry else 4.80
+    if target_duration >= 35.0 and matched_entry and "conversation_drop" in matched_entry:
+        calibrated_drop = matched_entry["conversation_drop"]
+    else:
+        calibrated_drop = matched_entry.get("default_drop", 4.80) if matched_entry else 4.80
     audio_offset = matched_entry.get("audio_offset", 0.0) if matched_entry else 0.0
 
     try:
@@ -371,9 +395,9 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
                 calibrated_bpm = detected_bpm
                 print(f"  🔍 [BeatSync] Detected BPM: {detected_bpm:.1f} (no catalog match)")
 
-            # Detect drop from actual onsets: highest-energy onset in 4-6.5s window
+            # Detect drop from actual onsets: closest onset to calibrated drop
             if detected_onsets:
-                drop_candidates = [t for t in detected_onsets if 3.5 <= t <= 7.0]
+                drop_candidates = [t for t in detected_onsets if abs(t - calibrated_drop) <= 2.5]
                 if drop_candidates:
                     # Prefer the onset closest to the catalog drop time
                     detected_drop = min(drop_candidates, key=lambda t: abs(t - calibrated_drop))

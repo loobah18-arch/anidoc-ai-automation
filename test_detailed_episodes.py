@@ -227,6 +227,91 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         code_jjk = match_episode_code_from_filename(jjk_fn)
         self.assertEqual(code_jjk, "S01E24")
 
+    def test_09_universal_scene_selector_and_canonical_combat_bounds(self):
+        """Verify universal production scene selector bounds and bystander/aftermath rejection."""
+        from core.gdrive_manager import get_episode_phase_boundaries
+
+        # 1. Demon Slayer S02E07 (Rengoku climax): Dialogue [130.0, 175.0] & Pure combat [175.0, 290.0] strictly ending before impalement/crying
+        bounds_s02e07 = get_episode_phase_boundaries("DS_S02E07", "rengoku", 1440.0)
+        self.assertEqual(bounds_s02e07["conv_window"], (130.0, 175.0))
+        self.assertEqual(bounds_s02e07["combat_window"], (175.0, 290.0))
+        combat_st_07 = [s["start"] for s in bounds_s02e07["curated_combat_scenes"]]
+        self.assertTrue(all(s["start"] >= 175.0 and s["end"] <= 290.0 for s in bounds_s02e07["curated_combat_scenes"]))
+        # Ground truth audits: strictly reject 300s impalement, 360s mother flashback, 480s sunrise, 800s dying smile, 1000s sunrise, 1140s crow/Obanai, 1234s credits, 1266s Giyu, 1398s Tanjiro
+        self.assertNotIn(300.0, combat_st_07, "Akaza impalement at 300s must be excluded from combat")
+        self.assertNotIn(360.0, combat_st_07, "Mother flashback at 360s must be excluded from combat")
+        self.assertNotIn(480.0, combat_st_07, "Sunrise monologue at 480s must be excluded from combat")
+        self.assertNotIn(800.0, combat_st_07, "Rengoku dying smile at 800s must be excluded from combat")
+        self.assertNotIn(1000.0, combat_st_07, "Sunrise monologue at 1000s must be excluded")
+        self.assertNotIn(1140.0, combat_st_07, "Obanai daytime crow at 1140s must be excluded")
+        self.assertNotIn(1234.0, combat_st_07, "Anime end credits at 1234s must be excluded")
+        self.assertNotIn(1266.0, combat_st_07, "Giyu mourning at 1266s must be excluded")
+        self.assertNotIn(1398.0, combat_st_07, "Tanjiro weeping at 1398s must be excluded")
+
+        # 2. Demon Slayer S02E06 (Rengoku vs Akaza setup): Dialogue [752.0, 886.5] & Combat [886.5, 1230.0]
+        bounds_s02e06 = get_episode_phase_boundaries("DS_S02E06", "rengoku", 1420.0)
+        self.assertEqual(bounds_s02e06["conv_window"], (752.0, 886.5))
+        self.assertEqual(bounds_s02e06["combat_window"], (886.5, 1230.0))
+        self.assertTrue(all(s["start"] >= 886.5 for s in bounds_s02e06["curated_combat_scenes"]))
+        self.assertTrue(all(s["start"] < 886.5 for s in bounds_s02e06["curated_conv_scenes"]))
+
+        # 3. JJK S02E17 (Sukuna vs Mahoraga): Combat [120.0, 1080.0], Yuji crying in ruins excluded
+        bounds_s02e17 = get_episode_phase_boundaries("S02E17", "sukuna", 1440.0)
+        self.assertEqual(bounds_s02e17["combat_window"], (120.0, 1080.0))
+        combat_st_jjk = [s["start"] for s in bounds_s02e17["curated_combat_scenes"]]
+        self.assertNotIn(1080.0, combat_st_jjk, "Yuji crying in Shibuya ruins (1080s) must be excluded from Sukuna combat")
+
+        # 4. Demon Slayer S01E17 (Zenitsu Thunderclap): Combat [480.0, 1200.0]
+        bounds_s01e17 = get_episode_phase_boundaries("DS_S01E17", "zenitsu", 1440.0)
+        self.assertEqual(bounds_s01e17["combat_window"], (480.0, 1200.0))
+        combat_st_zen = [s["start"] for s in bounds_s01e17["curated_combat_scenes"]]
+        self.assertNotIn(120.0, combat_st_zen, "Running through forest at 120s must be excluded from combat")
+        self.assertNotIn(780.0, combat_st_zen, "Gramps flashback at 780s must be excluded from combat")
+
+    def test_10_target_episode_and_dynamic_gdrive_rotation(self):
+        """Verify explicit target_episode matching and multi-episode rotation across Google Drive files."""
+        from core.gdrive_manager import pick_character_episodes, pick_best_file_for_character
+
+        mock_gdrive_files = [
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E17.mp4", "id": "id_s01e17"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4", "id": "id_s01e19"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E06.mp4", "id": "id_s02e06"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E07.mp4", "id": "id_s02e07"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E10.mp4", "id": "id_s02e10"},
+            {"name": "Jujutsu_Kaisen-S02E03-720p.mkv", "id": "id_jjk_03"},
+            {"name": "Jujutsu_Kaisen-S02E04-720p.mkv", "id": "id_jjk_04"},
+            {"name": "Jujutsu_Kaisen-S02E16-720p.mkv", "id": "id_jjk_16"},
+            {"name": "Jujutsu_Kaisen-S02E17-720p.mkv", "id": "id_jjk_17"},
+            {"name": "Jujutsu_Kaisen-S02E21-720p.mkv", "id": "id_jjk_21"},
+        ]
+
+        # 1. Explicit target_episode selection works directly
+        t17 = pick_character_episodes(mock_gdrive_files, "zenitsu", target_episode="s01e17")
+        self.assertEqual(len(t17), 1)
+        self.assertIn("S01_E17", t17[0]["name"])
+
+        t19 = pick_character_episodes(mock_gdrive_files, "tanjiro", target_episode="s01e19")
+        self.assertEqual(len(t19), 1)
+        self.assertIn("S01_E19", t19[0]["name"])
+
+        t10 = pick_character_episodes(mock_gdrive_files, "tengen", target_episode="s02e10")
+        self.assertEqual(len(t10), 1)
+        self.assertIn("S02_E10", t10[0]["name"])
+
+        t_jjk17 = pick_character_episodes(mock_gdrive_files, "sukuna", target_episode="s02e17")
+        self.assertEqual(len(t_jjk17), 1)
+        self.assertIn("S02E17", t_jjk17[0]["name"])
+
+        # 2. pick_best_file_for_character with target_episode
+        best_e21 = pick_best_file_for_character(mock_gdrive_files, "yuji", target_episode="s02e21")
+        self.assertIsNotNone(best_e21)
+        self.assertIn("S02E21", best_e21["name"])
+
+        # 3. Dynamic multi-episode rotation: Zenitsu can select multiple episodes in Demon Slayer
+        zen_eps = pick_character_episodes(mock_gdrive_files, "zenitsu", max_episodes=2)
+        self.assertTrue(len(zen_eps) >= 1)
+        self.assertTrue(all("Demon_Slayer" in ep["name"] for ep in zen_eps))
+
 if __name__ == "__main__":
     unittest.main()
 

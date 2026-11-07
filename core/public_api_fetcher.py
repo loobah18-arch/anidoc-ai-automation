@@ -13,7 +13,7 @@ import subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
-from config.settings import MARVEL_DIR, JJK_DIR, SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT
+from config.settings import MARVEL_DIR, JJK_DIR, DEMONSLAYER_DIR, SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT
 
 # Multi-Catalog Scenepack Queries for Maximum Visual Diversity
 MULTI_CLIP_CATALOG = {
@@ -92,7 +92,9 @@ MULTI_CLIP_CATALOG = {
         "Tanjiro vs Hantengu Swordsmith Village 4K scenepack logless"
     ],
     "rengoku": [
+        "https://www.youtube.com/watch?v=U34Hn8cv_U4",
         "Rengoku vs Akaza Mugen Train 4K 60FPS scenepack logless",
+        "Kimetsu no Yaiba / Demon Slayer Rengoku vs Akaza 4K | No Subtitle & No Copyright",
         "Rengoku Ninth Form Flame Tiger 4K 60FPS scenepack logless"
     ],
     "zenitsu": [
@@ -246,7 +248,8 @@ def fetch_character_scenepack(
     Downloads and slices real 4K/1080p footage for a character with multi-query rotation.
     """
     is_marvel = character_key in ["spiderman", "ironman", "thor", "thanos", "wolverine", "loki"]
-    universe_dir = MARVEL_DIR if is_marvel else JJK_DIR
+    is_ds = character_key in ["tanjiro", "rengoku", "zenitsu", "akaza", "giyu", "tengen", "inosuke", "muzan", "nezuko", "muichiro", "gyutaro"]
+    universe_dir = MARVEL_DIR if is_marvel else (DEMONSLAYER_DIR if is_ds else JJK_DIR)
     universe_dir.mkdir(parents=True, exist_ok=True)
     
     # Pick a random query from catalog to guarantee diverse scene coverage
@@ -264,7 +267,8 @@ def fetch_character_scenepack(
     cmd = [
         "yt-dlp",
         "--extractor-args", "youtube:player_client=android,web",
-        "-f", "b[ext=mp4]/b",
+        "-f", "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/bv*+ba/b",
+        "--merge-output-format", "mp4",
         "-o", str(temp_raw),
         target,
         "--max-downloads", "1"

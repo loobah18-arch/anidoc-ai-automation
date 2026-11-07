@@ -44,9 +44,11 @@ def main():
     parser.add_argument("--title", type=str, default=None, help="Custom video title")
     parser.add_argument("--cc", type=str, default=None, help="4K HDR Color Grade Preset (jjk_void, sukuna_shrine, hinokami_flame, thunder_gold, water_breathing, flame_hashira, akaza_compass, cyber_phonk)")
     parser.add_argument("--gdrive-folder", type=str, default=None, help="Google Drive folder URL or ID to pull movie/episode footage from")
+    parser.add_argument("--episode", type=str, default=None, help="Specific episode code or filename substring from Google Drive (e.g. S01E19, S02E10, S01E17, S02E07, S02E16, S02E21)")
     parser.add_argument("--github-repo", type=str, default=None, help="GitHub repository URL or slug to fetch video clips from")
     parser.add_argument("--audio", type=str, default=None, help="Path to custom audio file")
     parser.add_argument("--output", type=str, default=None, help="Output MP4 path")
+    parser.add_argument("--resolution", type=str, choices=["1080p", "1440p", "2k", "4k"], default=None, help="Output resolution preset (default: 1440p)")
     parser.add_argument("--upload", action="store_true", help="Upload rendered video to YouTube Shorts")
     parser.add_argument("--privacy", type=str, choices=["public", "unlisted", "private"], default="public", help="YouTube video privacy status")
     parser.add_argument("--refresh-clips", action="store_true", help="Download and slice a fresh scenepack for the character")
@@ -54,6 +56,23 @@ def main():
     parser.add_argument("--port", type=int, default=7860, help="Port for AniDoc Studio server (default: 7860)")
     
     args = parser.parse_args()
+
+    # Apply resolution configuration if explicitly provided
+    if args.resolution:
+        import config.settings as settings
+        res_key = args.resolution.lower()
+        if res_key in settings.RESOLUTION_PRESETS:
+            w, h = settings.RESOLUTION_PRESETS[res_key]
+            settings.VIDEO_WIDTH = w
+            settings.VIDEO_HEIGHT = h
+            settings.FOREGROUND_WIDTH = w
+            settings.FOREGROUND_HEIGHT = int(w * 5 / 4)
+            settings.FOREGROUND_Y_OFFSET = (h - settings.FOREGROUND_HEIGHT) // 2
+            settings.ACTIVE_FRAME_HEIGHT = settings.FOREGROUND_HEIGHT
+            settings.LETTERBOX_TOP_BAR = settings.FOREGROUND_Y_OFFSET
+            settings.LETTERBOX_BOT_BAR = settings.FOREGROUND_Y_OFFSET
+            settings.LETTERBOX_BAR_HEIGHT = settings.FOREGROUND_Y_OFFSET
+            print(f"📐 [Resolution] Configured output resolution to {res_key.upper()} ({w}x{h}, 9:16 portrait)")
     
     # If --studio is specified, launch web video editor
     if args.studio:
@@ -66,6 +85,21 @@ def main():
         target_universe = "demonslayer"
 
     chosen_char = args.character
+    target_episode = args.episode
+
+    # If episode is explicitly provided, infer character & universe if not set
+    if target_episode:
+        from core.timestamp_loader import match_episode_code_from_filename, load_episode_metadata
+        ep_code = match_episode_code_from_filename(target_episode) or target_episode.upper()
+        ep_meta = load_episode_metadata(ep_code)
+        if ep_meta:
+            if not target_universe:
+                target_universe = ep_meta.get("universe", "demonslayer")
+            if not chosen_char and ep_meta.get("characters"):
+                # Pick the lead protagonist/fighter
+                chosen_char = ep_meta["characters"][0].get("name", "").lower()
+                print(f"🎬 [Main] Inferred character '{chosen_char}' and universe '{target_universe}' from episode '{ep_code}'")
+
     if chosen_char:
         if chosen_char not in CHARACTER_THEMES:
             raise ValueError(f"Unknown character '{chosen_char}'. Valid options: {list(CHARACTER_THEMES.keys())}")
@@ -102,7 +136,8 @@ def main():
         github_repo=args.github_repo,
         gdrive_folder=args.gdrive_folder,
         auto_fetch_clips=True,
-        force_refresh=args.refresh_clips
+        force_refresh=args.refresh_clips,
+        target_episode=args.episode
     )
     
     output_path = result["output_path"]
@@ -161,10 +196,83 @@ def main():
                 title=metadata["title"],
                 description=metadata["description"],
                 tags=metadata["tags"],
-                privacy_status=args.privacy
+                privacy_status=args.privacy,
+                bgm_track=result.get("audio_used", ""),
             )
             if upload_res.get("status") == "success":
                 print(f"🌟 Published to YouTube: {upload_res.get('url')}")
+            elif upload_res.get("status") == "blocked":
+                block_type = upload_res.get("block_type", "both")
+                print(f"🛑 [YouTube] Upload blocked by YouTube: reason='{upload_res.get('rejection_reason')}', identified_cause='{block_type}'.")
+                print("🔄 [Pipeline Restart] Restarting workflow with cause-specific copyright remediation...")
+
+                ncs_track_path = Path(__file__).resolve().parent / "assets/audio/ncs/cradles.mp3"
+                if not ncs_track_path.exists():
+                    ncs_track_path = Path(__file__).resolve().parent / "assets/audio/ncs/aerohead_fragments_recap.mp3"
+
+                alt_audio_path = None
+                alt_phonk = None
+                should_remove_clip = False
+
+                if block_type == "audio":
+                    print("🎵 [NCS Audio Swarm] BGM was identified as copyrighted. Switching to verified copyright-free NCS song (Sub Urban - Cradles [NCS Release])...")
+                    alt_audio_path = ncs_track_path if ncs_track_path.exists() else None
+                    alt_phonk = "ncs_cradles"
+                elif block_type == "clip":
+                    print("✂️ [Clip Remover] Video clip was identified as copyrighted. Removing the offending clip from the timeline...")
+                    should_remove_clip = True
+                    curr_phonk = args.phonk or result.get("audio_used", "")
+                    alt_phonk = curr_phonk
+                else:  # both
+                    print("🛡️ [Dual Remediation] Both clip and audio require remediation. Removing copyrighted clip AND switching to NCS copyright-free song...")
+                    should_remove_clip = True
+                    alt_audio_path = ncs_track_path if ncs_track_path.exists() else None
+                    alt_phonk = "ncs_cradles"
+
+                # Style adaptation
+                curr_sub_style = sub_style or "spur_hook"
+                alt_sub_style = "viral_karaoke" if curr_sub_style == "spur_hook" else "spur_hook"
+                cc_choices = ["cyber_phonk", "hinokami_flame", "cool_blue", "marvel_hdr", "thunder_gold"]
+                current_cc = args.cc or result.get("cc_preset", "")
+                alt_cc = next((c for c in cc_choices if c != current_cc), "cyber_phonk")
+
+                print(f"🎨 [Remediated Style] Cause='{block_type}' | Subtitles='{alt_sub_style}' | CC='{alt_cc}' | ClipRemoved={should_remove_clip}")
+
+                alt_output_file = output_path.parent / f"{output_path.stem}_remediated.mp4"
+                alt_result = render_cinematic_edit(
+                    character_key=chosen_char,
+                    audio_path=alt_audio_path,
+                    phonk_track=alt_phonk,
+                    output_path=alt_output_file,
+                    target_duration=args.duration,
+                    subtitle_style=alt_sub_style,
+                    burn_subtitles=burn_subs,
+                    enable_subtitles=burn_subs,
+                    custom_quote=args.quote,
+                    custom_title=args.title,
+                    cc_preset=alt_cc,
+                    github_repo=args.github_repo,
+                    gdrive_folder=args.gdrive_folder,
+                    auto_fetch_clips=True,
+                    force_refresh=False,
+                    remove_copyrighted_clip=should_remove_clip,
+                )
+                alt_output_path = alt_result["output_path"]
+                alt_meta = alt_result["metadata"]
+
+                print(f"🚀 [YouTube] Re-attempting upload with remediated Short: {alt_output_path.name}...")
+                alt_upload_res = upload_video_to_youtube(
+                    video_path=alt_output_path,
+                    title=f"{alt_meta['title']}",
+                    description=alt_meta["description"],
+                    tags=alt_meta["tags"],
+                    privacy_status=args.privacy,
+                    bgm_track="ncs_cradles" if alt_audio_path else "",
+                )
+                if alt_upload_res.get("status") == "success":
+                    print(f"🌟 Published remediated video to YouTube: {alt_upload_res.get('url')}")
+                else:
+                    print(f"⚠️ Remediated upload status: {alt_upload_res.get('status')} ({alt_upload_res.get('reason') or alt_upload_res.get('error')})")
             else:
                 print(f"⚠️ YouTube upload status: {upload_res.get('status')} ({upload_res.get('reason') or upload_res.get('error')})")
 

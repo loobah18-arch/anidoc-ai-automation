@@ -4,6 +4,7 @@ Validates Phonk Audio Library, Public API / GitHub Clip Fetcher, Subtitle Styliz
 """
 import unittest
 import subprocess
+import re
 from pathlib import Path
 
 from config.settings import SCRATCH_DIR, VIDEO_WIDTH, VIDEO_HEIGHT, CC_PRESETS, PHONK_DIR
@@ -243,13 +244,13 @@ class TestAniDocPipeline(unittest.TestCase):
             fps=60,
             is_intro_hook=True
         )
-        # 6% edge crop
-        self.assertIn("crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06", dual_chain)
+        # Centered 3% edge crop
+        self.assertIn("crop=in_w*0.94:in_h*0.94:(in_w-in_w*0.94)/2:(in_h-in_h*0.94)/2", dual_chain)
         # Blurred synced background (1080x1920, boxblur=28:5, brightness 0.45)
         self.assertIn("boxblur=28:5", dual_chain)
         self.assertIn("colorchannelmixer=aa=1.0:rr=0.45:gg=0.45:bb=0.45", dual_chain)
-        # 4:5 Foreground (1080x1350) with 4px border at y=285
-        self.assertIn("drawbox=x=0:y=0:w=1080:h=1350:color=white@0.65:t=4", dual_chain)
+        # 4:5 Foreground (1080x1350) clean borderless action framing at y=285
+        self.assertNotIn("drawbox=", dual_chain)
         self.assertIn("overlay=x=0:y=285", dual_chain)
 
         # 4. Selective Bloom / Glow (Highlights > 185, additive 30%)
@@ -385,6 +386,245 @@ class TestAniDocPipeline(unittest.TestCase):
         self.assertTrue(test_out.exists())
         self.assertGreater(test_out.stat().st_size, 5000)
         test_out.unlink(missing_ok=True)
+
+    def test_14_precise_motion_tracking_and_montagem_zora(self):
+        """Verifies Montagem Zora BGM catalog entry and precise motion tracking engine."""
+        # 1. Montagem Zora phonk retrieval & catalog verification
+        from core.phonk_manager import get_random_or_specified_phonk, POPULAR_PHONK_CATALOG
+        zora_catalog = [item for item in POPULAR_PHONK_CATALOG if item["id"] == "montagem_zora"]
+        self.assertEqual(len(zora_catalog), 1, "Montagem Zora should exist in catalog")
+        self.assertEqual(zora_catalog[0]["bpm"], 110.0)
+
+        zora_path = get_random_or_specified_phonk("zora")
+        self.assertIsNotNone(zora_path)
+        self.assertTrue(Path(zora_path).exists())
+        self.assertIn("montagem_zora", Path(zora_path).name)
+
+        # 2. Motion tracker cascade models
+        from core.motion_tracker import (
+            get_cascades,
+            detect_active_content_bounds,
+            detect_subject_focal_point,
+            extract_motion_trajectory,
+            build_precise_motion_tracking_filter
+        )
+        cascades = get_cascades()
+        self.assertIsInstance(cascades, list)
+
+        # 3. Content bounds detection (even dimensions)
+        import numpy as np
+        test_frame = np.zeros((1080, 1920, 3), dtype=np.uint8)
+        test_frame[60:1020, 120:1800] = 180  # Simulating active content
+        l, t, w, h = detect_active_content_bounds(test_frame)
+        self.assertEqual(w % 2, 0)
+        self.assertEqual(h % 2, 0)
+
+        # 4. Focal point detection
+        cx, cy, conf = detect_subject_focal_point(test_frame)
+        self.assertTrue(0.0 <= cx <= 1.0)
+        self.assertTrue(0.0 <= cy <= 1.0)
+
+        # 5. Precise motion tracking filter builder
+        filter_str = build_precise_motion_tracking_filter(
+            duration=1.5,
+            video_width=1080,
+            video_height=1920,
+            camera_motion="push_in"
+        )
+        self.assertIn("scale=1080:1920", filter_str)
+        self.assertIn("crop=", filter_str)
+        self.assertIn("setsar=1", filter_str)
+
+    def test_15_adaptive_dual_layer_framing_and_dynamic_captions(self):
+        """Verifies adaptive dual-layer framing (Strategy A+B) and dynamic phrase subtitles."""
+        from core.effects_engine import build_velocity_clip_filter
+        from core.subtitle_stylizer import generate_kinetic_subtitles
+
+        # 1. Dual-layer chain with input/output tags
+        v_chain = build_velocity_clip_filter(
+            seg_idx=0,
+            duration=1.5,
+            video_width=1080,
+            video_height=1920,
+            input_tag="[0:v]",
+            output_tag="[v0]"
+        )
+        self.assertTrue(v_chain.startswith("[0:v]"))
+        self.assertTrue(v_chain.endswith("[v0]"))
+        self.assertIn("setsar=1", v_chain)
+
+        # 2. Engaging question subtitles with spur_hook (setup -> punchline at drop, no random LowerHype phrases)
+        ass_path = SCRATCH_DIR / "test_dynamic_subs.ass"
+        generate_kinetic_subtitles(
+            quote_text="IS SATORU GOJO TRULY | THE STRONGEST IN ANIME HISTORY?",
+            start_time=0.0,
+            end_time=25.0,
+            output_ass_path=ass_path,
+            style_preset="spur_hook",
+            character_name="gojo",
+            drop_time=5.4
+        )
+        self.assertTrue(ass_path.exists())
+        content = ass_path.read_text(encoding="utf-8")
+        self.assertIn("BaseText", content)
+        self.assertNotIn("LowerHype", content)
+        self.assertIn("TRULY", content)
+        self.assertIn("STRONGEST", content)
+        ass_path.unlink(missing_ok=True)
+
+    def test_16_proper_conversation_buildup_and_combat_purging(self):
+        """Verifies proper continuous dialogue buildup (>10s), 14.1s beat drop, and post-drop combat isolation."""
+        from core.beat_detector import generate_procedural_beat_grid, analyze_audio_beats
+        from core.timestamp_loader import load_episode_metadata
+        from core.subtitle_stylizer import generate_kinetic_subtitles
+
+        # 1. 42s beat grid: effective drop is at 14.128s, with single continuous dialogue shot before drop
+        grid = generate_procedural_beat_grid(duration=42.0, drop_time=14.128, bpm=110.0)
+        self.assertAlmostEqual(grid.drop_time, 14.13, delta=0.1)
+        segments = grid.get_cut_segments()
+        intro_segs = [s for s in segments if not s["is_drop"]]
+        combat_segs = [s for s in segments if s["is_drop"]]
+
+        # Pre-fight conversation is a single continuous unbroken shot before the drop
+        self.assertEqual(len(intro_segs), 1)
+        self.assertGreaterEqual(intro_segs[0]["duration"], 14.0)
+
+        # Combat has rapid cuts
+        self.assertGreaterEqual(len(combat_segs), 20)
+
+        # 2. Episode S02E06 metadata verifies dialogue scenes vs combat scenes
+        meta = load_episode_metadata("DS_S02E06")
+        self.assertIsNotNone(meta)
+        scenes = meta.get("scenes", [])
+        dialogue_scenes = [s for s in scenes if s["start"] < 885.0]
+        combat_scenes = [s for s in scenes if s["start"] >= 885.0]
+
+        self.assertGreaterEqual(len(dialogue_scenes), 3)
+        self.assertGreaterEqual(len(combat_scenes), 4)
+        # Verify dialogue descriptions
+        self.assertTrue(any("demonhood" in s["description"].lower() or "eternal" in s["description"].lower() for s in dialogue_scenes))
+        self.assertTrue(any("mortal beauty" in s["description"].lower() for s in dialogue_scenes))
+        self.assertTrue(any("compass needle" in s["description"].lower() for s in dialogue_scenes))
+        # Verify all combat scenes are purely combat clashes
+        for cs in combat_scenes:
+            self.assertTrue(cs["start"] >= 885.0)
+            self.assertIn("combat", cs["description"].lower())
+
+        # 3. Verify reference dialogue subtitles integration (matching reference XeqGgslY3h0: English ALL CAPS, word-by-word accumulation, no speaker tags, no top hook clutter)
+        self.assertIn("intro_dialogue", meta)
+        self.assertGreaterEqual(len(meta["intro_dialogue"]), 3)
+        ass_path = SCRATCH_DIR / "test_dialogue_subs.ass"
+        generate_kinetic_subtitles(
+            quote_text="CAN RENGOKU DEFEAT AKAZA? | OR DIE PROTECTING EVERYONE?",
+            start_time=0.0,
+            end_time=42.0,
+            output_ass_path=ass_path,
+            style_preset="spur_hook",
+            character_name="rengoku",
+            drop_time=14.128,
+            dialogue_lines=meta["intro_dialogue"]
+        )
+        self.assertTrue(ass_path.exists())
+        sub_text = ass_path.read_text(encoding="utf-8")
+        self.assertIn("DialogueSub", sub_text)
+        # Dynamic word-by-word accumulation events
+        dialogue_events = [l for l in sub_text.splitlines() if "Dialogue: 2" in l]
+        self.assertGreaterEqual(len(dialogue_events), 15)
+        # Subtitles contain ONLY what characters speak in clean ALL CAPS with pop tag and signature neon glow
+        clean_text = re.sub(r"\{.*?\}", "", sub_text)
+        self.assertIn("BECOME A DEMON", clean_text)
+        self.assertIn("I WILL NOT", clean_text)
+        self.assertIn("STRENGTH", clean_text)
+        self.assertIn("HASHIRA", clean_text)
+        self.assertNotIn("SEA OF FIRE", clean_text)
+        self.assertIn(r"\blur4", sub_text)
+        self.assertIn(r"\fscx112", sub_text)
+        # Zero speaker tags or badges (Akaza:, Rengoku:, [Akaza])
+        self.assertFalse(any("akaza:" in line.lower() or "rengoku:" in line.lower() for line in sub_text.splitlines()))
+        self.assertFalse(any("[akaza]" in line.lower() or "[rengoku]" in line.lower() for line in sub_text.splitlines()))
+        # Zero distracting top hook clutter during dialogue
+        self.assertNotIn("CAN RENGOKU DEFEAT AKAZA", sub_text)
+        ass_path.unlink(missing_ok=True)
+
+        # 4. Verify dynamic zoom in / zoom out velocity profiles matching reference FtImSrL2DOg
+        from core.effects_engine import get_segment_velocity_profile
+        drop_prof = get_segment_velocity_profile({"is_drop": True, "duration": 1.2, "is_first_drop": True}, 1, 25)
+        self.assertGreaterEqual(drop_prof["scale_factor"], 1.30)
+
+        repeat_punch = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0, "is_repeat": True, "repeat_count": 1}, 5, 25)
+        self.assertGreaterEqual(repeat_punch["scale_factor"], 1.35)
+        repeat_out = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0, "is_repeat": True, "repeat_count": 2}, 6, 25)
+        self.assertLessEqual(repeat_out["scale_factor"], 1.15)
+
+        combat_zoom_in = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0}, 2, 25)
+        combat_zoom_out = get_segment_velocity_profile({"is_drop": True, "prev_is_drop": True, "duration": 1.0}, 3, 25)
+        self.assertGreater(combat_zoom_in["scale_factor"], combat_zoom_out["scale_factor"])
+
+    def test_17_multi_episode_selection_and_repeat_detection(self):
+        """Verifies multi-episode candidate selection (S02E06 + S02E07) and timestamp-aware repeat tracking."""
+        import re
+        from core.gdrive_manager import pick_character_episodes
+
+        dummy_files = [
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E06.mp4", "id": "f6"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E07.mp4", "id": "f7"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4", "id": "f19"},
+        ]
+        chosen = pick_character_episodes(dummy_files, "rengoku", max_episodes=2)
+        self.assertEqual(len(chosen), 2)
+        chosen_names = [c["name"] for c in chosen]
+        self.assertIn("Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E06.mp4", chosen_names)
+        self.assertIn("Demon_Slayer_Kimetsu_no_Yaiba_480P_S02_E07.mp4", chosen_names)
+
+        # Repeat scene key extraction across slices
+        def get_key(cp_str):
+            ep_match = re.search(r"ep(\d+)", cp_str)
+            ts_match = re.search(r"(\d+)s(?:\.mp4)?", cp_str)
+            ep_tag = ep_match.group(1) if ep_match else "0"
+            return f"ep{ep_tag}_{ts_match.group(1)}s" if ts_match else cp_str
+
+        k1 = get_key("rengoku_gdrive_ep1_02_885s.mp4")
+        k2 = get_key("rengoku_gdrive_ep1_14_885s.mp4")
+        self.assertEqual(k1, "ep1_885s")
+        self.assertEqual(k1, k2)
+
+    def test_18_reference_benchmark_and_full_arc_pacing(self):
+        """Verifies reference metrics loading (including 9-vT3Vmzp-8 Reze Poker Face),
+        full musical arc pacing (71.0s), and reference comparison score."""
+        from core.automated_edit_reviewer import load_reference_benchmarks, review_edit_and_benchmark, generate_markdown_report
+        from core.beat_detector import generate_procedural_beat_grid
+
+        # 1. Load reference benchmarks
+        ref_data = load_reference_benchmarks()
+        self.assertIn("reference_02", ref_data)
+        ref_02 = ref_data["reference_02"]
+        self.assertAlmostEqual(ref_02["signal_metrics"]["yavg"], 75.6203, places=2)
+        self.assertAlmostEqual(ref_02["signal_metrics"]["satavg"], 18.1086, places=2)
+        self.assertAlmostEqual(ref_02["signal_metrics"]["ydif"], 39.3458, places=2)
+        self.assertEqual(ref_02["scene_cut_count"], 28)
+
+        # 2. Test full 71.0s musical arc grid (Poker Face reference pacing)
+        grid_71 = generate_procedural_beat_grid(duration=71.0, drop_time=16.0, bpm=120.0)
+        self.assertEqual(grid_71.duration, 71.0)
+        self.assertEqual(grid_71.drop_time, 16.0)
+        segs_71 = grid_71.get_cut_segments()
+        self.assertGreaterEqual(len(segs_71), 25, "Full 71s arc should produce 25+ cuts")
+
+        # Verify that cuts exist in intro, verse, pre-chorus build, and climax
+        cut_starts = [s["start"] for s in segs_71]
+        self.assertTrue(any(s >= 16.0 and s < 40.0 for s in cut_starts))
+        self.assertTrue(any(s >= 40.0 and s < 56.0 for s in cut_starts))
+        self.assertTrue(any(s >= 56.0 for s in cut_starts))
+
+        # 3. Test reviewer with reference benchmark integration
+        out_video = SCRATCH_DIR / "test_assembled_edit.mp4"
+        if out_video.exists():
+            review = review_edit_and_benchmark(out_video, expected_drop_time=1.5)
+            self.assertIn("reference_benchmark", review)
+            if review["reference_benchmark"]:
+                self.assertIn("similarity_score", review["reference_benchmark"])
+                report = generate_markdown_report(review)
+                self.assertIn("Pro Reference Benchmark Comparison", report)
 
 
 if __name__ == "__main__":

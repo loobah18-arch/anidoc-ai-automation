@@ -1,7 +1,7 @@
 {
   "episode_code": "DS_S02E06",
   "title": "Akaza",
-  "duration": 1440.0,
+  "duration": 1420.0,
   "universe": "demonslayer",
   "characters": [
     {
@@ -25,75 +25,143 @@
       ]
     }
   ],
-  "scene_count": 5,
+  "scene_count": 7,
   "source": "Google Drive - Demon Slayer Collection",
-  "notes": "DEMONSLAYER combat episode",
+  "notes": "DEMONSLAYER Mugen Train Akaza vs Rengoku definitive pre-fight dialogue and combat",
+  "intro_dialogue": [
+    {
+      "speaker": "Akaza",
+      "text": "WHY DON'T YOU BECOME A DEMON TOO?",
+      "start_rel": 0.6,
+      "end_rel": 3.6,
+      "glow_color": "&H00D946EF"
+    },
+    {
+      "speaker": "Rengoku",
+      "text": "I WILL NOT.",
+      "start_rel": 3.8,
+      "end_rel": 5.1,
+      "glow_color": "&H0000D4FF"
+    },
+    {
+      "speaker": "Akaza",
+      "text": "I CAN SENSE YOUR INCREDIBLE STRENGTH.",
+      "start_rel": 5.4,
+      "end_rel": 8.8,
+      "glow_color": "&H00D946EF"
+    },
+    {
+      "speaker": "Akaza",
+      "text": "YOU'RE A HASHIRA, AREN'T YOU?",
+      "start_rel": 9.1,
+      "end_rel": 13.6,
+      "glow_color": "&H00D946EF"
+    }
+  ],
   "scenes": [
     {
-      "start": 120.0,
-      "end": 300.0,
-      "action_level": "EXPLOSIVE",
+      "start": 752.0,
+      "end": 770.0,
+      "action_level": "INTENSE",
       "priority": "high",
-      "description": "Upper Moon 3 Akaza lands with crushing ground shockwave",
+      "description": "Pre-fight dialogue conversation: Akaza speaks, tempting Rengoku to become a demon for eternal strength",
       "characters_present": [
         "akaza",
-        "rengoku",
-        "tanjiro"
+        "rengoku"
       ],
-      "action_score": 0.95,
-      "duration": 180.0
+      "action_score": 0.85,
+      "duration": 18.0
     },
     {
-      "start": 360.0,
-      "end": 540.0,
-      "action_level": "EXPLOSIVE",
+      "start": 788.0,
+      "end": 810.0,
+      "action_level": "INTENSE",
       "priority": "high",
-      "description": "Akaza activates Destructive Death Compass Needle snowflake martial grid",
-      "characters_present": [
-        "akaza"
-      ],
-      "action_score": 0.95,
-      "duration": 180.0
-    },
-    {
-      "start": 540.0,
-      "end": 780.0,
-      "action_level": "EXPLOSIVE",
-      "priority": "high",
-      "description": "Rengoku Flame Breathing First Form charge clashes with Akaza Air Type",
+      "description": "Pre-fight dialogue conversation: Rengoku answers with mortal beauty speech and absolute refusal to become a demon",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
-      "action_score": 0.95,
-      "duration": 240.0
+      "action_score": 0.90,
+      "duration": 22.0
     },
     {
-      "start": 840.0,
-      "end": 1080.0,
+      "start": 872.0,
+      "end": 886.5,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "High-velocity sword and fist trades, Tanjiro cannot track their speed",
+      "description": "Pre-fight dialogue conversation: Akaza activates Destructive Death Compass Needle, Rengoku draws Nichirin sword in slow-mo",
       "characters_present": [
-        "rengoku",
         "akaza",
-        "tanjiro"
+        "rengoku"
       ],
       "action_score": 0.95,
-      "duration": 240.0
+      "duration": 14.5
     },
     {
-      "start": 1140.0,
-      "end": 1380.0,
+      "start": 886.5,
+      "end": 902.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Flame Breathing Fifth Form Flame Tiger roaring clash against Destructive Death Disorder",
+      "description": "Combat clash: Rengoku Flame Breathing First Form Sea of Fire high-speed charge vs Akaza",
+      "characters_present": [
+        "rengoku",
+        "akaza"
+      ],
+      "action_score": 1.0,
+      "duration": 15.5
+    },
+    {
+      "start": 945.0,
+      "end": 960.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Combat clash: Akaza Destructive Death Air Type shockwave barrage",
+      "characters_present": [
+        "akaza",
+        "rengoku"
+      ],
+      "action_score": 0.95,
+      "duration": 15.0
+    },
+    {
+      "start": 975.0,
+      "end": 1005.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Combat clash: Rengoku deflecting shockwave attacks and charging sword slashes",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
       "action_score": 0.95,
-      "duration": 240.0
+      "duration": 30.0
+    },
+    {
+      "start": 1080.0,
+      "end": 1130.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Combat clash: Fourth Form Blooming Flame Undulation circular slash defense",
+      "characters_present": [
+        "rengoku",
+        "akaza"
+      ],
+      "action_score": 0.95,
+      "duration": 50.0
+    },
+    {
+      "start": 1180.0,
+      "end": 1230.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Combat clash: Flame Breathing Fifth Form Flame Tiger roaring clash against Destructive Death Disorder",
+      "characters_present": [
+        "rengoku",
+        "akaza"
+      ],
+      "action_score": 1.0,
+      "duration": 50.0
     }
   ]
 }

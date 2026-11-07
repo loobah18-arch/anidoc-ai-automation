@@ -60,9 +60,9 @@ def interpolate_video_to_60fps(
     except Exception:
         pass
 
-    # 2. Fast High-Fidelity 60fps Stream Conversion via FFmpeg
+    # 2. Fast High-Fidelity 60fps Stream Conversion via FFmpeg motion frame interpolation
     print(f"⚡ [OpticalFlow] Upgrading '{input_video.name}' to {target_fps}fps...")
-    interp_vf = f"fps={target_fps}"
+    interp_vf = f"framerate=fps={target_fps}:interp_start=15:interp_end=240:scene=10.0"
     
     cmd = [
         "ffmpeg", "-y",

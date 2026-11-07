@@ -22,14 +22,21 @@ on:
         required: false
         default: ''
         type: string
+      episode:
+        description: 'Specific episode code from Google Drive (e.g. S01E19, S02E10, S01E17, S02E07, S02E16, S02E21, or leave empty for auto-rotation)'
+        required: false
+        default: ''
+        type: string
       phonk:
         description: 'Phonk BGM Track (or random for auto-rotation)'
         required: false
-        default: 'random'
+        default: 'montagem_zora'
         type: choice
         options:
-          - 'random'
+          - 'montagem_zora'
+          - 'poker_face'
           - 'rayelo_ultraslowed'
+          - 'random'
           - 'montagem_vozes_profundas'
           - 'glxxmstrider_dont_stop_slowed'
           - 'rubikdice_montagem_pegadora_slowed'
@@ -50,15 +57,29 @@ on:
         required: false
         default: ''
         type: string
+      resolution:
+        description: 'Output Resolution (1440p QHD upscale, 4k UHD, or 1080p FHD)'
+        required: false
+        default: '1440p'
+        type: choice
+        options:
+          - '1440p'
+          - '4k'
+          - '1080p'
+      duration:
+        description: 'Target Video Duration in seconds (e.g. 42.0 for proper conversation buildup, or 28.0)'
+        required: false
+        default: '42.0'
+        type: string
       refresh_clips:
         description: 'Download & slice fresh scenepack cuts (multi-source: yt-dlp → Archive.org → Pixabay)'
         required: false
         default: false
         type: boolean
       upload:
-        description: 'Upload rendered Short to YouTube (enabled by default)'
+        description: 'Upload rendered Short to YouTube (disabled by default on this branch)'
         required: false
-        default: true
+        default: false
         type: boolean
 
 jobs:
@@ -121,7 +142,8 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
-          CMD="python main.py --duration 28.0"
+          TARGET_DUR="${{ github.event.inputs.duration || '42.0' }}"
+          CMD="python main.py --duration $TARGET_DUR"
 
 
 
@@ -149,6 +171,10 @@ jobs:
           if [ -n "${{ github.event.inputs.character }}" ]; then
             CMD="$CMD --character ${{ github.event.inputs.character }}"
           fi
+
+          if [ -n "${{ github.event.inputs.episode }}" ]; then
+            CMD="$CMD --episode '${{ github.event.inputs.episode }}'"
+          fi
           
           if [ "${{ github.event.inputs.phonk }}" != "random" ] && [ -n "${{ github.event.inputs.phonk }}" ]; then
             CMD="$CMD --phonk ${{ github.event.inputs.phonk }}"
@@ -157,20 +183,25 @@ jobs:
           if [ -n "${{ github.event.inputs.gdrive_folder }}" ]; then
             CMD="$CMD --gdrive-folder '${{ github.event.inputs.gdrive_folder }}'"
           fi
+
+          if [ -n "${{ github.event.inputs.resolution }}" ]; then
+            CMD="$CMD --resolution ${{ github.event.inputs.resolution }}"
+          else
+            CMD="$CMD --resolution 1440p"
+          fi
           
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
           
-          # YouTube uploads: enabled by default (unless explicitly set to false),
-          # and enabled for scheduled daily runs on the main branch.
+          # YouTube uploads: STRICTLY DISABLED on this feature branch! Output is intended for Phone Only delivery.
           if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.ref_name }}" = "main" ]; then
             echo "🚀 [Publish] Scheduled daily upload on main."
             CMD="$CMD --upload"
-          elif [ "${{ github.event.inputs.upload }}" != "false" ]; then
-            echo "🚀 [Publish] YouTube upload enabled."
+          elif [ "${{ github.event.inputs.upload }}" = "true" ] && [ "${{ github.ref_name }}" = "main" ]; then
+            echo "🚀 [Publish] Explicit upload requested on main."
             CMD="$CMD --upload"
           else
-            echo "🔒 [Testing Mode] Skipping YouTube upload for this run (upload=false requested)."
+            echo "🔒 [Testing/Phone Mode] Skipping YouTube upload (Phone Only delivery)."
           fi
           
           echo "Executing: $CMD"

@@ -19,6 +19,7 @@ Phonk: Live trending August 2026 fetch via yt-dlp YouTube search.
 import os
 import subprocess
 import random
+import re
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
@@ -50,7 +51,8 @@ from core.effects_engine import (
     build_pre_drop_audio_vacuum_filter,
     build_combat_foley_audio_filter
 )
-from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS
+from core.subtitle_stylizer import generate_kinetic_subtitles, SUBTITLE_STYLE_PRESETS, DEFAULT_CHARACTER_DIALOGUE
+from core.timestamp_loader import load_episode_metadata, match_episode_code_from_filename
 from core.quote_ai import generate_edit_metadata, format_anime_description
 from core.opencut_engine import build_clip_audio_fade
 from core.smart_downloader import smart_fetch_clips
@@ -94,7 +96,10 @@ def render_cinematic_edit(
     github_repo: Optional[str] = None,
     gdrive_folder: Optional[str] = None,
     auto_fetch_clips: bool = True,
-    force_refresh: bool = False
+    force_refresh: bool = False,
+    exclude_clip_paths: Optional[List[str]] = None,
+    remove_copyrighted_clip: bool = False,
+    target_episode: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Renders an automated 4K Phonk / Scene Edit Short (9:16 Portrait, 1080x1920).
@@ -180,14 +185,39 @@ def render_cinematic_edit(
                 gdrive_url_or_id=gdrive_target,
                 target_character=character_key,
                 output_dir=universe_dir,
-                n_clips=n_clips + 4,
+                n_clips=max(n_clips + 10, 30),
                 title=title_text,
                 drop_index=drop_idx,
-                clip_duration=max(5.5, max_needed_dur + 1.5)
+                clip_duration=max(5.5, max_needed_dur + 1.5),
+                target_episode=target_episode
             )
             if gdrive_clips:
                 clip_paths = gdrive_clips
                 print(f"✅ [GoogleDrive] Using {len(clip_paths)} high-definition action clips with original audio.")
+                # Quality Upgrade: If GDrive footage is low-res (<720p), augment with genuine 1080p/4K scenepack for combat cuts
+                is_low_res = any("480p" in str(p).lower() for p in gdrive_clips)
+                if not is_low_res and gdrive_clips:
+                    try:
+                        probe_res = subprocess.run(
+                            ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=height", "-of", "csv=p=0", str(gdrive_clips[0])],
+                            capture_output=True, text=True, timeout=5
+                        ).stdout.strip()
+                        if probe_res.isdigit() and int(probe_res) < 720:
+                            is_low_res = True
+                    except Exception:
+                        pass
+
+                if is_low_res and auto_fetch_clips:
+                    print(f"⚠️ [Resolution] Detected low-res footage (<720p). Sourcing genuine 1080p/4K scenepack for combat cuts...")
+                    try:
+                        from core.public_api_fetcher import fetch_character_scenepack
+                        hd_combat = fetch_character_scenepack(character_key, max_clips=n_clips)
+                        if hd_combat and len(hd_combat) >= 3:
+                            # Keep Clip 0 (pre-fight dialogue intro) from Google Drive for canon audio & dialogue alignment
+                            clip_paths = [gdrive_clips[0]] + hd_combat[:n_clips - 1]
+                            print(f"✨ [Resolution] Upgraded {len(clip_paths)-1} combat cuts to genuine 1080p/4K footage!")
+                    except Exception as e_hd:
+                        print(f"ℹ️ [Resolution] Scenepack fetch notice: {e_hd}")
         except Exception as e:
             print(f"⚠️  [GoogleDrive] Extraction failed: {e}")
 
@@ -235,6 +265,16 @@ def render_cinematic_edit(
             )
             clip_paths.extend(extra)
 
+    # ── Copyright Shield: Exclude or Remove Flagged/Copyrighted Clips ──
+    if exclude_clip_paths:
+        exclude_set = {str(Path(p).resolve()) for p in exclude_clip_paths} | {Path(p).name for p in exclude_clip_paths}
+        clip_paths = [p for p in clip_paths if str(Path(p).resolve()) not in exclude_set and Path(p).name not in exclude_set]
+        print(f"✂️ [ClipRemover] Excluded {len(exclude_clip_paths)} flagged clip(s). Remaining: {len(clip_paths)}")
+
+    if remove_copyrighted_clip and clip_paths:
+        removed = clip_paths.pop(0) if len(clip_paths) > 1 else None
+        print(f"✂️ [ClipRemover] Removed suspected copyrighted clip from timeline: {getattr(removed, 'name', str(removed))}")
+
     # ── Thematic Narrative Arc Sequencing (Storytelling flow) ──
     # Sort and map clips according to the 3-act structure:
     # 1. Setup / Monologue intro (first clip)
@@ -243,26 +283,17 @@ def render_cinematic_edit(
     if len(clip_paths) >= n_clips:
         n_intro = sum(1 for f in drop_flags if not f)
         intro_c = clip_paths[:n_intro] if n_intro > 0 else [clip_paths[0]]
-        combat_pool = clip_paths[n_intro:n_clips - 1] if n_clips > n_intro + 1 else clip_paths[n_intro:]
         finisher_c = clip_paths[-1]
-
+        combat_pool = [c for c in clip_paths[n_intro:-1] if c not in intro_c and c != finisher_c]
         if not combat_pool:
-            combat_pool = clip_paths[:]
+            combat_pool = [c for c in clip_paths if c not in intro_c] or clip_paths[:]
 
-        # ── Dual-Timeline Parallel Contrast Cutting ──
-        # Interleaves Stream A (Character Intent / Face & Eye Close-Up) with Stream B (Wide Sakuga / Slashing VFX)
-        if len(combat_pool) >= 2:
-            stream_a = combat_pool[0::2]
-            stream_b = combat_pool[1::2]
-        else:
-            stream_a = combat_pool
-            stream_b = combat_pool
-
+        # ── Chronological Narrative Progression ──
+        # Preserves strict 3-act escalation (Intro -> Combat Clashes -> Climax Finisher)
+        # without alternating back-and-forth between different battle states or injuries.
         ordered_clips = []
         in_i = 0
-        a_i = 0
-        b_i = 0
-        combat_step = 0
+        combat_i = 0
 
         for idx, (dur, is_d) in enumerate(zip(durations, drop_flags)):
             if not is_d:
@@ -271,13 +302,8 @@ def render_cinematic_edit(
             elif idx == n_clips - 1:
                 ordered_clips.append(finisher_c)
             else:
-                if combat_step % 2 == 0:
-                    ordered_clips.append(stream_a[a_i % len(stream_a)])
-                    a_i += 1
-                else:
-                    ordered_clips.append(stream_b[b_i % len(stream_b)])
-                    b_i += 1
-                combat_step += 1
+                ordered_clips.append(combat_pool[combat_i % len(combat_pool)])
+                combat_i += 1
         clip_paths = ordered_clips
     elif clip_paths:
         while len(clip_paths) < n_clips:
@@ -292,12 +318,42 @@ def render_cinematic_edit(
     # Micro-flash inserts REMOVED — reference uses rare flashes as overlays, not segments.
     # Flashes are handled via build_beat_flash_filters (2-3 total per edit) as overlays.
 
-    # 5. Viral Upper-Third Statement Subtitles (Spur World / Reference Style)
+    # 5. Viral Upper-Third Statement Subtitles (Spur World / Reference Style) + Dialogue Subtitles
     ass_path = None
     if enable_subtitles or burn_subtitles or subtitle_style == "spur_hook":
         try:
             ass_out = SCRATCH_DIR / f"subtitles_{character_key}.ass"
             quote_text = custom_quote or metadata.get("engagement_question") or metadata.get("quote") or metadata.get("title") or "WHO IS THE STRONGEST WARRIOR?"
+            
+            # Fetch pre-fight dialogue lines from metadata or fallback catalog
+            dialogue_lines = []
+            ep_meta = None
+            for cp in clip_paths:
+                code = match_episode_code_from_filename(cp.name)
+                if code:
+                    ep_meta = load_episode_metadata(code)
+                    if ep_meta:
+                        break
+            if not ep_meta:
+                default_ep = "DS_S02E06" if character_key in ("rengoku", "akaza") else ("JJK_S02E17" if character_key in ("sukuna", "mahoraga") else None)
+                if default_ep:
+                    ep_meta = load_episode_metadata(default_ep)
+
+            raw_dialogue = (ep_meta.get("intro_dialogue") if ep_meta else None) or DEFAULT_CHARACTER_DIALOGUE.get(character_key)
+            if raw_dialogue:
+                drop_t = beat_grid.drop_time
+                for item in raw_dialogue:
+                    s_rel = float(item.get("start_rel", 0.0))
+                    e_rel = float(item.get("end_rel", s_rel + 3.0))
+                    scale_f = min(1.0, drop_t / 14.0)
+                    dialogue_lines.append({
+                        "speaker": item.get("speaker", ""),
+                        "text": item.get("text", ""),
+                        "start": round(s_rel * scale_f, 2),
+                        "end": round(min(drop_t - 0.2, e_rel * scale_f), 2),
+                        "glow_color": item.get("glow_color", "")
+                    })
+
             ass_path = generate_kinetic_subtitles(
                 quote_text=quote_text,
                 start_time=0.2,
@@ -305,9 +361,10 @@ def render_cinematic_edit(
                 output_ass_path=ass_out,
                 style_preset=subtitle_style or "spur_hook",
                 character_name=theme["name"],
-                drop_time=beat_grid.drop_time
+                drop_time=beat_grid.drop_time,
+                dialogue_lines=dialogue_lines
             )
-            print(f"✨ [Subtitles] Generated viral '{subtitle_style}' ASS subtitles: {ass_path.name}")
+            print(f"✨ [Subtitles] Generated viral '{subtitle_style}' ASS subtitles with {len(dialogue_lines)} dialogue lines: {ass_path.name}")
         except Exception as e:
             print(f"⚠️ [Subtitles] Notice generating subtitles: {e}")
             ass_path = None
@@ -343,8 +400,11 @@ def render_cinematic_edit(
     secondary_tone = "warm_red" if primary_tone == "cool_blue" else "cool_blue"
     mono_modes = ["mono_bw", "mono_blue", "mono_white"]
 
-    # ── Open-Source Video Editor Pathway (mifi/editly with WebGL gl-transitions) ──
-    if is_editly_available():
+    # ── Open-Source Video Editor Pathway vs Native Precise Motion Tracking ──
+    # Precise motion tracking requires continuous OpenCV trajectory cropping in FFmpeg.
+    # Editly is only invoked if motion tracking is not available or explicitly disabled.
+    use_editly = False
+    if use_editly and is_editly_available():
         print("🚀 [OpenSourceEditor] Detected mifi/editly. Assembling AMV using open-source WebGL editor...")
         temp_editly_out = SCRATCH_DIR / f"editly_raw_{character_key}.mp4"
         spec = generate_editly_spec(
@@ -381,16 +441,45 @@ def render_cinematic_edit(
                 }
         print("⚠️ [OpenSourceEditor] editly render did not complete. Falling back to native FFmpeg xfade engine.")
 
-    # 2026 Buttery-Smooth AMV Transitions with Zero-Drift Handle Compensation
-    # Each clip (except final) receives +0.15s handle to perfectly maintain 100% beat sync without drift.
-    trans_dur = 0.15
+    # 2026 Buttery-Smooth AMV Transitions with Zero-Drift Handle Compensation (0.18s punchy xfade)
+    # Each clip (except final) receives +0.18s handle to perfectly maintain 100% beat sync without drift.
+    trans_dur = 0.18
+    first_drop_found = False
+    for idx, seg in enumerate(segments):
+        if idx > 0 and segments[idx - 1].get("is_drop", False):
+            seg.setdefault("prev_is_drop", True)
+        if seg.get("is_drop", False) and not first_drop_found:
+            seg.setdefault("is_first_drop", True)
+            first_drop_found = True
+        if not seg.get("is_drop", False):
+            if idx < len(segments) - 1 and segments[idx + 1].get("is_drop", False):
+                seg["next_is_drop"] = True
+                seg["is_pre_drop"] = True
+
+    seen_clip_paths = {}
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
+        cp_key = str(cp.name) if hasattr(cp, "name") else str(cp)
+        # Extract unique scene identifier: match timestamp tag (e.g. 885s) and episode tag (ep1)
+        ep_match = re.search(r"ep(\d+)", cp_key)
+        ts_match = re.search(r"(\d+)s(?:\.mp4)?", cp_key)
+        if ts_match:
+            ep_tag = ep_match.group(1) if ep_match else "0"
+            scene_key = f"ep{ep_tag}_{ts_match.group(1)}s"
+        else:
+            scene_key = cp_key
+
+        seen_clip_paths[scene_key] = seen_clip_paths.get(scene_key, 0) + 1
+        if seen_clip_paths[scene_key] > 1:
+            seg["is_repeat"] = True
+            seg["repeat_count"] = seen_clip_paths[scene_key]
+
         vel_profile = get_segment_velocity_profile(seg, idx, len(segments))
         is_intro_hook = (idx == 0)
         use_bezier = vel_profile.get("use_bezier_velocity", False)
+        use_slowmo = vel_profile.get("use_smooth_slowmo", False)
         clip_render_dur = seg["duration"] + (trans_dur if idx < len(segments) - 1 else 0.0)
 
-        clip_vf = build_velocity_clip_filter(
+        v_chain = build_velocity_clip_filter(
             seg_idx=idx,
             duration=clip_render_dur,
             speed=vel_profile["speed"],
@@ -400,18 +489,24 @@ def render_cinematic_edit(
             fps=FPS,
             add_bars=vel_profile.get("add_bars", False),
             is_intro_hook=is_intro_hook,
-            use_bezier_velocity=use_bezier
+            use_bezier_velocity=use_bezier,
+            use_smooth_slowmo=use_slowmo,
+            clip_path=cp,
+            enable_motion_tracking=True,
+            narrative_role=seg.get("role"),
+            input_tag=f"[{idx}:v]",
+            output_tag=f"[v{idx}]"
         )
-        v_chain = f"[{idx}:v]{clip_vf}[v{idx}]"
         filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
 
-        # Clip audio fades + extraction (all segments use source audio)
+        # Clip audio fades + extraction (dialogue boosted during conversation intro, normal during combat)
         audio_fade = build_clip_audio_fade(seg["duration"])
+        clip_vol = 1.60 if not seg.get("is_drop", False) else 1.00
         if has_aud:
             a_chain = (
                 f"[{idx}:a]atrim=duration={seg['duration']:.3f},asetpts=PTS-STARTPTS,"
-                f"{audio_fade},volume=1.00,aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+                f"{audio_fade},volume={clip_vol:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
             )
         else:
             a_chain = f"aevalsrc=0:d={seg['duration']:.3f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
@@ -444,25 +539,26 @@ def render_cinematic_edit(
     sub_filter = ""
     if ass_path and ass_path.exists():
         escaped_ass = str(ass_path).replace("\\", "/").replace(":", "\\:")
-        fonts_arg = f":fontsdir='{FONTS_DIR}'" if FONTS_DIR.exists() else ""
-        sub_filter = f",subtitles='{escaped_ass}'{fonts_arg}"
+        sub_filter = f",subtitles='{escaped_ass}'"
     filter_chains.append(
         f"{video_src_tag}{vibrant_cc}{sub_filter}[vout]"
     )
 
     # Audio Dynamic Structure:
-    # 75% Dominant Phonk BGM / 25% Crisp Anime Combat SFX
+    # Pre-Fight Dialogue Phase: Phonk heavily ducked (0.20x) & lowpass filtered (380Hz); dialogue loud & clear (volume 1.60)
     # Pre-Drop Audio Vacuum (0.55s highpass riser + 0.16s dead silence + 808 drop sub-boost)
     # Katana Combat Foley transient presence on cut onsets
     # Master: loudnorm to -14 dB LUFS (-af loudnorm=I=-14:TP=-1.5:LRA=11)
     audio_vacuum_fx = build_pre_drop_audio_vacuum_filter(drop_t)
     combat_times = [round(seg["start"], 3) for seg in segments if seg.get("is_drop", False)]
     combat_foley_fx = build_combat_foley_audio_filter(combat_times, drop_t)
+    audio_fade_start = max(0.1, beat_grid.duration - 3.5)
+    audio_fade_dur = min(3.0, beat_grid.duration - audio_fade_start)
     filter_chains.append(
-        f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=120,lowpass=f=12000[clip_sfx_balanced];"
-        f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.25[phonk_full];"
-        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=75 25:dropout_transition=2,"
-        f"volume=1.20,loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
+        f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=80,lowpass=f=14000[clip_sfx_balanced];"
+        f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.0[phonk_full];"
+        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=60 40:dropout_transition=2,"
+        f"volume=1.20,afade=t=out:st={audio_fade_start:.2f}:d={audio_fade_dur:.2f},loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
 
     full_filter_complex = ";".join(filter_chains)

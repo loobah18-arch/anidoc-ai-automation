@@ -261,11 +261,16 @@ def get_title_driven_clips(
 
             # Check if scene matches title keywords (heavy boost to keep title relevance supreme)
             keyword_match = any(kw in desc for kw in intent["action_keywords"])
+            title_clean = re.sub(r"[^\w\s\.-]", " ", title.lower())
+            title_words = [w.strip(".") for w in title_clean.split() if len(w) >= 2 and w not in ["the", "and", "with", "for", "from", "short", "shorts", "jjk", "demonslayer"]]
+            title_overlap = sum(1 for w in title_words if (w in desc or (w.endswith("s") and len(w) > 2 and w[:-1] in desc)))
+            pref_bonus = max(0.0, 1.2 - preferred_eps.index(ep_code) * 0.35) if ep_code in preferred_eps else 0.0
+
             if keyword_match or intent["scene_type"] == "fight":
                 all_clips.append({
                     **scene,
                     "episode": ep_code,
-                    "relevance_score": scene.get("action_score", 0) + (1.5 if keyword_match else 0)
+                    "relevance_score": scene.get("action_score", 0) + (1.5 if keyword_match else 0) + (title_overlap * 0.3) + pref_bonus
                 })
 
     # Sort by relevance
