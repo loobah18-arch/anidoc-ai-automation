@@ -837,6 +837,7 @@ def slice_action_moments_from_source(
 
                 curated_candidates.append({
                     "start": p,
+                    "scene_end": en,
                     "score": base_score + (30.0 if is_conv else 0.0),
                     "description": desc,
                     "tag": f"💎 {tag_prefix}: {desc[:42]}",
@@ -952,16 +953,13 @@ def slice_action_moments_from_source(
             matching_cv = [w for w in scorer.window_scores if abs(w["start"] - c["start"]) < 2.5]
             if matching_cv:
                 best_cv = max(matching_cv, key=lambda w: w.get("score", 0))
-                # Reject black / static frames
-                if best_cv.get("rejected", False):
+                # High-energy sakuga or impact collision (high motion or high particle saturation) - definitely KEEP!
+                if best_cv.get("avg_diff", 0.0) >= 5.0 or best_cv.get("avg_highlight", 0.0) >= 3.0:
+                    c["score"] += best_cv.get("score", 0.0) * 0.4
+                elif best_cv.get("rejected", False) or (best_cv.get("avg_diff", 0.0) < 4.0 and best_cv.get("avg_highlight", 0.0) < 2.0):
+                    # Reject static spectator reaction cutaways & dark void frames
                     dropped_cutaways += 1
                     continue
-                # Reject static spectator reaction cutaways (low motion diff and low highlight energy)
-                if best_cv.get("avg_diff", 0.0) < 4.0 and best_cv.get("avg_highlight", 0.0) < 2.0:
-                    dropped_cutaways += 1
-                    continue
-                # Boost verified high-motion sakuga combat
-                c["score"] += best_cv.get("score", 0.0) * 0.4
         filtered_curated.append(c)
 
     if dropped_cutaways > 0:
@@ -1039,7 +1037,7 @@ def slice_action_moments_from_source(
         and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
-        and (c["start"] + clip_duration <= end_bound)
+        and (c["start"] + min(clip_duration, 3.5) <= end_bound)
         and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
     ]
     if drop_candidates:
@@ -1050,7 +1048,7 @@ def slice_action_moments_from_source(
             if not c.get("is_conversation", False)
             and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
             and not _is_credit(c.get("description", ""))
-            and (c["start"] + clip_duration <= end_bound)
+            and (c["start"] + min(clip_duration, 3.5) <= end_bound)
             and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         ]
         drop_climax = valid_drops[0] if valid_drops else final_candidates[0]
@@ -1062,7 +1060,7 @@ def slice_action_moments_from_source(
         and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
-        and (c["start"] + clip_duration <= end_bound)
+        and (c["start"] + min(clip_duration, 3.5) <= end_bound)
         and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
     ]
     if finisher_candidates:
@@ -1074,7 +1072,7 @@ def slice_action_moments_from_source(
             and not c.get("is_conversation", False)
             and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
             and not _is_credit(c.get("description", ""))
-            and (c["start"] + clip_duration <= end_bound)
+            and (c["start"] + min(clip_duration, 3.5) <= end_bound)
             and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         ]
         finisher = valid_finishers[-1] if valid_finishers else drop_climax
@@ -1088,7 +1086,7 @@ def slice_action_moments_from_source(
         and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
-        and (c["start"] + clip_duration <= end_bound)
+        and (c["start"] + min(clip_duration, 3.5) <= end_bound)
         and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         and any(kw in c.get("description", "").lower() for kw in ["exploding blood", "bakketsu", "pink", "boogie woogie", "godspeed", "destructive death", "tiger", "fifth form", "air type"])
     ]
@@ -1101,7 +1099,7 @@ def slice_action_moments_from_source(
             and not c.get("is_conversation", False)
             and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
             and not _is_credit(c.get("description", ""))
-            and (c["start"] + clip_duration <= end_bound)
+            and (c["start"] + min(clip_duration, 3.5) <= end_bound)
             and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         ]
         sec_drop = other_candidates[0] if other_candidates else final_candidates[1]
@@ -1166,7 +1164,7 @@ def slice_action_moments_from_source(
         and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
-        and (c["start"] + clip_duration <= end_bound)
+        and (c["start"] + min(clip_duration, 3.5) <= end_bound)
         and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
     ]
     # Prioritize highest action score scenes first
@@ -1244,8 +1242,9 @@ def slice_action_moments_from_source(
         # Duration: intro clip needs the full continuous intro duration (at least 16s), combat clips need 4.5s
         target_dur = max(clip_duration, 16.0) if idx < drop_idx else min(clip_duration, 5.0)
         if combat_window and idx >= drop_idx:
-            # Strictly prevent slicing past combat_end_bound to avoid bystander aftermath
-            target_dur = min(target_dur, max(1.5, combat_end_bound - start))
+            # Strictly prevent slicing past scene_end or combat_end_bound to avoid bystander aftermath / flashbacks
+            safe_end = min(cand.get("scene_end", combat_end_bound), combat_end_bound)
+            target_dur = min(target_dur, max(1.5, safe_end - start))
 
         # Try 1: Probe-matched English Dub audio stream
         cmd = [
