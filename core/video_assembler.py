@@ -184,7 +184,7 @@ def render_cinematic_edit(
                 gdrive_url_or_id=gdrive_target,
                 target_character=character_key,
                 output_dir=universe_dir,
-                n_clips=n_clips + 4,
+                n_clips=max(n_clips + 10, 30),
                 title=title_text,
                 drop_index=drop_idx,
                 clip_duration=max(5.5, max_needed_dur + 1.5)
@@ -281,11 +281,10 @@ def render_cinematic_edit(
     if len(clip_paths) >= n_clips:
         n_intro = sum(1 for f in drop_flags if not f)
         intro_c = clip_paths[:n_intro] if n_intro > 0 else [clip_paths[0]]
-        combat_pool = clip_paths[n_intro:n_clips - 1] if n_clips > n_intro + 1 else clip_paths[n_intro:]
         finisher_c = clip_paths[-1]
-
+        combat_pool = [c for c in clip_paths[n_intro:-1] if c not in intro_c and c != finisher_c]
         if not combat_pool:
-            combat_pool = clip_paths[:]
+            combat_pool = [c for c in clip_paths if c not in intro_c] or clip_paths[:]
 
         # ── Chronological Narrative Progression ──
         # Preserves strict 3-act escalation (Intro -> Combat Clashes -> Climax Finisher)

@@ -227,6 +227,43 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         code_jjk = match_episode_code_from_filename(jjk_fn)
         self.assertEqual(code_jjk, "S01E24")
 
+    def test_09_universal_scene_selector_and_canonical_combat_bounds(self):
+        """Verify universal production scene selector bounds and bystander/aftermath rejection."""
+        from core.gdrive_manager import get_episode_phase_boundaries
+
+        # 1. Demon Slayer S02E07 (Rengoku climax): Pure combat [480.0, 882.0]
+        bounds_s02e07 = get_episode_phase_boundaries("DS_S02E07", "rengoku", 1440.0)
+        self.assertEqual(bounds_s02e07["combat_window"], (480.0, 882.0))
+        self.assertIsNone(bounds_s02e07["conv_window"])
+        combat_st_07 = [s["start"] for s in bounds_s02e07["curated_combat_scenes"]]
+        # Ground truth audits: strictly reject 273s Inosuke tear, 1000s sunrise, 1140s crow/Obanai, 1234s credits, 1266s Giyu, 1398s Tanjiro
+        self.assertNotIn(273.0, combat_st_07, "Inosuke weeping boar mask at 273s must be excluded")
+        self.assertNotIn(1000.0, combat_st_07, "Sunrise monologue at 1000s must be excluded")
+        self.assertNotIn(1140.0, combat_st_07, "Obanai daytime crow at 1140s must be excluded")
+        self.assertNotIn(1234.0, combat_st_07, "Anime end credits at 1234s must be excluded")
+        self.assertNotIn(1266.0, combat_st_07, "Giyu mourning at 1266s must be excluded")
+        self.assertNotIn(1398.0, combat_st_07, "Tanjiro weeping at 1398s must be excluded")
+
+        # 2. Demon Slayer S02E06 (Rengoku vs Akaza setup): Dialogue [752.0, 886.5] & Combat [886.5, 1245.0]
+        bounds_s02e06 = get_episode_phase_boundaries("DS_S02E06", "rengoku", 1420.0)
+        self.assertEqual(bounds_s02e06["conv_window"], (752.0, 886.5))
+        self.assertEqual(bounds_s02e06["combat_window"], (886.5, 1245.0))
+        self.assertTrue(all(s["start"] >= 886.5 for s in bounds_s02e06["curated_combat_scenes"]))
+        self.assertTrue(all(s["start"] < 886.5 for s in bounds_s02e06["curated_conv_scenes"]))
+
+        # 3. JJK S02E17 (Sukuna vs Mahoraga): Combat [120.0, 1080.0], Yuji crying in ruins excluded
+        bounds_s02e17 = get_episode_phase_boundaries("S02E17", "sukuna", 1440.0)
+        self.assertEqual(bounds_s02e17["combat_window"], (120.0, 1080.0))
+        combat_st_jjk = [s["start"] for s in bounds_s02e17["curated_combat_scenes"]]
+        self.assertNotIn(1080.0, combat_st_jjk, "Yuji crying in Shibuya ruins (1080s) must be excluded from Sukuna combat")
+
+        # 4. Demon Slayer S01E17 (Zenitsu Thunderclap): Combat [480.0, 1200.0]
+        bounds_s01e17 = get_episode_phase_boundaries("DS_S01E17", "zenitsu", 1440.0)
+        self.assertEqual(bounds_s01e17["combat_window"], (480.0, 1200.0))
+        combat_st_zen = [s["start"] for s in bounds_s01e17["curated_combat_scenes"]]
+        self.assertNotIn(120.0, combat_st_zen, "Running through forest at 120s must be excluded from combat")
+        self.assertNotIn(780.0, combat_st_zen, "Gramps flashback at 780s must be excluded from combat")
+
 if __name__ == "__main__":
     unittest.main()
 

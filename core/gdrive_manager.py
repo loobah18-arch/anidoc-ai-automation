@@ -560,6 +560,110 @@ def is_black_or_credit_frame(video_path: Path, start_time: float, duration: floa
     return False
 
 
+def get_episode_phase_boundaries(
+    matched_ep_code: Optional[str],
+    character_key: str,
+    total_duration: float
+) -> Dict[str, Any]:
+    """
+    Computes canonical, production-grade semantic phase boundaries for any episode.
+    
+    Guarantees:
+    1. Zero bystander / spectator / crying scene leakage (e.g. Inosuke tear at 273s, Yuji crying at 1080s).
+    2. Zero post-battle aftermath / sunrise / mourning / credits leakage (e.g. 1000s sunrise, 1234s credits).
+    3. Strict character co-presence (target character or primary combatant).
+    4. Clean separation of Pre-Fight Dialogue/Conversation vs Pure Sakuga Combat.
+    """
+    # 1. Universal safe baseline bounds (skipping OP theme and ED credits)
+    start_bound = 95.0 if total_duration > 600 else (10.0 if total_duration > 60 else 1.0)
+    if total_duration > 3600:
+        end_bound = total_duration - 360.0
+    elif total_duration > 600:
+        end_bound = total_duration - 240.0  # Strictly exclude ED theme song, ending credits, and next episode preview
+    elif total_duration > 300:
+        end_bound = total_duration - 45.0
+    elif total_duration > 60:
+        end_bound = total_duration - 20.0
+    else:
+        end_bound = total_duration - 2.0
+
+    conv_window = None
+    combat_window = None
+    curated_combat_scenes = []
+    curated_conv_scenes = []
+
+    pure_conv_keywords = [
+        "dialogue", "conversation", "talk", "speak", "recruit", "demonhood",
+        "refusal", "standoff", "pre-fight dialogue"
+    ]
+    end_credit_keywords = [
+        "credits", "ending theme", "ending song", "preview", "next episode",
+        "taisho secret", "recap", "bumper", "staff roll", "cast roll",
+        "aftermath", "mourning", "funeral", "sunrise", "carriage", "passenger",
+        "fleeing", "corpse", "crying", "tears", "weep"
+    ]
+
+    ep_meta = load_episode_metadata(matched_ep_code) if matched_ep_code else None
+    if ep_meta and "scenes" in ep_meta:
+        valid_fighters = {character_key.lower()}
+        for c in ep_meta.get("characters", []):
+            role = c.get("role", "").lower()
+            if any(r in role for r in ["hashira", "moon", "antagonist", "protagonist", "fighter", "curse", "demon", "sorcerer"]):
+                valid_fighters.add(c.get("name", "").lower())
+
+        for s in ep_meta["scenes"]:
+            st = float(s.get("start", 0.0))
+            en = float(s.get("end", st + 10.0))
+            desc = s.get("description", "").lower()
+            score = float(s.get("action_score", 0.0))
+            chars = [c.lower() for c in s.get("characters_present", [])]
+
+            # Rejection 1: Aftermath, crying, sunrise, credits
+            if any(kw in desc for kw in end_credit_keywords) or bool(re.search(r"\b(ed|ending)\b", desc)):
+                continue
+
+            # Check if this scene is pre-fight dialogue/conversation
+            is_conv = (
+                any(kw in desc for kw in pure_conv_keywords)
+                or s.get("is_conversation", False)
+                or s.get("action_level") == "CALM"
+                or (score < 0.70 and ("intro" in desc or "dialogue" in desc))
+            )
+
+            has_target = character_key.lower() in chars
+            has_fighter = any(f in chars for f in valid_fighters)
+            is_solo_bystander = (not has_target) and all(
+                c in ["inosuke", "tanjiro", "zenitsu", "crow", "obanai", "yuji", "megumi", "spectator"]
+                for c in chars
+            )
+
+            if is_conv:
+                if has_target or (has_fighter and not is_solo_bystander):
+                    curated_conv_scenes.append(s)
+            else:
+                if score >= 0.70 and (has_target or (has_fighter and not is_solo_bystander)):
+                    curated_combat_scenes.append(s)
+
+        if curated_conv_scenes:
+            conv_start = min(float(s["start"]) for s in curated_conv_scenes)
+            conv_end = max(float(s["end"]) for s in curated_conv_scenes)
+            conv_window = (conv_start, conv_end)
+
+        if curated_combat_scenes:
+            fight_start = min(float(s["start"]) for s in curated_combat_scenes)
+            fight_end = max(float(s["end"]) for s in curated_combat_scenes)
+            combat_window = (fight_start, fight_end)
+
+    return {
+        "start_bound": start_bound,
+        "end_bound": end_bound,
+        "conv_window": conv_window,
+        "combat_window": combat_window,
+        "curated_combat_scenes": curated_combat_scenes,
+        "curated_conv_scenes": curated_conv_scenes,
+    }
+
+
 def slice_action_moments_from_source(
     video_path: Path,
     character_key: str,
@@ -610,22 +714,26 @@ def slice_action_moments_from_source(
     history = _load_history()
     file_used_ts = set(history.get("used_timestamps", {}).get(video_path.name, []))
 
-    # Skip Opening (0-95s) and Ending/Preview credits:
-    # Full movies (>3600s): ending credits roll is 5-6 mins (360s)
-    # Standard 20-25 min episodes (>600s): ending song (ED) + credits roll + preview is 3.5 mins (210s)
-    # Medium clips (300-600s): skip last 90s
-    # Short clips (<=300s): skip last 15s
-    start_bound = 95.0 if total_duration > 600 else (10.0 if total_duration > 60 else 1.0)
-    if total_duration > 3600:
-        end_bound = total_duration - 240.0
-    elif total_duration > 600:
-        end_bound = total_duration - 120.0  # Strictly exclude ED theme song, ending credits, and next episode preview
-    elif total_duration > 300:
-        end_bound = total_duration - 45.0
-    elif total_duration > 60:
-        end_bound = total_duration - 20.0
+    # Universal semantic phase boundaries from episode metadata:
+    # Derives exact combat bounds, conversation windows, and excludes all bystander/aftermath/credit leakage.
+    matched_ep_code = match_episode_code_from_filename(video_path.name)
+    phase_info = get_episode_phase_boundaries(
+        matched_ep_code=matched_ep_code,
+        character_key=character_key,
+        total_duration=total_duration
+    )
+    start_bound = phase_info["start_bound"]
+    end_bound = phase_info["end_bound"]
+    combat_window = phase_info["combat_window"]
+    conv_window = phase_info["conv_window"]
+
+    # Bounds for combat clips:
+    if combat_window:
+        combat_start_bound = max(start_bound, combat_window[0] - 1.0)
+        combat_end_bound = min(end_bound, combat_window[1] + 1.0)
     else:
-        end_bound = total_duration - 2.0
+        combat_start_bound = start_bound
+        combat_end_bound = end_bound
 
     # Universe Safety Guard: Never slice a video for a character from another universe
     file_universe = get_file_universe(video_path.name)
@@ -639,7 +747,6 @@ def slice_action_moments_from_source(
         )
 
     # ── Phase 1: Curated Episode Climax & Scene Extraction from Metadata ───────
-    matched_ep_code = match_episode_code_from_filename(video_path.name)
     curated_candidates = []
 
     # Ensure matched_ep_code belongs to the character's universe
@@ -651,6 +758,20 @@ def slice_action_moments_from_source(
         elif char_universe == "jjk" and is_code_ds:
             print(f"⚠️ [ActionSlicer] Mismatched episode code {matched_ep_code} for JJK character '{character_key}'. Ignoring.")
             matched_ep_code = None
+
+    pure_conv_keywords = [
+        "dialogue", "conversation", "talk", "speak", "recruit", "demonhood",
+        "refusal", "standoff", "pre-fight dialogue"
+    ]
+    end_credit_keywords = [
+        "credits", "ending theme", "ending song", "preview", "next episode",
+        "taisho secret", "recap", "bumper", "staff roll", "cast roll",
+        "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning",
+        "funeral", "sunrise", "carriage", "passenger", "fleeing", "corpse", "tears"
+    ]
+    def _is_credit(desc_text: str) -> bool:
+        low = desc_text.lower()
+        return any(kw in low for kw in end_credit_keywords) or bool(re.search(r"\b(ed|ending)\b", low))
 
     if matched_ep_code:
         print(f"📖 [ActionSlicer] Matched episode code: {matched_ep_code} for '{video_path.name}'")
@@ -664,21 +785,6 @@ def slice_action_moments_from_source(
             except Exception:
                 pass
 
-        # 2. Character-specific curated scenes from episode metadata
-        char_scenes = get_character_clips(matched_ep_code, character_key, min_action_score=0.55, max_clips=25)
-
-        # 3. General high-action scenes from episode metadata (Strict character presence check)
-        ep_meta = load_episode_metadata(matched_ep_code)
-        general_scenes = []
-        if ep_meta and not char_scenes:
-            print(f"⚠️ [ActionSlicer] Character '{character_key}' is NOT present in {matched_ep_code} metadata. Suppressing general other-character climaxes.")
-            general_scenes = []
-        elif ep_meta:
-            general_scenes = [
-                s for s in ep_meta.get("scenes", [])
-                if float(s.get("action_score", 0.0)) >= 0.70 and character_key.lower() in [c.lower() for c in s.get("characters_present", [])]
-            ]
-
         seen_ranges = set()
 
         def _add_curated_scene(s: Dict[str, Any], bonus: float, tag_prefix: str):
@@ -687,10 +793,7 @@ def slice_action_moments_from_source(
             desc = s.get("description", "Curated epic scene")
 
             # Strictly reject end credits, ending theme songs, next-episode previews, and bumpers
-            end_credit_keywords = [
-                "credits", "ending theme", "ending song", "preview", "next episode", "taisho secret", "recap", "bumper", "staff roll", "cast roll"
-            ]
-            if any(kw in desc.lower() for kw in end_credit_keywords) or bool(re.search(r"\b(ed|ending)\b", desc.lower())):
+            if _is_credit(desc):
                 return
 
             base_score = float(s.get("action_score", 0.8)) * 100.0 + bonus
@@ -703,42 +806,50 @@ def slice_action_moments_from_source(
             seen_ranges.add(key)
 
             scene_len = max(clip_duration, en - st)
-            is_conv = any(kw in desc.lower() for kw in ["dialogue", "conversation", "talk", "speak", "recruit", "demonhood", "monologue", "speech", "ideological"])
-            if scene_len <= clip_duration * 1.5:
-                pts = [st]
-            elif is_conv or scene_len <= 12.0:
-                pts = [st, round(st + (scene_len - clip_duration) * 0.5, 2)]
+            is_conv = (s in phase_info["curated_conv_scenes"]) or any(kw in desc.lower() for kw in pure_conv_keywords)
+
+            if is_conv:
+                if scene_len <= clip_duration * 1.5:
+                    pts = [st]
+                else:
+                    pts = [st, round(st + (scene_len - clip_duration) * 0.5, 2)]
             else:
-                # Dense action slicing across the entire fight scene duration (generates 6 to 15 unique combat cuts per scene)
-                step = max(clip_duration * 1.1, 5.5)
+                dense_step = 2.6
                 pts = []
-                curr = st + 0.5
-                while curr + clip_duration <= en:
+                curr = st
+                while curr + min(clip_duration, 3.2) <= en:
                     pts.append(round(curr, 2))
-                    curr += step
+                    curr += dense_step
+                if en - clip_duration > st and not any(abs(p - (en - clip_duration)) < 1.5 for p in pts):
+                    pts.append(round(en - clip_duration, 2))
 
             for p in pts:
-                # Clamp within video bounds
+                if is_conv:
+                    if conv_window and not (conv_window[0] - 1.0 <= p <= conv_window[1] + 1.0):
+                        continue
+                else:
+                    if combat_window and not (combat_start_bound <= p <= combat_end_bound):
+                        continue
                 if p < start_bound or p + clip_duration > end_bound:
                     continue
-                # Skip if timestamp was recently used (never skip essential dialogue scenes or when building full edit pool)
-                if is_conv or len(curated_candidates) < n_clips * 2 or not any(abs(p - prev) < 4.0 for prev in file_used_ts):
-                    curated_candidates.append({
-                        "start": p,
-                        "score": base_score + (30.0 if is_conv else 0.0),
-                        "description": desc,
-                        "tag": f"💎 {tag_prefix}: {desc[:42]}",
-                        "is_curated": True
-                    })
+
+                curated_candidates.append({
+                    "start": p,
+                    "score": base_score + (30.0 if is_conv else 0.0),
+                    "description": desc,
+                    "tag": f"💎 {tag_prefix}: {desc[:42]}",
+                    "is_curated": True,
+                    "is_conversation": is_conv
+                })
 
         for s in title_scenes:
             _add_curated_scene(s, bonus=20.0, tag_prefix="TITLE-MATCH")
-        for s in char_scenes:
-            _add_curated_scene(s, bonus=10.0, tag_prefix="CURATED-CHAR")
-        for s in general_scenes:
-            _add_curated_scene(s, bonus=0.0, tag_prefix="EPIC-SCENE")
+        for s in phase_info["curated_combat_scenes"]:
+            _add_curated_scene(s, bonus=15.0, tag_prefix="SAKUGA-COMBAT")
+        for s in phase_info["curated_conv_scenes"]:
+            _add_curated_scene(s, bonus=10.0, tag_prefix="INTRO-DIALOGUE")
 
-        print(f"✨ [ActionSlicer] Extracted {len(curated_candidates)} curated epic moments from metadata for {matched_ep_code}.")
+        print(f"✨ [ActionSlicer] Extracted {len(curated_candidates)} curated moments (dense sub-sliced) from metadata for {matched_ep_code}.")
 
     # ── Phase 2: OpenCV Motion, Climax & Highlight Energy Analysis ───────────
     cv_candidates = []
@@ -750,8 +861,8 @@ def slice_action_moments_from_source(
             n_clips=n_clips * 2,
             clip_duration=clip_duration,
             min_gap=clip_duration * 1.2,
-            start_bound=start_bound,
-            end_bound=end_bound
+            start_bound=combat_start_bound,
+            end_bound=combat_end_bound
         )
         for w in ranked_cv:
             if not any(abs(w["start"] - prev) < 5.0 for prev in file_used_ts):
@@ -760,20 +871,21 @@ def slice_action_moments_from_source(
                     "score": float(w["score"]) + (25.0 if w.get("climax_boost") else 0.0),
                     "description": "OpenCV Climax Motion & Neon Energy",
                     "tag": f"🔥 CV Motion ({w.get('avg_diff', 0):.1f}) Climax",
-                    "is_curated": False
+                    "is_curated": False,
+                    "is_conversation": False
                 })
-        intro_hook_cand = scorer.find_active_intro_hook(max_start=start_bound + 30.0)
-        print(f"👁️ [ActionSlicer] OpenCV Scorer discovered {len(cv_candidates)} high-motion climax windows.")
+        intro_hook_cand = scorer.find_active_intro_hook(max_start=combat_start_bound + 30.0)
+        print(f"👁️ [ActionSlicer] OpenCV Scorer discovered {len(cv_candidates)} high-motion climax windows within combat bounds.")
     except Exception as e:
         print(f"⚠️ [ActionSlicer] OpenCV scoring fallback: {e}")
 
-    # ── Phase 2b: Dynamic FFmpeg Audio Volume Scan across the Episode ─────────
+    # ── Phase 2b: Dynamic FFmpeg Audio Volume Scan across Combat Bounds ───────
     rand_offset = random.uniform(0.0, 2.5)
     step = 4.0 if total_duration > 600 else 2.0
-    t = start_bound + rand_offset
+    t = combat_start_bound + rand_offset
     audio_candidates = []
 
-    while t + clip_duration <= end_bound:
+    while t + clip_duration <= combat_end_bound:
         if not any(abs(t - prev) < 6.0 for prev in file_used_ts):
             cmd_h = [
                 "ffmpeg", "-ss", str(t), "-t", str(clip_duration),
@@ -815,7 +927,8 @@ def slice_action_moments_from_source(
                             "score": fight_score,
                             "description": "Dynamic Audio Clashing Scene",
                             "tag": "⚔️ Dynamic Combat Clash",
-                            "is_curated": False
+                            "is_curated": False,
+                            "is_conversation": False
                         })
             except Exception:
                 pass
@@ -823,55 +936,59 @@ def slice_action_moments_from_source(
 
     audio_candidates.sort(key=lambda x: x["score"], reverse=True)
     cv_candidates.sort(key=lambda x: x["score"], reverse=True)
-    print(f"⚔️ [ActionSlicer] Discovered {len(audio_candidates)} audio combat & {len(cv_candidates)} CV climax moments.")
+    print(f"⚔️ [ActionSlicer] Discovered {len(audio_candidates)} audio combat & {len(cv_candidates)} CV climax moments within combat bounds.")
 
     # ── Phase 3: Hybrid Merge (Curated Climax + OpenCV Vision + Audio Clash) ──
     curated_candidates.sort(key=lambda x: x["score"], reverse=True)
-    # If explosive/high-action sakuga candidates alone can fill the edit, use only pure sakuga!
     explosive_curated = [c for c in curated_candidates if c["score"] >= 100.0]
     candidate_source = explosive_curated if len(explosive_curated) >= n_clips else curated_candidates
     final_candidates = []
 
-    # 1. 100% Curated Priority: Use all curated sakuga moments first!
-    # They are verified canonical sakuga/combat moments that fans actually want to see.
+    # Preserve dense combat candidates with 2.2s minimum spacing
+    min_cand_gap = 2.2
     for c in candidate_source:
-        if len(final_candidates) >= n_clips + 8:
+        if len(final_candidates) >= max(n_clips * 2, 40):
             break
-        if not any(abs(c["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+        if not any(abs(c["start"] - s["start"]) < min_cand_gap for s in final_candidates):
             final_candidates.append(c)
 
-    # 2. Add OpenCV vision motion & climax candidates ONLY if more clips are needed
+    # Add OpenCV vision motion & climax candidates ONLY if more clips are needed
     if len(final_candidates) < n_clips + 8:
         for cv in cv_candidates:
             if len(final_candidates) >= n_clips + 8:
                 break
-            if not any(abs(cv["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+            if combat_window and not (combat_start_bound <= cv["start"] <= combat_end_bound):
+                continue
+            if not any(abs(cv["start"] - s["start"]) < min_cand_gap for s in final_candidates):
                 final_candidates.append(cv)
 
-    # 3. Add dynamic audio combat scenes if still needed
+    # Add dynamic audio combat scenes if still needed
     if len(final_candidates) < n_clips + 12:
         for a in audio_candidates:
             if len(final_candidates) >= n_clips + 12:
                 break
+            if combat_window and not (combat_start_bound <= a["start"] <= combat_end_bound):
+                continue
             if is_black_or_credit_frame(video_path, a["start"]):
                 continue
-            if not any(abs(a["start"] - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+            if not any(abs(a["start"] - s["start"]) < min_cand_gap for s in final_candidates):
                 final_candidates.append(a)
 
     # Safe fallback if too few candidates met strict thresholds
     if len(final_candidates) < n_clips:
-        print(f"⚠️ [ActionSlicer] Found {len(final_candidates)} candidates, adding paced scene fallback...")
-        t = start_bound
-        while t + clip_duration <= end_bound and len(final_candidates) < n_clips * 2:
-            if not any(abs(t - s["start"]) < (clip_duration * 1.5) for s in final_candidates):
+        print(f"⚠️ [ActionSlicer] Found {len(final_candidates)} candidates, adding paced scene fallback within combat bounds...")
+        t = combat_start_bound
+        while t + clip_duration <= combat_end_bound and len(final_candidates) < n_clips * 2:
+            if not any(abs(t - s["start"]) < min_cand_gap for s in final_candidates):
                 final_candidates.append({
                     "start": t,
                     "score": 50.0,
                     "description": "Paced Scene",
                     "tag": "🎬 Paced Scene",
-                    "is_curated": False
+                    "is_curated": False,
+                    "is_conversation": False
                 })
-            t += 15.0
+            t += 10.0
 
     final_candidates.sort(key=lambda x: x["score"], reverse=True)
     print(f"🎬 [ActionSlicer] Total hybrid candidate pool: {len(final_candidates)} scenes (Curated + OpenCV Vision + Audio).")
@@ -887,48 +1004,38 @@ def slice_action_moments_from_source(
     bridge_idx = min(n_clips - 4, max(drop_idx + 2, int(n_clips * 0.7))) if n_clips > 6 else max(0, n_clips - 2)
     last_idx = n_clips - 1
 
-    # Define pure dialogue and credit keywords to cleanly isolate conversation, combat, and reject credits
-    pure_conv_keywords = [
-        "dialogue", "conversation", "talk", "speak", "recruit", "demonhood",
-        "monologue", "speech", "words", "ideological"
-    ]
-    end_credit_keywords = [
-        "credits", "ending theme", "ending song", "preview", "next episode", "taisho secret", "recap", "bumper", "staff roll", "cast roll",
-        "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning", "funeral", "sunrise", "carriage", "passenger", "fleeing"
-    ]
-    def _is_credit(desc_text: str) -> bool:
-        low = desc_text.lower()
-        return any(kw in low for kw in end_credit_keywords) or bool(re.search(r"\b(ed|ending)\b", low))
-
     # Find the drop climax: signature primary attack (e.g. Fire Dragon, Domain Expansion, Sixfold Lightning)
     drop_candidates = [
         c for c in final_candidates
         if any(kw in c.get("description", "").lower() for kw in ["dragon", "enbu", "giant fire", "domain expansion", "hollow purple", "sixfold", "musical score", "ninth form", "first form", "sea of fire"])
+        and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
-        and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
+        and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
     ]
     if drop_candidates:
         drop_climax = max(drop_candidates, key=lambda x: x["score"])
     else:
         valid_drops = [
             c for c in final_candidates
-            if not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+            if not c.get("is_conversation", False)
+            and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
             and not _is_credit(c.get("description", ""))
             and (c["start"] + clip_duration <= end_bound)
-            and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
+            and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         ]
         drop_climax = valid_drops[0] if valid_drops else final_candidates[0]
 
-    # Find the true finisher: scene with 'decapitation', 'neck', 'slash', or latest timestamp among explosive candidates
+    # Find the true finisher: decisive strike or climax collision
     finisher_candidates = [
         c for c in final_candidates
-        if c != drop_climax and any(kw in c.get("description", "").lower() for kw in ["decapitat", "neck", "sever", "cleave", "circular slash", "kamado song", "wolf hunt", "flame tiger", "disorder"])
+        if c != drop_climax and any(kw in c.get("description", "").lower() for kw in ["decapitat", "neck", "sever", "cleave", "circular slash", "kamado song", "wolf hunt", "flame tiger", "disorder", "impact collision", "supreme clash"])
+        and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
-        and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
+        and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
     ]
     if finisher_candidates:
         finisher = max(finisher_candidates, key=lambda x: x["start"])
@@ -936,10 +1043,11 @@ def slice_action_moments_from_source(
         valid_finishers = [
             c for c in final_candidates
             if c != drop_climax
+            and not c.get("is_conversation", False)
             and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
             and not _is_credit(c.get("description", ""))
             and (c["start"] + clip_duration <= end_bound)
-            and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
+            and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         ]
         finisher = valid_finishers[-1] if valid_finishers else drop_climax
     else:
@@ -949,10 +1057,11 @@ def slice_action_moments_from_source(
     sec_candidates = [
         c for c in final_candidates
         if c != drop_climax and c != finisher
+        and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
-        and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
+        and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         and any(kw in c.get("description", "").lower() for kw in ["exploding blood", "bakketsu", "pink", "boogie woogie", "godspeed", "destructive death", "tiger", "fifth form", "air type"])
     ]
     if sec_candidates:
@@ -961,10 +1070,11 @@ def slice_action_moments_from_source(
         other_candidates = [
             c for c in final_candidates
             if c != drop_climax and c != finisher
+            and not c.get("is_conversation", False)
             and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
             and not _is_credit(c.get("description", ""))
             and (c["start"] + clip_duration <= end_bound)
-            and (c["start"] >= 885.0 if matched_ep_code == "DS_S02E06" else True)
+            and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         ]
         sec_drop = other_candidates[0] if other_candidates else final_candidates[1]
     else:
@@ -973,14 +1083,13 @@ def slice_action_moments_from_source(
     # Find intro candidates: strictly pre-fight dialogue/conversation scenes
     intro_dialogue = [
         c for c in final_candidates
-        if any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+        if (c.get("is_conversation", False) or any(kw in c.get("description", "").lower() for kw in pure_conv_keywords))
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
-        and (740.0 <= c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
+        and (conv_window[0] - 1.0 <= c["start"] <= conv_window[1] + 1.0 if conv_window else True)
     ]
-    # For Mugen Train S02E06, strictly prioritize the 752.0s continuous pre-fight dialogue confrontation scene
-    if matched_ep_code == "DS_S02E06":
-        intro_dialogue.sort(key=lambda x: (abs(x["start"] - 752.0), -x["start"]))
+    if conv_window:
+        intro_dialogue.sort(key=lambda x: x["start"])
     else:
         intro_dialogue.sort(key=lambda x: x["start"], reverse=True)
 
@@ -993,37 +1102,12 @@ def slice_action_moments_from_source(
             and not _is_credit(c.get("description", ""))
             and c["start"] >= 90.0
             and (c["start"] + clip_duration <= end_bound)
-            and (c["start"] < 885.0 if matched_ep_code == "DS_S02E06" else True)
+            and (c["start"] <= combat_start_bound + 10.0 if combat_window else True)
         ]
-        other_intro.sort(key=lambda x: x["start"], reverse=True)
+        other_intro.sort(key=lambda x: x["start"])
         intro_pool = (intro_dialogue + other_intro)[:drop_idx]
-    if matched_ep_code != "DS_S02E06":
-        intro_pool.sort(key=lambda x: x["start"])
 
     # Combat pool for clips AFTER the drop: strictly exclude any dialogue/conversation, credit, or non-combat aftermath scenes
-    post_drop_candidates = [
-        c for c in final_candidates
-        if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c["start"] >= drop_climax["start"]
-        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not _is_credit(c.get("description", ""))
-        and (c["start"] + clip_duration <= end_bound)
-        and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
-        and not (matched_ep_code == "DS_S02E07" and c["start"] >= 885.0)
-    ]
-    post_drop_candidates.sort(key=lambda x: x["start"])
-
-    other_combat = [
-        c for c in final_candidates
-        if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool and c not in post_drop_candidates
-        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-        and not _is_credit(c.get("description", ""))
-        and (c["start"] + clip_duration <= end_bound)
-        and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
-        and not (matched_ep_code == "DS_S02E07" and c["start"] >= 885.0)
-    ]
-    other_combat.sort(key=lambda x: x["start"])
-    combat_pool = post_drop_candidates + other_combat
-
     selected = [None] * n_clips
     for i in range(min(drop_idx, len(intro_pool))):
         selected[i] = intro_pool[i]
@@ -1043,7 +1127,6 @@ def slice_action_moments_from_source(
     selected[last_idx] = finisher
 
     # Diverse combat pool selection with strict non-repetition and distance spacing
-    # CRITICAL: strictly ensure zero conversation/dialogue scenes and zero credits are in post-drop combat
     used_counts = collections.Counter()
     for c in selected:
         if c is not None:
@@ -1052,10 +1135,11 @@ def slice_action_moments_from_source(
     available_combat = [
         c for c in final_candidates
         if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool
+        and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
         and (c["start"] + clip_duration <= end_bound)
-        and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
+        and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
     ]
     # Prioritize highest action score scenes first
     available_combat.sort(key=lambda x: x["score"], reverse=True)
@@ -1065,20 +1149,20 @@ def slice_action_moments_from_source(
             prev_cand = selected[i - 1] if i > 0 else None
             prev_st = prev_cand["start"] if prev_cand else -999.0
 
-            # 1. Best: Completely unused candidate with at least 12s distance from previous cut
+            # 1. Best: Completely unused candidate with at least 8s distance from previous cut
             chosen_c = None
             for cand in available_combat:
                 if used_counts[cand["start"]] > 0:
                     continue
-                if abs(cand["start"] - prev_st) < 12.0:
+                if abs(cand["start"] - prev_st) < 8.0:
                     continue
                 chosen_c = cand
                 break
 
-            # 2. Any completely unused candidate with distance >= 5s
+            # 2. Any completely unused candidate with distance >= 4s
             if not chosen_c:
                 for cand in available_combat:
-                    if used_counts[cand["start"]] == 0 and abs(cand["start"] - prev_st) >= 5.0:
+                    if used_counts[cand["start"]] == 0 and abs(cand["start"] - prev_st) >= 4.0:
                         chosen_c = cand
                         break
 
@@ -1089,18 +1173,18 @@ def slice_action_moments_from_source(
                         chosen_c = cand
                         break
 
-            # 4. If all candidates used at least once: pick least frequently used candidate,
-            # breaking ties by distance from previous cut, to strictly avoid back-to-back repeats!
+            # 4. If all candidates used at least once: pick least frequently used candidate
             if not chosen_c:
                 cand_pool = available_combat if available_combat else [
                     c for c in final_candidates
-                    if not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
-                    and not any(kw in c.get("description", "").lower() for kw in end_credit_keywords)
+                    if not c.get("is_conversation", False)
+                    and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+                    and not _is_credit(c.get("description", ""))
                     and (c["start"] + clip_duration <= end_bound)
-                    and not (matched_ep_code == "DS_S02E06" and c["start"] < 885.0)
+                    and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
                 ]
                 if cand_pool:
-                    non_adjacent = [c for c in cand_pool if abs(c["start"] - prev_st) >= 10.0]
+                    non_adjacent = [c for c in cand_pool if abs(c["start"] - prev_st) >= 4.0]
                     pool_to_sort = non_adjacent if non_adjacent else cand_pool
                     pool_to_sort.sort(key=lambda c: (used_counts[c["start"]], -abs(c["start"] - prev_st)))
                     chosen_c = pool_to_sort[0]
@@ -1303,7 +1387,7 @@ def fetch_and_prepare_gdrive_footage(
 
     # Multi-Episode Ingestion: Combine Ep 1 (Setup/Intro) with Ep 2 (Peak Sakuga Climax & Finisher)
     vid_1, vid_2 = downloaded_videos[0], downloaded_videos[1]
-    n_half = max(5, n_clips // 2 + 1)
+    n_half = max(10, n_clips // 2 + 2)
     print(f"🎬 [MultiEpisode] Ingesting multi-episode arc: Ep1 '{vid_1.name}' + Ep2 '{vid_2.name}'")
 
     slices_1 = slice_action_moments_from_source(
@@ -1322,7 +1406,7 @@ def fetch_and_prepare_gdrive_footage(
         video_path=vid_2,
         character_key=target_character,
         output_dir=output_dir,
-        n_clips=max(6, n_clips - len(slices_1) + 4),
+        n_clips=max(14, n_clips - len(slices_1) + 8),
         clip_duration=clip_duration,
         title=title,
         drop_index=0,
