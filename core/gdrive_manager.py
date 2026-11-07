@@ -260,13 +260,17 @@ def pick_character_episodes(
         except Exception as e:
             print(f"⚠️ [GoogleDrive] Title episode intent resolution notice: {e}")
 
-    # 3. Special multi-episode pairs for iconic anime arcs (only if unused in current rotation cycle):
+    # 3. Special multi-episode pairs for iconic anime arcs:
     # 1. Rengoku: S02E06 + S02E07
     if character_key == "rengoku":
         e6 = next((f for f in universe_files if "s02_e06" in f["name"].lower() or "s02e06" in f["name"].lower()), None)
         e7 = next((f for f in universe_files if "s02_e07" in f["name"].lower() or "s02e07" in f["name"].lower()), None)
-        if e6 and e7 and (e6["name"] not in used_files or e7["name"] not in used_files):
-            chosen = [e6, e7][:max_episodes]
+        chosen = []
+        if e6:
+            chosen.append(e6)
+        if e7 and len(chosen) < max_episodes:
+            chosen.append(e7)
+        if chosen:
             print(f"🎯 [GoogleDrive] Multi-Episode Selection for Rengoku: {[c['name'] for c in chosen]}")
             return chosen
 
@@ -274,22 +278,37 @@ def pick_character_episodes(
     if character_key == "gojo":
         e9 = next((f for f in universe_files if "s02e09" in f["name"].lower() or "s02_e09" in f["name"].lower()), None)
         e4 = next((f for f in universe_files if "s02e04" in f["name"].lower() or "s02_e04" in f["name"].lower()), None)
-        if e9 and e4 and (e9["name"] not in used_files or e4["name"] not in used_files):
-            return [e9, e4][:max_episodes]
+        chosen = []
+        if e9:
+            chosen.append(e9)
+        if e4 and len(chosen) < max_episodes:
+            chosen.append(e4)
+        if chosen:
+            return chosen
 
     # 3. Sukuna: S02E17 + S02E16
     if character_key == "sukuna":
         e17 = next((f for f in universe_files if "s02e17" in f["name"].lower() or "s02_e17" in f["name"].lower()), None)
         e16 = next((f for f in universe_files if "s02e16" in f["name"].lower() or "s02_e16" in f["name"].lower()), None)
-        if e17 and e16 and (e17["name"] not in used_files or e16["name"] not in used_files):
-            return [e17, e16][:max_episodes]
+        chosen = []
+        if e17:
+            chosen.append(e17)
+        if e16 and len(chosen) < max_episodes:
+            chosen.append(e16)
+        if chosen:
+            return chosen
 
     # 4. Tanjiro: S01E19 + S02E10
     if character_key == "tanjiro":
         e19 = next((f for f in universe_files if "s01_e19" in f["name"].lower() or "s01e19" in f["name"].lower() or "e19" in f["name"].lower()), None)
         e10 = next((f for f in universe_files if "s02_e10" in f["name"].lower() or "s02e10" in f["name"].lower() or "e10" in f["name"].lower()), None)
-        if e19 and e10 and (e19["name"] not in used_files or e10["name"] not in used_files):
-            return [e19, e10][:max_episodes]
+        chosen = []
+        if e19:
+            chosen.append(e19)
+        if e10 and len(chosen) < max_episodes:
+            chosen.append(e10)
+        if chosen:
+            return chosen
 
     # 4. Universal multi-episode rotation across ALL available episodes for the character / universe
     best = pick_best_file_for_character(universe_files, character_key, title=title, target_episode=target_episode)
@@ -298,7 +317,15 @@ def pick_character_episodes(
 
     chosen_list = [best]
     if max_episodes > 1:
-        other_candidates = [f for f in universe_files if f["name"] != best["name"]]
+        other_candidates = [
+            f for f in universe_files
+            if f["name"] != best["name"] and (
+                any(p in f["name"].lower() for p in CHARACTER_EPISODE_PREFERENCES.get(character_key, [])) or
+                character_key in f["name"].lower()
+            )
+        ]
+        if not other_candidates:
+            other_candidates = [f for f in universe_files if f["name"] != best["name"]]
         unused_others = [f for f in other_candidates if f["name"] not in used_files]
         cand_pool = unused_others if unused_others else other_candidates
         if cand_pool:
