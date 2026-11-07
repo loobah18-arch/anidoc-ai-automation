@@ -653,6 +653,7 @@ def get_episode_phase_boundaries(
             fight_start = min(float(s["start"]) for s in curated_combat_scenes)
             fight_end = max(float(s["end"]) for s in curated_combat_scenes)
             combat_window = (fight_start, fight_end)
+            end_bound = fight_end
 
     return {
         "start_bound": start_bound,
@@ -815,22 +816,23 @@ def slice_action_moments_from_source(
                     pts = [st, round(st + (scene_len - clip_duration) * 0.5, 2)]
             else:
                 dense_step = 2.6
+                min_safe_dur = min(clip_duration, 3.5)
                 pts = []
                 curr = st
-                while curr + min(clip_duration, 3.2) <= en:
+                while curr + min_safe_dur <= en:
                     pts.append(round(curr, 2))
                     curr += dense_step
-                if en - clip_duration > st and not any(abs(p - (en - clip_duration)) < 1.5 for p in pts):
-                    pts.append(round(en - clip_duration, 2))
+                if en - min_safe_dur >= st and not any(abs(p - (en - min_safe_dur)) < 1.5 for p in pts):
+                    pts.append(round(en - min_safe_dur, 2))
 
             for p in pts:
                 if is_conv:
                     if conv_window and not (conv_window[0] - 1.0 <= p <= conv_window[1] + 1.0):
                         continue
                 else:
-                    if combat_window and not (combat_start_bound <= p <= combat_end_bound):
+                    if combat_window and not (combat_start_bound <= p and p + min(clip_duration, 3.5) <= combat_end_bound):
                         continue
-                if p < start_bound or p + clip_duration > end_bound:
+                if p < start_bound or p + min(clip_duration, 3.5) > end_bound:
                     continue
 
                 curated_candidates.append({
@@ -939,9 +941,35 @@ def slice_action_moments_from_source(
     print(f"⚔️ [ActionSlicer] Discovered {len(audio_candidates)} audio combat & {len(cv_candidates)} CV climax moments within combat bounds.")
 
     # ── Phase 3: Hybrid Merge (Curated Climax + OpenCV Vision + Audio Clash) ──
-    curated_candidates.sort(key=lambda x: x["score"], reverse=True)
-    explosive_curated = [c for c in curated_candidates if c["score"] >= 100.0]
-    candidate_source = explosive_curated if len(explosive_curated) >= n_clips else curated_candidates
+    # Universal OpenCV Sakuga Gate: Filter out static bystander cutaways & reaction shots
+    filtered_curated = []
+    dropped_cutaways = 0
+    for c in curated_candidates:
+        if c.get("is_conversation", False):
+            filtered_curated.append(c)
+            continue
+        if scorer and getattr(scorer, "window_scores", None):
+            matching_cv = [w for w in scorer.window_scores if abs(w["start"] - c["start"]) < 2.5]
+            if matching_cv:
+                best_cv = max(matching_cv, key=lambda w: w.get("score", 0))
+                # Reject black / static frames
+                if best_cv.get("rejected", False):
+                    dropped_cutaways += 1
+                    continue
+                # Reject static spectator reaction cutaways (low motion diff and low highlight energy)
+                if best_cv.get("avg_diff", 0.0) < 4.0 and best_cv.get("avg_highlight", 0.0) < 2.0:
+                    dropped_cutaways += 1
+                    continue
+                # Boost verified high-motion sakuga combat
+                c["score"] += best_cv.get("score", 0.0) * 0.4
+        filtered_curated.append(c)
+
+    if dropped_cutaways > 0:
+        print(f"🛡️ [ActionSlicer] OpenCV Sakuga Gate filtered out {dropped_cutaways} low-motion bystander cutaways.")
+
+    filtered_curated.sort(key=lambda x: x["score"], reverse=True)
+    explosive_curated = [c for c in filtered_curated if c["score"] >= 100.0]
+    candidate_source = explosive_curated if len(explosive_curated) >= n_clips else filtered_curated
     final_candidates = []
 
     # Preserve dense combat candidates with 2.2s minimum spacing
@@ -1215,6 +1243,9 @@ def slice_action_moments_from_source(
         
         # Duration: intro clip needs the full continuous intro duration (at least 16s), combat clips need 4.5s
         target_dur = max(clip_duration, 16.0) if idx < drop_idx else min(clip_duration, 5.0)
+        if combat_window and idx >= drop_idx:
+            # Strictly prevent slicing past combat_end_bound to avoid bystander aftermath
+            target_dur = min(target_dur, max(1.5, combat_end_bound - start))
 
         # Try 1: Probe-matched English Dub audio stream
         cmd = [

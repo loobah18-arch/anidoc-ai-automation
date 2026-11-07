@@ -231,9 +231,9 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         """Verify universal production scene selector bounds and bystander/aftermath rejection."""
         from core.gdrive_manager import get_episode_phase_boundaries
 
-        # 1. Demon Slayer S02E07 (Rengoku climax): Pure combat [480.0, 882.0]
+        # 1. Demon Slayer S02E07 (Rengoku climax): Pure combat [480.0, 876.0] strictly ending before impalement/crying
         bounds_s02e07 = get_episode_phase_boundaries("DS_S02E07", "rengoku", 1440.0)
-        self.assertEqual(bounds_s02e07["combat_window"], (480.0, 882.0))
+        self.assertEqual(bounds_s02e07["combat_window"], (480.0, 876.0))
         self.assertIsNone(bounds_s02e07["conv_window"])
         combat_st_07 = [s["start"] for s in bounds_s02e07["curated_combat_scenes"]]
         # Ground truth audits: strictly reject 273s Inosuke tear, 1000s sunrise, 1140s crow/Obanai, 1234s credits, 1266s Giyu, 1398s Tanjiro

@@ -41,7 +41,7 @@
     },
     {
       "start": 720.0,
-      "end": 760.0,
+      "end": 738.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
       "description": "Esoteric Art Ninth Form: Rengoku dragon flame aura & launch",
@@ -50,33 +50,46 @@
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 40.0
+      "duration": 18.0
     },
     {
-      "start": 760.0,
+      "start": 748.0,
+      "end": 782.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "Ninth Form high-speed dragon flight & destructive charge",
+      "characters_present": [
+        "rengoku",
+        "akaza"
+      ],
+      "action_score": 1.0,
+      "duration": 34.0
+    },
+    {
+      "start": 795.0,
       "end": 820.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Ninth Form high-speed dragon charge & terrain cleave",
+      "description": "Ninth Form terrain cleave & blazing canyon slash",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 60.0
+      "duration": 25.0
     },
     {
       "start": 860.0,
-      "end": 882.0,
+      "end": 876.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Supreme clash: Ninth Form Rengoku vs Destructive Death Annihilation Type impact collision",
+      "description": "Supreme clash: Ninth Form Rengoku vs Destructive Death Annihilation Type explosive collision",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 22.0
+      "duration": 16.0
     }
   ]
 }
