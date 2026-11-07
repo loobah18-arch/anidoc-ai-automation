@@ -100,7 +100,7 @@
     },
     {
       "start": 886.5,
-      "end": 940.0,
+      "end": 902.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
       "description": "Combat clash: Rengoku Flame Breathing First Form Sea of Fire high-speed charge vs Akaza",
@@ -109,7 +109,7 @@
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 54.0
+      "duration": 15.5
     },
     {
       "start": 945.0,
@@ -126,7 +126,7 @@
     },
     {
       "start": 975.0,
-      "end": 1020.0,
+      "end": 1005.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
       "description": "Combat clash: Rengoku deflecting shockwave attacks and charging sword slashes",
@@ -135,11 +135,11 @@
         "akaza"
       ],
       "action_score": 0.95,
-      "duration": 45.0
+      "duration": 30.0
     },
     {
       "start": 1080.0,
-      "end": 1140.0,
+      "end": 1130.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
       "description": "Combat clash: Fourth Form Blooming Flame Undulation circular slash defense",
@@ -148,11 +148,11 @@
         "akaza"
       ],
       "action_score": 0.95,
-      "duration": 60.0
+      "duration": 50.0
     },
     {
       "start": 1180.0,
-      "end": 1245.0,
+      "end": 1230.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
       "description": "Combat clash: Flame Breathing Fifth Form Flame Tiger roaring clash against Destructive Death Disorder",
@@ -161,7 +161,7 @@
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 65.0
+      "duration": 50.0
     }
   ]
 }

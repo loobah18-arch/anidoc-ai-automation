@@ -859,11 +859,12 @@ def slice_action_moments_from_source(
     intro_hook_cand = None
     try:
         scorer = SceneScorer(video_path)
-        scorer.analyze(step_frames=4, window_duration=clip_duration)
+        # Tight 1.5s window duration to evaluate combat sakuga with high temporal acuity
+        scorer.analyze(step_frames=4, window_duration=1.5)
         ranked_cv = scorer.get_ranked_scenes(
             n_clips=n_clips * 2,
-            clip_duration=clip_duration,
-            min_gap=clip_duration * 1.2,
+            clip_duration=1.5,
+            min_gap=2.5,
             start_bound=combat_start_bound,
             end_bound=combat_end_bound
         )
@@ -950,13 +951,13 @@ def slice_action_moments_from_source(
             filtered_curated.append(c)
             continue
         if scorer and getattr(scorer, "window_scores", None):
-            matching_cv = [w for w in scorer.window_scores if abs(w["start"] - c["start"]) < 2.5]
+            matching_cv = [w for w in scorer.window_scores if abs(w["start"] - c["start"]) < 1.5]
             if matching_cv:
                 best_cv = max(matching_cv, key=lambda w: w.get("score", 0))
                 # High-energy sakuga or impact collision (high motion or high particle saturation) - definitely KEEP!
-                if best_cv.get("avg_diff", 0.0) >= 5.0 or best_cv.get("avg_highlight", 0.0) >= 3.0:
+                if best_cv.get("avg_diff", 0.0) >= 5.0 or best_cv.get("avg_highlight", 0.0) >= 2.5:
                     c["score"] += best_cv.get("score", 0.0) * 0.4
-                elif best_cv.get("rejected", False) or (best_cv.get("avg_diff", 0.0) < 4.0 and best_cv.get("avg_highlight", 0.0) < 2.0):
+                elif best_cv.get("rejected", False) or (best_cv.get("avg_diff", 0.0) < 4.5 and best_cv.get("avg_highlight", 0.0) < 2.0):
                     # Reject static spectator reaction cutaways & dark void frames
                     dropped_cutaways += 1
                     continue
@@ -1064,7 +1065,7 @@ def slice_action_moments_from_source(
         and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
     ]
     if finisher_candidates:
-        finisher = max(finisher_candidates, key=lambda x: x["start"])
+        finisher = max(finisher_candidates, key=lambda x: x.get("score", 0.0))
     elif len(final_candidates) > 2:
         valid_finishers = [
             c for c in final_candidates
@@ -1075,7 +1076,7 @@ def slice_action_moments_from_source(
             and (c["start"] + min(clip_duration, 3.5) <= end_bound)
             and (combat_start_bound <= c["start"] <= combat_end_bound if combat_window else True)
         ]
-        finisher = valid_finishers[-1] if valid_finishers else drop_climax
+        finisher = max(valid_finishers, key=lambda x: x.get("score", 0.0)) if valid_finishers else drop_climax
     else:
         finisher = final_candidates[0]
 
@@ -1244,7 +1245,8 @@ def slice_action_moments_from_source(
         if combat_window and idx >= drop_idx:
             # Strictly prevent slicing past scene_end or combat_end_bound to avoid bystander aftermath / flashbacks
             safe_end = min(cand.get("scene_end", combat_end_bound), combat_end_bound)
-            target_dur = min(target_dur, max(1.5, safe_end - start))
+            avail = max(0.5, safe_end - start)
+            target_dur = min(target_dur, avail)
 
         # Try 1: Probe-matched English Dub audio stream
         cmd = [

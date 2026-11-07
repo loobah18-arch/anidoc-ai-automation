@@ -231,9 +231,9 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         """Verify universal production scene selector bounds and bystander/aftermath rejection."""
         from core.gdrive_manager import get_episode_phase_boundaries
 
-        # 1. Demon Slayer S02E07 (Rengoku climax): Pure combat [480.0, 876.0] strictly ending before impalement/crying
+        # 1. Demon Slayer S02E07 (Rengoku climax): Pure combat [480.0, 826.0] strictly ending before impalement/crying
         bounds_s02e07 = get_episode_phase_boundaries("DS_S02E07", "rengoku", 1440.0)
-        self.assertEqual(bounds_s02e07["combat_window"], (480.0, 876.0))
+        self.assertEqual(bounds_s02e07["combat_window"], (480.0, 826.0))
         self.assertIsNone(bounds_s02e07["conv_window"])
         combat_st_07 = [s["start"] for s in bounds_s02e07["curated_combat_scenes"]]
         # Ground truth audits: strictly reject 273s Inosuke tear, 1000s sunrise, 1140s crow/Obanai, 1234s credits, 1266s Giyu, 1398s Tanjiro
@@ -244,10 +244,10 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         self.assertNotIn(1266.0, combat_st_07, "Giyu mourning at 1266s must be excluded")
         self.assertNotIn(1398.0, combat_st_07, "Tanjiro weeping at 1398s must be excluded")
 
-        # 2. Demon Slayer S02E06 (Rengoku vs Akaza setup): Dialogue [752.0, 886.5] & Combat [886.5, 1245.0]
+        # 2. Demon Slayer S02E06 (Rengoku vs Akaza setup): Dialogue [752.0, 886.5] & Combat [886.5, 1230.0]
         bounds_s02e06 = get_episode_phase_boundaries("DS_S02E06", "rengoku", 1420.0)
         self.assertEqual(bounds_s02e06["conv_window"], (752.0, 886.5))
-        self.assertEqual(bounds_s02e06["combat_window"], (886.5, 1245.0))
+        self.assertEqual(bounds_s02e06["combat_window"], (886.5, 1230.0))
         self.assertTrue(all(s["start"] >= 886.5 for s in bounds_s02e06["curated_combat_scenes"]))
         self.assertTrue(all(s["start"] < 886.5 for s in bounds_s02e06["curated_conv_scenes"]))
 

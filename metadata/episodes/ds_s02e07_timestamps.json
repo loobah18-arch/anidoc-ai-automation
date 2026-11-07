@@ -24,7 +24,7 @@
   ],
   "scene_count": 4,
   "source": "Google Drive - Demon Slayer Collection",
-  "notes": "DEMONSLAYER combat episode - pure action sakuga strictly ending before impalement/sunrise (sub-885s)",
+  "notes": "DEMONSLAYER combat episode - pure action sakuga strictly ending before impalement/sunrise (sub-826s)",
   "scenes": [
     {
       "start": 480.0,
@@ -67,29 +67,16 @@
     },
     {
       "start": 795.0,
-      "end": 820.0,
+      "end": 826.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Ninth Form terrain cleave & blazing canyon slash",
+      "description": "Supreme clash: Ninth Form terrain cleave & explosive collision vs Destructive Death Annihilation Type",
       "characters_present": [
         "rengoku",
         "akaza"
       ],
       "action_score": 1.0,
-      "duration": 25.0
-    },
-    {
-      "start": 860.0,
-      "end": 876.0,
-      "action_level": "EXPLOSIVE",
-      "priority": "high",
-      "description": "Supreme clash: Ninth Form Rengoku vs Destructive Death Annihilation Type explosive collision",
-      "characters_present": [
-        "rengoku",
-        "akaza"
-      ],
-      "action_score": 1.0,
-      "duration": 16.0
+      "duration": 31.0
     }
   ]
 }
