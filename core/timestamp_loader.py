@@ -51,7 +51,13 @@ def get_character_clips(
     character_clips = []
     for scene in metadata.get("scenes", []):
         chars_present = scene.get("characters_present", [])
-        action_score = scene.get("action_score", 0)
+        action_score = scene.get("action_score") if scene.get("action_score") is not None else (
+            1.0 if scene.get("action_level") == "EXPLOSIVE"
+            else 0.85 if scene.get("action_level") == "INTENSE"
+            else 0.70 if scene.get("action_level") == "MODERATE"
+            else 0.50 if scene.get("action_level") == "CALM"
+            else 0.0
+        )
 
         # Check if character appears and meets action threshold
         if character.lower() in [c.lower() for c in chars_present]:
@@ -61,7 +67,13 @@ def get_character_clips(
     # Sort by action score (highest first) and priority
     character_clips.sort(key=lambda x: (
         1 if x.get("priority") == "high" else (2 if x.get("priority") == "medium" else 3),
-        -x.get("action_score", 0)
+        -(x.get("action_score") if x.get("action_score") is not None else (
+            1.0 if x.get("action_level") == "EXPLOSIVE"
+            else 0.85 if x.get("action_level") == "INTENSE"
+            else 0.70 if x.get("action_level") == "MODERATE"
+            else 0.50 if x.get("action_level") == "CALM"
+            else 0.0
+        ))
     ))
 
     return character_clips[:max_clips]

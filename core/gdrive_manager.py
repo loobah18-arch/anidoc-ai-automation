@@ -617,7 +617,7 @@ def get_episode_phase_boundaries(
             st = float(s.get("start", 0.0))
             en = float(s.get("end", st + 10.0))
             desc = s.get("description", "").lower()
-            score = float(s.get("action_score", 0.0))
+            score = float(s.get("action_score") if s.get("action_score") is not None else (1.0 if s.get("action_level") == "EXPLOSIVE" else 0.85 if s.get("action_level") == "INTENSE" else 0.70 if s.get("action_level") == "MODERATE" else 0.50 if s.get("action_level") == "CALM" else 0.0))
             chars = [c.lower() for c in s.get("characters_present", [])]
 
             # Rejection 1: Aftermath, crying, sunrise, credits
@@ -801,7 +801,8 @@ def slice_action_moments_from_source(
             if _is_credit(desc):
                 return
 
-            base_score = float(s.get("action_score", 0.8)) * 100.0 + bonus
+            raw_action = s.get("action_score") if s.get("action_score") is not None else (1.0 if s.get("action_level") == "EXPLOSIVE" else 0.85 if s.get("action_level") == "INTENSE" else 0.70 if s.get("action_level") == "MODERATE" else 0.50 if s.get("action_level") == "CALM" else 0.80)
+            base_score = float(raw_action) * 100.0 + bonus
             if s.get("priority") == "high":
                 base_score += 15.0
 
@@ -1220,7 +1221,23 @@ def slice_action_moments_from_source(
                     pool_to_sort.sort(key=lambda c: (used_counts[c["start"]], -abs(c["start"] - prev_st)))
                     chosen_c = pool_to_sort[0]
                 else:
-                    chosen_c = final_candidates[0]
+                    combat_fallback = [
+                        c for c in final_candidates
+                        if not c.get("is_conversation", False)
+                        and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+                        and not _is_credit(c.get("description", ""))
+                    ]
+                    chosen_c = combat_fallback[0] if combat_fallback else (drop_climax or final_candidates[0])
+
+            # Invariant: Combat slots (i >= drop_idx) MUST NEVER contain conversation or credit scenes
+            if i >= drop_idx and (chosen_c.get("is_conversation", False) or any(kw in chosen_c.get("description", "").lower() for kw in pure_conv_keywords) or _is_credit(chosen_c.get("description", ""))):
+                combat_fallback = [
+                    c for c in final_candidates
+                    if not c.get("is_conversation", False)
+                    and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
+                    and not _is_credit(c.get("description", ""))
+                ]
+                chosen_c = combat_fallback[0] if combat_fallback else drop_climax
 
             selected[i] = chosen_c
             used_counts[chosen_c["start"]] += 1
