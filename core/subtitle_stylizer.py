@@ -141,6 +141,46 @@ DEFAULT_CHARACTER_DIALOGUE = {
     "zenitsu": [
         {"speaker": "Zenitsu", "text": "THUNDER BREATHING, FIRST FORM:\nTHUNDERCLAP AND FLASH...", "start_rel": 0.5, "end_rel": 8.0},
         {"speaker": "Zenitsu", "text": "SIXFOLD!", "start_rel": 9.0, "end_rel": 13.8}
+    ],
+    "tengen": [
+        {"speaker": "Tengen", "text": "THINGS ARE ABOUT TO GET REAL FLASHY!", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H00FFAA00"},
+        {"speaker": "Tengen", "text": "SOUND BREATHING, FOURTH FORM:\nBLOOMING FLAME CALAMITY!", "start_rel": 7.5, "end_rel": 13.8, "glow_color": "&H0000C8FF"}
+    ],
+    "inosuke": [
+        {"speaker": "Inosuke", "text": "COMING THROUGH! MAKE WAY FOR LORD INOSUKE!", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H0000FFCC"},
+        {"speaker": "Inosuke", "text": "BEAST BREATHING, FIFTH FANG:\nCRAZY CUTTING!", "start_rel": 7.5, "end_rel": 13.8, "glow_color": "&H0000FFFF"}
+    ],
+    "giyu": [
+        {"speaker": "Giyu", "text": "WATER BREATHING...", "start_rel": 0.5, "end_rel": 5.0, "glow_color": "&H00FF8800"},
+        {"speaker": "Giyu", "text": "ELEVENTH FORM:\nDEAD CALM.", "start_rel": 6.0, "end_rel": 13.8, "glow_color": "&H00FFFF00"}
+    ],
+    "muichiro": [
+        {"speaker": "Muichiro", "text": "WHICH FORM WAS IT AGAIN?", "start_rel": 0.5, "end_rel": 5.0, "glow_color": "&H00CCFF00"},
+        {"speaker": "Muichiro", "text": "MIST BREATHING, SEVENTH FORM:\nOBSCURING CLOUDS.", "start_rel": 6.0, "end_rel": 13.8, "glow_color": "&H00FFFFFF"}
+    ],
+    "gyutaro": [
+        {"speaker": "Gyutaro", "text": "YOU'RE A PRETTY BOY, AREN'T YOU? I HATE THAT...", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H000000FF"},
+        {"speaker": "Gyutaro", "text": "BLOOD DEMON ART:\nFLYING BLOOD SICKLES!", "start_rel": 7.5, "end_rel": 13.8, "glow_color": "&H002200CC"}
+    ],
+    "yuji": [
+        {"speaker": "Yuji", "text": "I DON'T CARE IF THIS BODY BREAKS...", "start_rel": 0.5, "end_rel": 6.0, "glow_color": "&H000000FF"},
+        {"speaker": "Yuji", "text": "BLACK FLASH!", "start_rel": 7.0, "end_rel": 13.8, "glow_color": "&H000000FF"}
+    ],
+    "megumi": [
+        {"speaker": "Megumi", "text": "WITH THIS TREASURE I SUMMON...", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H00333333"},
+        {"speaker": "Megumi", "text": "DIVINE GENERAL MAHORAGA!", "start_rel": 6.5, "end_rel": 13.8, "glow_color": "&H00FFFFFF"}
+    ],
+    "nobara": [
+        {"speaker": "Nobara", "text": "DON'T LOOK DOWN ON ME!", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H000055FF"},
+        {"speaker": "Nobara", "text": "HAIRPIN... RESONANCE!", "start_rel": 6.5, "end_rel": 13.8, "glow_color": "&H000088FF"}
+    ],
+    "todo": [
+        {"speaker": "Todo", "text": "WHAT KIND OF WOMAN IS YOUR TYPE?", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H00FF00AA"},
+        {"speaker": "Todo", "text": "BOOGIE WOOGIE!", "start_rel": 6.5, "end_rel": 13.8, "glow_color": "&H00FFAA00"}
+    ],
+    "mahito": [
+        {"speaker": "Mahito", "text": "THE SOUL COMES BEFORE THE BODY.", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H00AA00FF"},
+        {"speaker": "Mahito", "text": "IDLE TRANSFIGURATION!", "start_rel": 6.5, "end_rel": 13.8, "glow_color": "&H00FF00FF"}
     ]
 }
 

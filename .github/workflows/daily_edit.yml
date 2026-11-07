@@ -77,7 +77,7 @@ on:
         default: false
         type: boolean
       upload:
-        description: 'Upload rendered Short to YouTube (disabled by default on this branch)'
+        description: 'Upload rendered Short to YouTube (enabled automatically on daily schedule; optional for manual test dispatches)'
         required: false
         default: false
         type: boolean
