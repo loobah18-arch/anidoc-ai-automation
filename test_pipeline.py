@@ -244,8 +244,8 @@ class TestAniDocPipeline(unittest.TestCase):
             fps=60,
             is_intro_hook=True
         )
-        # 6% edge crop
-        self.assertIn("crop=in_w*0.88:in_h*0.88:in_w*0.06:in_h*0.06", dual_chain)
+        # Centered 3% edge crop
+        self.assertIn("crop=in_w*0.94:in_h*0.94:(in_w-in_w*0.94)/2:(in_h-in_h*0.94)/2", dual_chain)
         # Blurred synced background (1080x1920, boxblur=28:5, brightness 0.45)
         self.assertIn("boxblur=28:5", dual_chain)
         self.assertIn("colorchannelmixer=aa=1.0:rr=0.45:gg=0.45:bb=0.45", dual_chain)
