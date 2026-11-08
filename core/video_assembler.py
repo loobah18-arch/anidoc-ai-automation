@@ -327,14 +327,23 @@ def render_cinematic_edit(
             # Fetch pre-fight dialogue lines from metadata or fallback catalog
             dialogue_lines = []
             ep_meta = None
-            detected_ep_code = None
-            for cp in clip_paths:
-                code = match_episode_code_from_filename(cp.name)
-                if code:
-                    detected_ep_code = code
-                    ep_meta = load_episode_metadata(code)
-                    if ep_meta:
-                        break
+            detected_ep_code = target_episode
+            if detected_ep_code:
+                ep_meta = load_episode_metadata(detected_ep_code)
+
+            if not ep_meta:
+                for cp in clip_paths:
+                    code = match_episode_code_from_filename(cp.name)
+                    if code:
+                        # Universe safety: ensure code matches character's universe
+                        if theme.get("universe") == "demonslayer" and not code.startswith("DS_"):
+                            continue
+                        if theme.get("universe") in ("jjk", "marvel") and code.startswith("DS_"):
+                            continue
+                        detected_ep_code = code
+                        ep_meta = load_episode_metadata(code)
+                        if ep_meta:
+                            break
             if not ep_meta:
                 default_ep = (
                     "DS_S02E06" if character_key in ("rengoku", "akaza")
@@ -372,8 +381,11 @@ def render_cinematic_edit(
                     en = float(s.get("end", -999))
                     if abs(st - clip0_ts) < 5.0 or (st <= clip0_ts <= en):
                         if "dialogue" in s:
-                            scene_dialogue = s["dialogue"]
-                            break
+                            diag_speakers = [str(item.get("speaker", "")).lower() for item in s["dialogue"]]
+                            chars_in_s = [c.lower() for c in s.get("characters_present", [])]
+                            if any(character_key.lower() in sp or sp in character_key.lower() for sp in diag_speakers) or character_key.lower() in chars_in_s:
+                                scene_dialogue = s["dialogue"]
+                                break
 
             # Fallback to episode intro dialogue ONLY if it matches the current character
             intro_diag = None

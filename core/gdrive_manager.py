@@ -683,7 +683,13 @@ def get_episode_phase_boundaries(
         except Exception as e:
             print(f"⚠️ [AutoCatalog] Phase boundaries notice: {e}")
     if ep_meta and "scenes" in ep_meta:
-        valid_fighters = {character_key.lower()}
+        char_k_lower = character_key.lower()
+        # Does the episode have scenes explicitly featuring the target character?
+        has_character_scenes = any(
+            char_k_lower in [c.lower() for c in s.get("characters_present", [])]
+            for s in ep_meta.get("scenes", [])
+        )
+        valid_fighters = {char_k_lower}
         for c in ep_meta.get("characters", []):
             role = c.get("role", "").lower()
             if any(r in role for r in ["hashira", "moon", "antagonist", "protagonist", "fighter", "curse", "demon", "sorcerer"]):
@@ -710,18 +716,21 @@ def get_episode_phase_boundaries(
                 or (score < 0.70 and ("intro" in desc or "dialogue" in desc))
             )
 
-            has_target = character_key.lower() in chars
+            has_target = char_k_lower in chars
             has_fighter = any(f in chars for f in valid_fighters)
             is_solo_bystander = (not has_target) and all(
                 c in ["inosuke", "tanjiro", "zenitsu", "crow", "obanai", "yuji", "megumi", "spectator"]
                 for c in chars
             )
 
+            # Strict isolation: if episode has scenes for target character, ONLY select target's scenes
+            fighter_ok = has_target if has_character_scenes else (has_fighter and not is_solo_bystander)
+
             if is_conv:
-                if has_target or (has_fighter and not is_solo_bystander):
+                if fighter_ok:
                     curated_conv_scenes.append(s)
             else:
-                if score >= 0.70 and (has_target or (has_fighter and not is_solo_bystander)):
+                if score >= 0.70 and fighter_ok:
                     curated_combat_scenes.append(s)
 
         if curated_conv_scenes:

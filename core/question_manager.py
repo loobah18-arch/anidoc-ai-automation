@@ -317,7 +317,18 @@ def get_engaging_question(
     scene_pool: List[str] = []
     if clean_ep:
         for scene_key, questions in SCENE_SPECIFIC_QUESTIONS.items():
-            if scene_key.upper().replace("_", "") == clean_ep:
+            # Universe guard: reject cross-universe scenes
+            if anime_universe:
+                is_ds_scene = scene_key.startswith("DS_")
+                if anime_universe in ("demonslayer", "demon_slayer") and not is_ds_scene:
+                    continue
+                if anime_universe in ("jjk", "marvel") and is_ds_scene:
+                    continue
+
+            sk_clean = scene_key.upper().replace("_", "").replace("-", "")
+            if sk_clean == clean_ep or (
+                anime_universe in ("demonslayer", "demon_slayer") and sk_clean == f"DS{clean_ep}"
+            ):
                 scene_pool.extend(questions)
                 break
 

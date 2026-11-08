@@ -175,8 +175,10 @@ def match_episode_code_from_filename(filename: str) -> Optional[str]:
     is_ds = any(k in fn for k in [
         "demon", "slayer", "kimetsu", "yaiba", "kny", "mugen", "tanjiro", "rengoku",
         "zenitsu", "uzui", "akaza", "giyu", "inosuke", "muzan", "nezuko", "muichiro",
-        "gyutaro", "swordsmith", "entertainment", "yukaku", "hashira"
-    ])
+        "gyutaro", "swordsmith", "entertainment", "yukaku", "hashira",
+        "shinobu", "kocho", "kanae", "kanroji", "mitsuri", "sanemi", "gyomei", "iguro", "obanai",
+        "ds_", "ds-", "demonslayer"
+    ]) or fn.startswith("ds")
 
     # 2. Jujutsu Kaisen specific identification
     is_jjk = any(k in fn for k in [
@@ -270,12 +272,18 @@ def match_episode_code_from_filename(filename: str) -> Optional[str]:
     if match:
         season = int(match.group(1))
         episode = int(match.group(2))
-        jjk_cand = f"S{season:02d}E{episode:02d}"
-        if load_episode_metadata(jjk_cand):
-            return jjk_cand
         ds_cand = f"DS_S{season:02d}E{episode:02d}"
-        if load_episode_metadata(ds_cand):
-            return ds_cand
+        jjk_cand = f"S{season:02d}E{episode:02d}"
+        if any(h in fn for h in ["ds", "demon", "kimetsu", "shinobu", "kocho", "giyu", "hashira"]):
+            if load_episode_metadata(ds_cand):
+                return ds_cand
+            if load_episode_metadata(jjk_cand):
+                return jjk_cand
+        else:
+            if load_episode_metadata(jjk_cand):
+                return jjk_cand
+            if load_episode_metadata(ds_cand):
+                return ds_cand
 
     # ── CASE D: MULTI-ANIME & NEW EPISODE DETECTION ─────────────────────────
     try:
