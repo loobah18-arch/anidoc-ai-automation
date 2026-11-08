@@ -180,10 +180,15 @@ class SceneScorer:
 
         return chosen[:n_clips]
 
-    def find_active_intro_hook(self, max_start: float = 45.0, min_diff: float = 3.0) -> Optional[Dict[str, Any]]:
+    def find_active_intro_hook(
+        self,
+        min_start: float = 90.0,
+        max_start: float = 360.0,
+        min_diff: float = 3.0
+    ) -> Optional[Dict[str, Any]]:
         """
         Intro Hook Enforcement (0:00–0:03):
-        Ensures the first clip starts on active movement, never a static/dark frame.
+        Ensures the first clip starts on active movement, never a static/dark frame or studio logo.
         """
         if not self.window_scores:
             self.analyze()
@@ -191,7 +196,7 @@ class SceneScorer:
         candidates = [
             w for w in self.window_scores
             if not w["rejected"]
-            and w["start"] <= max_start
+            and min_start <= w["start"] <= max_start
             and w["avg_diff"] >= min_diff
             and w["avg_luma"] >= 35.0
         ]

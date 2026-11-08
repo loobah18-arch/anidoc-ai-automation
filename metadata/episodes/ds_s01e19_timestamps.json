@@ -27,6 +27,29 @@
   "scene_count": 6,
   "source": "Google Drive - Demon Slayer Collection",
   "notes": "DEMONSLAYER combat episode",
+  "intro_dialogue": [
+    {
+      "speaker": "Tanjiro",
+      "text": "THE BOND BETWEEN NEZUKO AND ME...",
+      "start_rel": 0.5,
+      "end_rel": 5.0,
+      "glow_color": "&H00FFAA00"
+    },
+    {
+      "speaker": "Tanjiro",
+      "text": "CANNOT BE SEVERED BY ANYONE!",
+      "start_rel": 5.5,
+      "end_rel": 8.5,
+      "glow_color": "&H0000C8FF"
+    },
+    {
+      "speaker": "Tanjiro",
+      "text": "HINOKAMI KAGURA: DANCE!",
+      "start_rel": 9.0,
+      "end_rel": 13.8,
+      "glow_color": "&H00FF0022"
+    }
+  ],
   "scenes": [
     {
       "start": 180.0,
@@ -57,11 +80,12 @@
       "end": 960.0,
       "action_level": "CALM",
       "priority": "low",
-      "description": "Tanjuro Kagura memory: Breath properly and dance without fatigue",
+      "description": "Pre-fight memory & dialogue: Tanjuro Kagura memory - Breath properly and dance without fatigue",
       "characters_present": [
         "tanjiro"
       ],
       "action_score": 0.60,
+      "is_conversation": true,
       "duration": 180.0
     },
     {

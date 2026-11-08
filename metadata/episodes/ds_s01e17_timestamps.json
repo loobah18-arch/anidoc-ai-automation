@@ -18,6 +18,29 @@
   "scene_count": 5,
   "source": "Google Drive - Demon Slayer Collection",
   "notes": "DEMONSLAYER combat episode",
+  "intro_dialogue": [
+    {
+      "speaker": "Gramps",
+      "text": "IF YOU CAN ONLY DO ONE THING...",
+      "start_rel": 0.5,
+      "end_rel": 4.5,
+      "glow_color": "&H00FFAA00"
+    },
+    {
+      "speaker": "Gramps",
+      "text": "HONE IT TO ABSOLUTE PERFECTION!",
+      "start_rel": 5.0,
+      "end_rel": 8.0,
+      "glow_color": "&H00FFFF00"
+    },
+    {
+      "speaker": "Zenitsu",
+      "text": "THUNDERCLAP AND FLASH: SIXFOLD!",
+      "start_rel": 8.5,
+      "end_rel": 13.8,
+      "glow_color": "&H0000FFFF"
+    }
+  ],
   "scenes": [
     {
       "start": 120.0,
@@ -45,15 +68,16 @@
     },
     {
       "start": 780.0,
-      "end": 920.0,
-      "action_level": "MODERATE",
+      "end": 940.0,
+      "action_level": "CALM",
       "priority": "medium",
-      "description": "Gramps flashback: Hone a single strike to absolute perfection",
+      "description": "Pre-fight memory & dialogue: Gramps flashback - Hone a single strike to absolute perfection",
       "characters_present": [
         "zenitsu"
       ],
-      "action_score": 0.50,
-      "duration": 140.0
+      "action_score": 0.65,
+      "is_conversation": true,
+      "duration": 160.0
     },
     {
       "start": 960.0,

@@ -36,6 +36,29 @@
   "scene_count": 5,
   "source": "Google Drive - Demon Slayer Collection",
   "notes": "DEMONSLAYER combat episode",
+  "intro_dialogue": [
+    {
+      "speaker": "Tengen",
+      "text": "WE ARE GOING FOR THE WIN!",
+      "start_rel": 0.5,
+      "end_rel": 4.5,
+      "glow_color": "&H00FFAA00"
+    },
+    {
+      "speaker": "Tengen",
+      "text": "MUSICAL SCORE TECHNIQUE...",
+      "start_rel": 5.0,
+      "end_rel": 8.0,
+      "glow_color": "&H0000C8FF"
+    },
+    {
+      "speaker": "Tengen",
+      "text": "COMPLETE!",
+      "start_rel": 8.5,
+      "end_rel": 13.8,
+      "glow_color": "&H00FFFF00"
+    }
+  ],
   "scenes": [
     {
       "start": 180.0,
@@ -52,14 +75,15 @@
     {
       "start": 420.0,
       "end": 660.0,
-      "action_level": "EXPLOSIVE",
+      "action_level": "CALM",
       "priority": "high",
-      "description": "Tengen Uzui arrives with completed Musical Score: We are going for the win!",
+      "description": "Pre-fight standoff & dialogue: Tengen Uzui arrives with completed Musical Score - We are going for the win!",
       "characters_present": [
         "tengen",
         "gyutaro"
       ],
-      "action_score": 0.95,
+      "action_score": 0.70,
+      "is_conversation": true,
       "duration": 240.0
     },
     {

@@ -255,9 +255,9 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         self.assertTrue(all(s["start"] >= 886.5 for s in bounds_s02e06["curated_combat_scenes"]))
         self.assertTrue(all(s["start"] < 886.5 for s in bounds_s02e06["curated_conv_scenes"]))
 
-        # 3. JJK S02E17 (Sukuna vs Mahoraga): Combat [120.0, 1080.0], Yuji crying in ruins excluded
+        # 3. JJK S02E17 (Sukuna vs Mahoraga): Combat [120.0, 1040.0], Yuji crying in ruins excluded
         bounds_s02e17 = get_episode_phase_boundaries("S02E17", "sukuna", 1440.0)
-        self.assertEqual(bounds_s02e17["combat_window"], (120.0, 1080.0))
+        self.assertEqual(bounds_s02e17["combat_window"], (120.0, 1040.0))
         combat_st_jjk = [s["start"] for s in bounds_s02e17["curated_combat_scenes"]]
         self.assertNotIn(1080.0, combat_st_jjk, "Yuji crying in Shibuya ruins (1080s) must be excluded from Sukuna combat")
 
@@ -311,6 +311,39 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         zen_eps = pick_character_episodes(mock_gdrive_files, "zenitsu", max_episodes=2)
         self.assertTrue(len(zen_eps) >= 1)
         self.assertTrue(all("Demon_Slayer" in ep["name"] for ep in zen_eps))
+
+    def test_11_english_dub_filtering_and_single_battle_cohesion(self):
+        """Verify English dub footage is completely purged and 1 Short = 1 Battle is enforced."""
+        from core.gdrive_manager import pick_character_episodes, pick_best_file_for_character
+
+        mixed_files = [
+            {"name": "Jujutsu_Kaisen_[English]_1080P_S02_E04.mp4", "id": "fid_gojo_eng_04"},
+            {"name": "Jujutsu_Kaisen_[English]_1080P_S02_E09.mp4", "id": "fid_gojo_eng_09"},
+            {"name": "Jujutsu_Kaisen-S02E04-720p.mkv", "id": "fid_gojo_jpn_04"},
+            {"name": "Jujutsu_Kaisen-S02E09-720p.mkv", "id": "fid_gojo_jpn_09"},
+            {"name": "Demon_Slayer_[English]_S01E19.mp4", "id": "fid_ds_eng_19"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_S01_E19.mp4", "id": "fid_ds_jpn_19"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_S02_E06.mp4", "id": "fid_ds_06"},
+            {"name": "Demon_Slayer_Kimetsu_no_Yaiba_S02_E07.mp4", "id": "fid_ds_07"},
+        ]
+
+        # 1. English dubbed files are filtered out, preferring pure Japanese audio
+        gojo_eps = pick_character_episodes(mixed_files, "gojo")
+        self.assertEqual(len(gojo_eps), 1, "Gojo must default to exactly 1 episode to prevent era clashing")
+        self.assertNotIn("English", gojo_eps[0]["name"])
+        self.assertIn("720p.mkv", gojo_eps[0]["name"])
+
+        # 2. Pick best file for Tanjiro rejects English dub file
+        tanjiro_best = pick_best_file_for_character(mixed_files, "tanjiro")
+        self.assertIsNotNone(tanjiro_best)
+        self.assertNotIn("English", tanjiro_best["name"])
+        self.assertEqual(tanjiro_best["id"], "fid_ds_jpn_19")
+
+        # 3. Rengoku continuous battle can select 2 episodes if max_episodes=2
+        rengoku_eps = pick_character_episodes(mixed_files, "rengoku", max_episodes=2)
+        self.assertEqual(len(rengoku_eps), 2)
+        self.assertTrue(any("S02_E06" in ep["name"] for ep in rengoku_eps))
+        self.assertTrue(any("S02_E07" in ep["name"] for ep in rengoku_eps))
 
 if __name__ == "__main__":
     unittest.main()

@@ -12,73 +12,88 @@
         "Rips off Hanami's wooden branches bare-handed",
         "Crushes Hanami into the wall with Infinity",
         "0.2-second Domain Expansion: Unlimited Void",
-        "ErButton-smashing massacre of 1,000 transfigured humans"
+        "Supersonic sprint massacre of 1,000 transfigured humans"
       ]
     }
   ],
-  "scene_count": 5,
+  "scene_count": 4,
   "source": "Google Drive - JJK Collection",
-  "notes": "JJK combat episode",
+  "notes": "JJK combat episode - Adult Gojo Shibuya Subway Climax",
+  "intro_dialogue": [
+    {
+      "speaker": "Gojo",
+      "text": "IS THAT ALL YOU'VE GOT?",
+      "start_rel": 0.5,
+      "end_rel": 4.5,
+      "glow_color": "&H00FFAA00"
+    },
+    {
+      "speaker": "Gojo",
+      "text": "DOMAIN EXPANSION...",
+      "start_rel": 5.0,
+      "end_rel": 8.5,
+      "glow_color": "&H0000FFFF"
+    },
+    {
+      "speaker": "Gojo",
+      "text": "0.2-SECOND UNLIMITED VOID.",
+      "start_rel": 9.0,
+      "end_rel": 13.8,
+      "glow_color": "&H00FF00AA"
+    }
+  ],
   "scenes": [
     {
       "start": 180.0,
-      "end": 420.0,
-      "action_level": "INTENSE",
+      "end": 380.0,
+      "action_level": "CALM",
       "priority": "high",
-      "description": "Gojo engages disaster curses without using cursed energy blasts to protect civilians",
+      "description": "Pre-fight standoff & dialogue: Gojo engages disaster curses without using cursed energy blasts",
       "characters_present": [
         "gojo"
       ],
-      "action_score": 0.75,
-      "duration": 240.0
+      "action_score": 0.65,
+      "is_conversation": true,
+      "duration": 200.0
     },
     {
-      "start": 420.0,
-      "end": 660.0,
+      "start": 390.0,
+      "end": 540.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Gojo corners Hanami and crushes him into dust against the subway wall",
+      "description": "Combat clash: Gojo corners Hanami, rips branches bare-handed and crushes him with Infinity",
       "characters_present": [
         "gojo"
       ],
       "action_score": 0.95,
-      "duration": 240.0
+      "is_conversation": false,
+      "duration": 150.0
     },
     {
-      "start": 720.0,
-      "end": 900.0,
+      "start": 740.0,
+      "end": 850.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Gojo expands 0.2-second Unlimited Void paralyzing all brains",
+      "description": "Combat clash: Gojo expands 0.2-second Unlimited Void domain expansion paralyzing all brains",
       "characters_present": [
         "gojo"
       ],
-      "action_score": 0.95,
-      "duration": 180.0
+      "action_score": 0.98,
+      "is_conversation": false,
+      "duration": 110.0
     },
     {
-      "start": 900.0,
-      "end": 1080.0,
+      "start": 890.0,
+      "end": 1040.0,
       "action_level": "EXPLOSIVE",
       "priority": "high",
-      "description": "Gojo sprints at supersonic speeds decapitating 1,000 transfigured humans in 299 seconds",
+      "description": "💎 CLIMAX & FINISHER: Gojo sprints at supersonic speeds decapitating 1,000 transfigured humans in 299 seconds",
       "characters_present": [
         "gojo"
       ],
-      "action_score": 0.95,
-      "duration": 180.0
-    },
-    {
-      "start": 1080.0,
-      "end": 1320.0,
-      "action_level": "EXPLOSIVE",
-      "priority": "high",
-      "description": "Kenjaku appears with Prison Realm: Good evening, Satoru Gojo",
-      "characters_present": [
-        "gojo"
-      ],
-      "action_score": 0.95,
-      "duration": 240.0
+      "action_score": 1.0,
+      "is_conversation": false,
+      "duration": 150.0
     }
   ]
 }

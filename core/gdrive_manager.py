@@ -189,13 +189,14 @@ def get_file_universe(filename: str) -> Optional[str]:
 def pick_character_episodes(
     files: List[Dict[str, str]],
     character_key: str,
-    max_episodes: int = 2,
+    max_episodes: int = 1,
     title: Optional[str] = None,
     target_episode: Optional[str] = None
 ) -> List[Dict[str, str]]:
     """
     Selects up to max_episodes diverse, non-repetitive episodes/movies for the character.
-    Guarantees multi-episode story progression (e.g. S02E06 dialogue + S02E07 climax for Rengoku).
+    Guarantees single cohesive battle per Short (max_episodes=1 default) to avoid
+    jarring era/visual clashes, unless explicitly Rengoku Mugen Train continuous arc (S02E06+S02E07).
     Supports:
       - Explicit target_episode selection (CLI/workflow parameter)
       - Title-driven episode routing
@@ -214,10 +215,10 @@ def pick_character_episodes(
         print(f"⚠️ [GoogleDrive] No Google Drive files match universe '{char_universe}' for character '{character_key}'.")
         return []
 
-    # Clean pool of piracy-dub / corrupt files
+    # Clean pool of piracy-dub / corrupt files and English-dubbed footage (favor authentic Japanese audio)
     clean_pool = [
         f for f in universe_files
-        if not any(b in f["name"].lower() for b in ["hindi", "dual audio", "pikahd"])
+        if not any(b in f["name"].lower() for b in ["hindi", "dual audio", "pikahd", "english", "[english]", "(english)", "eng dub", "dubbed"])
     ]
     if clean_pool:
         universe_files = clean_pool
@@ -260,9 +261,9 @@ def pick_character_episodes(
         except Exception as e:
             print(f"⚠️ [GoogleDrive] Title episode intent resolution notice: {e}")
 
-    # 3. Special multi-episode pairs for iconic anime arcs:
-    # 1. Rengoku: S02E06 + S02E07
-    if character_key == "rengoku":
+    # 3. Special multi-episode pairs for continuous anime battles:
+    # Rengoku: S02E06 + S02E07 (the only legitimate continuous 2-part battle in library)
+    if character_key == "rengoku" and max_episodes >= 2:
         e6 = next((f for f in universe_files if "s02_e06" in f["name"].lower() or "s02e06" in f["name"].lower()), None)
         e7 = next((f for f in universe_files if "s02_e07" in f["name"].lower() or "s02e07" in f["name"].lower()), None)
         chosen = []
@@ -272,42 +273,6 @@ def pick_character_episodes(
             chosen.append(e7)
         if chosen:
             print(f"🎯 [GoogleDrive] Multi-Episode Selection for Rengoku: {[c['name'] for c in chosen]}")
-            return chosen
-
-    # 2. Gojo: S02E09 + S02E04
-    if character_key == "gojo":
-        e9 = next((f for f in universe_files if "s02e09" in f["name"].lower() or "s02_e09" in f["name"].lower()), None)
-        e4 = next((f for f in universe_files if "s02e04" in f["name"].lower() or "s02_e04" in f["name"].lower()), None)
-        chosen = []
-        if e9:
-            chosen.append(e9)
-        if e4 and len(chosen) < max_episodes:
-            chosen.append(e4)
-        if chosen:
-            return chosen
-
-    # 3. Sukuna: S02E17 + S02E16
-    if character_key == "sukuna":
-        e17 = next((f for f in universe_files if "s02e17" in f["name"].lower() or "s02_e17" in f["name"].lower()), None)
-        e16 = next((f for f in universe_files if "s02e16" in f["name"].lower() or "s02_e16" in f["name"].lower()), None)
-        chosen = []
-        if e17:
-            chosen.append(e17)
-        if e16 and len(chosen) < max_episodes:
-            chosen.append(e16)
-        if chosen:
-            return chosen
-
-    # 4. Tanjiro: S01E19 + S02E10
-    if character_key == "tanjiro":
-        e19 = next((f for f in universe_files if "s01_e19" in f["name"].lower() or "s01e19" in f["name"].lower() or "e19" in f["name"].lower()), None)
-        e10 = next((f for f in universe_files if "s02_e10" in f["name"].lower() or "s02e10" in f["name"].lower() or "e10" in f["name"].lower()), None)
-        chosen = []
-        if e19:
-            chosen.append(e19)
-        if e10 and len(chosen) < max_episodes:
-            chosen.append(e10)
-        if chosen:
             return chosen
 
     # 4. Universal multi-episode rotation across ALL available episodes for the character / universe
@@ -362,10 +327,10 @@ def pick_best_file_for_character(
         print(f"⚠️ [GoogleDrive] No Google Drive files match universe '{char_universe}' for character '{character_key}'. Rejecting cross-universe selection.")
         return None
 
-    # Quality Gate: Filter out 480p low-res and dual-audio/piracy-dub files (favor 1080p/720p)
+    # Quality Gate: Filter out 480p low-res, piracy-dub, and English dub files (favor Japanese 1080p/720p)
     clean_pool = [
         f for f in universe_files
-        if not any(b in f["name"].lower() for b in ["480p", "hindi", "dual audio", "pikahd"])
+        if not any(b in f["name"].lower() for b in ["480p", "hindi", "dual audio", "pikahd", "english", "[english]", "(english)", "eng dub", "dubbed"])
     ]
     if clean_pool:
         universe_files = clean_pool
@@ -577,10 +542,11 @@ def download_single_gdrive_file(file_info: Dict[str, str], download_dir: Path) -
     return None
 
 
-def get_english_audio_map(video_path: Path) -> List[str]:
+def get_japanese_audio_map(video_path: Path) -> List[str]:
     """
-    Probes video streams and returns the FFmpeg -map arguments for the English audio track,
-    preferring English Dub streams in multi-language MKV/MP4 files.
+    Probes video streams and returns the FFmpeg -map arguments for the original Japanese audio track,
+    preferring Japanese (jpn/japanese/jap/nihongo) streams in multi-language MKV/MP4 files.
+    Avoids English/dubbed audio tracks to guarantee authentic anime voice acting.
     """
     cmd = [
         "ffprobe", "-v", "error",
@@ -592,7 +558,7 @@ def get_english_audio_map(video_path: Path) -> List[str]:
         data = json.loads(res.stdout)
         streams = data.get("streams", [])
         
-        eng_audio_a_idx = None
+        jpn_audio_a_idx = None
         first_audio_a_idx = None
         audio_count = 0
         for s in streams:
@@ -602,17 +568,21 @@ def get_english_audio_map(video_path: Path) -> List[str]:
                 tags = s.get("tags", {})
                 lang = tags.get("language", "").lower()
                 title = tags.get("title", "").lower()
-                if "eng" in lang or "english" in title or "dub" in title:
-                    eng_audio_a_idx = audio_count
+                if any(k in lang or k in title for k in ["jpn", "japanese", "jap", "nihongo"]):
+                    jpn_audio_a_idx = audio_count
                     break
                 audio_count += 1
         
-        chosen_a_idx = eng_audio_a_idx if eng_audio_a_idx is not None else first_audio_a_idx
+        chosen_a_idx = jpn_audio_a_idx if jpn_audio_a_idx is not None else first_audio_a_idx
         if chosen_a_idx is not None:
             return ["-map", "0:v:0", "-map", f"0:a:{chosen_a_idx}?"]
     except Exception:
         pass
     return ["-map", "0:v:0", "-map", "0:a:0?"]
+
+
+# Backward-compatible alias
+get_english_audio_map = get_japanese_audio_map
 
 
 def is_black_or_credit_frame(video_path: Path, start_time: float, duration: float = 2.0) -> bool:
@@ -677,7 +647,9 @@ def get_episode_phase_boundaries(
         "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning",
         "funeral", "sunrise", "dawn", "carriage", "passenger", "fleeing",
         "corpse", "tears", "flashback", "bystander", "reaction", "spectator",
-        "injured", "kneeling", "impal"
+        "injured", "kneeling", "impal", "prison realm", "kenjaku", "sealed",
+        "sealing", "star religious", "riko", "headquarters", "crying in despair",
+        "white void", "feeds sukuna", "church", "cult"
     ]
 
     ep_meta = load_episode_metadata(matched_ep_code) if matched_ep_code else None
@@ -847,7 +819,9 @@ def slice_action_moments_from_source(
         "crow", "aftermath", "mother", "weep", "crying", "dying", "mourning",
         "funeral", "sunrise", "dawn", "carriage", "passenger", "fleeing",
         "corpse", "tears", "flashback", "bystander", "reaction", "spectator",
-        "injured", "kneeling", "impal"
+        "injured", "kneeling", "impal", "prison realm", "kenjaku", "sealed",
+        "sealing", "star religious", "riko", "headquarters", "crying in despair",
+        "white void", "feeds sukuna", "church", "cult"
     ]
     def _is_credit(desc_text: str) -> bool:
         low = desc_text.lower()
@@ -958,7 +932,9 @@ def slice_action_moments_from_source(
                     "is_curated": False,
                     "is_conversation": False
                 })
-        intro_hook_cand = scorer.find_active_intro_hook(max_start=combat_start_bound + 30.0)
+        intro_min = conv_window[0] if conv_window else (90.0 if total_duration > 600 else 1.0)
+        intro_max = conv_window[1] if conv_window else min(360.0, combat_start_bound + 30.0)
+        intro_hook_cand = scorer.find_active_intro_hook(min_start=intro_min, max_start=intro_max)
         print(f"👁️ [ActionSlicer] OpenCV Scorer discovered {len(cv_candidates)} high-motion climax windows within combat bounds.")
     except Exception as e:
         print(f"⚠️ [ActionSlicer] OpenCV scoring fallback: {e}")
@@ -1319,8 +1295,8 @@ def slice_action_moments_from_source(
 
     print(f"💥 [ActionSlicer] Mapped #1 CLIMAX scene ({drop_climax['start']:.1f}s, {drop_climax['tag']}) directly to Beat Drop (Clip {drop_idx+1})!")
 
-    # Probe English Dub audio stream mapping
-    eng_audio_map = get_english_audio_map(video_path)
+    # Probe authentic Japanese anime audio stream mapping
+    eng_audio_map = get_japanese_audio_map(video_path)
 
     generated_clips = []
     new_used_ts = []
@@ -1467,8 +1443,10 @@ def fetch_and_prepare_gdrive_footage(
         print("⚠️ [GoogleDrive] No files retrieved from Google Drive folder index.")
         return []
 
-    # Select candidate episodes (up to 2 for rich multi-episode combat arcs)
-    candidate_episodes = pick_character_episodes(items, target_character, max_episodes=2, title=title, target_episode=target_episode)
+    # Select candidate episodes: single episode by default to prevent era/arc Frankenstein clashes,
+    # unless Rengoku Mugen Train continuous 2-part battle (S02E06 + S02E07)
+    max_eps = 2 if (target_character == "rengoku" and not target_episode) else 1
+    candidate_episodes = pick_character_episodes(items, target_character, max_episodes=max_eps, title=title, target_episode=target_episode)
     if not candidate_episodes:
         print(f"⚠️ [GoogleDrive] No matching episodes found for '{target_character}'.")
         return []
