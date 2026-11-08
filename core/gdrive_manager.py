@@ -1363,17 +1363,19 @@ def slice_action_moments_from_source(
         start = cand["start"]
         out_clip = output_dir / f"{prefix}_{idx:02d}_{int(start)}s.mp4"
         
-        # Duration: intro clip needs the full continuous conversation duration (at least 18s), combat clips need 4.5s
-        target_dur = max(clip_duration, 18.0) if idx < drop_idx else min(clip_duration, 5.0)
-        if combat_window and idx >= drop_idx:
-            # Strictly prevent slicing past scene_end or combat_end_bound to avoid bystander aftermath / flashbacks
-            safe_end = min(cand.get("scene_end", combat_end_bound), combat_end_bound)
-            avail = max(0.5, safe_end - start)
-            target_dur = min(target_dur, avail)
-        elif idx < drop_idx and cand.get("scene_end"):
-            # Ensure full speech completion without rushing
-            avail = max(18.0, cand["scene_end"] - start)
-            target_dur = avail
+        # Duration: intro clip needs the pre-fight standoff conversation duration (at least 16s, up to 20s), combat clips need 3.5 to 5.0s
+        if idx < drop_idx:
+            if cand.get("scene_end"):
+                avail = max(0.5, cand["scene_end"] - start)
+                target_dur = max(16.0, min(avail, 20.0))
+            else:
+                target_dur = max(16.0, min(clip_duration, 20.0))
+        else:
+            target_dur = min(clip_duration, 5.0)
+            if combat_window:
+                safe_end = min(cand.get("scene_end", combat_end_bound), combat_end_bound)
+                avail = max(0.5, safe_end - start)
+                target_dur = min(target_dur, avail)
 
         # Try 1: Probe-matched English Dub audio stream
         cmd = [
@@ -1399,7 +1401,7 @@ def slice_action_moments_from_source(
             subprocess.run(cmd, capture_output=True, check=True, timeout=60)
             if out_clip.exists() and out_clip.stat().st_size > 40_000:
                 sliced_successfully = True
-        except subprocess.CalledProcessError as e:
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
             # Try 2: Generic optional audio mapping (0:v:0 + 0:a:0?)
             fallback_cmd = [
                 "ffmpeg", "-y",
@@ -1422,7 +1424,7 @@ def slice_action_moments_from_source(
                 subprocess.run(fallback_cmd, capture_output=True, check=True, timeout=60)
                 if out_clip.exists() and out_clip.stat().st_size > 40_000:
                     sliced_successfully = True
-            except subprocess.CalledProcessError as e2:
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e2:
                 # Try 3: Video-only stream extraction (-an) to guarantee real 1080p anime footage
                 video_only_cmd = [
                     "ffmpeg", "-y",
@@ -1444,9 +1446,25 @@ def slice_action_moments_from_source(
                 except Exception as e3:
                     err_msg = (e3.stderr.decode() if hasattr(e3, "stderr") and e3.stderr else str(e3))[-250:]
                     print(f"  ⚠️ Error cutting clip at {start}s across all audio/video attempts: {err_msg}")
+        except Exception as e_unexp:
+            print(f"  ⚠️ Unexpected error cutting clip at {start}s: {e_unexp}")
 
-        # Clean up any 0-byte or corrupted fragments so they don't pollute clip discovery
-        if not sliced_successfully:
+        # Strict validation: verify file exists, size > 40KB, and valid moov atom / stream duration via ffprobe
+        is_valid = False
+        if sliced_successfully and out_clip.exists() and out_clip.stat().st_size > 40_000:
+            try:
+                probe_test = subprocess.run(
+                    ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(out_clip)],
+                    capture_output=True, text=True, timeout=5
+                )
+                if probe_test.returncode == 0 and probe_test.stdout.strip():
+                    dur_val = float(probe_test.stdout.strip())
+                    if dur_val >= 0.5:
+                        is_valid = True
+            except Exception:
+                is_valid = False
+
+        if not is_valid:
             out_clip.unlink(missing_ok=True)
         else:
             generated_clips.append(out_clip)
@@ -1457,7 +1475,7 @@ def slice_action_moments_from_source(
                 else ("🔥 FINISHER" if idx == last_idx
                 else "⚔️ Scene"))
             )
-            print(f"  ✂️ Clip {idx+1:02d}/{len(selected)} sliced ({start:.1f}s - {start+clip_duration:.1f}s) [{role_tag}] {cand.get('tag', '')}")
+            print(f"  ✂️ Clip {idx+1:02d}/{len(selected)} sliced ({start:.1f}s - {start+target_dur:.1f}s) [{role_tag}] {cand.get('tag', '')}")
 
     # Record used timestamps in history
     if "used_timestamps" not in history:

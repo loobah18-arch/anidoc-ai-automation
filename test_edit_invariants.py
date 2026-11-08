@@ -108,5 +108,15 @@ class TestAnimeEditInvariants(unittest.TestCase):
         self.assertIn("I WILL FULFILL MY DUTY", dialogue[2]["text"])
         self.assertLessEqual(dialogue[2]["end_rel"], 13.6)
 
+    def test_06_clip_health_validation(self):
+        """Verify that invalid or missing clips are rejected by is_clip_healthy."""
+        from core.clip_manager import is_clip_healthy
+        from config.settings import SCRATCH_DIR
+        bad_path = SCRATCH_DIR / "fake_corrupt_test_file.mp4"
+        bad_path.write_bytes(b"corrupted binary data without moov atom")
+        self.assertFalse(is_clip_healthy(bad_path))
+        bad_path.unlink(missing_ok=True)
+        self.assertFalse(is_clip_healthy(bad_path))
+
 if __name__ == "__main__":
     unittest.main()

@@ -33,7 +33,7 @@ from core.open_source_editor import (
 )
 from core.xfade_engine import build_xfade_transition_filter
 from core.beat_detector import analyze_audio_beats, BeatGrid
-from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES
+from core.clip_manager import get_character_scene_clips, CHARACTER_THEMES, is_clip_healthy
 from core.phonk_manager import get_random_or_specified_phonk
 from core.best_moments import fetch_best_episode_clips
 from core.free_stream_fetcher import fetch_free_stream_clips
@@ -169,9 +169,11 @@ def render_cinematic_edit(
         )
         seen_loc = set()
         for lp in local_cand:
-            if lp.exists() and lp.stat().st_size > 20_000 and str(lp) not in seen_loc:
+            if is_clip_healthy(lp) and str(lp) not in seen_loc:
                 seen_loc.add(str(lp))
                 clip_paths.append(lp)
+            elif lp.exists() and not lp.name.startswith("proc_"):
+                lp.unlink(missing_ok=True)
         if len(clip_paths) >= n_clips:
             print(f"🎬 [LocalClips] Using {len(clip_paths)} high-definition action clips locally for '{character_key}'.")
 

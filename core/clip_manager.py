@@ -235,6 +235,22 @@ def generate_procedural_cinematic_scene(
     return output_path
 
 
+def is_clip_healthy(p: Path) -> bool:
+    """Verifies that an MP4 clip exists, is >20KB, and has readable streams via ffprobe (no moov atom corruption)."""
+    if not p.exists() or p.stat().st_size <= 20_000:
+        return False
+    if p.name.startswith("proc_"):
+        return False
+    try:
+        res = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(p)],
+            capture_output=True, text=True, timeout=5
+        )
+        return res.returncode == 0 and bool(res.stdout.strip()) and float(res.stdout.strip()) > 0.4
+    except Exception:
+        return False
+
+
 def get_character_scene_clips(
     character_key: str,
     segment_durations: List[float],
@@ -261,37 +277,40 @@ def get_character_scene_clips(
         universe_dir = JJK_DIR
     universe_dir.mkdir(parents=True, exist_ok=True)
     
-    # Search for character-specific clips in both dirs (including scratch, strictly validating size > 10KB)
+    # Search for character-specific clips in both dirs (strictly validating health via ffprobe)
     scratch_char_dir = SCRATCH_DIR / theme.get("universe", "jjk")
     scratch_char_dir.mkdir(parents=True, exist_ok=True)
     
-    raw_clips = [
-        p for p in (
-            list(universe_dir.glob(f"*{character_key}*.mp4")) +
-            list(scratch_char_dir.glob(f"*{character_key}*.mp4"))
-        )
-        if p.exists() and p.stat().st_size > 10_000 and not p.name.startswith("proc_")
-    ]
+    cand_files = (
+        list(universe_dir.glob(f"*{character_key}*.mp4")) +
+        list(scratch_char_dir.glob(f"*{character_key}*.mp4"))
+    )
+    raw_clips = []
+    for p in cand_files:
+        if is_clip_healthy(p):
+            raw_clips.append(p)
+        elif p.exists() and not p.name.startswith("proc_"):
+            p.unlink(missing_ok=True)
     
     # If forced refresh or missing, download fresh multi-query scenepack
     if (not raw_clips or force_refresh) and auto_fetch_online:
         print(f"🌐 Fetching fresh scenepack cuts for '{character_key}'...")
         fetched = fetch_character_scenepack(character_key, max_clips=len(segment_durations) + 6)
         if fetched:
-            raw_clips = [p for p in fetched if p.exists() and p.stat().st_size > 10_000 and not p.name.startswith("proc_")]
+            raw_clips = [p for p in fetched if is_clip_healthy(p)]
             
     # Last resort: use any real anime universe clips
     if not raw_clips:
-        raw_clips = [
-            p for p in (list(universe_dir.glob("*.mp4")) + list(scratch_char_dir.glob("*.mp4")))
-            if p.exists() and p.stat().st_size > 10_000 and not p.name.startswith("proc_")
-        ]
+        cand_all = list(universe_dir.glob("*.mp4")) + list(scratch_char_dir.glob("*.mp4"))
+        for p in cand_all:
+            if is_clip_healthy(p):
+                raw_clips.append(p)
 
     # Deduplicate paths, remove empties
     seen = set()
     unique_clips = []
     for p in raw_clips:
-        if p.exists() and p.stat().st_size > 10_000 and str(p) not in seen:
+        if is_clip_healthy(p) and str(p) not in seen:
             seen.add(str(p))
             unique_clips.append(p)
     raw_clips = sorted(unique_clips, key=lambda p: p.name)
