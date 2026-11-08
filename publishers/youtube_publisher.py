@@ -318,6 +318,8 @@ def upload_video_with_block_retry(
     youtube_client: Any = None,
     media_upload_cls: Any = None,
     bgm_track: str = "",
+    force_upload: bool = False,
+    gate_check: bool = False,
 ) -> Dict[str, Any]:
     """Uploads a video to YouTube with automatic block detection, deletion of blocked uploads,
 
@@ -348,7 +350,23 @@ def upload_video_with_block_retry(
             creds = Credentials(token=access_token)
             youtube = build("youtube", "v3", credentials=creds)
         except Exception as e:
-            print(f"[YouTube] ❌ Failed to build YouTube client: {e}")
+            print(f"[YouTube] ⚠️ Could not build YouTube client: {e}")
+            return {"status": "error", "reason": f"Client build failed: {e}"}
+
+    # Evaluate Candle Gate performance protection
+    from publishers.candle_gate import CandleGate
+    gate = CandleGate()
+    if gate_check and not force_upload and not dry_run and youtube:
+        gate_res = gate.evaluate_live_channel(youtube)
+        candle_eval = gate_res.get("candle_evaluation", {})
+        if candle_eval and not candle_eval.get("can_upload", True):
+            rec = candle_eval.get("recommendation", "Upload deferred by Candle Gate.")
+            print(f"[YouTube] 🛑 {rec}")
+            return {
+                "status": "deferred_candle_gate",
+                "reason": rec,
+                "candle_evaluation": candle_eval,
+            }
             return {"status": "error", "error": str(e)}
 
     current_video_path = video_path
@@ -437,6 +455,14 @@ def upload_video_with_block_retry(
 
         if not is_blocked:
             print(f"🎉 [YouTube] Video {video_id} VERIFIED CLEAN! Accepted by YouTube. URL: {video_url}")
+            from datetime import datetime, timezone
+            gate.record_upload({
+                "video_id": video_id,
+                "title": title,
+                "url": video_url,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "status": "uploaded",
+            })
             return {
                 "status": "success",
                 "video_id": video_id,
@@ -472,6 +498,8 @@ def upload_video_to_youtube(
     youtube_client: Any = None,
     media_upload_cls: Any = None,
     bgm_track: str = "",
+    force_upload: bool = False,
+    gate_check: bool = True,
 ) -> Dict[str, Any]:
     """Uploads a square or vertical video to YouTube Shorts with block verification, diagnosis & retry."""
     return upload_video_with_block_retry(
@@ -486,4 +514,6 @@ def upload_video_to_youtube(
         youtube_client=youtube_client,
         media_upload_cls=media_upload_cls,
         bgm_track=bgm_track,
+        force_upload=force_upload,
+        gate_check=gate_check,
     )
