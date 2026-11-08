@@ -77,9 +77,9 @@ on:
         default: false
         type: boolean
       upload:
-        description: 'Upload rendered Short to YouTube (enabled automatically on daily schedule; optional for manual test dispatches)'
+        description: 'Upload rendered Short to YouTube Shorts (@Jazzcreatesclips)'
         required: false
-        default: false
+        default: true
         type: boolean
 
 jobs:
@@ -195,15 +195,16 @@ jobs:
           # Always refresh clips to get diverse sources each run
           CMD="$CMD --refresh-clips"
           
-          # YouTube uploads: STRICTLY DISABLED on this feature branch! Output is intended for Phone Only delivery.
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.ref_name }}" = "main" ]; then
-            echo "🚀 [Publish] Scheduled daily upload on main."
-            CMD="$CMD --upload"
-          elif [ "${{ github.event.inputs.upload }}" = "true" ] && [ "${{ github.ref_name }}" = "main" ]; then
-            echo "🚀 [Publish] Explicit upload requested on main."
-            CMD="$CMD --upload"
+          # YouTube uploads enabled on main: publishes to @Jazzcreatesclips
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event.inputs.upload }}" = "true" ] || [ -z "${{ github.event.inputs.upload }}" ]; then
+              echo "🚀 [Publish] Uploading rendered 4K edit short to YouTube Shorts (@Jazzcreatesclips)..."
+              CMD="$CMD --upload"
+            else
+              echo "🔒 [Skip Upload] upload=false requested. Skipping YouTube upload."
+            fi
           else
-            echo "🔒 [Testing/Phone Mode] Skipping YouTube upload (Phone Only delivery)."
+            echo "🔒 [Branch Protection] Skipping YouTube upload on feature branch '${{ github.ref_name }}'."
           fi
           
           echo "Executing: $CMD"
