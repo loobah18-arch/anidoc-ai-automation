@@ -337,26 +337,45 @@ def render_cinematic_edit(
                     if ep_meta:
                         break
             if not ep_meta:
-                default_ep = "DS_S02E06" if character_key in ("rengoku", "akaza") else ("JJK_S02E17" if character_key in ("sukuna", "mahoraga") else None)
+                default_ep = (
+                    "DS_S02E06" if character_key in ("rengoku", "akaza")
+                    else "JJK_S02E04" if character_key in ("gojo", "toji")
+                    else "JJK_S02E17" if character_key in ("sukuna", "mahoraga")
+                    else None
+                )
                 if default_ep:
                     ep_meta = load_episode_metadata(default_ep)
 
-            raw_dialogue = (ep_meta.get("intro_dialogue") if ep_meta else None) or DEFAULT_CHARACTER_DIALOGUE.get(character_key)
+            # Detect if clip_0 is associated with a specific scene's frame-accurate dialogue
+            clip0_name = clip_paths[0].name if clip_paths else ""
+            ts_match = re.search(r"(\d+)s", clip0_name)
+            clip0_ts = float(ts_match.group(1)) if ts_match else None
+
+            scene_dialogue = None
+            if ep_meta and "scenes" in ep_meta and clip0_ts is not None:
+                for s in ep_meta["scenes"]:
+                    st = float(s.get("start", -999))
+                    en = float(s.get("end", -999))
+                    if abs(st - clip0_ts) < 5.0 or (st <= clip0_ts <= en):
+                        if "dialogue" in s:
+                            scene_dialogue = s["dialogue"]
+                            break
+
+            raw_dialogue = scene_dialogue or (ep_meta.get("intro_dialogue") if ep_meta else None) or DEFAULT_CHARACTER_DIALOGUE.get(character_key)
             if raw_dialogue:
                 drop_t = beat_grid.drop_time
-                max_d_end = max((float(x.get("end_rel", 13.5)) for x in raw_dialogue), default=13.5)
-                # Scale dialogue only if it exceeds available pre-drop window, ensuring conversation finishes naturally
-                scale_f = min(1.0, (drop_t - 0.4) / max_d_end) if max_d_end > 0 else 1.0
                 for item in raw_dialogue:
-                    s_rel = float(item.get("start_rel", 0.0))
-                    e_rel = float(item.get("end_rel", s_rel + 3.0))
-                    dialogue_lines.append({
-                        "speaker": item.get("speaker", ""),
-                        "text": item.get("text", ""),
-                        "start": round(s_rel * scale_f, 2),
-                        "end": round(min(drop_t - 0.3, e_rel * scale_f), 2),
-                        "glow_color": item.get("glow_color", "")
-                    })
+                    s_rel = float(item.get("start_rel", item.get("start", 0.0)))
+                    e_rel = float(item.get("end_rel", item.get("end", s_rel + 3.0)))
+                    # Never accelerate dialogue with artificial scale factors — preserve 100% natural speech sync
+                    if s_rel < drop_t - 0.2:
+                        dialogue_lines.append({
+                            "speaker": item.get("speaker", ""),
+                            "text": item.get("text", ""),
+                            "start": round(s_rel, 2),
+                            "end": round(min(drop_t - 0.15, e_rel), 2),
+                            "glow_color": item.get("glow_color", "")
+                        })
 
             ass_path = generate_kinetic_subtitles(
                 quote_text=quote_text,

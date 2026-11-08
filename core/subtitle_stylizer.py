@@ -122,17 +122,20 @@ DEFAULT_CHARACTER_DIALOGUE = {
         {"speaker": "Akaza", "text": "YOU'RE A HASHIRA, AREN'T YOU?", "start_rel": 9.1, "end_rel": 13.6, "glow_color": "&H001E27FF"}
     ],
     "gojo": [
-        {"speaker": "Gojo", "text": "YO. IT'S BEEN A WHILE.", "start_rel": 0.8, "end_rel": 3.8},
-        {"speaker": "Gojo", "text": "THROUGHOUT HEAVEN AND EARTH...", "start_rel": 4.5, "end_rel": 8.5},
-        {"speaker": "Gojo", "text": "I ALONE AM THE HONORED ONE.", "start_rel": 8.8, "end_rel": 13.5}
+        {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 4.6},
+        {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 4.8, "end_rel": 8.8},
+        {"speaker": "Toji", "text": "I'M GOING TO LOSE?", "start_rel": 9.0, "end_rel": 11.2},
+        {"speaker": "Toji", "text": "OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 11.5, "end_rel": 13.9}
     ],
     "sukuna": [
         {"speaker": "Sukuna", "text": "LET US SEE IF YOU CAN ENTERTAIN ME.", "start_rel": 0.5, "end_rel": 6.0},
         {"speaker": "Sukuna", "text": "DOMAIN EXPANSION:\nMALEVOLENT SHRINE!", "start_rel": 7.0, "end_rel": 13.8}
     ],
     "toji": [
-        {"speaker": "Toji", "text": "YOU WERE BLESSED WITH POWER AND INSTINCTS.", "start_rel": 0.5, "end_rel": 6.5},
-        {"speaker": "Toji", "text": "NOW SHOW ME WHAT THE SIX EYES CAN DO.", "start_rel": 7.5, "end_rel": 13.8}
+        {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 4.6},
+        {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 4.8, "end_rel": 8.8},
+        {"speaker": "Toji", "text": "I'M GOING TO LOSE?", "start_rel": 9.0, "end_rel": 11.2},
+        {"speaker": "Toji", "text": "OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 11.5, "end_rel": 13.9}
     ],
     "tanjiro": [
         {"speaker": "Tanjiro", "text": "I MUST PROTECT NEZUKO WITH MY LIFE!", "start_rel": 0.5, "end_rel": 6.0},

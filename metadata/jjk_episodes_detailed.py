@@ -354,14 +354,24 @@ S02E04_TIMESTAMPS = {
         }
     ],
     "intro_dialogue": [
-        {"speaker": "Gojo", "text": "YO. IT'S BEEN A WHILE.", "start_rel": 0.8, "end_rel": 3.8},
-        {"speaker": "Gojo", "text": "THROUGHOUT HEAVEN AND EARTH...", "start_rel": 4.5, "end_rel": 8.5},
-        {"speaker": "Gojo", "text": "I ALONE AM THE HONORED ONE.", "start_rel": 8.8, "end_rel": 13.5}
+        {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 4.6},
+        {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 4.8, "end_rel": 8.8},
+        {"speaker": "Toji", "text": "I'M GOING TO LOSE?", "start_rel": 9.0, "end_rel": 11.2},
+        {"speaker": "Toji", "text": "OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 11.5, "end_rel": 13.9}
     ],
     "scenes": [
         {"start": 120.0, "end": 360.0, "action_level": "CALM", "priority": "low", "description": "Star Religious Group cult delivery meeting", "characters_present": ["toji"], "action_score": 0.10, "is_conversation": False},
-        {"start": 420.0, "end": 660.0, "action_level": "CALM", "priority": "medium", "description": "Pre-fight confrontation: Gojo confronts Toji floating upside down: Yo, it's been a while", "characters_present": ["gojo", "toji"], "is_conversation": True, "action_score": 0.60},
-        {"start": 720.0, "end": 838.0, "action_level": "CALM", "priority": "high", "description": "Pre-fight dialogue standoff: Gojo Honored One monologue: Throughout heaven and earth, I alone am the honored one", "characters_present": ["gojo", "toji"], "is_conversation": True, "action_score": 0.65},
+        {"start": 420.0, "end": 660.0, "action_level": "CALM", "priority": "high", "description": "Pre-fight confrontation: Gojo confronts Toji floating upside down: The reason you're going to lose is because you didn't chop my head off", "characters_present": ["gojo", "toji"], "is_conversation": True, "action_score": 0.70, "dialogue": [
+            {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 4.6},
+            {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 4.8, "end_rel": 8.8},
+            {"speaker": "Toji", "text": "I'M GOING TO LOSE?", "start_rel": 9.0, "end_rel": 11.2},
+            {"speaker": "Toji", "text": "OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 11.5, "end_rel": 13.9}
+        ]},
+        {"start": 720.0, "end": 838.0, "action_level": "CALM", "priority": "medium", "description": "Pre-fight dialogue standoff: Gojo Honored One monologue: Throughout heaven and earth, I alone am the honored one", "characters_present": ["gojo", "toji"], "is_conversation": True, "action_score": 0.65, "dialogue": [
+            {"speaker": "Gojo", "text": "SORRY, AMANAI. I'M NOT EVEN ANGRY RIGHT NOW.", "start_rel": 0.8, "end_rel": 4.5},
+            {"speaker": "Gojo", "text": "IT'S JUST THAT THE WORLD FEELS SO WONDERFUL RIGHT NOW.", "start_rel": 4.8, "end_rel": 8.8},
+            {"speaker": "Gojo", "text": "THROUGHOUT HEAVEN AND EARTH, I ALONE AM THE HONORED ONE.", "start_rel": 9.0, "end_rel": 13.8}
+        ]},
         {"start": 840.0, "end": 960.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Combat clash: Gojo blasts Toji through the forest with Cursed Technique Reversal Red", "characters_present": ["gojo", "toji"], "action_score": 1.0, "is_conversation": False},
         {"start": 960.0, "end": 1140.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX & FINISHER: Secret Hollow Technique Purple obliterates Toji", "characters_present": ["gojo", "toji"], "action_score": 1.0, "is_conversation": False},
     ]

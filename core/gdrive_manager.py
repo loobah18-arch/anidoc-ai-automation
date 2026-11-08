@@ -920,7 +920,8 @@ def slice_action_moments_from_source(
                     "description": desc,
                     "tag": f"💎 {tag_prefix}: {desc[:42]}",
                     "is_curated": True,
-                    "is_conversation": is_conv
+                    "is_conversation": is_conv,
+                    "dialogue": s.get("dialogue")
                 })
 
         for s in title_scenes:
@@ -1203,10 +1204,8 @@ def slice_action_moments_from_source(
         and (c["start"] >= (120.0 if total_duration > 600 else 1.0))
         and (conv_window[0] - 1.0 <= c["start"] <= conv_window[1] + 1.0 if conv_window else True)
     ]
-    if conv_window:
-        intro_dialogue.sort(key=lambda x: x["start"])
-    else:
-        intro_dialogue.sort(key=lambda x: x["start"], reverse=True)
+    # Prioritize scenes with dialogue definitions and highest action/conversation scores
+    intro_dialogue.sort(key=lambda x: (0 if x.get("dialogue") else 1, -x.get("score", 0.0), x["start"]))
 
     if len(intro_dialogue) >= drop_idx:
         intro_pool = intro_dialogue[:drop_idx]

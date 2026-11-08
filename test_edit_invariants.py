@@ -50,16 +50,17 @@ class TestAnimeEditInvariants(unittest.TestCase):
         self.assertLess(conv_scene["start"], 840.0)
 
     def test_03_gojo_intro_dialogue_accuracy_and_completion(self):
-        """Verify S02E04 intro dialogue accurately captures 'The Honored One' and completes before drop."""
+        """Verify S02E04 intro dialogue accurately captures pre-fight dialogue and completes before drop."""
         dialogue = S02E04_TIMESTAMPS.get("intro_dialogue")
         self.assertIsNotNone(dialogue)
-        self.assertEqual(len(dialogue), 3)
-        self.assertIn("YO. IT'S BEEN A WHILE.", dialogue[0]["text"])
-        self.assertIn("THROUGHOUT HEAVEN AND EARTH...", dialogue[1]["text"])
-        self.assertIn("I ALONE AM THE HONORED ONE.", dialogue[2]["text"])
-        # Dialogue finishes cleanly by 13.5s, allowing a natural pause before the 14.1s beat drop
-        last_line_end = dialogue[2]["end_rel"]
-        self.assertLessEqual(last_line_end, 13.6)
+        self.assertEqual(len(dialogue), 4)
+        self.assertIn("THE REASON YOU'RE GOING TO LOSE", dialogue[0]["text"])
+        self.assertIn("DIDN'T USE THAT CURSED TOOL", dialogue[1]["text"])
+        self.assertIn("I'M GOING TO LOSE?", dialogue[2]["text"])
+        self.assertIn("OUR FIGHT IS JUST GETTING STARTED!", dialogue[3]["text"])
+        # Dialogue finishes cleanly by 13.9s, allowing a natural pause before the 14.1s beat drop
+        last_line_end = dialogue[3]["end_rel"]
+        self.assertLessEqual(last_line_end, 14.0)
         self.assertGreaterEqual(last_line_end, 13.0)
 
     def test_04_simple_font_and_clean_subtitles(self):
