@@ -50,7 +50,7 @@ def extract_clip_audio_for_sync(clip_path: Path, output_wav: Path, duration: flo
 
 def transcribe_clip_with_whisper(
     audio_path: Path,
-    drop_time: float = 14.0
+    drop_time: float = 30.54
 ) -> Optional[List[Dict[str, Any]]]:
     """
     Tier 1: AI Speech Recognition using faster-whisper or whisper.
@@ -125,7 +125,7 @@ def transcribe_clip_with_whisper(
 def align_dialogue_with_audio_energy(
     audio_path: Path,
     dialogue_lines: List[Dict[str, Any]],
-    drop_time: float = 14.0
+    drop_time: float = 30.54
 ) -> List[Dict[str, Any]]:
     """
     Tier 2: Acoustic Voice Activity Detection (VAD) via SciPy.
@@ -232,7 +232,7 @@ def align_dialogue_with_audio_energy(
 def get_synced_dialogue_for_clip(
     clip_path: Path,
     fallback_dialogue: Optional[List[Dict[str, Any]]] = None,
-    drop_time: float = 14.0
+    drop_time: float = 30.54
 ) -> List[Dict[str, Any]]:
     """
     Main Entry Point: Resolves 100% audio-synchronized dialogue subtitles for any clip.

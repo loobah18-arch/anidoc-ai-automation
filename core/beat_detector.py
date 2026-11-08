@@ -268,21 +268,13 @@ def generate_procedural_beat_grid(duration: float = DEFAULT_DURATION, drop_time:
 
     # ── Act 1: Atmospheric Hook / Dialogue Build ──
     # Unbroken, single continuous conversation scene leading directly into the beat drop
+    # Strict invariant: NO subdivision cuts during the conversation phase. It is ONE continuous held shot.
     effective_drop = min(drop_time, max(1.5, duration - 4.0))
     beat_times.append(round(effective_drop, 2))
 
     # Extended Full Musical Arc (>= 60.0s, e.g. 71s/76s full Lady Gaga Poker Face / AMV arc)
     if duration >= 60.0:
         climax_start = round(duration - 4.0, 2)
-        # Stage 1: Intro hold subdivisions if drop is long (e.g. 16s intro)
-        if effective_drop >= 12.0:
-            intro_step = bar if bar >= 3.0 else bar * 2
-            t_intro = intro_step
-            while t_intro < effective_drop - 1.5:
-                if t_intro not in beat_times:
-                    beat_times.append(round(t_intro, 2))
-                t_intro += intro_step
-
         curr = effective_drop
         # Stage 2: Verse Combat Exchanges (2-beat rapid cuts ~1.0s)
         verse_end = min(curr + (duration * 0.35), climax_start - 12.0)
@@ -363,7 +355,13 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
     matched_entry = next((item for item in POPULAR_PHONK_CATALOG if item["id"] == track_stem or item["id"] in track_stem), None)
 
     calibrated_bpm = matched_entry.get("bpm", 134.0) if matched_entry else 134.0
-    if target_duration >= 35.0 and matched_entry and "conversation_drop" in matched_entry:
+    if target_duration >= 45.0 and matched_entry and "conversation_drop" in matched_entry:
+        calibrated_drop = max(30.0, float(matched_entry["conversation_drop"]))
+    elif target_duration >= 45.0:
+        bar = (60.0 / calibrated_bpm) * 4
+        bars_needed = max(1, int(np.ceil(30.0 / bar)))
+        calibrated_drop = round(bars_needed * bar, 2)
+    elif target_duration >= 35.0 and matched_entry and "conversation_drop" in matched_entry:
         calibrated_drop = matched_entry["conversation_drop"]
     else:
         calibrated_drop = matched_entry.get("default_drop", 4.80) if matched_entry else 4.80
@@ -397,14 +395,23 @@ def analyze_audio_beats(audio_path: Path, target_duration: float = DEFAULT_DURAT
 
             # Detect drop from actual onsets: closest onset to calibrated drop
             if detected_onsets:
-                drop_candidates = [t for t in detected_onsets if abs(t - calibrated_drop) <= 2.5]
-                if drop_candidates:
-                    # Prefer the onset closest to the catalog drop time
-                    detected_drop = min(drop_candidates, key=lambda t: abs(t - calibrated_drop))
-                    print(f"  🎯 [BeatSync] Drop snapped: {calibrated_drop:.2f}s → {detected_drop:.3f}s (offset {audio_offset:.1f}s)")
+                if target_duration >= 45.0:
+                    # Enforce conversation phase of at least 30.0s
+                    drop_candidates = [t for t in detected_onsets if t >= 30.0 and abs(t - calibrated_drop) <= 3.0]
+                    if drop_candidates:
+                        detected_drop = min(drop_candidates, key=lambda t: abs(t - calibrated_drop))
+                        print(f"  🎯 [BeatSync] Long conversation drop snapped: {calibrated_drop:.2f}s → {detected_drop:.3f}s (offset {audio_offset:.1f}s)")
+                    else:
+                        detected_drop = max(30.0, calibrated_drop)
+                        print(f"  ⚠️  [BeatSync] Using calibrated >=30s drop: {detected_drop:.2f}s (offset {audio_offset:.1f}s)")
                 else:
-                    detected_drop = calibrated_drop
-                    print(f"  ⚠️  [BeatSync] Using calibrated drop: {detected_drop:.2f}s (offset {audio_offset:.1f}s)")
+                    drop_candidates = [t for t in detected_onsets if abs(t - calibrated_drop) <= 2.5]
+                    if drop_candidates:
+                        detected_drop = min(drop_candidates, key=lambda t: abs(t - calibrated_drop))
+                        print(f"  🎯 [BeatSync] Drop snapped: {calibrated_drop:.2f}s → {detected_drop:.3f}s (offset {audio_offset:.1f}s)")
+                    else:
+                        detected_drop = calibrated_drop
+                        print(f"  ⚠️  [BeatSync] Using calibrated drop: {detected_drop:.2f}s (offset {audio_offset:.1f}s)")
             else:
                 print(f"  ⚠️  [BeatSync] No onsets detected, using catalog defaults")
 

@@ -1109,13 +1109,10 @@ def slice_action_moments_from_source(
     print(f"🎬 [ActionSlicer] Total hybrid candidate pool: {len(final_candidates)} scenes (Curated + OpenCV Vision + Audio).")
 
     # ── Phase 4: Intelligent Scene Orchestration for Beat Drops ───────────────
-    # The #1 loudest / most epic climax scene is mapped to the Beat Drop (index 4 or drop_idx)
-    # The #2 scene is mapped to the Bridge Drop (~index 22 or 12)
-    # The #3 scene is mapped to the Climax Outro Finisher (last clip)
-    if drop_index is not None and 0 <= drop_index < n_clips:
-        drop_idx = drop_index
-    else:
-        drop_idx = min(2, max(0, n_clips - 1))
+    # Invariant: Pre-drop conversation is strictly ONE continuous, contiguous sequence of at least 30s.
+    # The conversation must directly precede / surround the fight scenes used for the edit.
+    # Post-drop slots (i >= 1) strictly contain PURE COMBAT / SAKUGA FIGHT SCENES ONLY.
+    drop_idx = 1  # Exactly 1 continuous conversation clip before the beat drop
     bridge_idx = min(n_clips - 4, max(drop_idx + 2, int(n_clips * 0.7))) if n_clips > 6 else max(0, n_clips - 2)
     last_idx = n_clips - 1
 
@@ -1195,49 +1192,47 @@ def slice_action_moments_from_source(
     else:
         sec_drop = drop_climax
 
-    # Find intro candidates: strictly pre-fight dialogue/conversation scenes (never episode opener)
-    intro_dialogue = [
+    # ── Single Continuous Pre-Fight Conversation Selection (Directly around the fight scene) ──
+    # Select candidate pre-fight dialogue/conversation scenes (never episode opener)
+    all_conv_candidates = [
         c for c in (curated_conv_pool + final_candidates)
         if (c.get("is_conversation", False) or any(kw in c.get("description", "").lower() for kw in pure_conv_keywords))
         and not _is_credit(c.get("description", ""))
-        and (c["start"] + clip_duration <= end_bound)
         and (c["start"] >= (120.0 if total_duration > 600 else 1.0))
         and (conv_window[0] - 1.0 <= c["start"] <= conv_window[1] + 1.0 if conv_window else True)
+        and (c["start"] <= drop_climax["start"] + 15.0)  # Must lead directly into or surround the combat encounter
     ]
-    # Prioritize scenes with dialogue definitions and highest action/conversation scores
-    intro_dialogue.sort(key=lambda x: (0 if x.get("dialogue") else 1, -x.get("score", 0.0), x["start"]))
-
-    if len(intro_dialogue) >= drop_idx:
-        intro_pool = intro_dialogue[:drop_idx]
-    else:
-        # Strictly conversation/standoff before combat, never an episode opener (<180s)
-        other_intro = [
+    if not all_conv_candidates:
+        all_conv_candidates = [
             c for c in (curated_conv_pool + final_candidates)
-            if c not in (drop_climax, sec_drop, finisher) and c not in intro_dialogue
-            and not _is_credit(c.get("description", ""))
+            if not _is_credit(c.get("description", ""))
             and c["start"] >= (120.0 if total_duration > 600 else 1.0)
-            and (c["start"] + clip_duration <= end_bound)
-            and (c["start"] <= combat_start_bound + 15.0 if combat_window else True)
+            and c not in (drop_climax, sec_drop, finisher)
             and not any(kw in c.get("description", "").lower() for kw in ["dragon", "purple", "cleave", "explosion", "collision", "decapitat"])
         ]
-        other_intro.sort(key=lambda x: x["start"])
-        intro_pool = (intro_dialogue + other_intro)[:drop_idx]
 
-    # Pre-drop slots (i < drop_idx): strictly pre-fight conversation only
-    selected = [None] * n_clips
-    for i in range(min(drop_idx, len(intro_pool))):
-        selected[i] = intro_pool[i]
-
-    # Fallback to intro hook ONLY if no conversation scene was chosen and start >= 180s
-    if intro_hook_cand and selected[0] is None and intro_hook_cand["start"] >= (180.0 if total_duration > 600 else 1.0):
-        selected[0] = {
+    # Prioritize conversation with dialogue definitions, closest to and directly preceding the combat climax
+    if all_conv_candidates:
+        all_conv_candidates.sort(key=lambda c: (
+            0 if c.get("dialogue") else 1,
+            abs(drop_climax["start"] - c.get("scene_end", c["start"]))
+        ))
+        best_conv = all_conv_candidates[0]
+    elif intro_hook_cand and intro_hook_cand["start"] >= (180.0 if total_duration > 600 else 1.0):
+        best_conv = {
             "start": intro_hook_cand["start"],
             "score": intro_hook_cand["score"],
             "description": "Active Intro Hook Shot",
             "tag": "🎯 Intro Hook",
-            "is_curated": False
+            "is_curated": False,
+            "is_conversation": True
         }
+    else:
+        best_conv = final_candidates[0]
 
+    # Slot 0 is strictly the single continuous pre-fight conversation shot
+    selected = [None] * n_clips
+    selected[0] = best_conv
     selected[drop_idx] = drop_climax
     selected[bridge_idx] = sec_drop
     selected[last_idx] = finisher
@@ -1250,7 +1245,7 @@ def slice_action_moments_from_source(
 
     available_combat = [
         c for c in final_candidates
-        if c not in (drop_climax, sec_drop, finisher) and c not in intro_pool
+        if c not in (drop_climax, sec_drop, finisher, best_conv)
         and not c.get("is_conversation", False)
         and not any(kw in c.get("description", "").lower() for kw in pure_conv_keywords)
         and not _is_credit(c.get("description", ""))
@@ -1260,7 +1255,7 @@ def slice_action_moments_from_source(
     # Prioritize highest action score scenes first
     available_combat.sort(key=lambda x: x["score"], reverse=True)
 
-    for i in range(n_clips):
+    for i in range(1, n_clips):
         if selected[i] is None:
             prev_cand = selected[i - 1] if i > 0 else None
             prev_st = prev_cand["start"] if prev_cand else -999.0
@@ -1313,8 +1308,8 @@ def slice_action_moments_from_source(
                     ]
                     chosen_c = combat_fallback[0] if combat_fallback else (drop_climax or final_candidates[0])
 
-            # Invariant: Combat slots (i >= drop_idx) MUST NEVER contain conversation or credit scenes
-            if i >= drop_idx and (chosen_c.get("is_conversation", False) or any(kw in chosen_c.get("description", "").lower() for kw in pure_conv_keywords) or _is_credit(chosen_c.get("description", ""))):
+            # Invariant: Combat slots (i >= 1) MUST NEVER contain conversation or credit scenes
+            if chosen_c.get("is_conversation", False) or any(kw in chosen_c.get("description", "").lower() for kw in pure_conv_keywords) or _is_credit(chosen_c.get("description", "")):
                 combat_fallback = [
                     c for c in final_candidates
                     if not c.get("is_conversation", False)
@@ -1326,7 +1321,7 @@ def slice_action_moments_from_source(
             selected[i] = chosen_c
             used_counts[chosen_c["start"]] += 1
 
-    # Final Invariant Enforcement: Post-drop slots (i >= drop_idx) MUST ONLY CONTAIN FIGHT SCENES
+    # Final Invariant Enforcement: Post-drop slots (i >= 1) MUST ONLY CONTAIN FIGHT SCENES
     pure_combat_candidates = [
         c for c in final_candidates
         if not c.get("is_conversation", False)
@@ -1338,12 +1333,12 @@ def slice_action_moments_from_source(
     if not pure_combat_candidates:
         pure_combat_candidates = [drop_climax, sec_drop, finisher]
 
-    for i in range(drop_idx, n_clips):
+    for i in range(1, n_clips):
         cand = selected[i]
         if cand is None or cand.get("is_conversation", False) or any(kw in cand.get("description", "").lower() for kw in pure_conv_keywords) or _is_credit(cand.get("description", "")):
             selected[i] = pure_combat_candidates[i % len(pure_combat_candidates)]
 
-    print(f"💥 [ActionSlicer] Mapped #1 CLIMAX scene ({drop_climax['start']:.1f}s, {drop_climax['tag']}) directly to Beat Drop (Clip {drop_idx+1})!")
+    print(f"💥 [ActionSlicer] Mapped #1 CLIMAX scene ({drop_climax['start']:.1f}s, {drop_climax['tag']}) directly to Beat Drop (Clip 2)!")
 
     # Probe authentic Japanese anime audio stream mapping
     eng_audio_map = get_japanese_audio_map(video_path)
@@ -1362,13 +1357,10 @@ def slice_action_moments_from_source(
         start = cand["start"]
         out_clip = output_dir / f"{prefix}_{idx:02d}_{int(start)}s.mp4"
         
-        # Duration: intro clip needs the pre-fight standoff conversation duration (at least 16s, up to 20s), combat clips need 3.5 to 5.0s
+        # Duration: intro clip needs at least 30.0s of pure continuous pre-fight conversation (zero fight cuts before drop)
         if idx < drop_idx:
-            if cand.get("scene_end"):
-                avail = max(0.5, cand["scene_end"] - start)
-                target_dur = max(16.0, min(avail, 20.0))
-            else:
-                target_dur = max(16.0, min(clip_duration, 20.0))
+            avail = max(30.0, cand.get("scene_end", start + 35.0) - start)
+            target_dur = max(30.0, min(avail, 35.0))
         else:
             target_dur = min(clip_duration, 5.0)
             if combat_window:

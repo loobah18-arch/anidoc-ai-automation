@@ -67,9 +67,9 @@ on:
           - '4k'
           - '1080p'
       duration:
-        description: 'Target Video Duration in seconds (e.g. 42.0 for proper conversation buildup, or 28.0)'
+        description: 'Target Video Duration in seconds (e.g. 54.0 for >=30s pre-fight conversation + combat edit)'
         required: false
-        default: '42.0'
+        default: '54.0'
         type: string
       refresh_clips:
         description: 'Download & slice fresh scenepack cuts (multi-source: yt-dlp → Archive.org → Pixabay)'

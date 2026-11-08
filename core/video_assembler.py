@@ -284,23 +284,22 @@ def render_cinematic_edit(
     # 3. Ultimate technique climax finisher (highest energy / final clip)
     if len(clip_paths) >= n_clips:
         n_intro = sum(1 for f in drop_flags if not f)
-        intro_c = clip_paths[:n_intro] if n_intro > 0 else [clip_paths[0]]
+        # Invariant: Pre-drop conversation is strictly ONE continuous sequence from clip_paths[0] (no scene hopping).
+        intro_c = [clip_paths[0]]
         finisher_c = clip_paths[-1]
-        combat_pool = [c for c in clip_paths[n_intro:-1] if c not in intro_c and c != finisher_c]
+        combat_pool = [c for c in clip_paths[1:-1] if c not in intro_c and c != finisher_c]
         if not combat_pool:
-            combat_pool = [c for c in clip_paths if c not in intro_c] or clip_paths[:]
+            combat_pool = [c for c in clip_paths[1:] if c not in intro_c] or clip_paths[:]
 
         # ── Chronological Narrative Progression ──
         # Preserves strict 3-act escalation (Intro -> Combat Clashes -> Climax Finisher)
-        # without alternating back-and-forth between different battle states or injuries.
+        # Pre-drop contains ONLY the continuous pre-fight conversation; post-drop contains ONLY pure fight scenes.
         ordered_clips = []
-        in_i = 0
         combat_i = 0
 
         for idx, (dur, is_d) in enumerate(zip(durations, drop_flags)):
             if not is_d:
-                ordered_clips.append(intro_c[in_i % len(intro_c)])
-                in_i += 1
+                ordered_clips.append(clip_paths[0])
             elif idx == n_clips - 1:
                 ordered_clips.append(finisher_c)
             else:

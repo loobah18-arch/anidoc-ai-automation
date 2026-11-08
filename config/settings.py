@@ -43,7 +43,8 @@ FOREGROUND_WIDTH = VIDEO_WIDTH
 FOREGROUND_HEIGHT = int(VIDEO_WIDTH * 5 / 4)  # 4:5 tall centered foreground
 FOREGROUND_Y_OFFSET = (VIDEO_HEIGHT - FOREGROUND_HEIGHT) // 2
 FPS = 60  # High-bitrate 60fps export
-DEFAULT_DURATION = 28.0  # Perfect 28.0s duration: 5s buildup + 23s drop combat rush & finisher
+MIN_CONVERSATION_DURATION = 30.0  # Strict invariant: videos must contain at least 30s of pure pre-fight conversation
+DEFAULT_DURATION = 54.0  # Perfect 54.0s duration: >=30s continuous pre-fight conversation + ~24s pure combat edit (<60s Shorts limit)
 
 # Clean Cinematic Widescreen Framing (Preserves 100% anime choreography with letterbox bars)
 FRAMING_MODE = "cinematic_widescreen"

@@ -29,7 +29,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Pro AMV Reference",
         "bpm": 120.0,
         "default_drop": 16.0,
-        "conversation_drop": 16.0,
+        "conversation_drop": 32.0,
         "audio_offset": 0.00,
     },
     {
@@ -38,7 +38,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Brazilian Phonk",
         "bpm": 110.0,
         "default_drop": 5.40,
-        "conversation_drop": 14.128,
+        "conversation_drop": 30.54,
         "audio_offset": 0.00,
     },
     {
@@ -47,6 +47,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Brazilian Phonk",
         "bpm": 136.0,
         "default_drop": 7.48,
+        "conversation_drop": 31.76,
         "audio_offset": 0.00,
     },
     {
@@ -55,6 +56,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Dark Brazilian Phonk",
         "bpm": 132.0,
         "default_drop": 4.80,
+        "conversation_drop": 30.91,
         "audio_offset": 0.00,
     },
     {
@@ -63,6 +65,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Drift Phonk",
         "bpm": 130.0,
         "default_drop": 5.45,
+        "conversation_drop": 31.38,
         "audio_offset": 0.00,
     },
     {
@@ -71,6 +74,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Brazilian Phonk",
         "bpm": 132.0,
         "default_drop": 4.96,
+        "conversation_drop": 30.91,
         "audio_offset": 0.00,
     },
     {
@@ -79,6 +83,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Brazilian Phonk",
         "bpm": 128.0,
         "default_drop": 4.55,
+        "conversation_drop": 30.00,
         "audio_offset": 0.00,
     },
     {
@@ -87,6 +92,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Brazilian Funk",
         "bpm": 130.0,
         "default_drop": 4.77,
+        "conversation_drop": 31.38,
         "audio_offset": 0.00,
     },
     {
@@ -95,6 +101,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Brazilian Phonk",
         "bpm": 130.0,
         "default_drop": 4.43,
+        "conversation_drop": 31.38,
         "audio_offset": 0.00,
     },
     {
@@ -103,6 +110,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Slowed Funk",
         "bpm": 126.0,
         "default_drop": 4.95,
+        "conversation_drop": 30.48,
         "audio_offset": 0.00,
     },
     {
@@ -111,6 +119,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Dark Brazilian Phonk",
         "bpm": 132.0,
         "default_drop": 4.60,
+        "conversation_drop": 30.91,
         "audio_offset": 0.00,
     },
     {
@@ -119,6 +128,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Aura Phonk",
         "bpm": 135.0,
         "default_drop": 4.80,
+        "conversation_drop": 30.22,
         "audio_offset": 11.20,
     },
     {
@@ -127,6 +137,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Aggressive Phonk",
         "bpm": 134.0,
         "default_drop": 4.80,
+        "conversation_drop": 30.45,
         "audio_offset": 14.20,
     },
     {
@@ -135,6 +146,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Infernal Phonk",
         "bpm": 138.0,
         "default_drop": 4.80,
+        "conversation_drop": 31.30,
         "audio_offset": 10.20,
     },
     {
@@ -143,6 +155,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Aura Phonk",
         "bpm": 132.0,
         "default_drop": 4.80,
+        "conversation_drop": 30.91,
         "audio_offset": 11.20,
     },
     {
@@ -151,6 +164,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Slava Phonk",
         "bpm": 136.0,
         "default_drop": 4.80,
+        "conversation_drop": 31.76,
         "audio_offset": 1.70,
     },
     {
@@ -159,6 +173,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Next Phonk",
         "bpm": 132.0,
         "default_drop": 4.80,
+        "conversation_drop": 30.91,
         "audio_offset": 11.20,
     },
     {
@@ -167,6 +182,7 @@ POPULAR_PHONK_CATALOG = [
         "genre": "Brazilian Phonk",
         "bpm": 140.0,
         "default_drop": 4.80,
+        "conversation_drop": 30.86,
         "audio_offset": 1.00,
     },
 ]

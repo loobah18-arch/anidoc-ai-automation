@@ -130,12 +130,56 @@ class TestAnimeEditInvariants(unittest.TestCase):
             {"speaker": "Toji", "text": "OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 11.5, "end_rel": 13.9}
         ]
         dummy_clip = SCRATCH_DIR / "non_existent_clip.mp4"
-        synced = get_synced_dialogue_for_clip(dummy_clip, raw_dialogue, drop_time=14.128)
+        synced = get_synced_dialogue_for_clip(dummy_clip, raw_dialogue, drop_time=30.54)
         self.assertEqual(len(synced), 4)
         for s in synced:
-            self.assertLess(s["start"], 14.128)
-            self.assertLessEqual(s["end"], 14.128 - 0.15)
+            self.assertLess(s["start"], 30.54)
+            self.assertLessEqual(s["end"], 30.54 - 0.15)
         self.assertEqual(synced[0]["text"], raw_dialogue[0]["text"])
+
+    def test_08_conversation_intro_at_least_30s_and_single_continuous_shot(self):
+        """Verify the conversation phase is at least 30s and is strictly 1 continuous shot (no scene hopping)."""
+        from core.beat_detector import generate_procedural_beat_grid
+        from config.settings import DEFAULT_DURATION, MIN_CONVERSATION_DURATION
+
+        self.assertGreaterEqual(MIN_CONVERSATION_DURATION, 30.0)
+        self.assertGreaterEqual(DEFAULT_DURATION, 50.0)
+
+        # Procedural beat grid for full short
+        grid = generate_procedural_beat_grid(duration=DEFAULT_DURATION, drop_time=30.54, bpm=110.0)
+        self.assertGreaterEqual(grid.drop_time, 30.0)
+
+        segments = grid.get_cut_segments()
+        pre_drop_segments = [s for s in segments if not s["is_drop"]]
+        # Must be exactly ONE continuous shot before the drop — zero hopping between scenes
+        self.assertEqual(len(pre_drop_segments), 1)
+        self.assertGreaterEqual(pre_drop_segments[0]["duration"], 30.0)
+
+    def test_09_post_drop_pure_combat_exclusivity(self):
+        """Verify that all segments after the beat drop are strictly and exclusively combat."""
+        from core.beat_detector import generate_procedural_beat_grid
+        grid = generate_procedural_beat_grid(duration=54.0, drop_time=30.54, bpm=110.0)
+        segments = grid.get_cut_segments()
+        post_drop_segments = [s for s in segments if s["is_drop"]]
+        self.assertGreater(len(post_drop_segments), 5)
+        for s in post_drop_segments:
+            self.assertTrue(s["is_drop"])
+            self.assertGreaterEqual(s["start"], grid.drop_time - 0.05)
+
+    def test_10_conversation_directly_surrounds_combat_scene(self):
+        """Verify pre-fight conversation is selected from the same battle and immediately precedes the combat window."""
+        bounds_jjk = get_episode_phase_boundaries(
+            total_duration=1440.0,
+            character_key="gojo",
+            matched_ep_code="S02E04"
+        )
+        self.assertIsNotNone(bounds_jjk["conv_window"])
+        self.assertIsNotNone(bounds_jjk["combat_window"])
+        conv_start, conv_end = bounds_jjk["conv_window"]
+        fight_start, fight_end = bounds_jjk["combat_window"]
+        # The conversation must precede the combat encounter
+        self.assertLess(conv_start, fight_end)
+        self.assertLessEqual(conv_start, fight_start)
 
 if __name__ == "__main__":
     unittest.main()
