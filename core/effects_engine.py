@@ -215,11 +215,10 @@ def build_combat_foley_audio_filter(
     """
     filters = []
 
-    # 1. Dialogue clarity during pre-fight conversation: loud, rich, and crisp voices
+    # 1. Dialogue clarity during pre-fight conversation: vocal presence clarity
     intro_end = max(0.1, drop_time - 0.55)
-    filters.append(f"volume=enable='between(t\\,0\\,{intro_end:.3f})':volume=1.60")
-    filters.append(f"highpass=f=80:enable='between(t\\,0\\,{intro_end:.3f})'")
-    filters.append(f"treble=g=2.5:f=3200:enable='between(t\\,0\\,{intro_end:.3f})'")
+    filters.append(f"highpass=f=120:enable='between(t\\,0\\,{intro_end:.3f})'")
+    filters.append(f"treble=g=1.5:f=3200:enable='between(t\\,0\\,{intro_end:.3f})'")
 
     # 2. Combat Foley boosts on cut timestamps after drop
     valid_cuts = [t for t in combat_cut_times if t >= drop_time - 0.10]

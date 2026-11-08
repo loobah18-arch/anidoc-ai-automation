@@ -485,6 +485,9 @@ def render_cinematic_edit(
                 seg["next_is_drop"] = True
                 seg["is_pre_drop"] = True
 
+    from core.vocal_isolator import extract_speech_intervals_from_dialogue, build_vocal_isolation_filter
+    speech_intervals = extract_speech_intervals_from_dialogue(dialogue_lines, drop_time=beat_grid.drop_time)
+
     seen_clip_paths = {}
     for idx, (cp, seg, has_aud) in enumerate(zip(clip_paths, segments, has_clip_audio_list)):
         cp_key = str(cp.name) if hasattr(cp, "name") else str(cp)
@@ -529,13 +532,20 @@ def render_cinematic_edit(
         filter_chains.append(v_chain)
         concat_v_inputs.append(f"[v{idx}]")
 
-        # Clip audio fades + extraction (dialogue boosted during conversation intro, normal during combat)
+        # Anime Background Music Cancellation & Vocal Isolation:
+        # Pre-Fight Dialogue (idx == 0): Cancels stereo OST, bandpass filters speech formants, gates silence
+        # Combat Climax (idx >= 1): Mutes anime audio (0.0 volume) so only pure Phonk music plays
+        is_conv = not seg.get("is_drop", False)
         audio_fade = build_clip_audio_fade(seg["duration"])
-        clip_vol = 1.60 if not seg.get("is_drop", False) else 1.00
         if has_aud:
+            vocal_filter = build_vocal_isolation_filter(
+                clip_path=cp,
+                speech_intervals=speech_intervals if is_conv else None,
+                is_conversation=is_conv
+            )
             a_chain = (
                 f"[{idx}:a]atrim=duration={seg['duration']:.3f},asetpts=PTS-STARTPTS,"
-                f"{audio_fade},volume={clip_vol:.2f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
+                f"{audio_fade},{vocal_filter},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
             )
         else:
             a_chain = f"aevalsrc=0:d={seg['duration']:.3f},aformat=sample_rates=48000:channel_layouts=stereo[a{idx}]"
