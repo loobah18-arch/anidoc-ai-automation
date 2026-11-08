@@ -148,6 +148,13 @@ CHARACTER_THEMES = {
         "cc_preset": "sukuna_crimson",
         "quote": "You've got a nice face, man... envy eats me alive!"
     },
+    "shinobu": {
+        "universe": "demonslayer",
+        "name": "Shinobu Kocho",
+        "colors": ["#a855f7", "#06b6d4", "#1e1b4b"],
+        "cc_preset": "wisteria_bloom",
+        "quote": "Insect Breathing, Butterfly Dance: Caprice."
+    },
 
     # ── Marvel Universe (Legacy compatibility) ──
     "spiderman": {

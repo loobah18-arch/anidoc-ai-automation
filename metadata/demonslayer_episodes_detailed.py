@@ -74,6 +74,17 @@ DS_S01E20_TIMESTAMPS = {
     "universe": "demonslayer",
     "characters": [
         {
+            "name": "Shinobu",
+            "role": "Insect Hashira",
+            "key_moments": [
+                "Arrives at Natagumo Mountain floating like a butterfly",
+                "Rescues Murata from spider thread acid cocoon",
+                "Confronts Spider Demon Sister with calm smile",
+                "Insect Breathing Butterfly Dance: Caprice (Chō no Mai: Tawamure)",
+                "Lethal Wisteria poison injection disintegrating the demon"
+            ]
+        },
+        {
             "name": "Giyu",
             "role": "Water Hashira",
             "key_moments": [
@@ -82,6 +93,16 @@ DS_S01E20_TIMESTAMPS = {
                 "Water Breathing Eleventh Form: Dead Calm (Lull)",
                 "Nullifies Rui's Blood Demon Art effortlessly",
                 "One-shot decapitation of Lower Moon Five Rui"
+            ]
+        },
+        {
+            "name": "Spider Sister",
+            "role": "Daughter Spider Demon",
+            "key_moments": [
+                "Traps Demon Slayers in acid cocoons",
+                "Attempts to poison Shinobu Kocho",
+                "Stung by Shinobu's Nichirin blade",
+                "Dissolved by lethal Wisteria flower poison"
             ]
         },
         {
@@ -96,13 +117,27 @@ DS_S01E20_TIMESTAMPS = {
         }
     ],
     "intro_dialogue": [
-        {"speaker": "Rui", "text": "I'LL TEAR YOU TO SHREDS FOR GETTING IN MY WAY!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
-        {"speaker": "Giyu", "text": "YOU DID WELL TO HOLD OUT UNTIL I GOT HERE.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H0000C8FF"},
-        {"speaker": "Giyu", "text": "LEAVE THE REST TO ME.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H0000C8FF"},
-        {"speaker": "Rui", "text": "BLOOD DEMON ART: CUTTING THREAD ROTATION!", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H001E27FF"},
-        {"speaker": "Giyu", "text": "TOTAL CONCENTRATION... WATER BREATHING, ELEVENTH FORM: DEAD CALM.", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H0000FFFF"}
+        {"speaker": "Spider Demon", "text": "STAY AWAY FROM ME! YOU CAN'T CUT MY HEAD OFF!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Shinobu", "text": "IT'S TRUE THAT I CANNOT CUT OFF A DEMON'S HEAD.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H00D946EF"},
+        {"speaker": "Shinobu", "text": "HOWEVER... I CAN KILL DEMONS WITH POISON.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H00D946EF"},
+        {"speaker": "Shinobu", "text": "SO THAT WE CAN BECOME FRIENDS... ACCEPT YOUR PENALTY.", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H00D946EF"},
+        {"speaker": "Shinobu", "text": "INSECT BREATHING: BUTTERFLY DANCE — CAPRICE!", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H00FF00FF"}
     ],
     "scenes": [
+        {
+            "start": 360.0, "end": 520.0, "action_level": "CALM", "priority": "high",
+            "description": "Pre-fight standoff & confrontation: Shinobu descends and confronts Spider Demon Sister - 'So that we can become friends... accept your penalty.'",
+            "characters_present": ["shinobu", "spider_sister"],
+            "action_score": 0.80, "is_conversation": True, "duration": 160.0,
+            "dialogue": [
+                {"speaker": "Spider Demon", "text": "STAY AWAY FROM ME! YOU CAN'T CUT MY HEAD OFF!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
+                {"speaker": "Shinobu", "text": "IT'S TRUE THAT I CANNOT CUT OFF A DEMON'S HEAD.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H00D946EF"},
+                {"speaker": "Shinobu", "text": "HOWEVER... I CAN KILL DEMONS WITH POISON.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H00D946EF"},
+                {"speaker": "Shinobu", "text": "SO THAT WE CAN BECOME FRIENDS... ACCEPT YOUR PENALTY.", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H00D946EF"},
+                {"speaker": "Shinobu", "text": "INSECT BREATHING: BUTTERFLY DANCE — CAPRICE!", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H00FF00FF"}
+            ]
+        },
+        {"start": 520.0, "end": 640.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX: Shinobu leaps gracefully with Insect Breathing Butterfly Dance: Caprice, injecting lethal Wisteria poison into Spider Sister", "characters_present": ["shinobu", "spider_sister"], "action_score": 1.0, "is_conversation": False, "duration": 120.0},
         {
             "start": 1000.0, "end": 1060.0, "action_level": "CALM", "priority": "high",
             "description": "Pre-fight standoff & dialogue: Giyu intercepts Rui's fatal threads and shields Tanjiro - Leave the rest to me",

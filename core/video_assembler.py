@@ -338,7 +338,7 @@ def render_cinematic_edit(
             if not ep_meta:
                 default_ep = (
                     "DS_S02E06" if character_key in ("rengoku", "akaza")
-                    else "DS_S01E20" if character_key in ("giyu", "tomioka")
+                    else "DS_S01E20" if character_key in ("giyu", "tomioka", "shinobu", "kocho")
                     else "DS_S01E19" if character_key in ("tanjiro",)
                     else "DS_S01E17" if character_key in ("zenitsu",)
                     else "DS_S02E10" if character_key in ("tengen", "uzui", "gyutaro")
@@ -375,7 +375,14 @@ def render_cinematic_edit(
                             scene_dialogue = s["dialogue"]
                             break
 
-            raw_dialogue = scene_dialogue or (ep_meta.get("intro_dialogue") if ep_meta else None) or DEFAULT_CHARACTER_DIALOGUE.get(character_key)
+            # Fallback to episode intro dialogue ONLY if it matches the current character
+            intro_diag = None
+            if ep_meta and "intro_dialogue" in ep_meta:
+                diag_speakers = [str(item.get("speaker", "")).lower() for item in ep_meta["intro_dialogue"]]
+                if any(character_key.lower() in sp or sp in character_key.lower() for sp in diag_speakers):
+                    intro_diag = ep_meta["intro_dialogue"]
+
+            raw_dialogue = scene_dialogue or intro_diag or DEFAULT_CHARACTER_DIALOGUE.get(character_key)
             if clip_paths and clip_paths[0].exists():
                 from core.audio_speech_syncer import get_synced_dialogue_for_clip
                 dialogue_lines = get_synced_dialogue_for_clip(

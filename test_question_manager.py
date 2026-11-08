@@ -108,6 +108,28 @@ class TestQuestionManager(unittest.TestCase):
             if out_ass.exists():
                 out_ass.unlink()
 
+    def test_05_multi_character_episode_isolation(self):
+        """Verify that multi-character episodes like DS_S01E20 isolate questions per character."""
+        # Shinobu must get Shinobu-specific questions in DS_S01E20
+        q_shinobu = get_engaging_question("shinobu", episode_code="DS_S01E20")
+        self.assertIn(" | ", q_shinobu)
+        self.assertTrue(
+            any(k in q_shinobu for k in ["SHINOBU", "WISTERIA", "INSECT", "BUTTERFLY", "SPIDER SISTER"]),
+            f"Shinobu got non-Shinobu question: {q_shinobu}"
+        )
+        self.assertNotIn("GIYU", q_shinobu)
+        self.assertNotIn("DEAD CALM", q_shinobu)
+
+        # Giyu must get Giyu-specific questions in DS_S01E20
+        q_giyu = get_engaging_question("giyu", episode_code="DS_S01E20")
+        self.assertIn(" | ", q_giyu)
+        self.assertTrue(
+            any(k in q_giyu for k in ["GIYU", "DEAD CALM", "WATER BREATHING", "ELEVENTH FORM", "RUI"]),
+            f"Giyu got non-Giyu question: {q_giyu}"
+        )
+        self.assertNotIn("SHINOBU", q_giyu)
+        self.assertNotIn("WISTERIA", q_giyu)
+
 
 if __name__ == "__main__":
     unittest.main()

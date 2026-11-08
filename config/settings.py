@@ -304,6 +304,17 @@ CC_PRESETS = {
         "vignette": "0",
         "primary_color": "&H00D2FF00",  # Wild Beast Indigo/Cyan
         "accent_color": "#00FFD2"
+    },
+    "wisteria_bloom": {
+        "contrast": 1.22,
+        "brightness": 0.02,
+        "saturation": 1.35,
+        "gamma": 1.10,
+        "colorbalance": "rs=0.04:gs=-0.02:bs=0.08:rm=0.02:gm=-0.01:bm=0.06",
+        "unsharp": "3:3:0.6:3:3:0.0",
+        "vignette": "0",
+        "primary_color": "&H00D946EF",  # Wisteria Purple/Magenta
+        "accent_color": "#D946EF"
     }
 }
 
@@ -330,6 +341,7 @@ CHARACTER_COLOR_MAP = {
     "nezuko":    {"primary": "warm_red",   "energy": "hinokami_flame", "text_color": "&H008833FF", "energy_hex": "#FF3388"},
     "muichiro":  {"primary": "cool_blue",  "energy": "cool_blue",      "text_color": "&H00D2FF00", "energy_hex": "#00D2FF"},
     "gyutaro":   {"primary": "warm_red",   "energy": "sukuna_crimson", "text_color": "&H0033FF33", "energy_hex": "#33FF33"},
+    "shinobu":   {"primary": "cool_blue",  "energy": "wisteria_bloom", "text_color": "&H00D946EF", "energy_hex": "#D946EF"},
     # Marvel Characters (legacy)
     "loki":      {"primary": "cool_blue",  "energy": "mahito_purple", "text_color": "&H00D200FF", "energy_hex": "#D200FF"},
     "spiderman": {"primary": "warm_red",   "energy": "warm_red",      "text_color": "&H003333FF", "energy_hex": "#FF2233"},
@@ -351,6 +363,6 @@ YOUTUBE_ACCESS_TOKEN = os.environ.get("YOUTUBE_ACCESS_TOKEN", "")
 # Channel Branding & SEO
 CHANNEL_TAGS = [
     "jjk", "gojo", "sukuna", "jujutsukaisen", "animeedit", "phonk", "velocity",
-    "demonslayer", "kimetsunoyaiba", "tanjiro", "rengoku", "zenitsu", "akaza", "giyu", "tengen",
+    "demonslayer", "kimetsunoyaiba", "tanjiro", "rengoku", "zenitsu", "akaza", "giyu", "tengen", "shinobu",
     "marvel", "spiderman", "avengers", "ironman", "infinitywar", "4kedit", "shorts"
 ]

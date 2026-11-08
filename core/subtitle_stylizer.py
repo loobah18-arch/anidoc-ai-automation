@@ -178,6 +178,13 @@ DEFAULT_CHARACTER_DIALOGUE = {
         {"speaker": "Rui", "text": "BLOOD DEMON ART: CUTTING THREAD ROTATION!", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H001E27FF"},
         {"speaker": "Giyu", "text": "TOTAL CONCENTRATION... WATER BREATHING, ELEVENTH FORM: DEAD CALM.", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H0000FFFF"}
     ],
+    "shinobu": [
+        {"speaker": "Spider Demon", "text": "STAY AWAY FROM ME! YOU CAN'T CUT MY HEAD OFF!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Shinobu", "text": "IT'S TRUE THAT I CANNOT CUT OFF A DEMON'S HEAD.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H00D946EF"},
+        {"speaker": "Shinobu", "text": "HOWEVER... I CAN KILL DEMONS WITH POISON.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H00D946EF"},
+        {"speaker": "Shinobu", "text": "SO THAT WE CAN BECOME FRIENDS... ACCEPT YOUR PENALTY.", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H00D946EF"},
+        {"speaker": "Shinobu", "text": "INSECT BREATHING: BUTTERFLY DANCE — CAPRICE!", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H00FF00FF"}
+    ],
     "muichiro": [
         {"speaker": "Gyokko", "text": "MY BEAUTIFUL POTS ARE SUPERIOR TO ANY HUMAN ART!", "start_rel": 0.5, "end_rel": 6.0, "glow_color": "&H00CCFF00"},
         {"speaker": "Muichiro", "text": "WHICH FORM WAS IT AGAIN? YOUR POTS LOOK QUITE ASYMMETRIC.", "start_rel": 6.5, "end_rel": 13.0, "glow_color": "&H00CCFF00"},

@@ -91,6 +91,15 @@ class TestDetailedEpisodesAndScenes(unittest.TestCase):
         self.assertTrue(len(rengoku_clips) >= 1)
         self.assertTrue(any("ninth form" in c.get("description", "").lower() for c in rengoku_clips))
 
+        # Shinobu & Giyu dual Hashira isolation in DS_S01E20
+        shinobu_clips = get_character_clips("DS_S01E20", "shinobu", min_action_score=0.8)
+        self.assertTrue(len(shinobu_clips) >= 1)
+        self.assertTrue(any("butterfly" in c.get("description", "").lower() for c in shinobu_clips))
+
+        giyu_clips = get_character_clips("DS_S01E20", "giyu", min_action_score=0.8)
+        self.assertTrue(len(giyu_clips) >= 1)
+        self.assertTrue(any("dead calm" in c.get("description", "").lower() for c in giyu_clips))
+
         # JJK
         sukuna_clips = get_character_clips("S02E17", "sukuna", min_action_score=0.8)
         self.assertTrue(len(sukuna_clips) >= 2)

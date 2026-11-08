@@ -114,7 +114,11 @@ SCENE_SPECIFIC_QUESTIONS: Dict[str, List[str]] = {
         "ASLEEP ON A TREE BRANCH | IS SLEEPING ZENITSU LOWKEY HASHIRA TIER?",
         "HONE A SINGLE STRIKE TO PERFECTION | WAS GODSPEED THE CLEANEST SAKUGA?"
     ],
-    "DS_S01E20": [  # Giyu Dead Calm vs Rui
+    "DS_S01E20": [  # Shinobu vs Spider Sister & Giyu Dead Calm vs Rui
+        "SHE CANNOT CUT OFF A DEMON'S HEAD | IS SHINOBU'S WISTERIA POISON DEADLIER?",
+        "INSECT BREATHING BUTTERFLY DANCE | IS SHINOBU THE FASTEST HASHIRA?",
+        "THE COLDEST SMILE IN DEMON SLAYER | DID SPIDER SISTER DESERVE HER MERCY?",
+        "LETHAL WISTERIA INJECTION | COULD ANY LOWER MOON SURVIVE SHINOBU?",
         "RUI'S THREADS COULD NOT TOUCH HIM | IS ELEVENTH FORM DEAD CALM IMPENETRABLE?",
         "THE QUIETEST HASHIRA IN HISTORY | COULD ANY DEMON BREACH GIYU'S DEFENSE?",
         "WATER BREATHING ELEVENTH FORM | DID GIYU CREATE THE GREATEST DEFENSE?",
@@ -199,6 +203,13 @@ CHARACTER_SPECIFIC_QUESTIONS: Dict[str, List[str]] = {
     "muichiro": [
         "DID MUICHIRO SOLO AN UPPER MOON | FASTER THAN ANY HASHIRA?",
         "IS MUICHIRO TOKITO | THE BIGGEST PRODIGY IN ANIME?"
+    ],
+    "shinobu": [
+        "SHE CANNOT CUT OFF A DEMON'S HEAD | IS SHINOBU'S WISTERIA POISON DEADLIER?",
+        "INSECT BREATHING BUTTERFLY DANCE | IS SHINOBU THE FASTEST HASHIRA?",
+        "THE COLDEST SMILE IN DEMON SLAYER | DID SPIDER SISTER DESERVE HER MERCY?",
+        "LETHAL WISTERIA INJECTION | COULD ANY LOWER MOON SURVIVE SHINOBU?",
+        "POISONED STINGER NICHIRIN BLADE | IS SHINOBU THE DEADLIEST HASHIRA?"
     ],
 
     # ── Expanded Multi-Anime Library ──
@@ -311,6 +322,38 @@ def get_engaging_question(
                 break
 
     if scene_pool:
+        # If character is specified, prioritize scene questions matching character or signature moves
+        char_matches = []
+        if char_k:
+            char_terms = [char_k]
+            if char_k in ("shinobu", "kocho"):
+                char_terms.extend(["shinobu", "kocho", "insect", "wisteria", "poison", "butterfly"])
+            elif char_k in ("giyu", "tomioka"):
+                char_terms.extend(["giyu", "tomioka", "water", "dead calm", "lull", "eleventh form"])
+            elif char_k == "tanjiro":
+                char_terms.extend(["tanjiro", "hinokami", "sun breathing", "kamado"])
+            elif char_k == "zenitsu":
+                char_terms.extend(["zenitsu", "thunder", "sixfold", "godspeed"])
+            elif char_k in ("tengen", "uzui"):
+                char_terms.extend(["tengen", "uzui", "sound breathing", "musical score"])
+            elif char_k == "rengoku":
+                char_terms.extend(["rengoku", "flame", "kyojuro", "ninth form"])
+            elif char_k in ("muichiro", "tokito"):
+                char_terms.extend(["muichiro", "tokito", "mist", "obscuring clouds"])
+            elif char_k == "gojo":
+                char_terms.extend(["gojo", "satoru", "infinity", "hollow purple", "six eyes", "void"])
+            elif char_k == "sukuna":
+                char_terms.extend(["sukuna", "malevolent", "shrine", "cleave", "dismantle"])
+            elif char_k in ("toji", "fushiguro"):
+                char_terms.extend(["toji", "fushiguro", "heavenly restriction", "inverted spear"])
+
+            char_matches = [
+                q for q in scene_pool
+                if any(term in q.lower() for term in char_terms)
+            ]
+        if char_matches:
+            scene_pool = char_matches
+
         # Check if any scene-specific questions are fresh
         unused_scene = [q for q in scene_pool if q not in used]
         if unused_scene:

@@ -18,7 +18,7 @@ on:
           - 'random'
           - 'marvel'
       character:
-        description: 'Specific character (tanjiro, rengoku, zenitsu, akaza, giyu, tengen, inosuke, muzan, nezuko, muichiro, gyutaro, gojo, sukuna, yuji, toji, megumi)'
+        description: 'Specific character (tanjiro, rengoku, zenitsu, akaza, giyu, tengen, inosuke, muzan, nezuko, muichiro, gyutaro, shinobu, gojo, sukuna, yuji, toji, megumi)'
         required: false
         default: ''
         type: string
