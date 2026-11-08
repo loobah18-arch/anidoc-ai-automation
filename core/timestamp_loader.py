@@ -12,19 +12,59 @@ METADATA_DIR = Path(__file__).resolve().parent.parent / "metadata" / "episodes"
 
 
 def load_episode_metadata(episode_code: str) -> Optional[Dict[str, Any]]:
-    """Load timestamp metadata for a specific episode."""
+    """Load timestamp metadata for a specific episode from JSON and Python databases."""
+    clean_code = episode_code.upper().replace("_", "")
     filename = f"{episode_code.lower()}_timestamps.json"
     filepath = METADATA_DIR / filename
+    data = None
 
-    if not filepath.exists():
-        return None
+    if filepath.exists():
+        try:
+            with open(filepath, 'r') as f:
+                data = json.load(f)
+        except Exception as e:
+            print(f"⚠️ Failed to load metadata for {episode_code}: {e}")
+
+    # Fallback/merge with detailed python databases if available
+    try:
+        from metadata.jjk_episodes_detailed import ALL_EPISODES as JJK_ALL
+        for k, v in JJK_ALL.items():
+            if k.upper().replace("_", "") == clean_code or clean_code.endswith(k.upper().replace("_", "")):
+                if data is None:
+                    data = v.copy()
+                else:
+                    if "intro_dialogue" in v and "intro_dialogue" not in data:
+                        data["intro_dialogue"] = v["intro_dialogue"]
+                    if "scenes" in v and "scenes" in data:
+                        for s_json in data["scenes"]:
+                            st_json = float(s_json.get("start", -999))
+                            for s_py in v["scenes"]:
+                                if abs(float(s_py.get("start", -999)) - st_json) < 5.0 and "dialogue" in s_py:
+                                    s_json.setdefault("dialogue", s_py["dialogue"])
+                break
+    except Exception:
+        pass
 
     try:
-        with open(filepath, 'r') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"⚠️ Failed to load metadata for {episode_code}: {e}")
-        return None
+        from metadata.demonslayer_episodes_detailed import ALL_DS_EPISODES as DS_ALL
+        for k, v in DS_ALL.items():
+            if k.upper().replace("_", "") == clean_code or clean_code.endswith(k.upper().replace("_", "")):
+                if data is None:
+                    data = v.copy()
+                else:
+                    if "intro_dialogue" in v and "intro_dialogue" not in data:
+                        data["intro_dialogue"] = v["intro_dialogue"]
+                    if "scenes" in v and "scenes" in data:
+                        for s_json in data["scenes"]:
+                            st_json = float(s_json.get("start", -999))
+                            for s_py in v["scenes"]:
+                                if abs(float(s_py.get("start", -999)) - st_json) < 5.0 and "dialogue" in s_py:
+                                    s_json.setdefault("dialogue", s_py["dialogue"])
+                break
+    except Exception:
+        pass
+
+    return data
 
 
 def get_character_clips(

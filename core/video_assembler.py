@@ -362,7 +362,14 @@ def render_cinematic_edit(
                             break
 
             raw_dialogue = scene_dialogue or (ep_meta.get("intro_dialogue") if ep_meta else None) or DEFAULT_CHARACTER_DIALOGUE.get(character_key)
-            if raw_dialogue:
+            if clip_paths and clip_paths[0].exists():
+                from core.audio_speech_syncer import get_synced_dialogue_for_clip
+                dialogue_lines = get_synced_dialogue_for_clip(
+                    clip_path=clip_paths[0],
+                    fallback_dialogue=raw_dialogue,
+                    drop_time=beat_grid.drop_time
+                )
+            elif raw_dialogue:
                 drop_t = beat_grid.drop_time
                 for item in raw_dialogue:
                     s_rel = float(item.get("start_rel", item.get("start", 0.0)))

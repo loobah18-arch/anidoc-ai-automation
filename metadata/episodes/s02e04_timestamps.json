@@ -29,25 +29,32 @@
   "notes": "JJK combat episode - Teen Gojo vs Toji Awakened Climax",
   "intro_dialogue": [
     {
+      "speaker": "Gojo",
+      "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...",
+      "start_rel": 0.6,
+      "end_rel": 4.6,
+      "glow_color": "&H00FFFFFF"
+    },
+    {
+      "speaker": "Gojo",
+      "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.",
+      "start_rel": 4.8,
+      "end_rel": 8.8,
+      "glow_color": "&H00FFFFFF"
+    },
+    {
       "speaker": "Toji",
-      "text": "ARE YOU REALLY SATORU GOJO?",
-      "start_rel": 0.5,
-      "end_rel": 3.8,
-      "glow_color": "&H001E27FF"
+      "text": "I'M GOING TO LOSE?",
+      "start_rel": 9.0,
+      "end_rel": 11.2,
+      "glow_color": "&H00FFFFFF"
     },
     {
-      "speaker": "Gojo",
-      "text": "THROUGHOUT HEAVEN AND EARTH...",
-      "start_rel": 4.2,
-      "end_rel": 8.0,
-      "glow_color": "&H00FFAA00"
-    },
-    {
-      "speaker": "Gojo",
-      "text": "I ALONE AM THE HONORED ONE.",
-      "start_rel": 8.5,
-      "end_rel": 13.8,
-      "glow_color": "&H0000FFFF"
+      "speaker": "Toji",
+      "text": "OUR FIGHT IS JUST GETTING STARTED!",
+      "start_rel": 11.5,
+      "end_rel": 13.9,
+      "glow_color": "&H00FFFFFF"
     }
   ],
   "scenes": [
@@ -56,27 +63,73 @@
       "end": 660.0,
       "action_level": "CALM",
       "priority": "high",
-      "description": "Pre-fight standoff & dialogue: Gojo confronts Toji floating upside down - Yo, it's been a while",
+      "description": "Pre-fight standoff & dialogue: Gojo confronts Toji floating upside down - The reason you're going to lose is because you didn't chop my head off",
       "characters_present": [
         "gojo",
         "toji"
       ],
-      "action_score": 0.65,
+      "action_score": 0.75,
       "is_conversation": true,
-      "duration": 240.0
+      "duration": 240.0,
+      "dialogue": [
+        {
+          "speaker": "Gojo",
+          "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...",
+          "start_rel": 0.6,
+          "end_rel": 4.6
+        },
+        {
+          "speaker": "Gojo",
+          "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.",
+          "start_rel": 4.8,
+          "end_rel": 8.8
+        },
+        {
+          "speaker": "Toji",
+          "text": "I'M GOING TO LOSE?",
+          "start_rel": 9.0,
+          "end_rel": 11.2
+        },
+        {
+          "speaker": "Toji",
+          "text": "OUR FIGHT IS JUST GETTING STARTED!",
+          "start_rel": 11.5,
+          "end_rel": 13.9
+        }
+      ]
     },
     {
-      "start": 660.0,
-      "end": 840.0,
+      "start": 720.0,
+      "end": 838.0,
       "action_level": "CALM",
-      "priority": "high",
+      "priority": "medium",
       "description": "Pre-fight monologue & awakening: The Honored One - Throughout heaven and earth, I alone am the honored one",
       "characters_present": [
         "gojo"
       ],
       "action_score": 0.70,
       "is_conversation": true,
-      "duration": 180.0
+      "duration": 118.0,
+      "dialogue": [
+        {
+          "speaker": "Gojo",
+          "text": "SORRY, AMANAI. I'M NOT EVEN ANGRY RIGHT NOW.",
+          "start_rel": 0.8,
+          "end_rel": 4.5
+        },
+        {
+          "speaker": "Gojo",
+          "text": "IT'S JUST THAT THE WORLD FEELS SO WONDERFUL RIGHT NOW.",
+          "start_rel": 4.8,
+          "end_rel": 8.8
+        },
+        {
+          "speaker": "Gojo",
+          "text": "THROUGHOUT HEAVEN AND EARTH, I ALONE AM THE HONORED ONE.",
+          "start_rel": 9.0,
+          "end_rel": 13.8
+        }
+      ]
     },
     {
       "start": 840.0,

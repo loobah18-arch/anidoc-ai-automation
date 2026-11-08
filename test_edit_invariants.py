@@ -119,5 +119,23 @@ class TestAnimeEditInvariants(unittest.TestCase):
         bad_path.unlink(missing_ok=True)
         self.assertFalse(is_clip_healthy(bad_path))
 
+    def test_07_dynamic_speech_syncer_and_safe_bounds(self):
+        """Verify dynamic speech-to-subtitle synchronizer snaps dialogue safely before beat drop."""
+        from core.audio_speech_syncer import get_synced_dialogue_for_clip
+        from config.settings import SCRATCH_DIR
+        raw_dialogue = [
+            {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 4.6},
+            {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 4.8, "end_rel": 8.8},
+            {"speaker": "Toji", "text": "I'M GOING TO LOSE?", "start_rel": 9.0, "end_rel": 11.2},
+            {"speaker": "Toji", "text": "OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 11.5, "end_rel": 13.9}
+        ]
+        dummy_clip = SCRATCH_DIR / "non_existent_clip.mp4"
+        synced = get_synced_dialogue_for_clip(dummy_clip, raw_dialogue, drop_time=14.128)
+        self.assertEqual(len(synced), 4)
+        for s in synced:
+            self.assertLess(s["start"], 14.128)
+            self.assertLessEqual(s["end"], 14.128 - 0.15)
+        self.assertEqual(synced[0]["text"], raw_dialogue[0]["text"])
+
 if __name__ == "__main__":
     unittest.main()
