@@ -126,23 +126,9 @@ DS_S01E20_TIMESTAMPS = {
     "scenes": [
         {
             "start": 360.0, "end": 520.0, "action_level": "CALM", "priority": "high",
-            "description": "Pre-fight standoff & confrontation: Shinobu descends and confronts Spider Demon Sister - 'So that we can become friends... accept your penalty.'",
-            "characters_present": ["shinobu", "spider_sister"],
-            "action_score": 0.80, "is_conversation": True, "duration": 160.0,
-            "dialogue": [
-                {"speaker": "Spider Demon", "text": "STAY AWAY FROM ME! YOU CAN'T CUT MY HEAD OFF!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
-                {"speaker": "Shinobu", "text": "IT'S TRUE THAT I CANNOT CUT OFF A DEMON'S HEAD.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H00D946EF"},
-                {"speaker": "Shinobu", "text": "HOWEVER... I CAN KILL DEMONS WITH POISON.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H00D946EF"},
-                {"speaker": "Shinobu", "text": "SO THAT WE CAN BECOME FRIENDS... ACCEPT YOUR PENALTY.", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H00D946EF"},
-                {"speaker": "Shinobu", "text": "INSECT BREATHING: BUTTERFLY DANCE — CAPRICE!", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H00FF00FF"}
-            ]
-        },
-        {"start": 520.0, "end": 640.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX: Shinobu leaps gracefully with Insect Breathing Butterfly Dance: Caprice, injecting lethal Wisteria poison into Spider Sister", "characters_present": ["shinobu", "spider_sister"], "action_score": 1.0, "is_conversation": False, "duration": 120.0},
-        {
-            "start": 1000.0, "end": 1060.0, "action_level": "CALM", "priority": "high",
             "description": "Pre-fight standoff & dialogue: Giyu intercepts Rui's fatal threads and shields Tanjiro - Leave the rest to me",
             "characters_present": ["giyu", "tanjiro", "rui"],
-            "action_score": 0.75, "is_conversation": True, "duration": 60.0,
+            "action_score": 0.80, "is_conversation": True, "duration": 160.0,
             "dialogue": [
                 {"speaker": "Rui", "text": "I'LL TEAR YOU TO SHREDS FOR GETTING IN MY WAY!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
                 {"speaker": "Giyu", "text": "YOU DID WELL TO HOLD OUT UNTIL I GOT HERE.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H0000C8FF"},
@@ -151,8 +137,21 @@ DS_S01E20_TIMESTAMPS = {
                 {"speaker": "Giyu", "text": "TOTAL CONCENTRATION... WATER BREATHING, ELEVENTH FORM: DEAD CALM.", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H0000FFFF"}
             ]
         },
-        {"start": 1060.0, "end": 1120.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX: Giyu activates Eleventh Form Dead Calm - Rui's razor threads dissolve into water ripples", "characters_present": ["giyu", "rui"], "action_score": 0.98, "is_conversation": False, "duration": 60.0},
-        {"start": 1120.0, "end": 1170.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 FINISHER: Giyu glides across the water surface and effortlessly decapitates Rui in a single stroke", "characters_present": ["giyu", "rui"], "action_score": 1.0, "is_conversation": False, "duration": 50.0},
+        {"start": 520.0, "end": 640.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX: Giyu activates Eleventh Form Dead Calm - Rui's razor threads dissolve into water ripples and Giyu effortlessly decapitates Rui", "characters_present": ["giyu", "rui"], "action_score": 1.0, "is_conversation": False, "duration": 120.0},
+        {
+            "start": 980.0, "end": 1080.0, "action_level": "CALM", "priority": "high",
+            "description": "Pre-fight standoff & confrontation: Shinobu descends and confronts Spider Demon Sister - 'So that we can become friends... accept your penalty.'",
+            "characters_present": ["shinobu", "spider_sister"],
+            "action_score": 0.80, "is_conversation": True, "duration": 100.0,
+            "dialogue": [
+                {"speaker": "Spider Demon", "text": "STAY AWAY FROM ME! YOU CAN'T CUT MY HEAD OFF!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
+                {"speaker": "Shinobu", "text": "IT'S TRUE THAT I CANNOT CUT OFF A DEMON'S HEAD.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H00D946EF"},
+                {"speaker": "Shinobu", "text": "HOWEVER... I CAN KILL DEMONS WITH POISON.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H00D946EF"},
+                {"speaker": "Shinobu", "text": "SO THAT WE CAN BECOME FRIENDS... ACCEPT YOUR PENALTY.", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H00D946EF"},
+                {"speaker": "Shinobu", "text": "INSECT BREATHING: BUTTERFLY DANCE — CAPRICE!", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H00FF00FF"}
+            ]
+        },
+        {"start": 1080.0, "end": 1220.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX: Shinobu leaps gracefully with Insect Breathing Butterfly Dance: Caprice, injecting lethal Wisteria poison into Spider Sister", "characters_present": ["shinobu", "spider_sister"], "action_score": 1.0, "is_conversation": False, "duration": 140.0},
     ]
 }
 
