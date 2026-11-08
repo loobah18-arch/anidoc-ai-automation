@@ -338,8 +338,12 @@ def render_cinematic_edit(
             if not ep_meta:
                 default_ep = (
                     "DS_S02E06" if character_key in ("rengoku", "akaza")
-                    else "JJK_S02E04" if character_key in ("gojo", "toji")
-                    else "JJK_S02E17" if character_key in ("sukuna", "mahoraga")
+                    else "DS_S01E20" if character_key in ("giyu", "tomioka")
+                    else "DS_S01E19" if character_key in ("tanjiro",)
+                    else "DS_S01E17" if character_key in ("zenitsu",)
+                    else "DS_S02E10" if character_key in ("tengen", "uzui", "gyutaro")
+                    else "S02E04" if character_key in ("gojo", "toji")
+                    else "S02E17" if character_key in ("sukuna", "mahoraga")
                     else None
                 )
                 if default_ep:

@@ -70,25 +70,54 @@ DS_S01E19_TIMESTAMPS = {
 DS_S01E20_TIMESTAMPS = {
     "episode_code": "DS_S01E20",
     "title": "Pretence of Family",
-    "duration": 1440.0,
+    "duration": 1415.7,
     "universe": "demonslayer",
     "characters": [
         {
             "name": "Giyu",
-            "role": "Hashira",
+            "role": "Water Hashira",
             "key_moments": [
                 "Arrives at Natagumo Mountain",
+                "Intercepts Rui's cutting threads and shields Tanjiro",
                 "Water Breathing Eleventh Form: Dead Calm (Lull)",
-                "Nullifies Rui's strongest Blood Demon Art effortlessly",
-                "One-shot decapitation"
+                "Nullifies Rui's Blood Demon Art effortlessly",
+                "One-shot decapitation of Lower Moon Five Rui"
+            ]
+        },
+        {
+            "name": "Rui",
+            "role": "Lower Moon Five",
+            "key_moments": [
+                "Prepares Cutting Thread Rotation to execute Tanjiro",
+                "Blood Demon Art: Cutting Thread Rotation",
+                "Encounter with Water Hashira Giyu",
+                "Decapitated by Eleventh Form Dead Calm"
             ]
         }
     ],
+    "intro_dialogue": [
+        {"speaker": "Rui", "text": "I'LL TEAR YOU TO SHREDS FOR GETTING IN MY WAY!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Giyu", "text": "YOU DID WELL TO HOLD OUT UNTIL I GOT HERE.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H0000C8FF"},
+        {"speaker": "Giyu", "text": "LEAVE THE REST TO ME.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H0000C8FF"},
+        {"speaker": "Rui", "text": "BLOOD DEMON ART: CUTTING THREAD ROTATION!", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Giyu", "text": "TOTAL CONCENTRATION... WATER BREATHING, ELEVENTH FORM: DEAD CALM.", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H0000FFFF"}
+    ],
     "scenes": [
-        {"start": 240.0, "end": 420.0, "action_level": "INTENSE", "priority": "high", "description": "Rui reattaches head, prepares Cutting Thread Wheel to execute Tanjiro", "characters_present": ["tanjiro"]},
-        {"start": 480.0, "end": 660.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Giyu Tomioka steps in and activates Eleventh Form Dead Calm", "characters_present": ["giyu"]},
-        {"start": 660.0, "end": 800.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Rui's razor threads dissolve into water ripples around Giyu", "characters_present": ["giyu"]},
-        {"start": 800.0, "end": 960.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Giyu glides forward and instantly severs Rui's neck", "characters_present": ["giyu"]},
+        {
+            "start": 1000.0, "end": 1060.0, "action_level": "CALM", "priority": "high",
+            "description": "Pre-fight standoff & dialogue: Giyu intercepts Rui's fatal threads and shields Tanjiro - Leave the rest to me",
+            "characters_present": ["giyu", "tanjiro", "rui"],
+            "action_score": 0.75, "is_conversation": True, "duration": 60.0,
+            "dialogue": [
+                {"speaker": "Rui", "text": "I'LL TEAR YOU TO SHREDS FOR GETTING IN MY WAY!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
+                {"speaker": "Giyu", "text": "YOU DID WELL TO HOLD OUT UNTIL I GOT HERE.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H0000C8FF"},
+                {"speaker": "Giyu", "text": "LEAVE THE REST TO ME.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H0000C8FF"},
+                {"speaker": "Rui", "text": "BLOOD DEMON ART: CUTTING THREAD ROTATION!", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H001E27FF"},
+                {"speaker": "Giyu", "text": "TOTAL CONCENTRATION... WATER BREATHING, ELEVENTH FORM: DEAD CALM.", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H0000FFFF"}
+            ]
+        },
+        {"start": 1060.0, "end": 1120.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 CLIMAX: Giyu activates Eleventh Form Dead Calm - Rui's razor threads dissolve into water ripples", "characters_present": ["giyu", "rui"], "action_score": 0.98, "is_conversation": False, "duration": 60.0},
+        {"start": 1120.0, "end": 1170.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "💎 FINISHER: Giyu glides across the water surface and effortlessly decapitates Rui in a single stroke", "characters_present": ["giyu", "rui"], "action_score": 1.0, "is_conversation": False, "duration": 50.0},
     ]
 }
 

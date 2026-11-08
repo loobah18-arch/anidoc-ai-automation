@@ -798,6 +798,7 @@ def slice_action_moments_from_source(
     # Universal semantic phase boundaries from episode metadata:
     # Derives exact combat bounds, conversation windows, and excludes all bystander/aftermath/credit leakage.
     matched_ep_code = match_episode_code_from_filename(video_path.name)
+    prefix = clip_prefix or (f"{character_key}_gdrive_{matched_ep_code}" if matched_ep_code else f"{character_key}_gdrive")
     phase_info = get_episode_phase_boundaries(
         matched_ep_code=matched_ep_code,
         character_key=character_key,

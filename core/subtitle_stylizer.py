@@ -172,11 +172,11 @@ DEFAULT_CHARACTER_DIALOGUE = {
         {"speaker": "Inosuke", "text": "BEAST BREATHING, FIFTH FANG: CRAZY CUTTING!", "start_rel": 22.5, "end_rel": 29.8, "glow_color": "&H0000FFFF"}
     ],
     "giyu": [
-        {"speaker": "Tanjiro", "text": "DON'T KILL HER! PLEASE, SHE'S MY SISTER!", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H00FF8800"},
-        {"speaker": "Giyu", "text": "DON'T GIVE OTHERS THE POWER OVER YOUR OWN LIFE!", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H00FF8800"},
-        {"speaker": "Giyu", "text": "WEAKLINGS HAVE NO RIGHTS OR CHOICES.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H00FF8800"},
-        {"speaker": "Giyu", "text": "CRYING WON'T CHANGE REALITY... THE DEAD WILL NEVER RETURN.", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H00FF8800"},
-        {"speaker": "Giyu", "text": "WATER BREATHING, ELEVENTH FORM: DEAD CALM.", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H00FFFF00"}
+        {"speaker": "Rui", "text": "I'LL TEAR YOU TO SHREDS FOR GETTING IN MY WAY!", "start_rel": 0.6, "end_rel": 5.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Giyu", "text": "YOU DID WELL TO HOLD OUT UNTIL I GOT HERE.", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H0000C8FF"},
+        {"speaker": "Giyu", "text": "LEAVE THE REST TO ME.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H0000C8FF"},
+        {"speaker": "Rui", "text": "BLOOD DEMON ART: CUTTING THREAD ROTATION!", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Giyu", "text": "TOTAL CONCENTRATION... WATER BREATHING, ELEVENTH FORM: DEAD CALM.", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H0000FFFF"}
     ],
     "muichiro": [
         {"speaker": "Gyokko", "text": "MY BEAUTIFUL POTS ARE SUPERIOR TO ANY HUMAN ART!", "start_rel": 0.5, "end_rel": 6.0, "glow_color": "&H00CCFF00"},

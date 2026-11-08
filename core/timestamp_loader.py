@@ -26,43 +26,46 @@ def load_episode_metadata(episode_code: str) -> Optional[Dict[str, Any]]:
             print(f"⚠️ Failed to load metadata for {episode_code}: {e}")
 
     # Fallback/merge with detailed python databases if available
-    try:
-        from metadata.jjk_episodes_detailed import ALL_EPISODES as JJK_ALL
-        for k, v in JJK_ALL.items():
-            if k.upper().replace("_", "") == clean_code or clean_code.endswith(k.upper().replace("_", "")):
-                if data is None:
-                    data = v.copy()
-                else:
-                    if "intro_dialogue" in v and "intro_dialogue" not in data:
-                        data["intro_dialogue"] = v["intro_dialogue"]
-                    if "scenes" in v and "scenes" in data:
-                        for s_json in data["scenes"]:
-                            st_json = float(s_json.get("start", -999))
-                            for s_py in v["scenes"]:
-                                if abs(float(s_py.get("start", -999)) - st_json) < 5.0 and "dialogue" in s_py:
-                                    s_json.setdefault("dialogue", s_py["dialogue"])
-                break
-    except Exception:
-        pass
+    is_ds_code = clean_code.startswith("DS")
+    if not is_ds_code:
+        try:
+            from metadata.jjk_episodes_detailed import ALL_EPISODES as JJK_ALL
+            for k, v in JJK_ALL.items():
+                if k.upper().replace("_", "") == clean_code or clean_code.endswith(k.upper().replace("_", "")):
+                    if data is None:
+                        data = v.copy()
+                    else:
+                        if "intro_dialogue" in v and "intro_dialogue" not in data:
+                            data["intro_dialogue"] = v["intro_dialogue"]
+                        if "scenes" in v and "scenes" in data:
+                            for s_json in data["scenes"]:
+                                st_json = float(s_json.get("start", -999))
+                                for s_py in v["scenes"]:
+                                    if abs(float(s_py.get("start", -999)) - st_json) < 5.0 and "dialogue" in s_py:
+                                        s_json.setdefault("dialogue", s_py["dialogue"])
+                    break
+        except Exception:
+            pass
 
-    try:
-        from metadata.demonslayer_episodes_detailed import ALL_DS_EPISODES as DS_ALL
-        for k, v in DS_ALL.items():
-            if k.upper().replace("_", "") == clean_code or clean_code.endswith(k.upper().replace("_", "")):
-                if data is None:
-                    data = v.copy()
-                else:
-                    if "intro_dialogue" in v and "intro_dialogue" not in data:
-                        data["intro_dialogue"] = v["intro_dialogue"]
-                    if "scenes" in v and "scenes" in data:
-                        for s_json in data["scenes"]:
-                            st_json = float(s_json.get("start", -999))
-                            for s_py in v["scenes"]:
-                                if abs(float(s_py.get("start", -999)) - st_json) < 5.0 and "dialogue" in s_py:
-                                    s_json.setdefault("dialogue", s_py["dialogue"])
-                break
-    except Exception:
-        pass
+    if is_ds_code or data is None:
+        try:
+            from metadata.demonslayer_episodes_detailed import ALL_DS_EPISODES as DS_ALL
+            for k, v in DS_ALL.items():
+                if k.upper().replace("_", "") == clean_code or clean_code.endswith(k.upper().replace("_", "")):
+                    if data is None:
+                        data = v.copy()
+                    else:
+                        if "intro_dialogue" in v and "intro_dialogue" not in data:
+                            data["intro_dialogue"] = v["intro_dialogue"]
+                        if "scenes" in v and "scenes" in data:
+                            for s_json in data["scenes"]:
+                                st_json = float(s_json.get("start", -999))
+                                for s_py in v["scenes"]:
+                                    if abs(float(s_py.get("start", -999)) - st_json) < 5.0 and "dialogue" in s_py:
+                                        s_json.setdefault("dialogue", s_py["dialogue"])
+                    break
+        except Exception:
+            pass
 
     return data
 
@@ -225,8 +228,10 @@ def match_episode_code_from_filename(filename: str) -> Optional[str]:
             code = f"DS_S{season:02d}E{episode:02d}"
             return code
 
-        # Match standalone episode number e.g. " - 19 "
-        ep_match = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
+        # Match standalone episode number e.g. " - 19 " (ignoring slice index patterns like _gdrive_01_779s)
+        clean_fn = re.sub(r"_gdrive_\d+_\d+s.*", "", fn)
+        clean_fn = re.sub(r"_slice_\d+.*", "", clean_fn)
+        ep_match = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", clean_fn)
         if ep_match:
             num = int(ep_match.group(1))
             for s in [1, 2, 3]:
@@ -246,7 +251,10 @@ def match_episode_code_from_filename(filename: str) -> Optional[str]:
             code = f"S{season:02d}E{episode:02d}"
             return code
 
-        ep_match = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", fn)
+        # Match standalone episode number e.g. " - 24 " (ignoring slice index patterns)
+        clean_fn = re.sub(r"_gdrive_\d+_\d+s.*", "", fn)
+        clean_fn = re.sub(r"_slice_\d+.*", "", clean_fn)
+        ep_match = re.search(r"[-_\s](\d{1,2})[\s_\.\(\[]", clean_fn)
         if ep_match:
             num = int(ep_match.group(1))
             for s in [2, 1]:
