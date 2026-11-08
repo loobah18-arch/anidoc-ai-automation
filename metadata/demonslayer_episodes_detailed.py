@@ -154,6 +154,11 @@ DS_S02E07_TIMESTAMPS = {
             ]
         }
     ],
+    "intro_dialogue": [
+        {"speaker": "Akaza", "text": "WHY DON'T YOU BECOME A DEMON TOO?", "start_rel": 0.8, "end_rel": 4.2},
+        {"speaker": "Rengoku", "text": "NO MATTER WHAT, I WILL NEVER BECOME A DEMON.", "start_rel": 4.6, "end_rel": 8.8},
+        {"speaker": "Rengoku", "text": "I WILL FULFILL MY DUTY AS A HASHIRA!", "start_rel": 9.2, "end_rel": 13.5}
+    ],
     "scenes": [
         {"start": 130.0, "end": 175.0, "action_level": "CALM", "priority": "high", "description": "Pre-fight standoff & monologue: Set your heart ablaze and fulfill Hashira duty", "characters_present": ["rengoku", "akaza"], "action_score": 0.65, "is_conversation": True},
         {"start": 175.0, "end": 235.0, "action_level": "EXPLOSIVE", "priority": "high", "description": "Esoteric Art Ninth Form: Rengoku dragon battle stance & flame aura ignition", "characters_present": ["rengoku", "akaza"], "action_score": 1.0},

@@ -28,69 +28,69 @@ def format_ass_timestamp(seconds: float) -> str:
 
 SUBTITLE_STYLE_PRESETS = {
     "spur_hook": {
-        "font": "Bebas Neue",
-        "fontsize": 58,
+        "font": "Montserrat",
+        "fontsize": 54,
         "primary": "&H00FFFFFF",         # Pure Crisp White
-        "active_word": "&H001E27FF",     # Crimson Red Highlight (&HAABBGGRR in ASS)
-        "outline": "&H00000000",         # Deep Solid Black Outline
-        "shadow": "&HA0000000",          # Dark Drop Shadow
-        "outline_width": 6.5,
-        "shadow_depth": 3.0,
-        "alignment": 8,                  # Top-Center (Upper Third Header Zone)
-        "margin_v": 180,                 # 180px from top of 1080x1920 canvas
-        "margin_lr": 90,
+        "active_word": "&H00FFFFFF",     # Clean Crisp White
+        "outline": "&H00000000",         # Subtle Clean Black Outline
+        "shadow": "&H80000000",          # Subtle Soft Drop Shadow
+        "outline_width": 2.5,
+        "shadow_depth": 1.5,
+        "alignment": 2,                  # Centered Lower-Third Zone
+        "margin_v": 340,                 # Safe above YouTube mobile chrome
+        "margin_lr": 80,
     },
     "viral_karaoke": {
-        "font": "Arial",
-        "fontsize": 64,                  # Proportional for 1:1 square canvas
+        "font": "Montserrat",
+        "fontsize": 54,
         "primary": "&H00FFFFFF",
-        "active_word": "&H002BF5FF",     # Bright Cyan Active
+        "active_word": "&H00FFFFFF",
         "outline": "&H00000000",
-        "shadow": "&H90000000",
-        "outline_width": 6.0,
-        "shadow_depth": 3.5,
-        "alignment": 2,                  # Bottom-center
-        "margin_v": 85,                  # Sits in lower third of square
-        "margin_lr": 60,
+        "shadow": "&H80000000",
+        "outline_width": 2.5,
+        "shadow_depth": 1.5,
+        "alignment": 2,
+        "margin_v": 340,
+        "margin_lr": 80,
     },
     "cyber_glow": {
-        "font": "Arial",
-        "fontsize": 64,
+        "font": "Montserrat",
+        "fontsize": 54,
         "primary": "&H00FFFFFF",
-        "active_word": "&H00FFFF00",     # Neon Cyan Active
-        "outline": "&H00FF55D2",
-        "shadow": "&H99000000",
-        "outline_width": 6.0,
-        "shadow_depth": 3.5,
+        "active_word": "&H00FFFFFF",
+        "outline": "&H00000000",
+        "shadow": "&H80000000",
+        "outline_width": 2.5,
+        "shadow_depth": 1.5,
         "alignment": 2,
-        "margin_v": 85,
-        "margin_lr": 60,
+        "margin_v": 340,
+        "margin_lr": 80,
     },
     "anime_shrine": {
-        "font": "Arial",
-        "fontsize": 66,
+        "font": "Montserrat",
+        "fontsize": 54,
         "primary": "&H00FFFFFF",
-        "active_word": "&H003333FF",     # Blood Crimson Active
+        "active_word": "&H00FFFFFF",
         "outline": "&H00000000",
-        "shadow": "&H99000088",
-        "outline_width": 6.0,
-        "shadow_depth": 3.5,
+        "shadow": "&H80000000",
+        "outline_width": 2.5,
+        "shadow_depth": 1.5,
         "alignment": 2,
-        "margin_v": 85,
-        "margin_lr": 60,
+        "margin_v": 340,
+        "margin_lr": 80,
     },
     "cinematic_minimal": {
-        "font": "Arial",
-        "fontsize": 58,
+        "font": "Montserrat",
+        "fontsize": 54,
         "primary": "&H00FFFFFF",
-        "active_word": "&H00E0E0E0",
+        "active_word": "&H00FFFFFF",
         "outline": "&H00000000",
-        "shadow": "&H60000000",
-        "outline_width": 5.0,
-        "shadow_depth": 2.5,
+        "shadow": "&H80000000",
+        "outline_width": 2.5,
+        "shadow_depth": 1.5,
         "alignment": 2,
-        "margin_v": 85,
-        "margin_lr": 60,
+        "margin_v": 340,
+        "margin_lr": 80,
     }
 }
 
@@ -122,9 +122,9 @@ DEFAULT_CHARACTER_DIALOGUE = {
         {"speaker": "Akaza", "text": "YOU'RE A HASHIRA, AREN'T YOU?", "start_rel": 9.1, "end_rel": 13.6, "glow_color": "&H001E27FF"}
     ],
     "gojo": [
-        {"speaker": "Gojo", "text": "THROUGHOUT HEAVEN AND EARTH...", "start_rel": 0.5, "end_rel": 4.5},
-        {"speaker": "Gojo", "text": "I ALONE AM THE HONORED ONE.", "start_rel": 5.0, "end_rel": 9.0},
-        {"speaker": "Gojo", "text": "HOLLOW TECHNIQUE:\nPURPLE.", "start_rel": 9.5, "end_rel": 13.8}
+        {"speaker": "Gojo", "text": "YO. IT'S BEEN A WHILE.", "start_rel": 0.8, "end_rel": 3.8},
+        {"speaker": "Gojo", "text": "THROUGHOUT HEAVEN AND EARTH...", "start_rel": 4.5, "end_rel": 8.5},
+        {"speaker": "Gojo", "text": "I ALONE AM THE HONORED ONE.", "start_rel": 8.8, "end_rel": 13.5}
     ],
     "sukuna": [
         {"speaker": "Sukuna", "text": "LET US SEE IF YOU CAN ENTERTAIN ME.", "start_rel": 0.5, "end_rel": 6.0},
@@ -289,11 +289,11 @@ def generate_kinetic_subtitles(
     margin_v = int(round(cfg['margin_v'] * scale_y))
     margin_l = int(round(margin_lr * scale_y))
 
-    # Reference-Matched Dialogue Subtitle Sizing & Placement (Signature anime neon glow matching reference XeqGgslY3h0)
-    d_fontsize = int(round(62 * scale_y))
-    d_outline = round(6.5 * scale_y, 1)
-    d_shadow = round(3.0 * scale_y, 1)
-    d_margin_v = int(round(720 * scale_y))  # Golden center-lower safe zone (above all YouTube mobile UI)
+    # Clean, simple dialogue subtitle style (Montserrat, solid pure white, subtle dark outline, lower-third)
+    d_fontsize = int(round(54 * scale_y))
+    d_outline = round(2.5 * scale_y, 1)
+    d_shadow = round(1.5 * scale_y, 1)
+    d_margin_v = int(round(340 * scale_y))  # Clean lower-third safe zone
     d_margin_lr = int(round(80 * scale_y))
 
     ass_header = f"""[Script Info]
@@ -307,8 +307,8 @@ PlayResY: {VIDEO_HEIGHT}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: BaseText,{cfg['font']},{fontsize},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,2,0,1,{outline_w},{shadow_d},{cfg['alignment']},{margin_l},{margin_l},{margin_v},1
-Style: DialogueSub,Montserrat,{d_fontsize},&H00FFFFFF,&H00000000,&H001E27FF,&HA0000000,-1,0,0,0,100,100,1,0,1,{d_outline},{d_shadow},2,{d_margin_lr},{d_margin_lr},{d_margin_v},1
+Style: BaseText,{cfg['font']},{fontsize},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,0,0,1,{outline_w},{shadow_d},{cfg['alignment']},{margin_l},{margin_l},{margin_v},1
+Style: DialogueSub,Montserrat,{d_fontsize},&H00FFFFFF,&H00000000,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,{d_outline},{d_shadow},2,{d_margin_lr},{d_margin_lr},{d_margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -418,9 +418,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             word_durs = [(wt / total_wt) * speech_dur for wt in weights]
 
             curr_t = st_val
-            glow_hex = dl.get("glow_color") or ("&H0000D4FF" if dl.get("speaker") == "Rengoku" else "&H00D946EF")
-            neon_tag = rf"{{\1c&H00FFFFFF\blur4\3c{glow_hex}\4c&HA0000000\fsp3}}"
-
             for w_idx in range(len(all_words)):
                 w_start = curr_t
                 dur = word_durs[w_idx]
@@ -434,13 +431,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 d_end = format_ass_timestamp(w_end)
 
                 current_words = all_words[:w_idx + 1]
-                # Isolate energetic scale pop ONLY to the newly added word; previous words remain rock-solid and stable
+                # Simple, rock-solid font styling without jumpy scale pops or artificial glow
                 lines_formatted = [[], []]
                 for idx_w, (w, l_idx) in enumerate(current_words):
-                    if idx_w == w_idx:
-                        lines_formatted[l_idx].append(rf"{{\fscx112\fscy112\t(0,70,\fscx100\fscy100)}}{w}")
-                    else:
-                        lines_formatted[l_idx].append(w)
+                    lines_formatted[l_idx].append(w)
 
                 line0 = " ".join(lines_formatted[0])
                 line1 = " ".join(lines_formatted[1]) if lines_formatted[1] else ""
@@ -449,9 +443,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 if line1:
                     full_text += r"\N" + line1
 
-                # Smooth fade transitions at line boundary
-                fade_tag = r"{\fad(80,0)}" if w_idx == 0 else (r"{\fad(0,80)}" if w_idx == len(all_words) - 1 else "")
-                events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{fade_tag}{neon_tag}{full_text}")
+                # Clean subtle fade at phrase boundaries
+                fade_tag = r"{\fad(60,0)}" if w_idx == 0 else (r"{\fad(0,60)}" if w_idx == len(all_words) - 1 else "")
+                events.append(f"Dialogue: 2,{d_start},{d_end},DialogueSub,,0,0,0,,{fade_tag}{full_text}")
             
     full_ass = ass_header + "\n".join(events) + "\n"
     with open(output_ass_path, "w", encoding="utf-8") as f:

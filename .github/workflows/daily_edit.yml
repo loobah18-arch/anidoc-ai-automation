@@ -126,6 +126,7 @@ jobs:
 
       - name: Run Test Suite
         run: |
+          python -m unittest test_edit_invariants.py
           python test_pipeline.py
 
       - name: Generate 4K Phonk Scene Edit

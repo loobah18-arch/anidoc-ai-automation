@@ -182,7 +182,7 @@ class SceneScorer:
 
     def find_active_intro_hook(
         self,
-        min_start: float = 90.0,
+        min_start: float = 180.0,
         max_start: float = 360.0,
         min_diff: float = 3.0
     ) -> Optional[Dict[str, Any]]:
