@@ -269,6 +269,15 @@ def match_episode_code_from_filename(filename: str) -> Optional[str]:
         if load_episode_metadata(ds_cand):
             return ds_cand
 
+    # ── CASE D: MULTI-ANIME & NEW EPISODE DETECTION ─────────────────────────
+    try:
+        from core.auto_cataloger import parse_anime_identity
+        parsed = parse_anime_identity(filename)
+        if parsed and parsed.get("episode_code"):
+            return parsed["episode_code"]
+    except Exception:
+        pass
+
     return None
 
 

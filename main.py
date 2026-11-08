@@ -102,7 +102,8 @@ def main():
 
     if chosen_char:
         if chosen_char not in CHARACTER_THEMES:
-            raise ValueError(f"Unknown character '{chosen_char}'. Valid options: {list(CHARACTER_THEMES.keys())}")
+            from core.clip_manager import ensure_character_theme
+            ensure_character_theme(chosen_char, universe=target_universe)
         char_uni = CHARACTER_THEMES[chosen_char]["universe"]
         if target_universe and target_universe != char_uni:
             print(f"⚠️ [Main] Character '{chosen_char}' belongs to universe '{char_uni}', adjusting universe filter from '{target_universe}' to '{char_uni}'.")

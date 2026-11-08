@@ -183,7 +183,14 @@ def get_file_universe(filename: str) -> Optional[str]:
         return "jjk"
     if is_marvel and not is_ds and not is_jjk:
         return "marvel"
-    return None
+
+    # Dynamic Multi-Anime Universe Identification
+    try:
+        from core.auto_cataloger import parse_anime_identity
+        parsed = parse_anime_identity(filename)
+        return parsed.get("universe")
+    except Exception:
+        return None
 
 
 def pick_character_episodes(
@@ -207,7 +214,8 @@ def pick_character_episodes(
 
     char_theme = CHARACTER_THEMES.get(character_key)
     if not char_theme:
-        return []
+        from core.clip_manager import ensure_character_theme
+        char_theme = ensure_character_theme(character_key)
     char_universe = char_theme["universe"]
 
     universe_files = [
@@ -618,7 +626,8 @@ def is_black_or_credit_frame(video_path: Path, start_time: float, duration: floa
 def get_episode_phase_boundaries(
     matched_ep_code: Optional[str],
     character_key: str,
-    total_duration: float
+    total_duration: float,
+    video_path: Optional[Path] = None
 ) -> Dict[str, Any]:
     """
     Computes canonical, production-grade semantic phase boundaries for any episode.
@@ -667,6 +676,12 @@ def get_episode_phase_boundaries(
     ]
 
     ep_meta = load_episode_metadata(matched_ep_code) if matched_ep_code else None
+    if not ep_meta and video_path and Path(video_path).exists():
+        try:
+            from core.auto_cataloger import auto_catalog_episode
+            ep_meta = auto_catalog_episode(Path(video_path), forced_code=matched_ep_code, lead_character=character_key)
+        except Exception as e:
+            print(f"⚠️ [AutoCatalog] Phase boundaries notice: {e}")
     if ep_meta and "scenes" in ep_meta:
         valid_fighters = {character_key.lower()}
         for c in ep_meta.get("characters", []):
@@ -786,7 +801,8 @@ def slice_action_moments_from_source(
     phase_info = get_episode_phase_boundaries(
         matched_ep_code=matched_ep_code,
         character_key=character_key,
-        total_duration=total_duration
+        total_duration=total_duration,
+        video_path=video_path
     )
     start_bound = phase_info["start_bound"]
     end_bound = phase_info["end_bound"]
@@ -804,6 +820,9 @@ def slice_action_moments_from_source(
     # Universe Safety Guard: Never slice a video for a character from another universe
     file_universe = get_file_universe(video_path.name)
     char_theme = CHARACTER_THEMES.get(character_key)
+    if not char_theme:
+        from core.clip_manager import ensure_character_theme
+        char_theme = ensure_character_theme(character_key, universe=file_universe)
     char_universe = char_theme["universe"] if char_theme else None
 
     if file_universe and char_universe and file_universe != char_universe:
@@ -1520,6 +1539,16 @@ def fetch_and_prepare_gdrive_footage(
         raw_vid = download_single_gdrive_file(ep_info, gdrive_workdir)
         if raw_vid and raw_vid.exists() and raw_vid.stat().st_size > 15_000_000:
             downloaded_videos.append(raw_vid)
+            # Automatic Cataloging Hook for newly downloaded episode
+            try:
+                from core.auto_cataloger import is_episode_cataloged, auto_catalog_episode, parse_anime_identity
+                p = parse_anime_identity(raw_vid.name)
+                c_code = p["episode_code"]
+                if not is_episode_cataloged(c_code):
+                    print(f"🆕 [AutoCatalog] Uncataloged video downloaded: '{raw_vid.name}'. Automatically registering into episode catalog...")
+                    auto_catalog_episode(raw_vid, forced_code=c_code, lead_character=target_character)
+            except Exception as e:
+                print(f"⚠️ [AutoCatalog] Ingestion cataloging notice: {e}")
         if len(downloaded_videos) >= 2:
             break
 

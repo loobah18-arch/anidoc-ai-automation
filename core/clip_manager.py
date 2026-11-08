@@ -192,7 +192,130 @@ CHARACTER_THEMES = {
         "cc_preset": "cyber_phonk",
         "quote": "I'm the best there is at what I do."
     },
+
+    # ── Expanded Multi-Anime Library ──
+    "denji": {
+        "universe": "chainsawman",
+        "name": "Denji (Chainsaw Man)",
+        "colors": ["#ea580c", "#f97316", "#18181b"],
+        "cc_preset": "cyber_phonk",
+        "quote": "Everyone's after my chainsaw heart! What about Denji's heart?!"
+    },
+    "makima": {
+        "universe": "chainsawman",
+        "name": "Makima",
+        "colors": ["#be123c", "#f43f5e", "#09090b"],
+        "cc_preset": "sukuna_shrine",
+        "quote": "I like people who are hardworking and loyal."
+    },
+    "power": {
+        "universe": "chainsawman",
+        "name": "Power",
+        "colors": ["#f43f5e", "#fbbf24", "#18181b"],
+        "cc_preset": "cyber_phonk",
+        "quote": "Bow before me, human! For I am Power!"
+    },
+    "sungjinwoo": {
+        "universe": "sololeveling",
+        "name": "Sung Jin-Woo",
+        "colors": ["#3b82f6", "#1d4ed8", "#020617"],
+        "cc_preset": "jjk_void",
+        "quote": "Arise."
+    },
+    "jinwoo": {
+        "universe": "sololeveling",
+        "name": "Sung Jin-Woo",
+        "colors": ["#3b82f6", "#1d4ed8", "#020617"],
+        "cc_preset": "jjk_void",
+        "quote": "Arise."
+    },
+    "ichigo": {
+        "universe": "bleach",
+        "name": "Ichigo Kurosaki",
+        "colors": ["#f97316", "#0284c7", "#09090b"],
+        "cc_preset": "water_breathing",
+        "quote": "Bankai! Tensa Zangetsu!"
+    },
+    "aizen": {
+        "universe": "bleach",
+        "name": "Sosuke Aizen",
+        "colors": ["#8b5cf6", "#6d28d9", "#090514"],
+        "cc_preset": "jjk_void",
+        "quote": "No one stands on the top of the world. Not you, not me, not even gods."
+    },
+    "eren": {
+        "universe": "aot",
+        "name": "Eren Yeager",
+        "colors": ["#15803d", "#854d0e", "#0a0a0a"],
+        "cc_preset": "marvel_hdr",
+        "quote": "If we kill all our enemies over there... will we finally be free?"
+    },
+    "levi": {
+        "universe": "aot",
+        "name": "Levi Ackerman",
+        "colors": ["#15803d", "#0284c7", "#0a0a0a"],
+        "cc_preset": "cyber_phonk",
+        "quote": "Give up on your dreams and die."
+    },
+    "naruto": {
+        "universe": "naruto",
+        "name": "Naruto Uzumaki",
+        "colors": ["#f97316", "#eab308", "#172554"],
+        "cc_preset": "hinokami_flame",
+        "quote": "I'm not gonna run away, I never go back on my word!"
+    },
+    "sasuke": {
+        "universe": "naruto",
+        "name": "Sasuke Uchiha",
+        "colors": ["#3b82f6", "#7c3aed", "#020617"],
+        "cc_preset": "jjk_void",
+        "quote": "I have long since closed my eyes... My only goal is in the darkness."
+    },
+    "luffy": {
+        "universe": "onepiece",
+        "name": "Monkey D. Luffy",
+        "colors": ["#dc2626", "#facc15", "#0369a1"],
+        "cc_preset": "thunder_gold",
+        "quote": "I'm gonna be King of the Pirates!"
+    },
+    "zoro": {
+        "universe": "onepiece",
+        "name": "Roronoa Zoro",
+        "colors": ["#15803d", "#22c55e", "#09090b"],
+        "cc_preset": "cyber_phonk",
+        "quote": "Nothing happened."
+    },
+    "kafka": {
+        "universe": "kaijuno8",
+        "name": "Kafka Hibino (Kaiju No. 8)",
+        "colors": ["#06b6d4", "#0f766e", "#020617"],
+        "cc_preset": "cyber_phonk",
+        "quote": "I will stand beside you on the front lines!"
+    },
+    "okarun": {
+        "universe": "dandadan",
+        "name": "Ken Takakura (Okarun)",
+        "colors": ["#a855f7", "#ec4899", "#09090b"],
+        "cc_preset": "cyber_phonk",
+        "quote": "Turbo Granny power, unleash!"
+    },
 }
+
+
+def ensure_character_theme(character_key: str, universe: Optional[str] = None) -> Dict[str, Any]:
+    """Ensures a character theme exists in CHARACTER_THEMES, generating one dynamically if not."""
+    ck = character_key.lower().strip()
+    if ck not in CHARACTER_THEMES:
+        uni = universe or "anime"
+        CHARACTER_THEMES[ck] = {
+            "universe": uni,
+            "name": character_key.replace("_", " ").title(),
+            "colors": ["#3b82f6", "#8b5cf6", "#090514"],
+            "cc_preset": "cyber_phonk",
+            "quote": "I will break through every limit!"
+        }
+        print(f"✨ [ClipManager] Dynamically registered character theme: '{ck}' ({uni.upper()})")
+    return CHARACTER_THEMES[ck]
 
 
 def generate_procedural_cinematic_scene(
