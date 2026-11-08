@@ -319,65 +319,64 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     
     events = []
 
-    # If dialogue lines are present, suppress top hook statement so the screen contains ONLY what characters speak
-    if not dialogue_lines:
-        if style_preset == "spur_hook":
-            # ── Viral Upper-Third Hook Statement Mode (Pure Engaging Question Format) ──
-            t_drop = drop_time if drop_time and (start_time < drop_time < end_time) else (start_time + total_dur * 0.45)
+    # 1. Upper-Third Engaging Hook Question Mode (spur_hook)
+    # Plays setup premise before drop, and punch question from drop to end in the upper third
+    if style_preset == "spur_hook":
+        t_drop = drop_time if drop_time and (start_time < drop_time < end_time) else (start_time + total_dur * 0.45)
 
-            if " | " in quote_text:
-                setup_raw, punch_raw = quote_text.split(" | ", 1)
-                setup_words = [w.strip() for w in setup_raw.split() if w.strip()]
-                punch_words = [w.strip() for w in punch_raw.split() if w.strip()]
-                if punch_words and punch_words[0].upper() in ("OR", "BUT"):
-                    punch_words = punch_words[1:]
-            elif len(words) >= 6:
-                mid = len(words) // 2
-                setup_words = words[:mid]
-                punch_words = words[mid:]
-            else:
-                setup_words = words
-                punch_words = words
-
-            # Setup statement line (plays cleanly until the beat drop)
-            setup_line = _format_spur_line(setup_words, cfg['active_word'], cfg['primary'])
-            ts_0 = format_ass_timestamp(start_time)
-            ts_drop = format_ass_timestamp(t_drop)
-            events.append(f"Dialogue: 1,{ts_0},{ts_drop},BaseText,,0,0,0,,{{\\fscx106\\fscy106\\t(0,100,\\fscx100\\fscy100)}}{setup_line}")
-
-            # Punchline statement line (with crimson red emphasis keywords, from drop to end)
-            punch_line = _format_spur_line(punch_words, cfg['active_word'], cfg['primary'])
-            ts_end = format_ass_timestamp(end_time)
-            events.append(f"Dialogue: 1,{ts_drop},{ts_end},BaseText,,0,0,0,,{{\\fscx110\\fscy110\\t(0,100,\\fscx100\\fscy100)}}{punch_line}")
+        if " | " in quote_text:
+            setup_raw, punch_raw = quote_text.split(" | ", 1)
+            setup_words = [w.strip() for w in setup_raw.split() if w.strip()]
+            punch_words = [w.strip() for w in punch_raw.split() if w.strip()]
+            if punch_words and punch_words[0].upper() in ("OR", "BUT"):
+                punch_words = punch_words[1:]
+        elif len(words) >= 6:
+            mid = len(words) // 2
+            setup_words = words[:mid]
+            punch_words = words[mid:]
         else:
-            # Word-by-word karaoke lines
-            for chunk_idx in range(0, len(words), chunk_size):
-                chunk_words = words[chunk_idx:chunk_idx + chunk_size]
-                chunk_start = start_time + (chunk_idx * word_dur)
-                chunk_end = min(end_time, start_time + ((chunk_idx + len(chunk_words)) * word_dur))
-                
-                # Word-by-word highlight within this chunk
-                for word_in_chunk_idx, active_word in enumerate(chunk_words):
-                    global_word_idx = chunk_idx + word_in_chunk_idx
-                    w_start = start_time + (global_word_idx * word_dur)
-                    w_end = min(end_time, w_start + word_dur)
-                    
-                    ts_start = format_ass_timestamp(w_start)
-                    ts_end = format_ass_timestamp(w_end)
-                    
-                    # Construct chunk string with highlighted word
-                    line_parts = []
-                    for j, w in enumerate(chunk_words):
-                        w_upper = w.upper()
-                        if j == word_in_chunk_idx:
-                            line_parts.append(
-                                f"{{\\c{cfg['active_word']}\\t(0,100,\\fscx118\\fscy118)\\t(100,200,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
-                            )
-                        else:
-                            line_parts.append(f"{{\\c{cfg['primary']}}}{w_upper}")
-                            
-                    formatted_line = " ".join(line_parts)
-                    events.append(f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{formatted_line}")
+            setup_words = words
+            punch_words = words
+
+        # Setup statement line (plays cleanly until the beat drop)
+        setup_line = _format_spur_line(setup_words, cfg['active_word'], cfg['primary'])
+        ts_0 = format_ass_timestamp(start_time)
+        ts_drop = format_ass_timestamp(t_drop)
+        events.append(f"Dialogue: 1,{ts_0},{ts_drop},BaseText,,0,0,0,,{{\\fscx106\\fscy106\\t(0,100,\\fscx100\\fscy100)}}{setup_line}")
+
+        # Punchline statement line (with crimson red emphasis keywords, from drop to end)
+        punch_line = _format_spur_line(punch_words, cfg['active_word'], cfg['primary'])
+        ts_end = format_ass_timestamp(end_time)
+        events.append(f"Dialogue: 1,{ts_drop},{ts_end},BaseText,,0,0,0,,{{\\fscx110\\fscy110\\t(0,100,\\fscx100\\fscy100)}}{punch_line}")
+    elif not dialogue_lines:
+        # Word-by-word karaoke lines (when not spur_hook and no dialogue)
+        for chunk_idx in range(0, len(words), chunk_size):
+            chunk_words = words[chunk_idx:chunk_idx + chunk_size]
+            chunk_start = start_time + (chunk_idx * word_dur)
+            chunk_end = min(end_time, start_time + ((chunk_idx + len(chunk_words)) * word_dur))
+
+            # Word-by-word highlight within this chunk
+            for word_in_chunk_idx, active_word in enumerate(chunk_words):
+                global_word_idx = chunk_idx + word_in_chunk_idx
+                w_start = start_time + (global_word_idx * word_dur)
+                w_end = min(end_time, w_start + word_dur)
+
+                ts_start = format_ass_timestamp(w_start)
+                ts_end = format_ass_timestamp(w_end)
+
+                # Construct chunk string with highlighted word
+                line_parts = []
+                for j, w in enumerate(chunk_words):
+                    w_upper = w.upper()
+                    if j == word_in_chunk_idx:
+                        line_parts.append(
+                            f"{{\\c{cfg['active_word']}\\t(0,100,\\fscx118\\fscy118)\\t(100,200,\\fscx100\\fscy100)}}{w_upper}{{\\rBaseText}}"
+                        )
+                    else:
+                        line_parts.append(f"{{\\c{cfg['primary']}}}{w_upper}")
+
+                formatted_line = " ".join(line_parts)
+                events.append(f"Dialogue: 1,{ts_start},{ts_end},BaseText,,0,0,0,,{formatted_line}")
 
     # ── Dialogue Subtitles during pre-fight conversation ──
     # Dynamic word-by-word accumulation matching reference XeqGgslY3h0:

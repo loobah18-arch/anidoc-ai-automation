@@ -189,13 +189,10 @@ CHARACTER_ENGAGEMENT_QUESTIONS: Dict[str, List[str]] = {
 }
 
 
-def get_character_engagement_question(character_key: str) -> str:
-    """Returns an interactive, viral engagement debate question for the character."""
-    questions = CHARACTER_ENGAGEMENT_QUESTIONS.get(character_key, [
-        "COULD ANYONE SURVIVE | THIS DEADLY COMBAT CLIMAX?",
-        "IS THIS THE MOST CINEMATIC | MOMENT IN ANIME HISTORY?"
-    ])
-    return random.choice(questions)
+def get_character_engagement_question(character_key: str, episode_code: Optional[str] = None) -> str:
+    """Returns an interactive, non-repeating viral engagement debate question grounded in the battle."""
+    from core.question_manager import get_engaging_question
+    return get_engaging_question(character_key=character_key, episode_code=episode_code)
 
 
 CHARACTER_VIRAL_CONCEPTS: Dict[str, List[Dict[str, Any]]] = {

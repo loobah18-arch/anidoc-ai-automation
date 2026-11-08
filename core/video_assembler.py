@@ -324,14 +324,14 @@ def render_cinematic_edit(
     if enable_subtitles or burn_subtitles or subtitle_style == "spur_hook":
         try:
             ass_out = SCRATCH_DIR / f"subtitles_{character_key}.ass"
-            quote_text = custom_quote or metadata.get("engagement_question") or metadata.get("quote") or metadata.get("title") or "WHO IS THE STRONGEST WARRIOR?"
-            
             # Fetch pre-fight dialogue lines from metadata or fallback catalog
             dialogue_lines = []
             ep_meta = None
+            detected_ep_code = None
             for cp in clip_paths:
                 code = match_episode_code_from_filename(cp.name)
                 if code:
+                    detected_ep_code = code
                     ep_meta = load_episode_metadata(code)
                     if ep_meta:
                         break
@@ -343,7 +343,18 @@ def render_cinematic_edit(
                     else None
                 )
                 if default_ep:
+                    detected_ep_code = default_ep
                     ep_meta = load_episode_metadata(default_ep)
+
+            # Scene-grounded non-repeating engaging hook question
+            from core.question_manager import get_engaging_question
+            quote_text = custom_quote or get_engaging_question(
+                character_key=character_key,
+                episode_code=detected_ep_code,
+                anime_universe=theme.get("universe")
+            )
+            metadata["engagement_question"] = quote_text
+            metadata["quote"] = quote_text
 
             # Detect if clip_0 is associated with a specific scene's frame-accurate dialogue
             clip0_name = clip_paths[0].name if clip_paths else ""

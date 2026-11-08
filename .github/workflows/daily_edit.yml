@@ -130,6 +130,7 @@ jobs:
           python -m unittest test_edit_invariants.py
           python -m unittest test_auto_cataloger.py
           python -m unittest test_vocal_isolator.py
+          python -m unittest test_question_manager.py
           python test_pipeline.py
 
       - name: Generate 4K Phonk Scene Edit
