@@ -210,15 +210,19 @@ def pick_character_episodes(
         return []
     char_universe = char_theme["universe"]
 
-    universe_files = [f for f in files if get_file_universe(f["name"]) == char_universe]
+    universe_files = [
+        f for f in files
+        if get_file_universe(f["name"]) == char_universe
+        and any(f["name"].lower().endswith(ext) for ext in SUPPORTED_VIDEO_EXTS)
+    ]
     if not universe_files:
-        print(f"⚠️ [GoogleDrive] No Google Drive files match universe '{char_universe}' for character '{character_key}'.")
+        print(f"⚠️ [GoogleDrive] No Google Drive video files match universe '{char_universe}' for character '{character_key}'.")
         return []
 
-    # Clean pool of piracy-dub / corrupt files and English-dubbed footage (favor authentic Japanese audio)
+    # Clean pool of spam / piracy / corrupt files (keeps English-tagged library releases)
     clean_pool = [
         f for f in universe_files
-        if not any(b in f["name"].lower() for b in ["hindi", "dual audio", "pikahd", "english", "[english]", "(english)", "eng dub", "dubbed"])
+        if not any(b in f["name"].lower() for b in ["hindi", "pikahd"])
     ]
     if clean_pool:
         universe_files = clean_pool
@@ -321,16 +325,22 @@ def pick_best_file_for_character(
         return None
     char_universe = char_theme["universe"]
 
-    # 1. STRICT UNIVERSE FILTERING: Filter files so ONLY the character's universe is eligible
-    universe_files = [f for f in files if get_file_universe(f["name"]) == char_universe]
+    # 1. STRICT UNIVERSE FILTERING: Filter files so ONLY valid video files from the character's universe are eligible
+    universe_files = [
+        f for f in files
+        if get_file_universe(f["name"]) == char_universe
+        and any(f["name"].lower().endswith(ext) for ext in SUPPORTED_VIDEO_EXTS)
+    ]
     if not universe_files:
-        print(f"⚠️ [GoogleDrive] No Google Drive files match universe '{char_universe}' for character '{character_key}'. Rejecting cross-universe selection.")
+        print(f"⚠️ [GoogleDrive] No Google Drive video files match universe '{char_universe}' for character '{character_key}'. Rejecting cross-universe selection.")
         return None
 
-    # Quality Gate: Filter out 480p low-res, piracy-dub, and English dub files (favor Japanese 1080p/720p)
+    # Quality Gate: Filter out spam / piracy files, and filter 480p low-res only when higher res (720p/1080p) exists
+    has_high_res = any(any(q in f["name"].lower() for q in ["1080p", "720p", "hdr", "bluray", "mkv"]) for f in universe_files)
     clean_pool = [
         f for f in universe_files
-        if not any(b in f["name"].lower() for b in ["480p", "hindi", "dual audio", "pikahd", "english", "[english]", "(english)", "eng dub", "dubbed"])
+        if not any(b in f["name"].lower() for b in ["hindi", "pikahd"])
+        and (not has_high_res or "480p" not in f["name"].lower())
     ]
     if clean_pool:
         universe_files = clean_pool
