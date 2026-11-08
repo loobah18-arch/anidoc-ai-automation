@@ -44,7 +44,7 @@ class TestVocalIsolator(unittest.TestCase):
         self.assertIn("+", expr)
 
     def test_03_conversation_stereo_vocal_filter(self):
-        """Verify conversation vocal isolation filter contains mid/side, bandpass, EQ, and gating."""
+        """Verify conversation vocal isolation filter contains mid/side center extraction, bandpass, EQ, compressor, and gain."""
         intervals = [(1.0, 5.0)]
         filt = build_vocal_isolation_filter(
             clip_path=None,
@@ -52,13 +52,13 @@ class TestVocalIsolator(unittest.TestCase):
             is_conversation=True
         )
 
-        self.assertIn("stereotools=mode=lr>l+r", filt)
-        self.assertIn("highpass=f=200", filt)
-        self.assertIn("lowpass=f=3800", filt)
-        self.assertIn("equalizer=f=1800", filt)
-        self.assertIn("agate=range=0.03", filt)
-        self.assertIn("volume=enable=", filt)
-        self.assertIn("volume=0.0", filt)
+        self.assertIn("pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1", filt)
+        self.assertIn("highpass=f=90", filt)
+        self.assertIn("lowpass=f=6500", filt)
+        self.assertIn("equalizer=f=1600", filt)
+        self.assertIn("equalizer=f=3400", filt)
+        self.assertIn("acompressor=", filt)
+        self.assertIn("volume=1.85", filt)
 
     def test_04_combat_scene_auto_mute_anime_music(self):
         """Verify combat scenes (post-drop) mute anime audio completely so only Phonk plays."""

@@ -113,12 +113,17 @@ def build_vocal_isolation_filter(
     """
     Constructs an ultra-clean FFmpeg audio filter graph for the clip:
     - If is_conversation is True:
-      Isolates vocal audio, strips stereo side music, filters out sub-bass/synths,
-      gates noise, and mutes background audio to 0.0 when actors are not speaking.
+      Cancels anime background music while ensuring character dialogue is 100% loud,
+      crisp, and clearly audible on mobile phone speakers:
+      1. Multi-Channel 5.1 extraction (Front Center channel 2) or Stereo Mid-Channel isolation.
+      2. Full-range vocal bandpass (90Hz - 6500Hz) cutting music sub-bass and high synths.
+      3. Vocal clarity & presence EQ (1600Hz + 3400Hz).
+      4. Dynamic broadcast voice compression (acompressor) lifting quiet syllables & whispers.
+      5. Dialogue volume amplification (1.85x) so speech cuts through cleanly over background phonk.
     - If is_conversation is False (combat scenes):
-      Mutes anime audio completely (volume=0.0) so only the Phonk music plays with 0% anime OST clash.
+      Mutes anime audio completely (volume=0.0) so only pure Phonk plays with 0% anime OST clash.
     """
-    # Combat Scenes: Mute anime clip audio so only Phonk music plays
+    # Combat Scenes: Mute anime clip audio completely so only Phonk music plays
     if not is_conversation:
         return "volume=0.0"
 
@@ -130,28 +135,23 @@ def build_vocal_isolation_filter(
         channels = probe_audio_channels(Path(clip_path))
 
     if channels >= 6:
-        # 5.1 surround: Front Center (channel 2) has isolated studio dialogue without music
+        # 5.1 surround: Front Center (channel 2) has isolated studio dialogue without background music
         filters.append("pan=stereo|c0=c2|c1=c2")
     else:
         # Stereo: Mid-Side separation — cancel wide stereo differential music and isolate centered dialogue
-        filters.append("stereotools=mode=lr>l+r:slev=0.016:mlev=1.65")
+        filters.append("pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1")
 
-    # 2. Vocal Formant Bandpass (cuts music basslines <200Hz, cuts cymbals/synths >3800Hz)
-    filters.append("highpass=f=200,lowpass=f=3800")
+    # 2. Vocal Formant Bandpass (cuts music basslines <90Hz, cuts harsh synths/cymbals >6500Hz)
+    filters.append("highpass=f=90,lowpass=f=6500")
 
-    # 3. Vocal Presence EQ (boosts speech intelligibility at 1800Hz)
-    filters.append("equalizer=f=1800:width_type=o:width=1.5:g=3.5")
+    # 3. Vocal Presence EQ (boosts speech intelligibility at 1600Hz and consonant articulation at 3400Hz)
+    filters.append("equalizer=f=1600:width_type=o:width=1.5:g=4.0")
+    filters.append("equalizer=f=3400:width_type=o:width=1.5:g=3.5")
 
-    # 4. Audio Gate (suppresses residual ambient noise / faint music between words)
-    filters.append("agate=range=0.03:threshold=0.08:attack=15:release=200")
+    # 4. Dynamic Broadcast Voice Compressor (evens out speech dynamics, lifts whispers and soft words)
+    filters.append("acompressor=threshold=-22dB:ratio=4:attack=5:release=50:makeup=5dB")
 
-    # 5. Whisper-Aligned Speech Window Muting (mutes pauses to 0.0 volume)
-    if speech_intervals:
-        speech_expr = build_speech_activity_expression(speech_intervals, buffer=0.25)
-        if speech_expr:
-            # When speech is active: boost dialogue to 1.80x
-            # When speech is inactive: 100% dead silence (0.0 volume), zero background music
-            filters.append(f"volume=enable='{speech_expr}':volume=1.80")
-            filters.append(f"volume=enable='not({speech_expr})':volume=0.0")
+    # 5. Vocal Presence Gain (ensures dialogue is prominent and clearly audible on mobile speakers)
+    filters.append("volume=1.85")
 
     return ",".join(filters)

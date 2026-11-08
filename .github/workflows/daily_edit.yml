@@ -131,6 +131,7 @@ jobs:
           python -m unittest test_auto_cataloger.py
           python -m unittest test_vocal_isolator.py
           python -m unittest test_question_manager.py
+          python -m unittest test_subtitle_mobile_safe_zone.py
           python test_pipeline.py
 
       - name: Generate 4K Phonk Scene Edit

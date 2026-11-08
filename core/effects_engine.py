@@ -185,9 +185,9 @@ def build_pre_drop_audio_vacuum_filter(
     impact_end = drop_time + 1.40
 
     filters = [
-        # 1. Pre-fight conversation ducking & lowpass: phonk acts as a moody sub-bass drone under dialogue
-        f"volume=enable='between(t\\,0\\,{intro_end:.3f})':volume=0.20",
-        f"lowpass=f=380:enable='between(t\\,0\\,{intro_end:.3f})'",
+        # 1. Pre-fight conversation ducking & lowpass: phonk acts as a moody, quiet sub-bass drone under dialogue
+        f"volume=enable='between(t\\,0\\,{intro_end:.3f})':volume=0.12",
+        f"lowpass=f=320:enable='between(t\\,0\\,{intro_end:.3f})'",
         # 2. Pre-drop riser & vacuum: sweep into dead silence
         f"highpass=f=1200:enable='between(t\\,{riser_start:.3f}\\,{vac_start:.3f})'",
         f"volume=enable='between(t\\,{vac_start:.3f}\\,{vac_end:.3f})':volume=0.0",

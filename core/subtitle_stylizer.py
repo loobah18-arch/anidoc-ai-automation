@@ -29,68 +29,68 @@ def format_ass_timestamp(seconds: float) -> str:
 SUBTITLE_STYLE_PRESETS = {
     "spur_hook": {
         "font": "Montserrat",
-        "fontsize": 54,
+        "fontsize": 56,
         "primary": "&H00FFFFFF",         # Pure Crisp White
-        "active_word": "&H00FFFFFF",     # Clean Crisp White
-        "outline": "&H00000000",         # Subtle Clean Black Outline
+        "active_word": "&H001E27FF",     # Crimson Red / Theme Accent
+        "outline": "&H00000000",         # Solid Crisp Black Outline
         "shadow": "&H80000000",          # Subtle Soft Drop Shadow
-        "outline_width": 2.5,
+        "outline_width": 2.8,
         "shadow_depth": 1.5,
-        "alignment": 2,                  # Centered Lower-Third Zone
-        "margin_v": 340,                 # Safe above YouTube mobile chrome
-        "margin_lr": 80,
+        "alignment": 8,                  # TOP CENTER (Upper Third Mobile Safe Zone)
+        "margin_v": 200,                 # Safe below top mobile header (status bar, search & sound icons)
+        "margin_lr": 100,                # Safe horizontal padding from mobile edges
     },
     "viral_karaoke": {
         "font": "Montserrat",
-        "fontsize": 54,
+        "fontsize": 56,
         "primary": "&H00FFFFFF",
-        "active_word": "&H00FFFFFF",
+        "active_word": "&H001E27FF",
         "outline": "&H00000000",
         "shadow": "&H80000000",
-        "outline_width": 2.5,
+        "outline_width": 2.8,
         "shadow_depth": 1.5,
-        "alignment": 2,
-        "margin_v": 340,
-        "margin_lr": 80,
+        "alignment": 8,
+        "margin_v": 200,
+        "margin_lr": 100,
     },
     "cyber_glow": {
         "font": "Montserrat",
-        "fontsize": 54,
+        "fontsize": 56,
         "primary": "&H00FFFFFF",
-        "active_word": "&H00FFFFFF",
+        "active_word": "&H0000FFFF",
         "outline": "&H00000000",
         "shadow": "&H80000000",
-        "outline_width": 2.5,
+        "outline_width": 2.8,
         "shadow_depth": 1.5,
-        "alignment": 2,
-        "margin_v": 340,
-        "margin_lr": 80,
+        "alignment": 8,
+        "margin_v": 200,
+        "margin_lr": 100,
     },
     "anime_shrine": {
         "font": "Montserrat",
-        "fontsize": 54,
+        "fontsize": 56,
         "primary": "&H00FFFFFF",
-        "active_word": "&H00FFFFFF",
+        "active_word": "&H0000C8FF",
         "outline": "&H00000000",
         "shadow": "&H80000000",
-        "outline_width": 2.5,
+        "outline_width": 2.8,
         "shadow_depth": 1.5,
-        "alignment": 2,
-        "margin_v": 340,
-        "margin_lr": 80,
+        "alignment": 8,
+        "margin_v": 200,
+        "margin_lr": 100,
     },
     "cinematic_minimal": {
         "font": "Montserrat",
-        "fontsize": 54,
+        "fontsize": 56,
         "primary": "&H00FFFFFF",
         "active_word": "&H00FFFFFF",
         "outline": "&H00000000",
         "shadow": "&H80000000",
-        "outline_width": 2.5,
+        "outline_width": 2.8,
         "shadow_depth": 1.5,
-        "alignment": 2,
-        "margin_v": 340,
-        "margin_lr": 80,
+        "alignment": 8,
+        "margin_v": 200,
+        "margin_lr": 100,
     }
 }
 
@@ -110,80 +110,119 @@ EMPHASIS_KEYWORDS = {
 
 DEFAULT_CHARACTER_DIALOGUE = {
     "rengoku": [
-        {"speaker": "Akaza", "text": "WHY DON'T YOU BECOME A DEMON TOO?", "start_rel": 0.6, "end_rel": 3.6, "glow_color": "&H001E27FF"},
-        {"speaker": "Rengoku", "text": "I WILL NOT.", "start_rel": 3.8, "end_rel": 5.1, "glow_color": "&H0000C8FF"},
-        {"speaker": "Akaza", "text": "I CAN SENSE YOUR INCREDIBLE STRENGTH.", "start_rel": 5.4, "end_rel": 8.8, "glow_color": "&H001E27FF"},
-        {"speaker": "Akaza", "text": "YOU'RE A HASHIRA, AREN'T YOU?", "start_rel": 9.1, "end_rel": 13.6, "glow_color": "&H001E27FF"}
+        {"speaker": "Akaza", "text": "WHY DON'T YOU BECOME A DEMON TOO?", "start_rel": 0.6, "end_rel": 4.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Rengoku", "text": "I WILL NOT. GROWING OLD AND DYING IS THE BEAUTY OF FLEETING HUMAN LIFE.", "start_rel": 5.0, "end_rel": 12.5, "glow_color": "&H0000C8FF"},
+        {"speaker": "Akaza", "text": "I CAN SENSE YOUR BATTLE SPIRIT... BECOME A DEMON, KYOJURO!", "start_rel": 13.0, "end_rel": 19.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Rengoku", "text": "NO MATTER WHAT HAPPENS, I WILL FULFILL MY DUTY!", "start_rel": 20.0, "end_rel": 25.5, "glow_color": "&H0000C8FF"},
+        {"speaker": "Rengoku", "text": "SET YOUR HEART ABLAZE! NINTH FORM: RENGOKU!", "start_rel": 26.0, "end_rel": 29.8, "glow_color": "&H0000C8FF"}
     ],
     "akaza": [
-        {"speaker": "Akaza", "text": "WHY DON'T YOU BECOME A DEMON TOO?", "start_rel": 0.6, "end_rel": 3.6, "glow_color": "&H001E27FF"},
-        {"speaker": "Rengoku", "text": "I WILL NOT.", "start_rel": 3.8, "end_rel": 5.1, "glow_color": "&H0000C8FF"},
-        {"speaker": "Akaza", "text": "I CAN SENSE YOUR INCREDIBLE STRENGTH.", "start_rel": 5.4, "end_rel": 8.8, "glow_color": "&H001E27FF"},
-        {"speaker": "Akaza", "text": "YOU'RE A HASHIRA, AREN'T YOU?", "start_rel": 9.1, "end_rel": 13.6, "glow_color": "&H001E27FF"}
+        {"speaker": "Akaza", "text": "WHY DON'T YOU BECOME A DEMON TOO? WE CAN FIGHT FOR ETERNITY.", "start_rel": 0.6, "end_rel": 6.5, "glow_color": "&H001E27FF"},
+        {"speaker": "Rengoku", "text": "I WILL NOT. MORTALITY IS WHAT MAKES HUMAN LIFE PRECIOUS.", "start_rel": 7.0, "end_rel": 13.5, "glow_color": "&H0000C8FF"},
+        {"speaker": "Akaza", "text": "IF YOU WON'T BECOME A DEMON, THEN I'LL HAVE TO KILL YOU WHILE YOU'RE STRONG!", "start_rel": 14.0, "end_rel": 21.0, "glow_color": "&H001E27FF"},
+        {"speaker": "Akaza", "text": "DESTRUCTIVE DEATH: COMPASS NEEDLE!", "start_rel": 21.5, "end_rel": 26.0, "glow_color": "&H001E27FF"},
+        {"speaker": "Akaza", "text": "ANNIHILATION TYPE!", "start_rel": 26.5, "end_rel": 29.8, "glow_color": "&H001E27FF"}
     ],
     "gojo": [
-        {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 4.6},
-        {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 4.8, "end_rel": 8.8},
-        {"speaker": "Toji", "text": "I'M GOING TO LOSE?", "start_rel": 9.0, "end_rel": 11.2},
-        {"speaker": "Toji", "text": "OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 11.5, "end_rel": 13.9}
+        {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 6.0},
+        {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 6.5, "end_rel": 13.0},
+        {"speaker": "Toji", "text": "I'M GOING TO LOSE? OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 13.5, "end_rel": 18.5},
+        {"speaker": "Gojo", "text": "THROUGHOUT HEAVEN AND EARTH... I ALONE AM THE HONORED ONE.", "start_rel": 19.0, "end_rel": 25.5},
+        {"speaker": "Gojo", "text": "SECRET TECHNIQUE: HOLLOW PURPLE.", "start_rel": 26.0, "end_rel": 29.8}
     ],
     "sukuna": [
-        {"speaker": "Sukuna", "text": "LET US SEE IF YOU CAN ENTERTAIN ME.", "start_rel": 0.5, "end_rel": 6.0},
-        {"speaker": "Sukuna", "text": "DOMAIN EXPANSION:\nMALEVOLENT SHRINE!", "start_rel": 7.0, "end_rel": 13.8}
+        {"speaker": "Sukuna", "text": "YOU CAN SEE MY CURSED TECHNIQUE? NOT BAD.", "start_rel": 0.5, "end_rel": 6.5},
+        {"speaker": "Sukuna", "text": "LET US SEE IF YOU CAN ADAPT TO THIS.", "start_rel": 7.0, "end_rel": 13.0},
+        {"speaker": "Sukuna", "text": "AN EIGHT-HANDLED SWORD... DIVINE GENERAL MAHORAGA.", "start_rel": 13.5, "end_rel": 20.0},
+        {"speaker": "Sukuna", "text": "YOU HAVE ENTERTAINED ME WELL.", "start_rel": 20.5, "end_rel": 25.5},
+        {"speaker": "Sukuna", "text": "DOMAIN EXPANSION: MALEVOLENT SHRINE!", "start_rel": 26.0, "end_rel": 29.8}
     ],
     "toji": [
-        {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 4.6},
-        {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 4.8, "end_rel": 8.8},
-        {"speaker": "Toji", "text": "I'M GOING TO LOSE?", "start_rel": 9.0, "end_rel": 11.2},
-        {"speaker": "Toji", "text": "OUR FIGHT IS JUST GETTING STARTED!", "start_rel": 11.5, "end_rel": 13.9}
+        {"speaker": "Gojo", "text": "THE REASON YOU'RE GOING TO LOSE IS BECAUSE YOU DIDN'T CHOP MY HEAD OFF...", "start_rel": 0.6, "end_rel": 6.0},
+        {"speaker": "Gojo", "text": "...AND BECAUSE YOU DIDN'T USE THAT CURSED TOOL WHEN YOU STABBED ME IN THE HEAD.", "start_rel": 6.5, "end_rel": 13.0},
+        {"speaker": "Toji", "text": "A DEAD MAN TALKING? YOU'RE FLOATING IN THE AIR, KID.", "start_rel": 13.5, "end_rel": 19.5},
+        {"speaker": "Gojo", "text": "THROUGHOUT HEAVEN AND EARTH, I ALONE AM THE HONORED ONE.", "start_rel": 20.0, "end_rel": 25.5},
+        {"speaker": "Toji", "text": "SOMETHING IS WRONG... I HAVE TO FINISH HIM NOW!", "start_rel": 26.0, "end_rel": 29.8}
     ],
     "tanjiro": [
-        {"speaker": "Tanjiro", "text": "I MUST PROTECT NEZUKO WITH MY LIFE!", "start_rel": 0.5, "end_rel": 6.0},
-        {"speaker": "Tanjiro", "text": "HINOKAMI KAGURA:\nDANCE OF THE FIRE GOD!", "start_rel": 7.0, "end_rel": 13.8}
+        {"speaker": "Tanjiro", "text": "NO MATTER HOW MANY TIMES I FALL, I WILL KEEP MOVING FORWARD!", "start_rel": 0.5, "end_rel": 6.5},
+        {"speaker": "Tanjiro", "text": "NEZUKO AND I... OUR BOND CAN NEVER BE SEVERED BY ANYONE!", "start_rel": 7.0, "end_rel": 14.0},
+        {"speaker": "Tanjiro", "text": "REMEMBER FATHER'S DANCE... MATCH YOUR BREATHING TO THE FLAME!", "start_rel": 14.5, "end_rel": 22.0},
+        {"speaker": "Tanjiro", "text": "TOTAL CONCENTRATION... SUN BREATHING!", "start_rel": 22.5, "end_rel": 26.5},
+        {"speaker": "Tanjiro", "text": "HINOKAMI KAGURA: DANCE OF THE FIRE GOD!", "start_rel": 27.0, "end_rel": 29.8}
     ],
     "zenitsu": [
-        {"speaker": "Zenitsu", "text": "THUNDER BREATHING, FIRST FORM:\nTHUNDERCLAP AND FLASH...", "start_rel": 0.5, "end_rel": 8.0},
-        {"speaker": "Zenitsu", "text": "SIXFOLD!", "start_rel": 9.0, "end_rel": 13.8}
+        {"speaker": "Zenitsu", "text": "DON'T GIVE UP. EVEN IF IT'S PAINFUL, DON'T RUN AWAY.", "start_rel": 0.5, "end_rel": 6.5},
+        {"speaker": "Zenitsu", "text": "GRANDPA TOLD ME... IT'S OKAY TO ONLY MASTER A SINGLE TECHNIQUE.", "start_rel": 7.0, "end_rel": 14.5},
+        {"speaker": "Zenitsu", "text": "HONE THAT ONE MOVE UNTIL IT REACHES ABSOLUTE PERFECTION!", "start_rel": 15.0, "end_rel": 22.5},
+        {"speaker": "Zenitsu", "text": "THUNDER BREATHING, FIRST FORM: THUNDERCLAP AND FLASH...", "start_rel": 23.0, "end_rel": 27.0},
+        {"speaker": "Zenitsu", "text": "GODSPEED SIXFOLD!", "start_rel": 27.5, "end_rel": 29.8}
     ],
     "tengen": [
-        {"speaker": "Tengen", "text": "THINGS ARE ABOUT TO GET REAL FLASHY!", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H00FFAA00"},
-        {"speaker": "Tengen", "text": "SOUND BREATHING, FOURTH FORM:\nBLOOMING FLAME CALAMITY!", "start_rel": 7.5, "end_rel": 13.8, "glow_color": "&H0000C8FF"}
+        {"speaker": "Tengen", "text": "I AM A GOD OF FESTIVALS. THE FLASHIEST GUY YOU'LL EVER MEET.", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H00FFAA00"},
+        {"speaker": "Gyutaro", "text": "YOU'RE DIFFERENT FROM THE OTHER HASHIRA... BORN WITH NATURAL LUCK.", "start_rel": 7.0, "end_rel": 13.5},
+        {"speaker": "Tengen", "text": "TALENT? DO I LOOK LIKE SOMEONE WITH TALENT? MANY DIED BEFORE ME!", "start_rel": 14.0, "end_rel": 21.0, "glow_color": "&H00FFAA00"},
+        {"speaker": "Tengen", "text": "I'VE COMPLETED MY MUSICAL SCORE! WE'RE WINNING THIS!", "start_rel": 21.5, "end_rel": 26.5, "glow_color": "&H0000C8FF"},
+        {"speaker": "Tengen", "text": "SOUND BREATHING, FOURTH FORM: BLOOMING FLAME CALAMITY!", "start_rel": 27.0, "end_rel": 29.8, "glow_color": "&H0000C8FF"}
     ],
     "inosuke": [
         {"speaker": "Inosuke", "text": "COMING THROUGH! MAKE WAY FOR LORD INOSUKE!", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H0000FFCC"},
-        {"speaker": "Inosuke", "text": "BEAST BREATHING, FIFTH FANG:\nCRAZY CUTTING!", "start_rel": 7.5, "end_rel": 13.8, "glow_color": "&H0000FFFF"}
+        {"speaker": "Inosuke", "text": "DON'T UNDERESTIMATE MY BEASTLY INSTINCTS!", "start_rel": 7.0, "end_rel": 14.5, "glow_color": "&H0000FFCC"},
+        {"speaker": "Inosuke", "text": "I CAN FEEL WHERE EVERY ENEMY IS SPREAD ACROSS THIS MOUNTAIN!", "start_rel": 15.0, "end_rel": 22.0, "glow_color": "&H0000FFFF"},
+        {"speaker": "Inosuke", "text": "BEAST BREATHING, FIFTH FANG: CRAZY CUTTING!", "start_rel": 22.5, "end_rel": 29.8, "glow_color": "&H0000FFFF"}
     ],
     "giyu": [
-        {"speaker": "Giyu", "text": "WATER BREATHING...", "start_rel": 0.5, "end_rel": 5.0, "glow_color": "&H00FF8800"},
-        {"speaker": "Giyu", "text": "ELEVENTH FORM:\nDEAD CALM.", "start_rel": 6.0, "end_rel": 13.8, "glow_color": "&H00FFFF00"}
+        {"speaker": "Tanjiro", "text": "DON'T KILL HER! PLEASE, SHE'S MY SISTER!", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H00FF8800"},
+        {"speaker": "Giyu", "text": "DON'T GIVE OTHERS THE POWER OVER YOUR OWN LIFE!", "start_rel": 6.0, "end_rel": 12.0, "glow_color": "&H00FF8800"},
+        {"speaker": "Giyu", "text": "WEAKLINGS HAVE NO RIGHTS OR CHOICES.", "start_rel": 12.5, "end_rel": 18.0, "glow_color": "&H00FF8800"},
+        {"speaker": "Giyu", "text": "CRYING WON'T CHANGE REALITY... THE DEAD WILL NEVER RETURN.", "start_rel": 18.5, "end_rel": 24.5, "glow_color": "&H00FF8800"},
+        {"speaker": "Giyu", "text": "WATER BREATHING, ELEVENTH FORM: DEAD CALM.", "start_rel": 25.0, "end_rel": 29.8, "glow_color": "&H00FFFF00"}
     ],
     "muichiro": [
-        {"speaker": "Muichiro", "text": "WHICH FORM WAS IT AGAIN?", "start_rel": 0.5, "end_rel": 5.0, "glow_color": "&H00CCFF00"},
-        {"speaker": "Muichiro", "text": "MIST BREATHING, SEVENTH FORM:\nOBSCURING CLOUDS.", "start_rel": 6.0, "end_rel": 13.8, "glow_color": "&H00FFFFFF"}
+        {"speaker": "Gyokko", "text": "MY BEAUTIFUL POTS ARE SUPERIOR TO ANY HUMAN ART!", "start_rel": 0.5, "end_rel": 6.0, "glow_color": "&H00CCFF00"},
+        {"speaker": "Muichiro", "text": "WHICH FORM WAS IT AGAIN? YOUR POTS LOOK QUITE ASYMMETRIC.", "start_rel": 6.5, "end_rel": 13.0, "glow_color": "&H00CCFF00"},
+        {"speaker": "Gyokko", "text": "HOW DARE YOU INSULT MY MASTERPIECES, YOU PEST!", "start_rel": 13.5, "end_rel": 19.5, "glow_color": "&H00CCFF00"},
+        {"speaker": "Muichiro", "text": "YOU'RE TALKING A LOT FOR SOMEONE WHO CAN'T EVEN TOUCH ME.", "start_rel": 20.0, "end_rel": 25.5, "glow_color": "&H00FFFFFF"},
+        {"speaker": "Muichiro", "text": "MIST BREATHING, SEVENTH FORM: OBSCURING CLOUDS.", "start_rel": 26.0, "end_rel": 29.8, "glow_color": "&H00FFFFFF"}
     ],
     "gyutaro": [
-        {"speaker": "Gyutaro", "text": "YOU'RE A PRETTY BOY, AREN'T YOU? I HATE THAT...", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H000000FF"},
-        {"speaker": "Gyutaro", "text": "BLOOD DEMON ART:\nFLYING BLOOD SICKLES!", "start_rel": 7.5, "end_rel": 13.8, "glow_color": "&H002200CC"}
+        {"speaker": "Gyutaro", "text": "YOU'RE A PRETTY BOY, AREN'T YOU? I HATE THAT...", "start_rel": 0.5, "end_rel": 6.0, "glow_color": "&H000000FF"},
+        {"speaker": "Gyutaro", "text": "PEOPLE LIKE YOU WERE BORN BLESSED, WHILE WE SUFFERED IN DIRT.", "start_rel": 6.5, "end_rel": 13.5, "glow_color": "&H000000FF"},
+        {"speaker": "Tengen", "text": "I'M NOT BLESSED. I WATCHED MY SIBLINGS DIE ONE BY ONE.", "start_rel": 14.0, "end_rel": 20.5, "glow_color": "&H00FFAA00"},
+        {"speaker": "Gyutaro", "text": "ENVY, HATE, SPITE... THAT'S WHAT FEEDS MY BLADES!", "start_rel": 21.0, "end_rel": 26.0, "glow_color": "&H002200CC"},
+        {"speaker": "Gyutaro", "text": "BLOOD DEMON ART: FLYING BLOOD SICKLES!", "start_rel": 26.5, "end_rel": 29.8, "glow_color": "&H002200CC"}
     ],
     "yuji": [
-        {"speaker": "Yuji", "text": "I DON'T CARE IF THIS BODY BREAKS...", "start_rel": 0.5, "end_rel": 6.0, "glow_color": "&H000000FF"},
-        {"speaker": "Yuji", "text": "BLACK FLASH!", "start_rel": 7.0, "end_rel": 13.8, "glow_color": "&H000000FF"}
+        {"speaker": "Yuji", "text": "I DON'T CARE IF THIS BODY BREAKS OR FALLS APART...", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H000000FF"},
+        {"speaker": "Mahito", "text": "YOU DON'T GET IT, ITADORI! I AM A CURSE, YOU ARE A SORCERER!", "start_rel": 7.0, "end_rel": 14.0, "glow_color": "&H00AA00FF"},
+        {"speaker": "Yuji", "text": "I ADMIT IT, MAHITO. I AM YOU. I WILL KILL YOU.", "start_rel": 14.5, "end_rel": 21.5, "glow_color": "&H000000FF"},
+        {"speaker": "Todo", "text": "THE BELL OF GION SHOJA ECHOES... WE ARE THE EXCEPTION!", "start_rel": 22.0, "end_rel": 26.5, "glow_color": "&H00FFAA00"},
+        {"speaker": "Yuji", "text": "CONSECUTIVE BLACK FLASH!", "start_rel": 27.0, "end_rel": 29.8, "glow_color": "&H000000FF"}
     ],
     "megumi": [
-        {"speaker": "Megumi", "text": "WITH THIS TREASURE I SUMMON...", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H00333333"},
-        {"speaker": "Megumi", "text": "DIVINE GENERAL MAHORAGA!", "start_rel": 6.5, "end_rel": 13.8, "glow_color": "&H00FFFFFF"}
+        {"speaker": "Megumi", "text": "I RECOGNIZE THAT MY TECHNIQUE HAS BEEN LIMITING ME...", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H00333333"},
+        {"speaker": "Megumi", "text": "IMAGINE IT... IMAGINE THE FUTURE WHERE I SURPASS MY LIMITS!", "start_rel": 7.0, "end_rel": 14.0, "glow_color": "&H00333333"},
+        {"speaker": "Megumi", "text": "EVEN IF I DIE HERE, I'LL DRAG YOU TO HELL WITH ME!", "start_rel": 14.5, "end_rel": 21.0, "glow_color": "&H00333333"},
+        {"speaker": "Megumi", "text": "WITH THIS TREASURE I SUMMON...", "start_rel": 21.5, "end_rel": 25.5, "glow_color": "&H00333333"},
+        {"speaker": "Megumi", "text": "EIGHT-HANDLED SWORD DIVERGENT SILA DIVINE GENERAL MAHORAGA!", "start_rel": 26.0, "end_rel": 29.8, "glow_color": "&H00FFFFFF"}
     ],
     "nobara": [
-        {"speaker": "Nobara", "text": "DON'T LOOK DOWN ON ME!", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H000055FF"},
-        {"speaker": "Nobara", "text": "HAIRPIN... RESONANCE!", "start_rel": 6.5, "end_rel": 13.8, "glow_color": "&H000088FF"}
+        {"speaker": "Nobara", "text": "DON'T LOOK DOWN ON ME!", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H000055FF"},
+        {"speaker": "Nobara", "text": "I BET MY LIFE ON LIVING AS MY TRUE SELF!", "start_rel": 7.0, "end_rel": 15.0, "glow_color": "&H000055FF"},
+        {"speaker": "Nobara", "text": "HAIRPIN... RESONANCE!", "start_rel": 15.5, "end_rel": 22.5, "glow_color": "&H000088FF"},
+        {"speaker": "Nobara", "text": "BLACK FLASH STRIKE!", "start_rel": 23.0, "end_rel": 29.8, "glow_color": "&H000088FF"}
     ],
     "todo": [
-        {"speaker": "Todo", "text": "WHAT KIND OF WOMAN IS YOUR TYPE?", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H00FF00AA"},
-        {"speaker": "Todo", "text": "BOOGIE WOOGIE!", "start_rel": 6.5, "end_rel": 13.8, "glow_color": "&H00FFAA00"}
+        {"speaker": "Todo", "text": "WHAT KIND OF WOMAN IS YOUR TYPE?", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H00FF00AA"},
+        {"speaker": "Todo", "text": "A BORING ANSWER MERITS A COMPLETE BEATDOWN!", "start_rel": 7.0, "end_rel": 14.5, "glow_color": "&H00FF00AA"},
+        {"speaker": "Todo", "text": "CLAP OF MY HANDS SWITCHES POSITIONS IN AN INSTANT!", "start_rel": 15.0, "end_rel": 22.0, "glow_color": "&H00FFAA00"},
+        {"speaker": "Todo", "text": "WE ARE THE EXCEPTION... BOOGIE WOOGIE!", "start_rel": 22.5, "end_rel": 29.8, "glow_color": "&H00FFAA00"}
     ],
     "mahito": [
-        {"speaker": "Mahito", "text": "THE SOUL COMES BEFORE THE BODY.", "start_rel": 0.5, "end_rel": 5.5, "glow_color": "&H00AA00FF"},
-        {"speaker": "Mahito", "text": "IDLE TRANSFIGURATION!", "start_rel": 6.5, "end_rel": 13.8, "glow_color": "&H00FF00FF"}
+        {"speaker": "Mahito", "text": "THE SOUL COMES BEFORE THE BODY.", "start_rel": 0.5, "end_rel": 6.5, "glow_color": "&H00AA00FF"},
+        {"speaker": "Mahito", "text": "WHEN THE SOUL CHANGES SHAPE, THE FLESH FOLLOWS!", "start_rel": 7.0, "end_rel": 14.5, "glow_color": "&H00AA00FF"},
+        {"speaker": "Mahito", "text": "YOU AND I ARE INHERENTLY THE SAME, ITADORI!", "start_rel": 15.0, "end_rel": 22.0, "glow_color": "&H00AA00FF"},
+        {"speaker": "Mahito", "text": "IDLE TRANSFIGURATION: INSTANT SPIRIT BODY OF DISTORTED KILLING!", "start_rel": 22.5, "end_rel": 29.8, "glow_color": "&H00FF00FF"}
     ]
 }
 
@@ -286,18 +325,25 @@ def generate_kinetic_subtitles(
     word_dur = total_dur / len(words)
     
     scale_y = VIDEO_HEIGHT / 1920.0
-    fontsize = int(round(cfg['fontsize'] * scale_y))
-    outline_w = round(cfg['outline_width'] * scale_y, 1)
-    shadow_d = round(cfg['shadow_depth'] * scale_y, 1)
-    margin_v = int(round(cfg['margin_v'] * scale_y))
-    margin_l = int(round(margin_lr * scale_y))
+    scale_x = VIDEO_WIDTH / 1080.0
+    
+    # ── Upper-Third Hook Question (BaseText) ──
+    # Placed at TOP CENTER (alignment 8) in the upper third mobile safe zone
+    q_fontsize = int(round(cfg.get('fontsize', 56) * scale_y))
+    q_outline = round(cfg.get('outline_width', 4.5) * scale_y, 1)
+    q_shadow = round(cfg.get('shadow_depth', 2.0) * scale_y, 1)
+    q_margin_v = int(round(cfg.get('margin_v', 200) * scale_y))  # Safe below top mobile chrome
+    q_margin_lr = int(round(cfg.get('margin_lr', 100) * scale_x))
+    q_alignment = cfg.get('alignment', 8)
 
-    # Clean, simple dialogue subtitle style (Montserrat, solid pure white, subtle dark outline, lower-third)
-    d_fontsize = int(round(54 * scale_y))
-    d_outline = round(2.5 * scale_y, 1)
-    d_shadow = round(1.5 * scale_y, 1)
-    d_margin_v = int(round(340 * scale_y))  # Clean lower-third safe zone
-    d_margin_lr = int(round(80 * scale_y))
+    # ── Lower-Third Dialogue Subtitles (DialogueSub) ──
+    # Placed at BOTTOM CENTER (alignment 2) in the lower third mobile safe zone
+    # MarginV is calibrated to sit safely ABOVE the YouTube Shorts bottom chrome (channel, title, subscribe button)
+    d_fontsize = int(round(48 * scale_y))
+    d_outline = round(3.8 * scale_y, 1)
+    d_shadow = round(1.8 * scale_y, 1)
+    d_margin_v = int(round(440 * scale_y))  # Safe above YouTube Shorts channel & title overlay
+    d_margin_lr = int(round(120 * scale_x)) # Safe inside YouTube right-side like/comment buttons
 
     ass_header = f"""[Script Info]
 Title: AniDoc High-Retention Kinetic Subtitles
@@ -310,7 +356,7 @@ PlayResY: {VIDEO_HEIGHT}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: BaseText,{cfg['font']},{fontsize},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,0,0,1,{outline_w},{shadow_d},{cfg['alignment']},{margin_l},{margin_l},{margin_v},1
+Style: BaseText,{cfg['font']},{q_fontsize},{cfg['primary']},&H00000000,{cfg['outline']},{cfg['shadow']},-1,0,0,0,100,100,0,0,1,{q_outline},{q_shadow},{q_alignment},{q_margin_lr},{q_margin_lr},{q_margin_v},1
 Style: DialogueSub,Montserrat,{d_fontsize},&H00FFFFFF,&H00000000,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,{d_outline},{d_shadow},2,{d_margin_lr},{d_margin_lr},{d_margin_v},1
 
 [Events]

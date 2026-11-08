@@ -607,8 +607,8 @@ def render_cinematic_edit(
     filter_chains.append(
         f"[clip_sfx_raw]volume=1.0,{combat_foley_fx},highpass=f=80,lowpass=f=14000[clip_sfx_balanced];"
         f"[{phonk_inp_idx}:a]{audio_vacuum_fx},volume=1.0[phonk_full];"
-        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=60 40:dropout_transition=2,"
-        f"volume=1.20,afade=t=out:st={audio_fade_start:.2f}:d={audio_fade_dur:.2f},loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
+        f"[phonk_full][clip_sfx_balanced]amix=inputs=2:duration=first:weights=1 1:dropout_transition=0:normalize=0,"
+        f"afade=t=out:st={audio_fade_start:.2f}:d={audio_fade_dur:.2f},loudnorm=I=-14:TP=-1.5:LRA=11[aout]"
     )
 
     full_filter_complex = ";".join(filter_chains)

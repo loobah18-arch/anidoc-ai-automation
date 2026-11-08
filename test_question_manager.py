@@ -90,15 +90,19 @@ class TestQuestionManager(unittest.TestCase):
             with open(out_ass, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            # Verify upper-third hook question lines (BaseText) are present
+            # Verify upper-third hook question lines (BaseText) are present and positioned in top mobile safe zone
             self.assertIn("BaseText", content)
             self.assertIn("TOJI THOUGHT", content)
             self.assertIn("HONORED ONE", content)
+            # Alignment 8 (top center) in BaseText style line
+            self.assertTrue(any("Style: BaseText" in line and ",8," in line for line in content.splitlines()))
 
-            # Verify lower-third dialogue lines (DialogueSub) are also present
+            # Verify lower-third dialogue lines (DialogueSub) are also present in bottom mobile safe zone
             self.assertIn("DialogueSub", content)
             self.assertIn("THROUGHOUT HEAVEN", content)
             self.assertIn("HONORED ONE", content)
+            # Alignment 2 (bottom center) with safe MarginV >= 440 (587 on 1440p)
+            self.assertTrue(any("Style: DialogueSub" in line and ",2," in line and any(m in line for m in ["440", "586", "587"]) for line in content.splitlines()))
 
         finally:
             if out_ass.exists():
