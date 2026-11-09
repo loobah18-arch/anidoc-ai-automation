@@ -148,7 +148,7 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: |
-          TARGET_DUR="${{ github.event.inputs.duration || '42.0' }}"
+          TARGET_DUR="${{ github.event.inputs.duration || '54.0' }}"
           CMD="python main.py --duration $TARGET_DUR"
 
 
