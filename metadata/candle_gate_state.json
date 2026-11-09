@@ -1,0 +1,55 @@
+{
+  "candle_evaluation": {
+    "decision": "UPLOAD_CLEARED",
+    "can_upload": true,
+    "requires_timer": false,
+    "timer_seconds": 3600,
+    "requires_spacing_sleep": false,
+    "spacing_sleep_seconds": 0,
+    "active_layer": "All Layers Cleared",
+    "recommendation": "Active video velocity (38 views/hr, peak: 38/hr) is below 2,500 views/hr threshold. Cleared to upload next video.",
+    "layer0": {
+      "layer": 0,
+      "decision": "SPACING_CLEARED",
+      "can_upload": true,
+      "requires_spacing_sleep": false,
+      "spacing_sleep_seconds": 0,
+      "elapsed_hours": 25.42,
+      "min_spacing_hours": 24.0,
+      "remaining_hours": 0.0,
+      "recommendation": "\u2705 24-Hour Spacing Cleared: Active video has been up for 25.4h (>= 24h). Evaluating performance under Layer 1 & Layer 2."
+    },
+    "layer1": {
+      "layer": 1,
+      "decision": "LAYER_1_CLEARED",
+      "can_upload": true,
+      "requires_timer": false,
+      "timer_seconds": 3600,
+      "total_views": 979,
+      "elapsed_hours": 25.42,
+      "recommendation": "Video is past the initial 24h window (25.4h elapsed). Layer 1 passed; evaluating under Layer 2."
+    },
+    "layer2": {
+      "decision": "UPLOAD_CLEARED",
+      "can_upload": true,
+      "consecutive_hours_below": 1,
+      "required_hours": 24,
+      "threshold": 2500,
+      "current_hourly_rate": 38,
+      "peak_hourly_rate": 38,
+      "total_candles": 1,
+      "recommendation": "Active video velocity (38 views/hr, peak: 38/hr) is below 2,500 views/hr threshold. Cleared to upload next video."
+    }
+  },
+  "hourly_candles": [
+    38
+  ],
+  "last_snapshot": {
+    "video_id": "iWkUqDcOWOc",
+    "title": "Giyu Tomioka's Eleventh Form Dead Calm Is Untouchable \ud83c\udf0a #giyu #demonslayer #shorts",
+    "total_views": 979,
+    "timestamp": "2026-11-09T17:00:58.539129+00:00",
+    "hourly_velocity": 38,
+    "elapsed_hours": 25.42
+  }
+}
