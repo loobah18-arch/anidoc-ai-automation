@@ -40,5 +40,19 @@
     "url": "https://youtube.com/shorts/clean_id_2",
     "timestamp": "2026-11-08T19:11:12.150390+00:00",
     "status": "uploaded"
+  },
+  {
+    "video_id": "clean_yt_100",
+    "title": "Test Title",
+    "url": "https://youtube.com/shorts/clean_yt_100",
+    "timestamp": "2026-11-09T02:18:28.448985+00:00",
+    "status": "uploaded"
+  },
+  {
+    "video_id": "clean_id_2",
+    "title": "Test Title",
+    "url": "https://youtube.com/shorts/clean_id_2",
+    "timestamp": "2026-11-09T02:18:28.455014+00:00",
+    "status": "uploaded"
   }
 ]

@@ -7,7 +7,7 @@ Layers:
 1. Layer 0 (24-Hour Minimum Spacing Guard):
    Ensures at least 24 hours between uploads to let each video circulate on the algorithm.
 2. Layer 1 (Early Momentum Gate):
-   If a video reaches >= 2,000 views within its first 12 hours, pause uploads to let early traction run.
+   If a video reaches >= 2,000 views within its first 24 hours, pause uploads to let early traction run.
    If near threshold (1.7k-1.99k), flags timer.
 3. Layer 2 (Viral Velocity Gate - 2k-3k views/hr):
    If hourly velocity exceeds 2,500 views/hr (2k-3k range), block upload until velocity stabilizes.
@@ -31,7 +31,7 @@ VIEW_THRESHOLD_MAX = 3000
 SUSTAINED_HOURS_REQUIRED = 24
 
 # Layer 1 Constants: Early Momentum Gate
-EARLY_HOURS_WINDOW = 12.0
+EARLY_HOURS_WINDOW = 24.0
 EARLY_VIEWS_THRESHOLD = 2000
 NEAR_THRESHOLD_PERCENT = 0.85
 NEAR_THRESHOLD_VIEWS = int(EARLY_VIEWS_THRESHOLD * NEAR_THRESHOLD_PERCENT)
@@ -97,7 +97,7 @@ class CandleGate:
         near_threshold_views: int = NEAR_THRESHOLD_VIEWS,
         timer_seconds: int = TIMER_DELAY_SECONDS,
     ) -> Dict[str, Any]:
-        """Layer 1 - Early Momentum Gate: Checks >= 2k views in 12h."""
+        """Layer 1 - Early Momentum Gate: Checks >= 2k views in 24h."""
         is_early_window = elapsed_hours <= window_hours
         has_early_momentum = is_early_window and total_views >= threshold_views
         is_near_threshold = is_early_window and (near_threshold_views <= total_views < threshold_views)
@@ -118,7 +118,7 @@ class CandleGate:
             remaining_window = max(window_hours - elapsed_hours, 0.0)
             recommendation = (
                 f"⏳ Video is at {total_views:,} views in {elapsed_hours:.1f}h (approaching {threshold_views:,} threshold "
-                f"with {remaining_window:.1f}h remaining in the 12h window). "
+                f"with {remaining_window:.1f}h remaining in the {window_hours:.0f}h window). "
                 f"Automatically setting a 1-hour timer ({timer_seconds // 60}m) to re-check before uploading."
             )
         else:
@@ -340,7 +340,7 @@ class CandleGate:
                 final_decision = layer1_eval["decision"]
                 can_upload = False
                 final_recommendation = layer1_eval["recommendation"]
-                active_layer = "Layer 1 (Early Momentum: 1-Hour Timer)" if requires_timer else "Layer 1 (Early Momentum Gate: >=2k views in 12h)"
+                active_layer = "Layer 1 (Early Momentum: 1-Hour Timer)" if requires_timer else "Layer 1 (Early Momentum Gate: >=2k views in 24h)"
             elif not layer2_eval["can_upload"]:
                 final_decision = layer2_eval["decision"]
                 can_upload = False

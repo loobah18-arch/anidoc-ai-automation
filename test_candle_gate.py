@@ -49,6 +49,11 @@ class TestAnidocCandleGate(unittest.TestCase):
         self.assertTrue(res["can_upload"])
         self.assertEqual(res["decision"], "LAYER_1_CLEARED")
 
+    def test_layer1_past_24h_window_cleared(self):
+        res = self.gate.evaluate_early_momentum(total_views=2500, elapsed_hours=26.0)
+        self.assertTrue(res["can_upload"])
+        self.assertEqual(res["decision"], "LAYER_1_CLEARED")
+
     def test_layer2_viral_velocity_blocked(self):
         res = self.gate.evaluate_hourly_candles(hourly_views=[1000, 2800])
         self.assertFalse(res["can_upload"])
