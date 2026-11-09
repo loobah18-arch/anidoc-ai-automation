@@ -367,7 +367,6 @@ def upload_video_with_block_retry(
                 "reason": rec,
                 "candle_evaluation": candle_eval,
             }
-            return {"status": "error", "error": str(e)}
 
     current_video_path = video_path
     current_title = title

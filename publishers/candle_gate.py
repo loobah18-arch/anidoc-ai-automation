@@ -287,6 +287,8 @@ class CandleGate:
 
             total_views = int(v_items[0]["statistics"].get("viewCount", 0))
             published_at = datetime.fromisoformat(published_at_str.replace("Z", "+00:00"))
+            if published_at.tzinfo is None:
+                published_at = published_at.replace(tzinfo=timezone.utc)
             now = datetime.now(timezone.utc)
             elapsed_hours = max((now - published_at).total_seconds() / 3600.0, 0.1)
 
@@ -298,6 +300,8 @@ class CandleGate:
                 prev_views = last_snapshot.get("total_views", 0)
                 try:
                     prev_time = datetime.fromisoformat(last_snapshot["timestamp"])
+                    if prev_time.tzinfo is None:
+                        prev_time = prev_time.replace(tzinfo=timezone.utc)
                     delta_hours = max((now - prev_time).total_seconds() / 3600.0, 0.1)
                     hourly_velocity = max(int((total_views - prev_views) / delta_hours), 0)
                 except Exception:
