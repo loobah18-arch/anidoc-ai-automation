@@ -360,7 +360,13 @@ def upload_video_with_block_retry(
     if gate_check and not force_upload and not dry_run and youtube:
         gate_res = gate.evaluate_live_channel(youtube)
         candle_eval = gate_res.get("candle_evaluation", {})
-        if candle_eval and not candle_eval.get("can_upload", True):
+        if candle_eval.get("requires_spacing_sleep", False):
+            wait_sec = candle_eval.get("spacing_sleep_seconds", 0)
+            print(f"[YouTube] ⏱️ 24h upload spacing is within inline window ({wait_sec // 60}m remaining). Sleeping inline...")
+            import time
+            time.sleep(wait_sec)
+            print("[YouTube] 🔔 24-Hour Spacing Cleared after inline sleep. Proceeding with upload.")
+        elif candle_eval and not candle_eval.get("can_upload", True):
             rec = candle_eval.get("recommendation", "Upload deferred by Candle Gate.")
             print(f"[YouTube] 🛑 {rec}")
             return {
