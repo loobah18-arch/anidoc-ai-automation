@@ -436,6 +436,28 @@ def render_cinematic_edit(
     cc_cfg = CC_PRESETS.get(active_cc, CC_PRESETS["marvel_hdr"])
     
     # 6. Build Multi-Layer FFmpeg Filtergraph (OpenCut-Inspired)
+    # Neural Vocal Separation via Demucs (if available in environment):
+    # Isolates pure character dialogue stem from background anime music in conversation scene (clip 0)
+    if clip_paths and clip_paths[0].exists():
+        from core.vocal_isolator import isolate_audio_with_demucs
+        demucs_vocals = SCRATCH_DIR / f"{clip_paths[0].stem}_vocals.wav"
+        if not demucs_vocals.exists():
+            isolate_audio_with_demucs(clip_paths[0], demucs_vocals)
+        if demucs_vocals.exists() and demucs_vocals.stat().st_size > 5000:
+            demucs_clip = SCRATCH_DIR / f"{clip_paths[0].stem}_clean_vocals.mp4"
+            remux_cmd = [
+                "ffmpeg", "-y", "-i", str(clip_paths[0]), "-i", str(demucs_vocals),
+                "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
+                "-shortest", str(demucs_clip)
+            ]
+            try:
+                subprocess.run(remux_cmd, capture_output=True, check=True, timeout=30)
+                if demucs_clip.exists() and demucs_clip.stat().st_size > 1000:
+                    clip_paths[0] = demucs_clip
+                    print(f"🎙️ [VocalIsolator] Replaced clip 0 audio with isolated Demucs dialogue stem")
+            except Exception as e:
+                print(f"⚠️ [VocalIsolator] Notice remuxing Demucs stem: {e}")
+
     cmd_inputs = []
     has_clip_audio_list = []
     

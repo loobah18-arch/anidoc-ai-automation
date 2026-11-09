@@ -58,7 +58,7 @@ class TestVocalIsolator(unittest.TestCase):
         self.assertIn("equalizer=f=1600", filt)
         self.assertIn("equalizer=f=3400", filt)
         self.assertIn("acompressor=", filt)
-        self.assertIn("volume=1.85", filt)
+        self.assertIn("volume='eval=frame:volume=if(gt(", filt)
 
     def test_04_combat_scene_auto_mute_anime_music(self):
         """Verify combat scenes (post-drop) mute anime audio completely so only Phonk plays."""

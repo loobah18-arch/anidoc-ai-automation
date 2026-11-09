@@ -151,7 +151,54 @@ def build_vocal_isolation_filter(
     # 4. Dynamic Broadcast Voice Compressor (evens out speech dynamics, lifts whispers and soft words)
     filters.append("acompressor=threshold=-22dB:ratio=4:attack=5:release=50:makeup=5dB")
 
-    # 5. Vocal Presence Gain (ensures dialogue is prominent and clearly audible on mobile speakers)
-    filters.append("volume=1.85")
+    # 5. Speech-Window Audio Gating: Silence all background music when character is not speaking
+    if speech_intervals:
+        speech_expr = build_speech_activity_expression(speech_intervals, buffer=0.15)
+        if speech_expr:
+            filters.append(f"volume='eval=frame:volume=if(gt({speech_expr},0),1.85,0.0)'")
+        else:
+            filters.append("volume=1.85")
+    else:
+        filters.append("volume=1.85")
 
     return ",".join(filters)
+
+
+def isolate_audio_with_demucs(input_audio_path: Path, output_vocals_path: Path) -> Optional[Path]:
+    """
+    Attempts to separate pure speech vocals from background anime music
+    using Meta's Demucs (htdemucs) deep neural network.
+    Returns path to isolated vocals.wav if successful, None otherwise.
+    """
+    import shutil
+    import tempfile
+
+    if not input_audio_path or not Path(input_audio_path).exists():
+        return None
+
+    try:
+        import demucs.separate
+    except ImportError:
+        if not shutil.which("demucs"):
+            return None
+
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            cmd = [
+                "python3", "-m", "demucs.separate",
+                "-n", "htdemucs",
+                "--two-stems", "vocals",
+                "-o", tmpdir,
+                str(input_audio_path)
+            ]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
+            if res.returncode == 0:
+                stem_file = Path(tmpdir) / "htdemucs" / input_audio_path.stem / "vocals.wav"
+                if stem_file.exists() and stem_file.stat().st_size > 5000:
+                    output_vocals_path.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(stem_file, output_vocals_path)
+                    print(f"🎙️ [Demucs] Successfully isolated pure anime dialogue vocals: {output_vocals_path.name}")
+                    return output_vocals_path
+    except Exception as e:
+        print(f"⚠️ [Demucs] Vocal separation fallback to filter: {e}")
+    return None
