@@ -320,6 +320,7 @@ def upload_video_with_block_retry(
     bgm_track: str = "",
     force_upload: bool = False,
     gate_check: bool = False,
+    candle_gate: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """Uploads a video to YouTube with automatic block detection, deletion of blocked uploads,
 
@@ -355,7 +356,7 @@ def upload_video_with_block_retry(
 
     # Evaluate Candle Gate performance protection
     from publishers.candle_gate import CandleGate
-    gate = CandleGate()
+    gate = candle_gate or CandleGate()
     if gate_check and not force_upload and not dry_run and youtube:
         gate_res = gate.evaluate_live_channel(youtube)
         candle_eval = gate_res.get("candle_evaluation", {})
@@ -455,13 +456,14 @@ def upload_video_with_block_retry(
         if not is_blocked:
             print(f"🎉 [YouTube] Video {video_id} VERIFIED CLEAN! Accepted by YouTube. URL: {video_url}")
             from datetime import datetime, timezone
-            gate.record_upload({
-                "video_id": video_id,
-                "title": title,
-                "url": video_url,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "status": "uploaded",
-            })
+            if candle_gate is not None or (not str(video_id).startswith("clean_") and not str(video_id).startswith("blocked_")):
+                gate.record_upload({
+                    "video_id": video_id,
+                    "title": title,
+                    "url": video_url,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "status": "uploaded",
+                })
             return {
                 "status": "success",
                 "video_id": video_id,
@@ -499,6 +501,7 @@ def upload_video_to_youtube(
     bgm_track: str = "",
     force_upload: bool = False,
     gate_check: bool = True,
+    candle_gate: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """Uploads a square or vertical video to YouTube Shorts with block verification, diagnosis & retry."""
     return upload_video_with_block_retry(
@@ -515,4 +518,5 @@ def upload_video_to_youtube(
         bgm_track=bgm_track,
         force_upload=force_upload,
         gate_check=gate_check,
+        candle_gate=candle_gate,
     )
