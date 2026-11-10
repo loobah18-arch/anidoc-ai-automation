@@ -1,23 +1,23 @@
 {
   "candle_evaluation": {
-    "decision": "UPLOAD_CLEARED",
-    "can_upload": true,
+    "decision": "UPLOAD_BLOCKED_24H_SPACING",
+    "can_upload": false,
     "requires_timer": false,
     "timer_seconds": 3600,
     "requires_spacing_sleep": false,
     "spacing_sleep_seconds": 0,
-    "active_layer": "All Layers Cleared",
-    "recommendation": "Active video velocity (38 views/hr, peak: 38/hr) is below 2,500 views/hr threshold. Cleared to upload next video.",
+    "active_layer": "Layer 0 (24-Hour Minimum Spacing Guard)",
+    "recommendation": "\u23f3 24-Hour Spacing Guard: Active video was uploaded 22.5h ago (< 24h required). Holding next upload to protect its initial 24h circulation window. Next upload permitted in 1.5h.",
     "layer0": {
       "layer": 0,
-      "decision": "SPACING_CLEARED",
-      "can_upload": true,
+      "decision": "UPLOAD_BLOCKED_24H_SPACING",
+      "can_upload": false,
       "requires_spacing_sleep": false,
       "spacing_sleep_seconds": 0,
-      "elapsed_hours": 25.42,
+      "elapsed_hours": 22.47,
       "min_spacing_hours": 24.0,
-      "remaining_hours": 0.0,
-      "recommendation": "\u2705 24-Hour Spacing Cleared: Active video has been up for 25.4h (>= 24h). Evaluating performance under Layer 1 & Layer 2."
+      "remaining_hours": 1.53,
+      "recommendation": "\u23f3 24-Hour Spacing Guard: Active video was uploaded 22.5h ago (< 24h required). Holding next upload to protect its initial 24h circulation window. Next upload permitted in 1.5h."
     },
     "layer1": {
       "layer": 1,
@@ -25,31 +25,32 @@
       "can_upload": true,
       "requires_timer": false,
       "timer_seconds": 3600,
-      "total_views": 979,
-      "elapsed_hours": 25.42,
-      "recommendation": "Video is past the initial 24h window (25.4h elapsed). Layer 1 passed; evaluating under Layer 2."
+      "total_views": 570,
+      "elapsed_hours": 22.47,
+      "recommendation": "Video has 570 views in 22.5h (< 2,000 threshold). Layer 1 cleared; evaluating under Layer 2."
     },
     "layer2": {
       "decision": "UPLOAD_CLEARED",
       "can_upload": true,
-      "consecutive_hours_below": 1,
+      "consecutive_hours_below": 2,
       "required_hours": 24,
       "threshold": 2500,
-      "current_hourly_rate": 38,
+      "current_hourly_rate": 25,
       "peak_hourly_rate": 38,
-      "total_candles": 1,
-      "recommendation": "Active video velocity (38 views/hr, peak: 38/hr) is below 2,500 views/hr threshold. Cleared to upload next video."
+      "total_candles": 2,
+      "recommendation": "Active video velocity (25 views/hr, peak: 38/hr) is below 2,500 views/hr threshold. Cleared to upload next video."
     }
   },
   "hourly_candles": [
-    38
+    38,
+    25
   ],
   "last_snapshot": {
-    "video_id": "iWkUqDcOWOc",
-    "title": "Giyu Tomioka's Eleventh Form Dead Calm Is Untouchable \ud83c\udf0a #giyu #demonslayer #shorts",
-    "total_views": 979,
-    "timestamp": "2026-11-09T17:00:58.539129+00:00",
-    "hourly_velocity": 38,
-    "elapsed_hours": 25.42
+    "video_id": "kuzy0sD26QE",
+    "title": "The Raw Menace of Sukuna's Flame Arrow \ud83d\udd25\u26a1 #sukuna #jjk #shorts",
+    "total_views": 570,
+    "timestamp": "2026-11-10T15:30:01.567566+00:00",
+    "hourly_velocity": 25,
+    "elapsed_hours": 22.47
   }
 }

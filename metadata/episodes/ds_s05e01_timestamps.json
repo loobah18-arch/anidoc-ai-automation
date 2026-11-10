@@ -1,0 +1,124 @@
+{
+  "episode_code": "DS_S05E01",
+  "title": "Demon Slayer DS_S05E01",
+  "duration": 2937.1,
+  "universe": "demonslayer",
+  "anime": "Demon Slayer",
+  "characters": [
+    {
+      "name": "inosuke",
+      "role": "Protagonist",
+      "key_moments": [
+        "Pre-fight conversation standoff",
+        "Explosive combat escalation & decisive encounter"
+      ]
+    }
+  ],
+  "scene_count": 6,
+  "source": "Google Drive / Local Library - Demon_Slayer_Kimetsu_no_Yaiba_480P_S05_E01.mp4",
+  "notes": "Auto-cataloged by AniDoc AutoCataloger Engine",
+  "intro_dialogue": [
+    {
+      "speaker": "Fighter",
+      "text": "IF YOU THINK YOU CAN DEFEAT ME HERE...",
+      "start_rel": 0.5,
+      "end_rel": 3.5,
+      "glow_color": "&H00FFFFFF"
+    },
+    {
+      "speaker": "Fighter",
+      "text": "...YOU HAVE NO IDEA WHO YOU'RE FACING.",
+      "start_rel": 4.0,
+      "end_rel": 7.5,
+      "glow_color": "&H00FFFFFF"
+    },
+    {
+      "speaker": "Opponent",
+      "text": "STAND GROUND! LET'S FINISH THIS!",
+      "start_rel": 8.0,
+      "end_rel": 11.0,
+      "glow_color": "&H00FFFFFF"
+    }
+  ],
+  "scenes": [
+    {
+      "start": 317.6,
+      "end": 352.6,
+      "action_level": "CALM",
+      "priority": "high",
+      "description": "Pre-fight standoff, character tension & dialogue buildup",
+      "characters_present": [
+        "inosuke"
+      ],
+      "action_score": 0.65,
+      "is_conversation": true,
+      "duration": 35.0
+    },
+    {
+      "start": 382.0,
+      "end": 418.7,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "description": "Combat engagement sequence #1",
+      "characters_present": [
+        "inosuke"
+      ],
+      "action_score": 0.85,
+      "is_conversation": false,
+      "duration": 36.7
+    },
+    {
+      "start": 998.0,
+      "end": 1032.7,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "💎 CLIMAX: Peak combat encounter and decisive strike",
+      "characters_present": [
+        "inosuke"
+      ],
+      "action_score": 0.95,
+      "is_conversation": false,
+      "duration": 34.7
+    },
+    {
+      "start": 1614.0,
+      "end": 1643.5,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "💎 CLIMAX: Peak combat encounter and decisive strike",
+      "characters_present": [
+        "inosuke"
+      ],
+      "action_score": 0.95,
+      "is_conversation": false,
+      "duration": 29.5
+    },
+    {
+      "start": 2230.0,
+      "end": 2256.6,
+      "action_level": "MODERATE",
+      "priority": "medium",
+      "description": "Combat engagement sequence #4",
+      "characters_present": [
+        "inosuke"
+      ],
+      "action_score": 0.75,
+      "is_conversation": false,
+      "duration": 26.6
+    },
+    {
+      "start": 2846.0,
+      "end": 2872.4,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "description": "Combat engagement sequence #5",
+      "characters_present": [
+        "inosuke"
+      ],
+      "action_score": 0.85,
+      "is_conversation": false,
+      "duration": 26.4
+    }
+  ],
+  "auto_cataloged": true
+}
