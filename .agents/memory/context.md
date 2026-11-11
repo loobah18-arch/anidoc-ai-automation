@@ -13,7 +13,9 @@ Core Function: Automated 4K HDR Phonk Scene Edit Engine for Demon Slayer & Jujut
   - 06:30 UTC Morning Slot: Demon Slayer (Kimetsu no Yaiba)
   - 18:30 UTC Evening Slot: Jujutsu Kaisen (JJK)
 - Workflow Status: Run 37171219344 passed cleanly with Inosuke 4K Edit published to YouTube Shorts (https://youtube.com/shorts/gGINUTqY9tw).
-- Test Suite: 15/15 tests passing (`test_detailed_episodes.py` 8/8, `test_pipeline.py` 7/7).
+- 2026-11-10 incident: run fired ~8.5h late (free-runner cron drift); CandleGate blocked at 22.5h elapsed and discarded the render (commit 2e56836 wiped test-mock history entries).
+- Fix A (2026-11-11, applied locally, NOT pushed): `publishers/candle_gate.py` inline spacing window 0.5h → 4.0h (covers runner drift up to 4h); `publishers/youtube_publisher.py` re-evaluates the gate after the inline sleep (defers if Layer 1/2 flips). Awaiting push approval.
+- Test Suite: test_candle_gate 9/9 OK, test_youtube_publisher 10/10 OK (both suites re-validated after Fix A).
 
 ## Universe Quarantine Architecture
 - Filename Matching: `core/timestamp_loader.py` uses separate Demon Slayer (`DS_SxxExx`) and JJK (`SxxExx`) regex branches with zero fallthrough.

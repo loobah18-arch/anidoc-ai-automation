@@ -78,6 +78,24 @@ class TestAnidocCandleGate(unittest.TestCase):
         self.assertFalse(res2["requires_spacing_sleep"])
         self.assertEqual(res2["decision"], "UPLOAD_BLOCKED_24H_SPACING")
 
+    def test_layer0_inline_wait_window_covers_runner_drift(self):
+        # Real-world case (2026-11-10): cron drifted ~8.5h late; active video was
+        # 22.5h old with 1.5h remaining -> must inline-wait, not discard the render.
+        res = self.gate.evaluate_upload_spacing(elapsed_hours=22.5)
+        self.assertFalse(res["can_upload"])
+        self.assertTrue(res["requires_spacing_sleep"])
+        self.assertEqual(res["decision"], "SPACING_WAIT_INLINE")
+        self.assertGreater(res["spacing_sleep_seconds"], 0)
+
+        # Exactly at the 4h inline-window boundary -> still an inline wait
+        res_edge = self.gate.evaluate_upload_spacing(elapsed_hours=20.0)
+        self.assertTrue(res_edge["requires_spacing_sleep"])
+
+        # Remaining wait beyond the 4h inline window -> hard block without sleep
+        res_far = self.gate.evaluate_upload_spacing(elapsed_hours=19.9)
+        self.assertFalse(res_far["requires_spacing_sleep"])
+        self.assertEqual(res_far["decision"], "UPLOAD_BLOCKED_24H_SPACING")
+
 
 if __name__ == "__main__":
     unittest.main()

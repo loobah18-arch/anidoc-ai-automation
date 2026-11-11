@@ -56,13 +56,13 @@ class CandleGate:
         self,
         elapsed_hours: float,
         min_spacing_hours: float = MIN_UPLOAD_SPACING_HOURS,
-        max_inline_wait_hours: float = 0.5,
+        max_inline_wait_hours: float = 4.0,
     ) -> Dict[str, Any]:
         """
         Layer 0 - 24-Hour Spacing Gate:
         Ensures next upload triggers after at least 24h of prior upload.
-        If within max_inline_wait_hours (<= 30 min) of the 24h mark, triggers an inline sleep
-        to protect against runner jitter and avoid an unnecessary daily skip.
+        If within max_inline_wait_hours (<= 4 hours) of the 24h mark, triggers an inline sleep
+        to protect against GitHub runner cron drift and avoid an unnecessary daily skip.
         """
         can_upload = elapsed_hours >= min_spacing_hours
         remaining_hours = max(min_spacing_hours - elapsed_hours, 0.0)

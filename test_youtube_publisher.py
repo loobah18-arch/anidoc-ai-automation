@@ -226,6 +226,98 @@ class TestYouTubePublisher(unittest.TestCase):
             self.assertEqual(res["attempts"], 2)
             self.assertEqual(mock_youtube.videos().delete.call_count, 2)
 
+    def test_upload_spacing_sleep_defers_when_gate_recheck_blocks(self):
+        # After the inline spacing sleep, the gate must be re-evaluated: if
+        # Layer 1/2 now blocks, the upload is deferred instead of force-pushed.
+        mock_gate = MagicMock()
+        first_eval = {"candle_evaluation": {
+            "requires_spacing_sleep": True,
+            "spacing_sleep_seconds": 5,
+            "can_upload": False,
+            "recommendation": "spacing wait",
+        }}
+        recheck_eval = {"candle_evaluation": {
+            "requires_spacing_sleep": False,
+            "can_upload": False,
+            "recommendation": "Layer 1 active push",
+        }}
+        mock_gate.evaluate_live_channel.side_effect = [first_eval, recheck_eval]
+
+        mock_youtube = MagicMock()
+
+        with patch("time.sleep") as mock_sleep, \
+             patch("pathlib.Path.exists", return_value=True), \
+             patch("publishers.youtube_publisher.validate_shorts_video", return_value=(True, "1080x1080, 30.0s")):
+
+            res = upload_video_with_block_retry(
+                video_path=Path("dummy_short.mp4"),
+                title="Test Title",
+                description="Test Desc",
+                tags=["anime"],
+                youtube_client=mock_youtube,
+                media_upload_cls=MagicMock(),
+                gate_check=True,
+                candle_gate=mock_gate,
+                verify_timeout_sec=0.0,
+            )
+
+        self.assertEqual(res["status"], "deferred_candle_gate")
+        self.assertIn("Layer 1", res["reason"])
+        mock_sleep.assert_called_once()
+        self.assertEqual(mock_gate.evaluate_live_channel.call_count, 2)
+        mock_youtube.videos().insert.assert_not_called()
+
+    def test_upload_spacing_sleep_proceeds_when_gate_recheck_clears(self):
+        # After the inline spacing sleep, a cleared gate re-evaluation lets the
+        # upload proceed normally (video must not be discarded).
+        mock_gate = MagicMock()
+        first_eval = {"candle_evaluation": {
+            "requires_spacing_sleep": True,
+            "spacing_sleep_seconds": 5,
+            "can_upload": False,
+            "recommendation": "spacing wait",
+        }}
+        recheck_eval = {"candle_evaluation": {
+            "requires_spacing_sleep": False,
+            "can_upload": True,
+            "recommendation": "cleared",
+        }}
+        mock_gate.evaluate_live_channel.side_effect = [first_eval, recheck_eval]
+
+        mock_youtube = MagicMock()
+        mock_req = MagicMock()
+        mock_req.next_chunk.return_value = (None, {"id": "clean_after_wait"})
+        mock_youtube.videos().insert.return_value = mock_req
+        mock_youtube.videos().list().execute.return_value = {
+            "items": [
+                {
+                    "status": {"uploadStatus": "uploaded"},
+                    "processingDetails": {"processingStatus": "succeeded"},
+                    "contentDetails": {},
+                }
+            ]
+        }
+
+        with patch("time.sleep"), \
+             patch("pathlib.Path.exists", return_value=True), \
+             patch("publishers.youtube_publisher.validate_shorts_video", return_value=(True, "1080x1080, 30.0s")):
+
+            res = upload_video_with_block_retry(
+                video_path=Path("dummy_short.mp4"),
+                title="Test Title",
+                description="Test Desc",
+                tags=["anime"],
+                youtube_client=mock_youtube,
+                media_upload_cls=MagicMock(),
+                gate_check=True,
+                candle_gate=mock_gate,
+                verify_timeout_sec=0.0,
+            )
+
+        self.assertEqual(res["status"], "success")
+        self.assertEqual(res["video_id"], "clean_after_wait")
+        self.assertEqual(mock_gate.evaluate_live_channel.call_count, 2)
+
 
 if __name__ == "__main__":
     unittest.main()
