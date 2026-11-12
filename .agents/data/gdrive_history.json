@@ -13,7 +13,8 @@
     "Jujutsu_Kaisen_[English]_1080P_S02_E04.mp4",
     "Jujutsu_Kaisen_[English]_1080P_S02_E09.mp4",
     "Demon_Slayer_Kimetsu_no_Yaiba_480P_S05_E01.mp4",
-    "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4"
+    "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4",
+    "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E08.mp4"
   ],
   "used_timestamps": {
     "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E19.mp4": [
@@ -459,6 +460,42 @@
       1029.2,
       408.0,
       1616.6
+    ],
+    "Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E08.mp4": [
+      243.5,
+      587.0,
+      1077.4,
+      579.2,
+      323.6,
+      581.8,
+      326.2,
+      584.4,
+      318.4,
+      840.0,
+      315.8,
+      333.3,
+      827.0,
+      576.6,
+      321.0,
+      594.5,
+      328.8,
+      816.6,
+      832.2,
+      819.2,
+      837.4,
+      821.8,
+      834.8,
+      1074.8,
+      829.6,
+      308.0,
+      1352.8,
+      571.4,
+      1343.4,
+      814.0,
+      574.0,
+      1327.8,
+      566.2,
+      589.6
     ]
   }
 }

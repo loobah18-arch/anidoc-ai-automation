@@ -1,0 +1,124 @@
+{
+  "episode_code": "DS_S01E08",
+  "title": "Demon Slayer DS_S01E08",
+  "duration": 1413.7,
+  "universe": "demonslayer",
+  "anime": "Demon Slayer",
+  "characters": [
+    {
+      "name": "tengen",
+      "role": "Protagonist",
+      "key_moments": [
+        "Pre-fight conversation standoff",
+        "Explosive combat escalation & decisive encounter"
+      ]
+    }
+  ],
+  "scene_count": 6,
+  "source": "Google Drive / Local Library - Demon_Slayer_Kimetsu_no_Yaiba_480P_S01_E08.mp4",
+  "notes": "Auto-cataloged by AniDoc AutoCataloger Engine",
+  "intro_dialogue": [
+    {
+      "speaker": "Fighter",
+      "text": "IF YOU THINK YOU CAN DEFEAT ME HERE...",
+      "start_rel": 0.5,
+      "end_rel": 3.5,
+      "glow_color": "&H00FFFFFF"
+    },
+    {
+      "speaker": "Fighter",
+      "text": "...YOU HAVE NO IDEA WHO YOU'RE FACING.",
+      "start_rel": 4.0,
+      "end_rel": 7.5,
+      "glow_color": "&H00FFFFFF"
+    },
+    {
+      "speaker": "Opponent",
+      "text": "STAND GROUND! LET'S FINISH THIS!",
+      "start_rel": 8.0,
+      "end_rel": 11.0,
+      "glow_color": "&H00FFFFFF"
+    }
+  ],
+  "scenes": [
+    {
+      "start": 243.5,
+      "end": 278.5,
+      "action_level": "CALM",
+      "priority": "high",
+      "description": "Pre-fight standoff, character tension & dialogue buildup",
+      "characters_present": [
+        "tengen"
+      ],
+      "action_score": 0.65,
+      "is_conversation": true,
+      "duration": 35.0
+    },
+    {
+      "start": 308.0,
+      "end": 336.8,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "description": "Combat engagement sequence #1",
+      "characters_present": [
+        "tengen"
+      ],
+      "action_score": 0.85,
+      "is_conversation": false,
+      "duration": 28.8
+    },
+    {
+      "start": 561.0,
+      "end": 598.0,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "💎 CLIMAX: Peak combat encounter and decisive strike",
+      "characters_present": [
+        "tengen"
+      ],
+      "action_score": 0.95,
+      "is_conversation": false,
+      "duration": 37.0
+    },
+    {
+      "start": 814.0,
+      "end": 844.6,
+      "action_level": "EXPLOSIVE",
+      "priority": "high",
+      "description": "💎 CLIMAX: Peak combat encounter and decisive strike",
+      "characters_present": [
+        "tengen"
+      ],
+      "action_score": 0.95,
+      "is_conversation": false,
+      "duration": 30.6
+    },
+    {
+      "start": 1067.0,
+      "end": 1104.8,
+      "action_level": "MODERATE",
+      "priority": "medium",
+      "description": "Combat engagement sequence #4",
+      "characters_present": [
+        "tengen"
+      ],
+      "action_score": 0.75,
+      "is_conversation": false,
+      "duration": 37.8
+    },
+    {
+      "start": 1320.0,
+      "end": 1356.3,
+      "action_level": "INTENSE",
+      "priority": "medium",
+      "description": "Combat engagement sequence #5",
+      "characters_present": [
+        "tengen"
+      ],
+      "action_score": 0.85,
+      "is_conversation": false,
+      "duration": 36.3
+    }
+  ],
+  "auto_cataloged": true
+}
