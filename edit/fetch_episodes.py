@@ -7,7 +7,7 @@ for code, e in eps.items():
     if os.path.exists(dst) and os.path.getsize(dst) > 50_000_000:
         continue
     for attempt in range(3):
-        r = subprocess.run([sys.executable, '-m', 'gdown', '--fuzzy', f"https://drive.google.com/uc?id={e['drive_id']}", '-O', dst])
+        r = subprocess.run([sys.executable, '-m', 'gdown', e['drive_id'], '-O', dst])
         if r.returncode == 0 and os.path.exists(dst) and os.path.getsize(dst) > 50_000_000:
             break
     else:
