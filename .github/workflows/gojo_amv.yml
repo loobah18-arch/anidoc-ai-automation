@@ -1,0 +1,27 @@
+name: Gojo AMV (exact rebuild)
+
+on:
+  push:
+    branches: [gojo-amv-exact]
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    # Same Debian/FFmpeg 7.1 build the original edit was rendered with, so the frames come out identical.
+    container: debian:trixie
+    timeout-minutes: 90
+    steps:
+      - name: Install tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates
+          pip3 install --break-system-packages gdown
+      - uses: actions/checkout@v4
+      - name: Render the edit
+        run: bash edit/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Gojo_AMV_Funk_Infernal
+          path: out/Gojo_AMV_Funk_Infernal.mp4
+          retention-days: 30
