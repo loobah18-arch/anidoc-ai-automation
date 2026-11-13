@@ -131,10 +131,10 @@ def op_group(code):
     return {1: 'S1a' if ep <= 13 else 'S1b', 2: 'S2a' if ep <= 5 else 'S2b'}.get(se, f'S{se}')
 
 
-hist.setdefault('openings', {})
+hist.setdefault('openings2', {})
 refs = []
 for e in eps:
-    if e in hist['openings'] or any(op_group(o) == op_group(e) and o != e for o in eps + refs):
+    if e in hist['openings2'] or any(op_group(o) == op_group(e) and o != e for o in eps + refs):
         continue
     sib = [o for o in sorted(EPISODES) if op_group(o) == op_group(e) and o not in eps]
     if sib:
@@ -148,7 +148,7 @@ with ThreadPoolExecutor(3) as ex:
 allshots = sum((sh_ for c, sh_, _ in scans if c in eps), [])
 sigs = {c: sg for c, _, sg in scans}
 for c in eps:
-    if c in hist['openings']:
+    if c in hist['openings2']:
         continue
     hits = []
     for t, v in sigs[c]:
@@ -157,15 +157,21 @@ for c in eps:
                 continue
             if sg and min(np.abs(v - w).mean() for _, w in sg) < 5:
                 hits.append(t); break
-    win = None
-    if len(hits) >= 6:                                                # densest 100 s run of matching shots
-        hits.sort(); best = max(range(len(hits)), key=lambda i: sum(1 for h in hits if hits[i] <= h <= hits[i] + 100))
-        run_ = [h for h in hits if hits[best] <= h <= hits[best] + 100]
-        win = [round(run_[0] - 3, 1), round(run_[-1] + 4, 1)]
-    hist['openings'][c] = win
+    win = []                                                          # every run of matching shots (opening, ending, recap)
+    hits.sort(); grp = []
+    for h in hits + [1e9]:
+        if grp and h - grp[-1] > 20:
+            if len(grp) >= 5:
+                win.append([round(grp[0] - 4, 1), round(grp[-1] + 5, 1)])
+            grp = []
+        grp.append(h)
+    hist['openings2'][c] = win
     print(c, 'opening', win, flush=True)
 for s in allshots:
-    s['op'] = bool(hist['openings'].get(s['ep'])) and hist['openings'][s['ep']][0] <= s['s'] <= hist['openings'][s['ep']][1]
+    w = hist['openings2'].get(s['ep']) or []
+    if w and not isinstance(w[0], list):
+        w = [w]
+    s['op'] = any(a <= s['s'] <= b for a, b in w)
 
 # ---------------------------------------------------------------- 4. filter repeats
 thumbs = np.array([s['thumb'] for s in allshots]).reshape(len(allshots), -1)
@@ -244,6 +250,20 @@ def take(idx_list, key, min_len):
                 assign[i] = s; taken.add(id(s)); break
 
 
+# build-ups want faces: grab a frame from the best calm candidates and look for an anime face
+try:
+    import cv2
+    casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
+    for s in sorted(pool, key=lambda s: -s['calm'])[:90]:
+        t = (s['s'] + s['e']) / 2
+        raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t:.2f}', '-i', f'src/{s["ep"]}.mp4', '-frames:v', '1',
+                        '-vf', 'scale=480:270,format=gray', '-f', 'rawvideo', '-'])
+        img = np.frombuffer(raw, np.uint8).reshape(270, 480)
+        faces = casc.detectMultiScale(img, 1.1, 4, minSize=(40, 40))
+        big = max((w * h for x, y, w, h in faces), default=0) / (480 * 270)
+        s['calm'] += 2.5 if big > 0.04 else (1.2 if big > 0 else -0.5)
+except Exception as ex:
+    print('face check skipped', ex, flush=True)
 take(pre + build2, 'calm', 0.8)                                      # build-ups: steady, readable shots
 heroes = [next(i for i, (a, b) in enumerate(tmpl) if a == DROP_BEAT)]
 if second_drop is not None:

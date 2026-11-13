@@ -31,8 +31,8 @@ jobs:
       - name: Install tools
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates libsndfile1
-          pip3 install --break-system-packages gdown numpy librosa soundfile
+          apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates libsndfile1 libglib2.0-0t64
+          pip3 install --break-system-packages gdown numpy librosa soundfile opencv-python-headless
       - uses: actions/checkout@v4
       - name: Cut a new edit
         env:
