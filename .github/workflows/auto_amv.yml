@@ -1,0 +1,56 @@
+name: Auto AMV (new edit every run)
+
+on:
+  push:
+    branches: [gojo-amv-exact]
+    paths: ['edit/auto.py', 'edit/characters.json', 'edit/template.txt', 'edit/pro_fx.py', '.github/workflows/auto_amv.yml']
+  workflow_dispatch:
+    inputs:
+      character:
+        description: 'gojo, sukuna, yuji, toji or megumi'
+        required: false
+        default: 'gojo'
+      song:
+        description: 'Song file name in edit/music without .mp3 (empty = next unused song)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-amv
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    timeout-minutes: 120
+    steps:
+      - name: Install tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates libsndfile1
+          pip3 install --break-system-packages gdown numpy librosa soundfile
+      - uses: actions/checkout@v4
+      - name: Cut a new edit
+        env:
+          CHARACTER: ${{ github.event.inputs.character || 'gojo' }}
+          SONG: ${{ github.event.inputs.song || '' }}
+        run: python3 edit/auto.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: auto-amv-${{ github.run_number }}
+          path: |
+            out/*.mp4
+            edit/work/edit_plan.json
+          retention-days: 30
+      - name: Remember what was used
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "amv-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add edit/history.json
+          git commit -m "history: auto AMV run ${{ github.run_number }}" || exit 0
+          git pull --rebase origin gojo-amv-exact && git push origin HEAD:gojo-amv-exact

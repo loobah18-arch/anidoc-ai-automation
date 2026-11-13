@@ -1,8 +1,6 @@
 name: Gojo AMV (exact rebuild)
 
 on:
-  push:
-    branches: [gojo-amv-exact]
   workflow_dispatch:
 
 jobs:

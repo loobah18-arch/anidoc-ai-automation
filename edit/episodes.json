@@ -1,5 +1,238 @@
 {
-  "S1E07": {"name": "Jujutsu_Kaisen_[English]_1080P_S01_E07.mp4", "drive_id": "1L-35_X4kNIHvDXshDQGh3oc0vVidvIja"},
-  "S2E04": {"name": "Jujutsu_Kaisen_[English]_1080P_S02_E04.mp4", "drive_id": "1f4DHABeV3Ic3EmKzGkI7IlR5ohIJNF-F"},
-  "S2E09": {"name": "Jujutsu_Kaisen_[English]_1080P_S02_E09.mp4", "drive_id": "1mtWod-fVYKXNE8g7BH-2ZGjB6k_mMsPT"}
+ "S1E01": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E01.mp4",
+  "drive_id": "17UPlzPlmgyM7rahc1DVUclvgBLHAqFKo"
+ },
+ "S1E02": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E02.mp4",
+  "drive_id": "1e_QFv_TuJmtFE9PCMGvoCF_Fa8IaA6Yd"
+ },
+ "S1E03": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E03.mp4",
+  "drive_id": "1J9r_iV0bYDSt98a8plja9FcP-pA0FnS7"
+ },
+ "S1E04": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E04.mp4",
+  "drive_id": "1O9T6au5Xv5R1BC35Lhj8QPudW5k29Gxd"
+ },
+ "S1E05": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E05.mp4",
+  "drive_id": "1UFNWMmyIiZKO3dc0k75fXqcPNxTf7but"
+ },
+ "S1E06": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E06.mp4",
+  "drive_id": "16bjjHUEzl3k7s90lKfuJ5eFTtiU3sQv6"
+ },
+ "S1E07": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E07.mp4",
+  "drive_id": "1L-35_X4kNIHvDXshDQGh3oc0vVidvIja"
+ },
+ "S1E08": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E08.mp4",
+  "drive_id": "1bVJcbsVKVt57gcYtg1VXtQITbqr3r2z1"
+ },
+ "S1E09": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E09.mp4",
+  "drive_id": "19kMs6EpCCv8pAT-fXxbHRmxQo03dGJ4c"
+ },
+ "S1E10": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E10.mp4",
+  "drive_id": "1FAbXd_o-9JPb0XepoSb4zQgc9WmEzpwS"
+ },
+ "S1E11": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E11.mp4",
+  "drive_id": "1ImR_xHOAJd_hCvoh1yDQJUGFngOzQefp"
+ },
+ "S1E12": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E12.mp4",
+  "drive_id": "1SboH7OtV83_JeB4--qEXanZ5Dmehjtlo"
+ },
+ "S1E13": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E13.mp4",
+  "drive_id": "1tRDExsKyBbPFcJohOk4jFOzu_m9gyxjt"
+ },
+ "S1E14": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E14.mp4",
+  "drive_id": "1L6CQdqDFvgMIo2ayJmBGssowX3hoaNO8"
+ },
+ "S1E15": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E15.mp4",
+  "drive_id": "1zoiL_XHITETTUgNAXiPJnvOea5PS_8Lp"
+ },
+ "S1E16": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E16.mp4",
+  "drive_id": "1WZf5udT60pupvvjPlx6XEmW89x1GVU4D"
+ },
+ "S1E17": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E17.mp4",
+  "drive_id": "10miIArBjnXQuwbPYN2lXYSvhOA-XWkbc"
+ },
+ "S1E18": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E18.mp4",
+  "drive_id": "1Hlr80qhrSzxAxqOlIh5g6ycS8t5ZFgMF"
+ },
+ "S1E19": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E19.mp4",
+  "drive_id": "1ZY8RfKSvUGxc019EAINKA-QoYhL2h8qF"
+ },
+ "S1E20": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E20.mp4",
+  "drive_id": "1YbfcETD5ciQMe4LBObx6sVE3ak2SM2rj"
+ },
+ "S1E21": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E21.mp4",
+  "drive_id": "1WQSk_GYnk-NEB00cgGw40aQG9pqx02Um"
+ },
+ "S1E22": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E22.mp4",
+  "drive_id": "1RNo5AXyRPnSLE8gQfmi6ucg3Znzfl8oS"
+ },
+ "S1E23": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E23.mp4",
+  "drive_id": "1S3t-5KsDOf1sUzS1qHSbfnhWMtlNgDob"
+ },
+ "S1E24": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S01_E24.mp4",
+  "drive_id": "112t8N73VMtyGh7TrDW3CfU3O2iZHBYuI"
+ },
+ "S2E01": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E01.mp4",
+  "drive_id": "1AMRIOLQFC6FWs7zOVzLPhBjtXV10f-TX"
+ },
+ "S2E02": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E02.mp4",
+  "drive_id": "1zV2raGTLa68jtHTqR5qa_wYeJKR7Nxjg"
+ },
+ "S2E03": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E03.mp4",
+  "drive_id": "1PmA4ki8aPZqNu09F-9_XnRo_2Z4qXHsD"
+ },
+ "S2E04": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E04.mp4",
+  "drive_id": "1f4DHABeV3Ic3EmKzGkI7IlR5ohIJNF-F"
+ },
+ "S2E05": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E05.mp4",
+  "drive_id": "1X71kWNymqWNDrgq-p-qY7jDA1E4SToF8"
+ },
+ "S2E06": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E06.mp4",
+  "drive_id": "1yYKe3TmqlO6Nmu2wlwsN7KsSFN7oL-24"
+ },
+ "S2E07": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E07.mp4",
+  "drive_id": "1fskG2leTwI3t-ZBkJZBFznSyU1OGib0F"
+ },
+ "S2E08": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E08.mp4",
+  "drive_id": "1Hw6LumbBiJuJYZf0FZ0Ex-TLr5a-saDs"
+ },
+ "S2E09": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E09.mp4",
+  "drive_id": "1mtWod-fVYKXNE8g7BH-2ZGjB6k_mMsPT"
+ },
+ "S2E10": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E10.mp4",
+  "drive_id": "1yRqgVWWenGXDnfa0fLd-jbaToOo_IV0h"
+ },
+ "S2E11": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E11.mp4",
+  "drive_id": "1wOu_2-zfEUUrydwPXV_VgFFDNP-3ThjF"
+ },
+ "S2E12": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E12.mp4",
+  "drive_id": "1KK6IaWitBwLCGY_HQWe64M27TuvyWvr8"
+ },
+ "S2E13": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E13.mp4",
+  "drive_id": "19Q39rvj49_bQCBWq7aGTs-EpjMt8AZsP"
+ },
+ "S2E14": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E14.mp4",
+  "drive_id": "1twkk5r_5WBZ6tHM4u2xndGnUFnQlTDj5"
+ },
+ "S2E15": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E15.mp4",
+  "drive_id": "1lHDIkZnzje4AOFfWU7DqfKk3s-ibsZpC"
+ },
+ "S2E16": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E16.mp4",
+  "drive_id": "1t6u60enhA2jUdwW9DCsoohqanEXKxz7c"
+ },
+ "S2E17": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E17.mp4",
+  "drive_id": "1h05g_Fb9J2w6M8pH3gzuJzBfp-B7ql-E"
+ },
+ "S2E18": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E18.mp4",
+  "drive_id": "1dgggKdtABbT-b2MnFcoHZYpqONUhTl-3"
+ },
+ "S2E19": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E19.mp4",
+  "drive_id": "1eKqKXJ2jgXM3gJ5ZiD3K1vUwxhl6VIpP"
+ },
+ "S2E20": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E20.mp4",
+  "drive_id": "1_PTJMCh5hylrXrVSZMnTQmwY9jCH90yE"
+ },
+ "S2E21": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E21.mp4",
+  "drive_id": "1nyFfUkox0Lp919g84wDAOh_j9VfFjHT4"
+ },
+ "S2E22": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E22.mp4",
+  "drive_id": "1c6OC1r0UPXsZe_tqjB5ADgW0y1S0SkyY"
+ },
+ "S2E23": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S02_E23.mp4",
+  "drive_id": "13XbluVRWAGT1x9KyHNDJI_JY0cdGtTrg"
+ },
+ "S3E01": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E01.mp4",
+  "drive_id": "1CcpRn6zaH5s0WouRdvh6JZ9vl6p-pWtk"
+ },
+ "S3E02": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E02.mp4",
+  "drive_id": "1fk9YTqwtbK0jMyGWYWyaJ9pMMrr8vSci"
+ },
+ "S3E03": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E03.mp4",
+  "drive_id": "1MtD9RAJQY-JVlZxbj-J5cGqoRq7J4Y0M"
+ },
+ "S3E04": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E04.mp4",
+  "drive_id": "1CHd7AfIebVWo-vswz5rzRl5oVVcMlnU1"
+ },
+ "S3E05": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E05.mp4",
+  "drive_id": "1Cm9pp4xF9dTRl09bBywLNxE29a8coHzC"
+ },
+ "S3E06": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E06.mp4",
+  "drive_id": "1T5XN6QijSyMxjahDBbXCF5DH0_X1xs8m"
+ },
+ "S3E07": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E07.mp4",
+  "drive_id": "1QufMAmqL_FSL_wnktBY6d1mKa5ZqeteA"
+ },
+ "S3E08": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E08.mp4",
+  "drive_id": "1sGkXaoRyarNreRse6KbCO5aBIFrOSK5k"
+ },
+ "S3E09": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E09.mp4",
+  "drive_id": "1qfWZma2EWWo4MCTWCyD8Nu3etOzye378"
+ },
+ "S3E10": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E10.mp4",
+  "drive_id": "1KP_LeXaoV49VsLA74vSFzgBIf6oUMG4z"
+ },
+ "S3E11": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E11.mp4",
+  "drive_id": "1jJQtqo393cZjlNP19XGnMf_nYdxMlTn9"
+ },
+ "S3E12": {
+  "name": "Jujutsu_Kaisen_[English]_1080P_S03_E12.mp4",
+  "drive_id": "1AY1i0b_GhZgZ9y1Uh6UYhVh0nLMJUnNd"
+ }
 }
