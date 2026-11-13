@@ -32,7 +32,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates libsndfile1 libglib2.0-0t64
-          pip3 install --break-system-packages gdown numpy librosa soundfile opencv-python-headless
+          pip3 install --break-system-packages gdown numpy librosa soundfile "opencv-python-headless<5"
       - uses: actions/checkout@v4
       - name: Cut a new edit
         env:

@@ -232,6 +232,8 @@ print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t:.2f}s start {song_start:.2f
 
 # ---------------------------------------------------------------- 6. fill the template
 tmpl = [tuple(map(int, l.split()[:2])) for l in open('template.txt')]
+max_beats = int(60.0 / P)                                             # keep every edit to 60 s, whatever the tempo
+tmpl = [(a, min(b, max_beats)) for a, b in tmpl if a < max_beats]
 n = len(tmpl)
 second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 pre = [i for i, (a, b) in enumerate(tmpl) if a < DROP_BEAT]
