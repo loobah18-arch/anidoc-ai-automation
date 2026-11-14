@@ -27,6 +27,11 @@ SONG = os.environ.get('SONG', '').strip()
 SEED = int(os.environ.get('SEED', time.time()))
 TEMPLATE_BEATS = 130            # length of the edit in beats (60 s at 130 BPM)
 DROP_BEAT = 17                  # first drop, same as the Gojo AMV
+START_BEAT = int(os.environ.get('START_BEAT', 0))     # convo shorts start the edit a few beats before the drop
+MAX_SECONDS = float(os.environ.get('MAX_SECONDS', 60))
+FORCE_EPS = [e for e in os.environ.get('FORCE_EPS', '').split(',') if e]
+EXCLUDE = [x.rsplit('|', 2) for x in os.environ.get('EXCLUDE', '').split(';') if x]   # ep|s|e already used
+OUT_NAME = os.environ.get('OUT_NAME', '')
 SCAN_W, SCAN_H, SCAN_FPS = 64, 36, 12
 rng = random.Random(SEED)
 os.chdir(HERE)
@@ -82,7 +87,9 @@ if new_eps:
 
 songs = sorted(f[:-4] for f in os.listdir('music') if f.endswith('.mp3'))
 song = SONG if SONG in songs else least_used(songs, hist['songs'], 1)[0]
-if PICK in CHARS:                                                     # a character: its fight episodes
+if FORCE_EPS:
+    eps = list(FORCE_EPS); series = EPISODES[eps[0]]['series']; title = series
+elif PICK in CHARS:                                                     # a character: its fight episodes
     title = PICK
     eps = least_used([e for e in CHARS[PICK] if e in EPISODES], hist['episodes'], 3)
     series = EPISODES[eps[0]]['series']
@@ -196,6 +203,7 @@ if refs:
 with ThreadPoolExecutor(3) as ex:
     scans = list(ex.map(scan, eps + refs))
 allshots = sum((sh_ for c, sh_, _ in scans if c in eps), [])
+allshots = [s for s in allshots if not any(s['ep'] == ep and s['e'] > float(a) - 2 and s['s'] < float(b) + 2 for ep, a, b in EXCLUDE)]
 sigs = {c: sg for c, _, sg in scans}
 for c in eps:
     if c in hist['openings2']:
@@ -277,13 +285,13 @@ for b in beats:
         best, drop_t = jump, float(b)
 if drop_t is None:
     drop_t = DROP_BEAT * P
-song_start = max(0.0, drop_t - DROP_BEAT * P)
+song_start = max(0.0, drop_t - (DROP_BEAT - START_BEAT) * P)
 print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t:.2f}s start {song_start:.2f}s', flush=True)
 
 # ---------------------------------------------------------------- 6. fill the template
 tmpl = [tuple(map(int, l.split()[:2])) for l in open('template.txt')]
-max_beats = int(60.0 / P)                                             # keep every edit to 60 s, whatever the tempo
-tmpl = [(a, min(b, max_beats)) for a, b in tmpl if a < max_beats]
+max_beats = START_BEAT + int(MAX_SECONDS / P)                         # keep every edit to its length, whatever the tempo
+tmpl = [(a, min(b, max_beats)) for a, b in tmpl if START_BEAT <= a < max_beats]
 n = len(tmpl)
 second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 pre = [i for i, (a, b) in enumerate(tmpl) if a < DROP_BEAT]
@@ -332,7 +340,7 @@ if len(assign) < n:
 impact_cut = np.percentile([s['impact'] for s in pool], 85)
 
 # ---------------------------------------------------------------- 7. render
-fr = lambda j: round(j * P * FPS)
+fr = lambda j: round((j - START_BEAT) * P * FPS)
 drop_i = next(i for i, (a, b) in enumerate(tmpl) if a == DROP_BEAT)
 kinds = default_transition_pattern(n, drop_i)
 if second_drop:
@@ -379,7 +387,7 @@ with ThreadPoolExecutor(os.cpu_count() or 2) as ex:
     list(ex.map(run, jobs))
 open('segfx/list.txt', 'w').write(''.join(f"file '{i:03d}.mp4'\n" for i in range(n)))
 os.makedirs('../out', exist_ok=True)
-name = re.sub(r'[^A-Za-z0-9]+', '_', title.title()) + f'_AMV_{song}'
+name = OUT_NAME or (re.sub(r'[^A-Za-z0-9]+', '_', title.title()) + f'_AMV_{song}')
 total = fr(tmpl[-1][1]) / FPS
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', 'segfx/list.txt', '-c', 'copy', 'work/video.mp4'])
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/video.mp4', '-ss', f'{song_start:.3f}', '-i', song_path,

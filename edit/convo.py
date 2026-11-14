@@ -1,0 +1,326 @@
+"""Conversation-first Shorts, styled like AOT EDIT's "Reze's battle iq":
+   1.5 s cold-open hook  ->  ~30-40 s of a real character conversation with burned-in captions
+   (white, all-caps extra-bold, soft glow whose colour follows the speaker, word-by-word reveal)
+   ->  ~20 s beat-synced AMV cut from the same episodes.   Full 9:16 (1080x1920).
+
+Steps
+  1. pick anime + 3 episodes (newest / least used, like auto.py) from the Drive folder
+  2. in the first episode find the fight (highest-motion minute) and transcribe the 3 minutes
+     before it with faster-whisper (translated to English when the audio isn't English)
+  3. choose the densest 28-42 s stretch of dialogue that ends close to the fight
+  4. split it into lines of <= 6 words, guess speakers from voice (pitch + timbre clustering)
+  5. render the conversation shot by shot with a face-following 9:16 crop, captions burned in
+  6. run auto.py for the AMV part (same episodes, conversation shots excluded), then join
+"""
+import json, os, random, re, subprocess, sys, time
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+os.chdir(HERE); sys.path.insert(0, HERE)
+from drive_index import library
+
+W, H, FPS = 1080, 1920, 30
+TOTAL = float(os.environ.get('TOTAL_SECONDS', 59))
+HOOK = 1.5
+PICK = (os.environ.get('PICK') or 'auto').strip().lower()
+SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
+COLORS = ['#FF3B5C', '#3DFF7A', '#B266FF', '#33D6FF', '#FFC533']      # pink-red, green, purple, cyan, gold
+FONT = os.environ.get('CAPTION_FONT', 'Montserrat ExtraBold')
+os.makedirs('src', exist_ok=True); os.makedirs('work/convo', exist_ok=True); os.makedirs('../out', exist_ok=True)
+EPISODES, LIB_SRC = library()
+hist = json.load(open('history.json')) if os.path.exists('history.json') else {}
+SRC = lambda code: 'src/' + code.replace(':', '__') + '.mp4'
+
+
+def sh(cmd, binary=False):
+    r = subprocess.run(cmd, capture_output=True, text=not binary)
+    if r.returncode:
+        raise RuntimeError(' '.join(map(str, cmd[:8])) + '\n' + (r.stderr[-1500:] if not binary else r.stderr[-1500:].decode(errors='ignore')))
+    return r.stdout
+
+
+def least_used(options, counts, k):
+    opts = list(options); rng.shuffle(opts); opts.sort(key=lambda o: counts.get(o, 0)); return opts[:k]
+
+
+def fetch(code):
+    dst = SRC(code)
+    if os.path.exists(dst) and os.path.getsize(dst) > 10_000_000:
+        return dst
+    for _ in range(3):
+        subprocess.run([sys.executable, '-m', 'gdown', EPISODES[code]['drive_id'], '-O', dst, '-q'])
+        if os.path.exists(dst) and os.path.getsize(dst) > 10_000_000:
+            return dst
+    raise SystemExit(f'download failed {code}')
+
+
+def duration(p):
+    return float(sh(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', p]))
+
+
+# ------------------------------------------------------------------ 1. choose
+series_all = sorted({v['series'] for v in EPISODES.values()})
+known = set(hist.get('known', []))
+new_eps = sorted(k for k in EPISODES if k not in known) if 'known' in hist else []
+match = [s for s in series_all if PICK != 'auto' and (s == PICK or s.startswith(PICK.replace(' ', '-')) or PICK.replace(' ', '-') in s)]
+chars = json.load(open('characters.json'))
+chars = {c: [e if ':' in e else f'jujutsu-kaisen:{e}' for e in v] for c, v in chars.items()}
+used_eps = {(k if ':' in k else f'jujutsu-kaisen:{k}'): v for k, v in hist.get('episodes', {}).items()}
+for c in hist.get('convos', []):
+    used_eps[c['ep']] = used_eps.get(c['ep'], 0) + 2                  # conversation episodes rest longer
+if PICK in chars:
+    cand = [e for e in chars[PICK] if e in EPISODES]
+else:
+    series = match[0] if match else (EPISODES[new_eps[0]]['series'] if new_eps else least_used(series_all, hist.get('series', {}), 1)[0])
+    cand = [k for k, v in EPISODES.items() if v['series'] == series]
+fresh = [e for e in new_eps if e in cand][:3]
+eps = fresh + least_used([e for e in cand if e not in fresh], used_eps, 3 - len(fresh))
+conv_ep = eps[0]
+print('pick', PICK, '| episodes', eps, '| conversation from', conv_ep, flush=True)
+fetch(conv_ep)
+src = SRC(conv_ep); dur = duration(src)
+
+# ------------------------------------------------------------------ 2. find the fight, transcribe before it
+SF, SW, SH_ = 4, 64, 36
+raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-i', src, '-vf', f'fps={SF},scale={SW}:{SH_},format=gray', '-f', 'rawvideo', '-'], binary=True)
+g = np.frombuffer(raw, np.uint8).reshape(-1, SH_, SW).astype(np.float32)
+mot = np.concatenate([[0], np.abs(np.diff(g, axis=0)).mean(axis=(1, 2))])
+per_s = np.array([mot[i * SF:(i + 1) * SF].mean() for i in range(len(mot) // SF)])
+lo, hi = 240, int(dur) - 150                                         # skip openings and the ending/preview
+prev = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
+best, fight = -1, None
+for t in range(lo + 200, hi - 60, 5):
+    if any(a - 60 < t < b + 240 for a, b in prev):
+        continue
+    v = per_s[t:t + 60].mean()
+    if v > best:
+        best, fight = v, t
+if fight is None:
+    fight = min(hi - 60, max(lo + 200, int(dur * 0.6)))
+win0, win1 = max(lo, fight - 200), fight + 20
+print(f'fight around {fight}s, transcribing {win0}-{win1}s', flush=True)
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(win0), '-t', str(win1 - win0), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/win.wav'])
+
+from faster_whisper import WhisperModel
+model = WhisperModel(os.environ.get('WHISPER', 'small'), device='cpu', compute_type='int8')
+segs, info = model.transcribe('work/convo/win.wav', beam_size=3, word_timestamps=True, vad_filter=True)
+segs = list(segs)
+task = 'transcribe'
+if info.language != 'en':                                             # Japanese audio: English captions
+    task = 'translate'
+    model = WhisperModel(os.environ.get('WHISPER_TRANSLATE', 'medium'), device='cpu', compute_type='int8')
+    segs = list(model.transcribe('work/convo/win.wav', task='translate', language=info.language, beam_size=3, word_timestamps=True, vad_filter=True)[0])
+print('language', info.language, task, len(segs), 'segments', flush=True)
+words = []
+for sg in segs:
+    for w in (sg.words or []):
+        t = w.word.strip()
+        if t and w.end > w.start:
+            words.append(dict(w=t, s=win0 + w.start, e=win0 + w.end, seg=id(sg)))
+if len(words) < 25:
+    raise SystemExit('not enough dialogue near the fight')
+
+# ------------------------------------------------------------------ 3. densest stretch of dialogue
+starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
+best, pick = -1, None
+for i in starts:
+    for j in range(i + 10, len(words)):
+        L = words[j]['e'] - words[i]['s']
+        if L > 42:
+            break
+        if L < 28 or not (words[j]['w'][-1:] in '.?!' or j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.8):
+            continue
+        talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
+        score = talk + 0.15 * (j - i) / L - 0.004 * max(0, fight - words[j]['e'])
+        if score > best:
+            best, pick = score, (i, j)
+if pick is None:
+    i = starts[0]; j = max(k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= 40)
+    pick = (i, j)
+cw = words[pick[0]:pick[1] + 1]
+c0 = max(win0, cw[0]['s'] - 0.35); c1 = min(win1, cw[-1]['e'] + 0.6)
+c0 = round(c0 * FPS) / FPS; c1 = round(c1 * FPS) / FPS
+CONV = c1 - c0
+print(f'conversation {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
+
+# ------------------------------------------------------------------ 4. caption lines + speakers
+lines, cur = [], []
+for k, w in enumerate(cw):
+    if cur and (len(cur) >= 6 or w['s'] - cur[-1]['e'] > 0.6 or w['seg'] != cur[-1]['seg'] or
+                (cur[-1]['w'][-1:] in '.?!,' and len(cur) >= 3)):
+        lines.append(cur); cur = []
+    cur.append(w)
+if cur:
+    lines.append(cur)
+
+import librosa
+y, sr = librosa.load('work/convo/win.wav', sr=16000)
+feats = []
+for ln in lines:
+    a, b = int((ln[0]['s'] - win0) * sr), int((ln[-1]['e'] - win0) * sr)
+    seg = y[a:max(b, a + 1600)]
+    f0 = librosa.yin(seg, fmin=70, fmax=500, sr=sr) if len(seg) > 2048 else np.array([150.0])
+    mf = librosa.feature.mfcc(y=seg, sr=sr, n_mfcc=13).mean(axis=1) if len(seg) > 2048 else np.zeros(13)
+    feats.append(np.concatenate([[np.log(np.median(f0)) * 6], mf[1:8] / 20]))
+feats = np.array(feats)
+spk = [0] * len(lines)
+if len(lines) >= 4:
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import silhouette_score
+    X = (feats - feats.mean(0)) / (feats.std(0) + 1e-6)
+    best_k, best_s = 1, 0.08
+    for k in (2, 3):
+        if len(lines) > k + 1:
+            lab = KMeans(k, n_init=10, random_state=0).fit_predict(X)
+            s = silhouette_score(X, lab)
+            if s > best_s:
+                best_k, best_s, spk = k, s, list(lab)
+    if best_k == 1:                                                   # no clear voices: change colour on each turn
+        spk = [0] * len(lines); c = 0
+        for i in range(1, len(lines)):
+            if lines[i][0]['seg'] != lines[i - 1][0]['seg'] and lines[i][0]['s'] - lines[i - 1][-1]['e'] > 0.5:
+                c = (c + 1) % 3
+            spk[i] = c
+order = list(dict.fromkeys(spk))                                     # first speaker gets pink, next green ...
+pal = COLORS[:]; rng.shuffle(pal[2:])
+colour_of = {s: pal[order.index(s) % len(pal)] for s in order}
+
+
+def ass_col(hexc, a='00'):
+    r, g_, b = hexc[1:3], hexc[3:5], hexc[5:7]
+    return f'&H{a}{b}{g_}{r}&'
+
+
+def clean(t):
+    return re.sub(r'[^\w\'?!.,-]', '', t).upper()
+
+
+def ts(t):
+    t = max(0, t); h = int(t // 3600); m = int(t % 3600 // 60); s = t % 60
+    return f'{h}:{m:02d}:{s:05.2f}'
+
+
+ass = [f"""[Script Info]
+ScriptType: v4.00+
+PlayResX: {W}
+PlayResY: {H}
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,{FONT},74,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,3,0,1,0,3,5,60,60,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"""]
+DIM = '&H00A0A0A0&'
+for li, ln in enumerate(lines):
+    col = colour_of[spk[li]]
+    t_end = min(ln[-1]['e'] + 0.35, lines[li + 1][0]['s'] if li + 1 < len(lines) else c1) - c0 + HOOK
+    toks = [clean(w['w']) for w in ln]
+    toks = [t for t in toks if t]
+    if not toks:
+        continue
+    split = len(toks) if len(toks) <= 3 or sum(map(len, toks)) <= 18 else (len(toks) + 1) // 2
+    for k in range(len(toks)):                                        # word-by-word: spoken white, the rest dim
+        a = ln[min(k, len(ln) - 1)]['s'] - c0 + HOOK
+        b = (ln[k + 1]['s'] - c0 + HOOK) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
+        if b <= a:
+            continue
+        parts = []
+        for m, t in enumerate(toks):
+            parts.append(('{\\1c&H00FFFFFF&}' if m <= k else '{\\1c' + DIM + '}') + t)
+            if m == split - 1 and m != len(toks) - 1:
+                parts.append('\\N')
+            elif m != len(toks) - 1:
+                parts.append(' ')
+        txt = ''.join(parts).replace(' \\N', '\\N')
+        pop = '{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else ''
+        glow = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord14\\blur12\\3c{ass_col(col)}\\3a&H40&\\shad0\\1a&HFF&}}'
+        main = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord3\\blur2\\3c{ass_col(col)}\\shad3}}'
+        ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
+        ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
+open('work/convo/captions.ass', 'w').write('\n'.join(ass) + '\n')
+json.dump(dict(ep=conv_ep, s=c0, e=c1, lines=[dict(t=' '.join(w['w'] for w in ln), speaker=int(spk[i]), colour=colour_of[spk[i]])
+                                               for i, ln in enumerate(lines)]), open('work/convo/convo.json', 'w'), indent=1)
+print('captions', len(lines), 'lines,', len(set(spk)), 'speaker colours', flush=True)
+
+# ------------------------------------------------------------------ 5. face-following 9:16 crop, shot by shot
+raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src, '-vf',
+          'fps=12,scale=64:36,format=gray', '-f', 'rawvideo', '-'], binary=True)
+gg = np.frombuffer(raw, np.uint8).reshape(-1, 36, 64).astype(np.float32)
+d = np.abs(np.diff(gg, axis=0)).mean(axis=(1, 2))
+cuts = [0.0] + [(i + 1) / 12 for i in range(len(d)) if d[i] > max(18, 4 * np.median(d[max(0, i - 12):i + 12]))] + [CONV]
+cuts = sorted(set(round(c * FPS) / FPS for c in cuts))
+cuts = [c for k, c in enumerate(cuts) if k == 0 or c - cuts[k - 1] >= 0.3 or c == CONV]
+iw, ih = map(int, sh(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', src]).strip().split(','))
+try:
+    import cv2
+    casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
+except Exception:
+    casc = None
+crop_w = ih * W / H                                                    # 9:16 window in source pixels
+prev_x = 0.5
+xs = []
+for a, b in zip(cuts[:-1], cuts[1:]):
+    cx = []
+    for f in (0.3, 0.7):
+        if casc is None:
+            break
+        t = c0 + a + (b - a) * f
+        fr = np.frombuffer(sh(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t:.2f}', '-i', src, '-frames:v', '1', '-vf',
+                               'scale=640:360,format=gray', '-f', 'rawvideo', '-'], binary=True), np.uint8).reshape(360, 640)
+        faces = casc.detectMultiScale(fr, 1.1, 3, minSize=(28, 28))
+        if len(faces):
+            x, y_, w, h = max(faces, key=lambda f_: f_[2] * f_[3])
+            cx.append((x + w / 2) / 640)
+    x = float(np.mean(cx)) if cx else 0.5
+    xs.append(x)
+os.makedirs('work/convo/seg', exist_ok=True)
+lst = []
+for k, ((a, b), x) in enumerate(zip(zip(cuts[:-1], cuts[1:]), xs)):
+    nf = round(b * FPS) - round(a * FPS)
+    if nf <= 0:
+        continue
+    left = min(max(x * iw - crop_w / 2, 0), iw - crop_w)
+    vf = (f'crop={int(crop_w) // 2 * 2}:{ih}:{int(left)}:0,scale={W}:{H}:flags=lanczos,setsar=1,'
+          f'eq=contrast=1.06:saturation=1.12,fps={FPS}')
+    out = f'work/convo/seg/{k:03d}.mp4'
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{c0 + a:.3f}', '-i', src, '-an', '-vf', vf, '-frames:v', str(nf),
+        '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '17', out])
+    lst.append(out)
+open('work/convo/seg/list.txt', 'w').write(''.join(f"file '{os.path.basename(p)}'\n" for p in lst))
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', 'work/convo/seg/list.txt', '-c', 'copy', 'work/convo/video.mp4'])
+
+# ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
+amv_len = max(14.0, TOTAL - HOOK - CONV)
+env = dict(os.environ, FORCE_EPS=','.join(eps), START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK)
+subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
+amv = '../out/_amv_part.mp4'
+plan = json.load(open('work/edit_plan.json'))
+P = 60.0 / plan['tempo']
+hook_at = (17 - 9) * P                                                # the first drop inside the AMV part
+name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_convo_' + plan['song']
+fc = (
+    f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
+    f"[0:a]atrim={hook_at:.3f}:{hook_at + HOOK:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={HOOK - 0.25}:d=0.25,volume=0.8[ha];"
+    f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
+    f"[2:a]asetpts=PTS-STARTPTS,loudnorm=I=-15:TP=-1.5:LRA=11,aresample=48000,aformat=channel_layouts=stereo[ca];"
+    f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
+    f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]"
+)
+# captions were timed from the start of the short (hook included); the conversation clip starts at 0
+txt = open('work/convo/captions.ass').read()
+txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for x, f in zip(m.group(1).split(':'), (3600, 60, 1))) - HOOK)), txt)
+open('work/convo/captions_shift.ass', 'w').write(txt)
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
+    '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src,
+    '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
+    '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
+os.remove(amv)
+print('wrote', f'out/{name}.mp4', flush=True)
+
+hist = json.load(open('history.json'))
+hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())))
+json.dump(hist, open('history.json', 'w'), indent=1)
