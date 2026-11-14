@@ -344,6 +344,11 @@ top = sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact']
 top.sort(key=lambda s: (s['ep'], s['s']))                            # story order through the fights
 for i, s in zip(rest, top):
     assign[i] = s; taken.add(id(s))
+if len(assign) < n:                                                   # small pool (one scene): reuse the strongest shots
+    print(f'pool short ({len(assign)}/{n}), reusing top shots', flush=True)
+    best = sorted(pool, key=lambda s: -s['impact'])
+    for j, i in enumerate(x for x in range(n) if x not in assign):
+        assign[i] = best[j % max(1, min(len(best), 12))]
 if len(assign) < n:
     sys.exit(f'not enough shots ({len(assign)}/{n})')
 impact_cut = np.percentile([s['impact'] for s in pool], 85)
