@@ -147,6 +147,10 @@ if info.language != 'en':                                             # Japanese
     task = 'translate'
     model = WhisperModel(os.environ.get('WHISPER_TRANSLATE', 'medium'), device='cpu', compute_type='int8')
     segs = list(model.transcribe(audio16, task='translate', language=info.language, beam_size=3, word_timestamps=True, vad_filter=True)[0])
+if len(segs) < 3:                                                     # misdetected (music) or VAD ate it: force Japanese -> English
+    task = 'translate'
+    segs = list(model.transcribe(audio16, task='translate', language='ja', beam_size=3, word_timestamps=True, vad_filter=False)[0])
+    segs = [sg for sg in segs if getattr(sg, 'no_speech_prob', 0) < 0.6 and len((sg.text or '').split()) >= 2]
 print('language', info.language, task, len(segs), 'segments', flush=True)
 words = []
 for sg in segs:
@@ -172,7 +176,7 @@ if len(words) < 12:
         raise SystemExit('not enough dialogue in the fight')
     print('too little dialogue there, trying the next fight moment', flush=True)
     os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
-    os.execv(sys.executable, [sys.executable] + sys.argv)
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 
 # ------------------------------------------------------------------ 3. densest stretch of dialogue
 starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
