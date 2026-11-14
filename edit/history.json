@@ -5,7 +5,8 @@
   "cotneus_stereo_love_funk": 1,
   "andromeda_montagem_coma": 1,
   "montagem_vozes_profundas": 1,
-  "andromeda_no_fear_phonk": 1
+  "andromeda_no_fear_phonk": 1,
+  "mvsterious_slava_funk": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -25,7 +26,10 @@
   "demon-slayer-kimetsu-no-yaiba:S5E07": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E16": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E24": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E09": 1
+  "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E23": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E11": 1,
+  "demon-slayer-kimetsu-no-yaiba:S5E03": 1
  },
  "shots": [
   {
@@ -1291,6 +1295,62 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
    "s": 1250.992
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 671.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 734.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 952.575
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1665.342
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 473.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 564.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 262.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 332.258
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 355.616
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 754.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1440.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1448.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 92.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 1164.167
   }
  ],
  "runs": [
@@ -1363,6 +1423,18 @@
     "demon-slayer-kimetsu-no-yaiba:S1E16",
     "demon-slayer-kimetsu-no-yaiba:S1E24",
     "demon-slayer-kimetsu-no-yaiba:S3E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-14 21:09 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "mvsterious_slava_funk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E23",
+    "demon-slayer-kimetsu-no-yaiba:S4E11",
+    "demon-slayer-kimetsu-no-yaiba:S5E03"
    ],
    "file": "_amv_part.mp4"
   }
@@ -1506,11 +1578,41 @@
     1302.4,
     1385.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E23": [
+   [
+    0.5,
+    117.2
+   ],
+   [
+    1309.6,
+    1361.8
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E11": [
+   [
+    -3.8,
+    75.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S5E03": [
+   [
+    24.2,
+    82.1
+   ],
+   [
+    98.2,
+    114.9
+   ],
+   [
+    1286.2,
+    1385.2
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 3,
-  "demon-slayer-kimetsu-no-yaiba": 3
+  "demon-slayer-kimetsu-no-yaiba": 4
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -1650,6 +1752,13 @@
    "e": 476.1333333333333,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_andromeda_no_fear_phonk.mp4",
    "time": "2026-11-14 20:57 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 519.6666666666666,
+   "e": 561.7333333333333,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_mvsterious_slava_funk.mp4",
+   "time": "2026-11-14 21:10 UTC"
   }
  ]
 }
