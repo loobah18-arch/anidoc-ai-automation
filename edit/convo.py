@@ -5,9 +5,9 @@
 
 Steps
   1. pick anime + 3 episodes (newest / least used, like auto.py) from the Drive folder
-  2. in the first episode find the fight (highest-motion minute) and transcribe the 3 minutes
-     before it with faster-whisper (translated to English when the audio isn't English)
-  3. choose the densest 28-42 s stretch of dialogue that ends close to the fight
+  2. of the 3 episodes take the one with the biggest fight (motion + glowing power effects over 90 s)
+     and transcribe the fight itself with faster-whisper (translated to English when needed)
+  3. choose the 28-42 s stretch where characters talk WHILE the action / auras are on screen
   4. split it into lines of <= 6 words, guess speakers from voice (pitch + timbre clustering)
   5. render the conversation shot by shot with a face-following 9:16 crop, captions burned in
   6. run auto.py for the AMV part (same episodes, conversation shots excluded), then join
@@ -75,30 +75,39 @@ else:
     cand = [k for k, v in EPISODES.items() if v['series'] == series]
 fresh = [e for e in new_eps if e in cand][:3]
 eps = fresh + least_used([e for e in cand if e not in fresh], used_eps, 3 - len(fresh))
-conv_ep = eps[0]
-print('pick', PICK, '| episodes', eps, '| conversation from', conv_ep, flush=True)
-fetch(conv_ep)
-src = SRC(conv_ep); dur = duration(src)
-
-# ------------------------------------------------------------------ 2. find the fight, transcribe before it
 SF, SW, SH_ = 4, 64, 36
-raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-i', src, '-vf', f'fps={SF},scale={SW}:{SH_},format=gray', '-f', 'rawvideo', '-'], binary=True)
-g = np.frombuffer(raw, np.uint8).reshape(-1, SH_, SW).astype(np.float32)
-mot = np.concatenate([[0], np.abs(np.diff(g, axis=0)).mean(axis=(1, 2))])
-per_s = np.array([mot[i * SF:(i + 1) * SF].mean() for i in range(len(mot) // SF)])
-lo, hi = 240, int(dur) - 150                                         # skip openings and the ending/preview
-prev = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
-best, fight = -1, None
-for t in range(lo + 200, hi - 60, 5):
-    if any(a - 60 < t < b + 240 for a, b in prev):
-        continue
-    v = per_s[t:t + 60].mean()
-    if v > best:
-        best, fight = v, t
-if fight is None:
-    fight = min(hi - 60, max(lo + 200, int(dur * 0.6)))
-win0, win1 = max(lo, fight - 200), fight + 20
-print(f'fight around {fight}s, transcribing {win0}-{win1}s', flush=True)
+def motion(src):
+    raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-i', src, '-vf', f'fps={SF},scale={SW}:{SH_}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], binary=True)
+    f = np.frombuffer(raw, np.uint8).reshape(-1, SH_, SW, 3).astype(np.float32)
+    g = f.mean(axis=3)
+    mot = np.concatenate([[0], np.abs(np.diff(g, axis=0)).mean(axis=(1, 2))])
+    sat = f.max(axis=3) - f.min(axis=3)                                 # glowing auras / power effects are bright and saturated
+    glow = ((sat > 90) & (f.max(axis=3) > 170)).mean(axis=(1, 2)) * 40
+    n = len(mot) // SF
+    return np.array([mot[i * SF:(i + 1) * SF].mean() + glow[i * SF:(i + 1) * SF].mean() for i in range(n)])
+
+# ------------------------------------------------------------------ 2. pick the episode with the biggest fight, find it
+FW = 90
+best_all = None
+for ep in eps:
+    fetch(ep)
+    d_ = duration(SRC(ep)); ps = motion(SRC(ep))
+    lo_, hi_ = 150, int(d_) - 150                                        # skip openings and the ending/preview
+    prev = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == ep]
+    for t in range(lo_, hi_ - FW, 5):
+        if any(a_ - FW < t < b_ for a_, b_ in prev):
+            continue
+        v = ps[t:t + FW].mean()
+        if best_all is None or v > best_all[0]:
+            best_all = (v, ep, t, ps, d_)
+    print(f'{ep} peak fight {max(ps[lo_:hi_].tolist() or [0]):.1f}', flush=True)
+_, conv_ep, fight, per_s, dur = best_all
+eps = [conv_ep] + [e for e in eps if e != conv_ep]
+src = SRC(conv_ep)
+lo, hi = 150, int(dur) - 150
+mref = np.percentile(per_s[lo:hi], 90) + 1e-6
+win0, win1 = max(lo, fight - 45), min(hi, fight + FW + 75)
+print('conversation from', conv_ep, f'| fight around {fight}s, transcribing {win0}-{win1}s', flush=True)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(win0), '-t', str(win1 - win0), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/win.wav'])
 
 from faster_whisper import WhisperModel
@@ -132,21 +141,22 @@ for sg in segs:
         wts = np.cumsum([0] + [len(t) + 2 for t in toks]); wts = wts / wts[-1]
         for k, t in enumerate(toks):
             words.append(dict(w=t, s=win0 + a0 + (a1 - a0) * wts[k], e=win0 + a0 + (a1 - a0) * wts[k + 1], seg=id(sg)))
-if len(words) < 25:
-    raise SystemExit('not enough dialogue near the fight')
+if len(words) < 12:
+    raise SystemExit('not enough dialogue in the fight')
 
 # ------------------------------------------------------------------ 3. densest stretch of dialogue
 starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
 best, pick = -1, None
 for i in starts:
-    for j in range(i + 10, len(words)):
+    for j in range(i + 6, len(words)):
         L = words[j]['e'] - words[i]['s']
         if L > 42:
             break
         if L < 28 or not (words[j]['w'][-1:] in '.?!' or j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.8):
             continue
         talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
-        score = talk + 0.15 * (j - i) / L - 0.004 * max(0, fight - words[j]['e'])
+        act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref    # action on screen while they talk
+        score = 0.5 * talk + 0.05 * (j - i) / L + 1.5 * min(act, 1.3)
         if score > best:
             best, pick = score, (i, j)
 if pick is None:
