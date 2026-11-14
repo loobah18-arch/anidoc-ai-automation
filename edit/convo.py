@@ -350,11 +350,18 @@ plan = json.load(open('work/edit_plan.json'))
 P = 60.0 / plan['tempo']
 hook_at = (17 - 9) * P                                                # the first drop inside the AMV part
 name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_convo_' + plan['song']
+# the same song plays quietly under the conversation and runs straight into the edit at full volume
+BED_VOL = float(os.environ.get('BED_VOL', '0.16'))
+bed_ss = plan.get('song_start', 0.0) - CONV
+if bed_ss < 0:
+    bed_ss = 0.0
 fc = (
     f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
     f"[0:a]atrim={hook_at:.3f}:{hook_at + HOOK:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={HOOK - 0.25}:d=0.25,volume=0.8[ha];"
     f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
-    f"[2:a]asetpts=PTS-STARTPTS,loudnorm=I=-15:TP=-1.5:LRA=11,aresample=48000,aformat=channel_layouts=stereo[ca];"
+    f"[2:a]asetpts=PTS-STARTPTS,loudnorm=I=-15:TP=-1.5:LRA=11,aresample=48000,aformat=channel_layouts=stereo[dl];"
+    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,volume={BED_VOL},afade=t=in:d=0.4[bd];"
+    f"[dl][bd]amix=inputs=2:duration=first:normalize=0[ca];"
     f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
     f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]"
 )
@@ -364,6 +371,7 @@ txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for 
 open('work/convo/captions_shift.ass', 'w').write(txt)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src,
+    '-ss', f'{bed_ss:.3f}', '-t', f'{CONV + 0.5:.3f}', '-i', f"music/{plan['song']}.mp3",
     '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
     '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
