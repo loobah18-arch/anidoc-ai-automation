@@ -8,7 +8,8 @@
   "andromeda_no_fear_phonk": 1,
   "mvsterious_slava_funk": 1,
   "glxxmstrider_dont_stop_slowed": 1,
-  "dygo_funk_infernal": 1
+  "dygo_funk_infernal": 1,
+  "rubikdice_montagem_pegadora_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -35,7 +36,8 @@
   "jujutsu-kaisen:S1E10": 1,
   "jujutsu-kaisen:S1E13": 1,
   "jujutsu-kaisen:S3E09": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E19": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
+  "jujutsu-kaisen:S1E17": 1
  },
  "shots": [
   {
@@ -1605,6 +1607,154 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
    "s": 1270.741
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 796.484
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 568.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 580.45
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 761.784
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 652.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 520.858
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 526.591
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 533.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 548.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 550.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 553.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 559.983
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 566.716
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 571.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 575.741
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 578.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 603.067
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 619.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 620.067
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 622.067
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 625.609
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 632.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 637.341
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 641.284
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 644.742
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 647.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 650.317
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 653.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 655.567
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 657.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 660.034
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 661.859
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 723.45
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 733.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 772.092
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 803.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 812.567
   }
  ],
  "runs": [
@@ -1711,6 +1861,16 @@
    "song": "dygo_funk_infernal",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E19"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-14 22:31 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "rubikdice_montagem_pegadora_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E17"
    ],
    "file": "_amv_part.mp4"
   }
@@ -1924,10 +2084,24 @@
     30.5,
     120.1
    ]
+  ],
+  "jujutsu-kaisen:S1E17": [
+   [
+    -4.0,
+    81.0
+   ],
+   [
+    694.2,
+    711.9
+   ],
+   [
+    1233.8,
+    1340.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 4,
+  "jujutsu-kaisen": 5,
   "demon-slayer-kimetsu-no-yaiba": 5
  },
  "known": [
@@ -2089,6 +2263,13 @@
    "e": 1209.6666666666667,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_dygo_funk_infernal.mp4",
    "time": "2026-11-14 21:50 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E17",
+   "s": 666.0,
+   "e": 684.8333333333334,
+   "file": "Jujutsu_Kaisen_narrated_rubikdice_montagem_pegadora_slowed.mp4",
+   "time": "2026-11-14 22:32 UTC"
   }
  ]
 }
