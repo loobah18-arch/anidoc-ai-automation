@@ -7,7 +7,8 @@
   "montagem_vozes_profundas": 1,
   "andromeda_no_fear_phonk": 1,
   "mvsterious_slava_funk": 1,
-  "glxxmstrider_dont_stop_slowed": 1
+  "glxxmstrider_dont_stop_slowed": 1,
+  "dygo_funk_infernal": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -33,7 +34,8 @@
   "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
   "jujutsu-kaisen:S1E10": 1,
   "jujutsu-kaisen:S1E13": 1,
-  "jujutsu-kaisen:S3E09": 1
+  "jujutsu-kaisen:S3E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E19": 1
  },
  "shots": [
   {
@@ -1515,6 +1517,94 @@
   {
    "ep": "jujutsu-kaisen:S3E09",
    "s": 1101.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1236.616
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1098.867
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1057.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1050.616
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1254.45
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1017.367
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1025.408
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1065.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1075.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1083.867
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1091.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1143.908
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1148.175
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1152.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1160.433
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1232.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1243.95
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1248.325
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1250.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1260.992
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1265.008
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1270.741
   }
  ],
  "runs": [
@@ -1611,6 +1701,16 @@
     "jujutsu-kaisen:S1E10",
     "jujutsu-kaisen:S1E13",
     "jujutsu-kaisen:S3E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-14 21:49 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "dygo_funk_infernal",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E19"
    ],
    "file": "_amv_part.mp4"
   }
@@ -1818,11 +1918,17 @@
     1270.4,
     1322.2
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E19": [
+   [
+    30.5,
+    120.1
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 4,
-  "demon-slayer-kimetsu-no-yaiba": 4
+  "demon-slayer-kimetsu-no-yaiba": 5
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -1976,6 +2082,13 @@
    "e": 894.2,
    "file": "Jujutsu_Kaisen_convo_glxxmstrider_dont_stop_slowed.mp4",
    "time": "2026-11-14 21:24 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "s": 1170.8,
+   "e": 1209.6666666666667,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_dygo_funk_infernal.mp4",
+   "time": "2026-11-14 21:50 UTC"
   }
  ]
 }
