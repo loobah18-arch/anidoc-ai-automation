@@ -12,16 +12,17 @@ Steps
      the drop, highest-impact shots on the drops, the rest in story order
   7. render each shot with pro_fx, join, add the song, update history.json
 """
-import json, os, random, subprocess, sys, time
+import json, os, random, re, subprocess, sys, time
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from pro_fx import build_shot_fx, pair_transitions, default_transition_pattern
+from drive_index import library
 
-W, H, FPS = int(os.environ.get('W', 1920)), int(os.environ.get('H', 1080)), 30
-CHAR = os.environ.get('CHARACTER', '').strip().lower() or 'gojo'
+W, H, FPS = int(os.environ.get('W', 1080)), int(os.environ.get('H', 1080)), 30   # 1:1 square
+PICK = (os.environ.get('PICK') or os.environ.get('CHARACTER') or 'auto').strip().lower()
 SONG = os.environ.get('SONG', '').strip()
 SEED = int(os.environ.get('SEED', time.time()))
 TEMPLATE_BEATS = 130            # length of the edit in beats (60 s at 130 BPM)
@@ -30,11 +31,31 @@ SCAN_W, SCAN_H, SCAN_FPS = 64, 36, 12
 rng = random.Random(SEED)
 os.chdir(HERE)
 os.makedirs('src', exist_ok=True); os.makedirs('work', exist_ok=True)
-EPISODES = json.load(open('episodes.json'))
+EPISODES, LIB_SRC = library()                                     # every episode currently in the Drive folder
 CHARS = json.load(open('characters.json'))
 HIST_PATH = 'history.json'
 hist = json.load(open(HIST_PATH)) if os.path.exists(HIST_PATH) else {}
 hist.setdefault('songs', {}); hist.setdefault('episodes', {}); hist.setdefault('shots', []); hist.setdefault('runs', [])
+hist.setdefault('series', {})
+
+
+def _k(code):                                                         # old JJK-only keys -> series:key
+    return f'jujutsu-kaisen:{code}' if code[:1] == 'S' and ':' not in code else code
+
+
+hist['episodes'] = {_k(k): v for k, v in hist['episodes'].items()}
+hist['openings2'] = {_k(k): v for k, v in hist.get('openings2', {}).items()}
+hist.pop('openings', None)
+for u in hist['shots']:
+    u['ep'] = _k(u['ep'])
+for r in hist['runs']:
+    if r.get('episodes'):
+        r['episodes'] = [_k(e) for e in r['episodes']]
+    r.setdefault('series', EPISODES.get(r['episodes'][0], {}).get('series', 'jujutsu-kaisen') if r.get('episodes') else '')
+if not hist['series']:
+    for r in hist['runs']:
+        hist['series'][r['series']] = hist['series'].get(r['series'], 0) + 1
+CHARS = {c: [_k(e) for e in v] for c, v in CHARS.items()}
 
 
 def sh(cmd, **kw):
@@ -51,23 +72,47 @@ def least_used(options, counts, k):
 
 
 # ---------------------------------------------------------------- 1. choices
-if CHAR not in CHARS:
-    sys.exit(f'unknown character {CHAR}; known: {", ".join(CHARS)}')
+series_all = sorted({v['series'] for v in EPISODES.values()})
+first_listing = 'known' not in hist
+known = set(hist.get('known', []))
+new_eps = [] if first_listing else sorted(k for k in EPISODES if k not in known)
+print(f'library ({LIB_SRC}):', ', '.join(f"{s} {sum(v['series'] == s for v in EPISODES.values())}" for s in series_all), flush=True)
+if new_eps:
+    print('new in Drive since last run:', new_eps, flush=True)
+
 songs = sorted(f[:-4] for f in os.listdir('music') if f.endswith('.mp3'))
 song = SONG if SONG in songs else least_used(songs, hist['songs'], 1)[0]
-eps = least_used([e for e in CHARS[CHAR] if e in EPISODES], hist['episodes'], 3)
+if PICK in CHARS:                                                     # a character: its fight episodes
+    title = PICK
+    eps = least_used([e for e in CHARS[PICK] if e in EPISODES], hist['episodes'], 3)
+    series = EPISODES[eps[0]]['series']
+else:
+    match = [s for s in series_all if PICK != 'auto' and (s == PICK or s.startswith(PICK) or PICK in s)]
+    if match:
+        series = match[0]
+    elif new_eps:                                                     # something new was added: use it first
+        series = EPISODES[new_eps[0]]['series']
+    else:                                                             # rotate between the anime in the folder
+        series = least_used(series_all, hist['series'], 1)[0]
+    title = series
+    pool_eps = [k for k, v in EPISODES.items() if v['series'] == series]
+    fresh = [e for e in new_eps if e in pool_eps][:3]
+    eps = fresh + least_used([e for e in pool_eps if e not in fresh], hist['episodes'], 3 - len(fresh))
+if not eps:
+    sys.exit(f'no episodes for {PICK}')
 eps.sort()
-print('character', CHAR, '| song', song, '| episodes', eps, '| seed', SEED, flush=True)
+print('pick', PICK, '| anime', series, '| song', song, '| episodes', eps, '| seed', SEED, flush=True)
+SRC = lambda code: 'src/' + code.replace(':', '__') + '.mp4'
 
 
 # ---------------------------------------------------------------- 2. download
 def fetch(code):
-    dst = f'src/{code}.mp4'
-    if os.path.exists(dst) and os.path.getsize(dst) > 50_000_000:
+    dst = SRC(code)
+    if os.path.exists(dst) and os.path.getsize(dst) > 10_000_000:
         return dst
     for _ in range(3):
         r = subprocess.run([sys.executable, '-m', 'gdown', EPISODES[code]['drive_id'], '-O', dst, '-q'])
-        if r.returncode == 0 and os.path.exists(dst) and os.path.getsize(dst) > 50_000_000:
+        if r.returncode == 0 and os.path.exists(dst) and os.path.getsize(dst) > 10_000_000:
             return dst
     raise SystemExit(f'download failed {code}')
 
@@ -82,7 +127,7 @@ def duration(p):
 
 
 def scan(code):
-    p = f'src/{code}.mp4'
+    p = SRC(code)
     raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-i', p, '-vf',
                     f'fps={SCAN_FPS},scale={SCAN_W}:{SCAN_H}:flags=area,format=rgb24', '-f', 'rawvideo', '-'])
     fr = np.frombuffer(raw, np.uint8).reshape(-1, SCAN_H, SCAN_W, 3).astype(np.float32)
@@ -127,8 +172,12 @@ def sh_bytes(cmd):
 
 # opening song: each opening is shared by a run of episodes, so a sibling episode shows where it is
 def op_group(code):
-    se, ep = int(code[1]), int(code[3:])
-    return {1: 'S1a' if ep <= 13 else 'S1b', 2: 'S2a' if ep <= 5 else 'S2b'}.get(se, f'S{se}')
+    v = EPISODES[code]; se, ep = v['season'], v['ep']
+    if v['series'] == 'jujutsu-kaisen' and se == 2:
+        part = 0 if ep <= 5 else 1
+    else:
+        part = (ep - 1) // 13                                        # a new opening roughly every cour
+    return (v['series'], se, part)
 
 
 hist.setdefault('openings2', {})
@@ -136,7 +185,8 @@ refs = []
 for e in eps:
     if e in hist['openings2'] or any(op_group(o) == op_group(e) and o != e for o in eps + refs):
         continue
-    sib = [o for o in sorted(EPISODES) if op_group(o) == op_group(e) and o not in eps]
+    sib = sorted((o for o in EPISODES if op_group(o) == op_group(e) and o not in eps),
+                 key=lambda o: abs(EPISODES[o]['ep'] - EPISODES[e]['ep']))
     if sib:
         refs.append(sib[0])
 if refs:
@@ -258,7 +308,7 @@ try:
     casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
     for s in sorted(pool, key=lambda s: -s['calm'])[:90]:
         t = (s['s'] + s['e']) / 2
-        raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t:.2f}', '-i', f'src/{s["ep"]}.mp4', '-frames:v', '1',
+        raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t:.2f}', '-i', SRC(s['ep']), '-frames:v', '1',
                         '-vf', 'scale=480:270,format=gray', '-f', 'rawvideo', '-'])
         img = np.frombuffer(raw, np.uint8).reshape(270, 480)
         faces = casc.detectMultiScale(img, 1.1, 4, minSize=(40, 40))
@@ -310,10 +360,10 @@ for k_, (a, b) in enumerate(tmpl):
     if k_ == n - 1:
         vf += f',fade=out:st={dur - 0.6:.2f}:d=0.6'
     plan.append(dict(beats=[a, b], ep=s['ep'], start=round(st, 3), fx=fx, speed=round(spd, 3)))
-    jobs.append(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{st:.3f}', '-i', f'src/{s["ep"]}.mp4', '-an',
+    jobs.append(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{st:.3f}', '-i', SRC(s['ep']), '-an',
                  '-vf', vf, '-frames:v', str(nf), '-r', str(FPS), '-fps_mode', 'cfr',
                  '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', f'segfx/{k_:03d}.mp4'])
-json.dump(dict(character=CHAR, song=song, episodes=eps, tempo=tempo, song_start=song_start, plan=plan),
+json.dump(dict(pick=PICK, anime=series, song=song, episodes=eps, tempo=tempo, song_start=song_start, plan=plan),
           open('work/edit_plan.json', 'w'), indent=1)
 
 
@@ -329,7 +379,7 @@ with ThreadPoolExecutor(os.cpu_count() or 2) as ex:
     list(ex.map(run, jobs))
 open('segfx/list.txt', 'w').write(''.join(f"file '{i:03d}.mp4'\n" for i in range(n)))
 os.makedirs('../out', exist_ok=True)
-name = f'{CHAR.title()}_AMV_{song}'
+name = re.sub(r'[^A-Za-z0-9]+', '_', title.title()) + f'_AMV_{song}'
 total = fr(tmpl[-1][1]) / FPS
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', 'segfx/list.txt', '-c', 'copy', 'work/video.mp4'])
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/video.mp4', '-ss', f'{song_start:.3f}', '-i', song_path,
@@ -341,7 +391,9 @@ print('wrote', f'out/{name}.mp4', flush=True)
 hist['songs'][song] = hist['songs'].get(song, 0) + 1
 for e in eps:
     hist['episodes'][e] = hist['episodes'].get(e, 0) + 1
+hist['series'][series] = hist['series'].get(series, 0) + 1
+hist['known'] = sorted(set(hist.get('known', [])) | set(EPISODES))
 hist['shots'] += [dict(ep=p['ep'], s=p['start']) for p in plan]
 hist['shots'] = hist['shots'][-3000:]
-hist['runs'].append(dict(time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime()), character=CHAR, song=song, episodes=eps, file=f'{name}.mp4'))
+hist['runs'].append(dict(time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime()), pick=PICK, series=series, song=song, episodes=eps, file=f'{name}.mp4'))
 json.dump(hist, open(HIST_PATH, 'w'), indent=1)
