@@ -342,7 +342,7 @@ sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i
 
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
 amv_len = max(14.0, TOTAL - HOOK - CONV)
-env = dict(os.environ, FORCE_EPS=','.join(eps), START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 150:.1f}|{c1 + 150:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK)
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'

@@ -30,6 +30,7 @@ DROP_BEAT = 17                  # first drop, same as the Gojo AMV
 START_BEAT = int(os.environ.get('START_BEAT', 0))     # convo shorts start the edit a few beats before the drop
 MAX_SECONDS = float(os.environ.get('MAX_SECONDS', 60))
 FORCE_EPS = [e for e in os.environ.get('FORCE_EPS', '').split(',') if e]
+INCLUDE = os.environ.get('INCLUDE', '')                 # ep|s|e: only shots from this scene (same characters)
 EXCLUDE = [x.rsplit('|', 2) for x in os.environ.get('EXCLUDE', '').split(';') if x]   # ep|s|e already used
 OUT_NAME = os.environ.get('OUT_NAME', '')
 SCAN_W, SCAN_H, SCAN_FPS = 64, 36, 12
@@ -204,6 +205,14 @@ with ThreadPoolExecutor(3) as ex:
     scans = list(ex.map(scan, eps + refs))
 allshots = sum((sh_ for c, sh_, _ in scans if c in eps), [])
 allshots = [s for s in allshots if not any(s['ep'] == ep and s['e'] > float(a) - 2 and s['s'] < float(b) + 2 for ep, a, b in EXCLUDE)]
+if INCLUDE:                                                           # widen around the scene only as far as needed
+    iep, ia, ib = INCLUDE.rsplit('|', 2); ia, ib = float(ia), float(ib)
+    for pad in range(0, 421, 30):
+        scene = [s for s in allshots if s['ep'] == iep and s['s'] >= ia - pad and s['e'] <= ib + pad]
+        if len(scene) >= 45:
+            break
+    print('scene shots', len(scene), 'within', pad, 's of', INCLUDE, flush=True)
+    allshots = scene
 sigs = {c: sg for c, _, sg in scans}
 for c in eps:
     if c in hist['openings2']:
@@ -242,7 +251,7 @@ for i in range(len(allshots)):
 used = {(u['ep'], round(u['s'])) for u in hist['shots']}
 pool = [s for k, s in enumerate(allshots)
         if not dup[k] and not any((s['ep'], round(s['s']) + o) in used for o in (-2, -1, 0, 1, 2))]
-if len(pool) < 90:                                                    # history too tight: allow reuse
+if len(pool) < 90 or INCLUDE:                                                    # history too tight: allow reuse
     pool = [s for k, s in enumerate(allshots) if not dup[k]]
 print('pool', len(pool), 'of', len(allshots), flush=True)
 
