@@ -3,7 +3,8 @@
   "rayelo_ultraslowed": 1,
   "montagem_zora": 1,
   "cotneus_stereo_love_funk": 1,
-  "andromeda_montagem_coma": 1
+  "andromeda_montagem_coma": 1,
+  "montagem_vozes_profundas": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -17,7 +18,10 @@
   "jujutsu-kaisen:S2E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E03": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E08": 1
+  "demon-slayer-kimetsu-no-yaiba:S5E08": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E15": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E26": 1,
+  "demon-slayer-kimetsu-no-yaiba:S5E07": 1
  },
  "shots": [
   {
@@ -1123,6 +1127,90 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
    "s": 1954.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+   "s": 1286.183
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+   "s": 1289.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 43.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 283.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E15",
+   "s": 109.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E15",
+   "s": 92.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E15",
+   "s": 328.808
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E15",
+   "s": 725.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 239.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 316.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 324.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 547.141
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 970.516
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 1125.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 1141.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "s": 1272.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+   "s": 78.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+   "s": 177.309
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+   "s": 1081.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+   "s": 1256.266
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+   "s": 1281.891
   }
  ],
  "runs": [
@@ -1173,6 +1261,18 @@
     "demon-slayer-kimetsu-no-yaiba:S5E08"
    ],
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_AMV_andromeda_montagem_coma.mp4"
+  },
+  {
+   "time": "2026-11-14 20:44 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "montagem_vozes_profundas",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E15",
+    "demon-slayer-kimetsu-no-yaiba:S1E26",
+    "demon-slayer-kimetsu-no-yaiba:S5E07"
+   ],
+   "file": "_amv_part.mp4"
   }
  ],
  "openings2": {
@@ -1268,11 +1368,23 @@
     1385.1
    ]
   ],
-  "demon-slayer-kimetsu-no-yaiba:S5E08": []
+  "demon-slayer-kimetsu-no-yaiba:S5E08": [],
+  "demon-slayer-kimetsu-no-yaiba:S1E15": [],
+  "demon-slayer-kimetsu-no-yaiba:S1E26": [],
+  "demon-slayer-kimetsu-no-yaiba:S5E07": [
+   [
+    5.1,
+    35.7
+   ],
+   [
+    109.2,
+    159.7
+   ]
+  ]
  },
  "series": {
   "jujutsu-kaisen": 3,
-  "demon-slayer-kimetsu-no-yaiba": 1
+  "demon-slayer-kimetsu-no-yaiba": 2
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -1397,5 +1509,14 @@
   "jujutsu-kaisen:S3E10",
   "jujutsu-kaisen:S3E11",
   "jujutsu-kaisen:S3E12"
+ ],
+ "convos": [
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E15",
+   "s": 1118.9666666666667,
+   "e": 1151.3666666666666,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_montagem_vozes_profundas.mp4",
+   "time": "2026-11-14 20:45 UTC"
+  }
  ]
 }
