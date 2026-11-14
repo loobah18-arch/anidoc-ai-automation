@@ -115,10 +115,23 @@ if info.language != 'en':                                             # Japanese
 print('language', info.language, task, len(segs), 'segments', flush=True)
 words = []
 for sg in segs:
-    for w in (sg.words or []):
-        t = w.word.strip()
-        if t and w.end > w.start:
-            words.append(dict(w=t, s=win0 + w.start, e=win0 + w.end, seg=id(sg)))
+    text = (sg.text or '').strip()
+    if not text:
+        continue
+    ws = [w for w in (sg.words or []) if w.word.strip()]
+    if task == 'transcribe' and ws:                                   # real word timings; glue split tokens back together
+        for w in ws:
+            if words and not w.word.startswith(' ') and words[-1]['seg'] == id(sg):
+                words[-1]['w'] += w.word.strip(); words[-1]['e'] = win0 + max(w.end, w.start + 0.05)
+            else:
+                words.append(dict(w=w.word.strip(), s=win0 + w.start, e=win0 + max(w.end, w.start + 0.12), seg=id(sg)))
+    else:                                                             # translation: full sentence, timing spread over the line
+        toks = text.split()
+        a0, a1 = (ws[0].start, ws[-1].end) if ws else (sg.start, sg.end)
+        a1 = max(a1, a0 + 0.3 * len(toks))
+        wts = np.cumsum([0] + [len(t) + 2 for t in toks]); wts = wts / wts[-1]
+        for k, t in enumerate(toks):
+            words.append(dict(w=t, s=win0 + a0 + (a1 - a0) * wts[k], e=win0 + a0 + (a1 - a0) * wts[k + 1], seg=id(sg)))
 if len(words) < 25:
     raise SystemExit('not enough dialogue near the fight')
 
@@ -148,7 +161,7 @@ print(f'conversation {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=T
 # ------------------------------------------------------------------ 4. caption lines + speakers
 lines, cur = [], []
 for k, w in enumerate(cw):
-    if cur and (len(cur) >= 6 or w['s'] - cur[-1]['e'] > 0.6 or w['seg'] != cur[-1]['seg'] or
+    if cur and (len(cur) >= 5 or sum(len(x['w']) for x in cur) >= 22 or w['s'] - cur[-1]['e'] > 0.6 or w['seg'] != cur[-1]['seg'] or
                 (cur[-1]['w'][-1:] in '.?!,' and len(cur) >= 3)):
         lines.append(cur); cur = []
     cur.append(w)
@@ -211,7 +224,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cap,{FONT},74,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,3,0,1,0,3,5,60,60,0,1
+Style: Cap,{FONT},98,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,3,0,1,0,3,5,60,60,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"""]
@@ -223,7 +236,7 @@ for li, ln in enumerate(lines):
     toks = [t for t in toks if t]
     if not toks:
         continue
-    split = len(toks) if len(toks) <= 3 or sum(map(len, toks)) <= 18 else (len(toks) + 1) // 2
+    split = len(toks) if len(toks) <= 3 or sum(map(len, toks)) <= 14 else (len(toks) + 1) // 2
     for k in range(len(toks)):                                        # word-by-word: spoken white, the rest dim
         a = ln[min(k, len(ln) - 1)]['s'] - c0 + HOOK
         b = (ln[k + 1]['s'] - c0 + HOOK) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
@@ -238,8 +251,8 @@ for li, ln in enumerate(lines):
                 parts.append(' ')
         txt = ''.join(parts).replace(' \\N', '\\N')
         pop = '{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else ''
-        glow = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord14\\blur12\\3c{ass_col(col)}\\3a&H40&\\shad0\\1a&HFF&}}'
-        main = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord3\\blur2\\3c{ass_col(col)}\\shad3}}'
+        glow = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord18\\blur16\\3c{ass_col(col)}\\3a&H20&\\shad0\\1a&HFF&}}'
+        main = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord4\\blur3\\3c{ass_col(col)}\\shad3}}'
         ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
         ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
 open('work/convo/captions.ass', 'w').write('\n'.join(ass) + '\n')
