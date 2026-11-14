@@ -366,7 +366,7 @@ for k_, (a, b) in enumerate(tmpl):
     vf = build_shot_fx(dur, W, H, fx, beat=P, speed=spd)
     vf += ',eq=contrast=1.12:saturation=1.18:gamma=0.97,vignette=PI/5'
     if k_ == n - 1:
-        vf += f',fade=out:st={dur - 0.6:.2f}:d=0.6'
+        fd = min(0.6, dur * 0.5); vf += f',fade=out:st={max(0.0, dur - fd):.2f}:d={fd:.2f}'
     plan.append(dict(beats=[a, b], ep=s['ep'], start=round(st, 3), fx=fx, speed=round(spd, 3)))
     jobs.append(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{st:.3f}', '-i', SRC(s['ep']), '-an',
                  '-vf', vf, '-frames:v', str(nf), '-r', str(FPS), '-fps_mode', 'cfr',
