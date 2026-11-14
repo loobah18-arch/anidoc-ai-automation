@@ -6,7 +6,8 @@
   "andromeda_montagem_coma": 1,
   "montagem_vozes_profundas": 1,
   "andromeda_no_fear_phonk": 1,
-  "mvsterious_slava_funk": 1
+  "mvsterious_slava_funk": 1,
+  "glxxmstrider_dont_stop_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -29,7 +30,10 @@
   "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E23": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E11": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E03": 1
+  "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
+  "jujutsu-kaisen:S1E10": 1,
+  "jujutsu-kaisen:S1E13": 1,
+  "jujutsu-kaisen:S3E09": 1
  },
  "shots": [
   {
@@ -1351,6 +1355,166 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
    "s": 1164.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 791.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 793.692
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 465.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 648.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 779.834
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 546.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 724.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 736.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 739.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 742.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 775.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 778.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 1022.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 1023.942
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 1030.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 1083.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 1096.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 1182.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E10",
+   "s": 1228.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 78.942
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 87.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 94.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 160.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 226.166
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 766.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 769.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 770.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 793.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 407.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 529.416
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 557.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 614.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 660.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 669.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 781.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 785.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 787.875
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1092.359
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1096.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1101.125
   }
  ],
  "runs": [
@@ -1435,6 +1599,18 @@
     "demon-slayer-kimetsu-no-yaiba:S1E23",
     "demon-slayer-kimetsu-no-yaiba:S4E11",
     "demon-slayer-kimetsu-no-yaiba:S5E03"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-14 21:23 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "glxxmstrider_dont_stop_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E10",
+    "jujutsu-kaisen:S1E13",
+    "jujutsu-kaisen:S3E09"
    ],
    "file": "_amv_part.mp4"
   }
@@ -1608,10 +1784,44 @@
     1286.2,
     1385.2
    ]
+  ],
+  "jujutsu-kaisen:S1E10": [
+   [
+    168.8,
+    260.6
+   ],
+   [
+    1271.1,
+    1370.2
+   ]
+  ],
+  "jujutsu-kaisen:S1E13": [
+   [
+    288.8,
+    379.4
+   ],
+   [
+    806.2,
+    838.9
+   ],
+   [
+    1241.2,
+    1340.2
+   ]
+  ],
+  "jujutsu-kaisen:S3E09": [
+   [
+    -4.0,
+    116.2
+   ],
+   [
+    1270.4,
+    1322.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 3,
+  "jujutsu-kaisen": 4,
   "demon-slayer-kimetsu-no-yaiba": 4
  },
  "known": [
@@ -1759,6 +1969,13 @@
    "e": 561.7333333333333,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_mvsterious_slava_funk.mp4",
    "time": "2026-11-14 21:10 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E13",
+   "s": 860.4666666666667,
+   "e": 894.2,
+   "file": "Jujutsu_Kaisen_convo_glxxmstrider_dont_stop_slowed.mp4",
+   "time": "2026-11-14 21:24 UTC"
   }
  ]
 }
