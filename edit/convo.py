@@ -7,7 +7,8 @@ Steps
   1. pick anime + 3 episodes (newest / least used, like auto.py) from the Drive folder
   2. of the 3 episodes take the one with the biggest fight (motion + glowing power effects over 90 s)
      and transcribe the fight itself with faster-whisper (translated to English when needed)
-  3. choose the 28-42 s stretch where characters talk WHILE the action / auras are on screen
+  3. choose a 14-27 s stretch where characters talk WHILE the action is on screen, ending only once
+     the speaker has finished (sentence end + pause); the anime's own music is removed (demucs vocals)
   4. split it into lines of <= 6 words, guess speakers from voice (pitch + timbre clustering)
   5. render the conversation shot by shot with a face-following 9:16 crop, captions burned in
   6. run auto.py for the AMV part (same episodes, conversation shots excluded), then join
@@ -21,6 +22,7 @@ from drive_index import library
 
 W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by default (1080x1440)
 TOTAL = float(os.environ.get('TOTAL_SECONDS', 59))
+CMIN, CMAX = float(os.environ.get('CONV_MIN', 14)), float(os.environ.get('CONV_MAX', 27))   # short talk, long edit
 HOOK = 1.5
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
@@ -122,10 +124,10 @@ bs, bt = -1, fight
 for t in range(lo, hi - 40, 2):
     if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP):
         continue
-    talk = speech[t:t + 38].mean()
+    talk = speech[t:t + 24].mean()
     if talk < 0.45:
         continue
-    act = per_s[t:t + 38].mean() / mref
+    act = per_s[t:t + 24].mean() / mref
     sc = 0.6 * talk + 1.5 * min(act, 1.3)
     if sc > bs:
         bs, bt = sc, t
@@ -178,9 +180,11 @@ best, pick = -1, None
 for i in starts:
     for j in range(i + 6, len(words)):
         L = words[j]['e'] - words[i]['s']
-        if L > 42:
+        if L > CMAX:
             break
-        if L < 28 or not (words[j]['w'][-1:] in '.?!' or j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.8):
+        # only end where the character has finished: sentence end AND a real pause (or nothing after)
+        done = words[j]['w'][-1:] in '.?!' and (j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.7)
+        if L < CMIN or not done:
             continue
         talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
         act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref    # action on screen while they talk
@@ -188,10 +192,12 @@ for i in starts:
         if score > best:
             best, pick = score, (i, j)
 if pick is None:
-    i = starts[0]; j = max(k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= 40)
+    i = starts[0]
+    ends = [k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX and words[k]['w'][-1:] in '.?!']
+    j = max(ends) if ends else max(k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX)
     pick = (i, j)
 cw = words[pick[0]:pick[1] + 1]
-c0 = max(win0, cw[0]['s'] - 0.35); c1 = min(win1, cw[-1]['e'] + 0.6)
+c0 = max(win0, cw[0]['s'] - 0.35); c1 = min(win1, cw[-1]['e'] + 0.8)
 c0 = round(c0 * FPS) / FPS; c1 = round(c1 * FPS) / FPS
 CONV = c1 - c0
 print(f'conversation {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
@@ -345,6 +351,12 @@ for k, ((a, b), x) in enumerate(zip(zip(cuts[:-1], cuts[1:]), xs)):
 open('work/convo/seg/list.txt', 'w').write(''.join(f"file '{os.path.basename(p)}'\n" for p in lst))
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', 'work/convo/seg/list.txt', '-c', 'copy', 'work/convo/video.mp4'])
 
+# ------------------------------------------------------------------ 5b. voices only: strip the anime's own music (copyright)
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src, '-vn', '-ac', '2', '-ar', '44100', 'work/convo/talk.wav'])
+subprocess.run([sys.executable, '-m', 'demucs', '--two-stems=vocals', '-n', 'htdemucs', '-o', 'work/convo/sep', 'work/convo/talk.wav'], check=True)
+VOICE = 'work/convo/sep/htdemucs/talk/vocals.wav'
+print('voices separated from the anime music', flush=True)
+
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
 amv_len = max(14.0, TOTAL - HOOK - CONV)
 env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 150:.1f}|{c1 + 150:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
@@ -356,10 +368,10 @@ P = 60.0 / plan['tempo']
 hook_at = (17 - 9) * P                                                # the first drop inside the AMV part
 name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_convo_' + plan['song']
 # the same song plays quietly under the conversation and runs straight into the edit at full volume
-BED_VOL = float(os.environ.get('BED_VOL', '0.16'))
-bed_ss = plan.get('song_start', 0.0) - CONV
-if bed_ss < 0:
-    bed_ss = 0.0
+BED_VOL = float(os.environ.get('BED_VOL', '0.22'))
+song_file = f"music/{plan['song']}.mp3"
+song_len = duration(song_file)
+bed_ss = (plan.get('song_start', 0.0) - CONV) % song_len           # ends exactly where the edit's music begins (wraps if needed)
 fc = (
     f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
     f"[0:a]atrim={hook_at:.3f}:{hook_at + HOOK:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={HOOK - 0.25}:d=0.25,volume=0.8[ha];"
@@ -375,8 +387,8 @@ txt = open('work/convo/captions.ass').read()
 txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for x, f in zip(m.group(1).split(':'), (3600, 60, 1))) - HOOK)), txt)
 open('work/convo/captions_shift.ass', 'w').write(txt)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
-    '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src,
-    '-ss', f'{bed_ss:.3f}', '-t', f'{CONV + 0.5:.3f}', '-i', f"music/{plan['song']}.mp3",
+    '-i', VOICE,
+    '-stream_loop', '1', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV + 0.5:.3f}', '-i', song_file,
     '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
     '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
