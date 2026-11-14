@@ -8,7 +8,8 @@
   "andromeda_no_fear_phonk": 1,
   "mvsterious_slava_funk": 1,
   "glxxmstrider_dont_stop_slowed": 1,
-  "dygo_funk_infernal": 1
+  "dygo_funk_infernal": 1,
+  "zxvren_montagem_delirio_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -35,7 +36,8 @@
   "jujutsu-kaisen:S1E10": 1,
   "jujutsu-kaisen:S1E13": 1,
   "jujutsu-kaisen:S3E09": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E19": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
+  "jujutsu-kaisen:S2E19": 1
  },
  "shots": [
   {
@@ -1605,6 +1607,118 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
    "s": 1270.741
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 250.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 282.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 458.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 370.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 335.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 256.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 261.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 277.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 285.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 292.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 295.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 298.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 302.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 308.433
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 310.917
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 317.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 325.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 330.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 384.309
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 387.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 428.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 438.433
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 479.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 485.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 491.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 499.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 518.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 542.767
   }
  ],
  "runs": [
@@ -1711,6 +1825,16 @@
    "song": "dygo_funk_infernal",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E19"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-14 22:25 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "zxvren_montagem_delirio_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S2E19"
    ],
    "file": "_amv_part.mp4"
   }
@@ -1924,10 +2048,20 @@
     30.5,
     120.1
    ]
+  ],
+  "jujutsu-kaisen:S2E19": [
+   [
+    65.7,
+    152.0
+   ],
+   [
+    1354.2,
+    1402.5
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 4,
+  "jujutsu-kaisen": 5,
   "demon-slayer-kimetsu-no-yaiba": 5
  },
  "known": [
@@ -2089,6 +2223,13 @@
    "e": 1209.6666666666667,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_dygo_funk_infernal.mp4",
    "time": "2026-11-14 21:50 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E19",
+   "s": 394.56666666666666,
+   "e": 419.46666666666664,
+   "file": "Jujutsu_Kaisen_convo_zxvren_montagem_delirio_slowed.mp4",
+   "time": "2026-11-14 22:26 UTC"
   }
  ]
 }
