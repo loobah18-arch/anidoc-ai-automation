@@ -106,8 +106,31 @@ eps = [conv_ep] + [e for e in eps if e != conv_ep]
 src = SRC(conv_ep)
 lo, hi = 150, int(dur) - 150
 mref = np.percentile(per_s[lo:hi], 90) + 1e-6
-win0, win1 = max(lo, fight - 45), min(hi, fight + FW + 75)
-print('conversation from', conv_ep, f'| fight around {fight}s, transcribing {win0}-{win1}s', flush=True)
+# scan the whole episode for speech, then take the stretch where they talk the most WHILE fighting
+from faster_whisper import WhisperModel
+import soundfile as _sf
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(lo), '-t', str(hi - lo), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/full.wav'])
+_scan = WhisperModel('small', device='cpu', compute_type='int8')
+_ss, _ = _scan.transcribe(_sf.read('work/convo/full.wav', dtype='float32')[0], beam_size=1, vad_filter=True)
+speech = np.zeros(int(dur) + 1)
+for sg in _ss:
+    if len((sg.text or '').strip()) > 1:
+        speech[int(lo + sg.start):int(lo + sg.end) + 1] = 1
+prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
+bs, bt = -1, fight
+for t in range(lo, hi - 40, 2):
+    if any(a_ - 40 < t < b_ for a_, b_ in prevc):
+        continue
+    talk = speech[t:t + 38].mean()
+    if talk < 0.45:
+        continue
+    act = per_s[t:t + 38].mean() / mref
+    sc = 0.6 * talk + 1.5 * min(act, 1.3)
+    if sc > bs:
+        bs, bt = sc, t
+fight = bt
+win0, win1 = max(lo, bt - 12), min(hi, bt + 52)
+print('conversation from', conv_ep, f'| talking fight at {bt}s (score {bs:.2f}), transcribing {win0}-{win1}s', flush=True)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(win0), '-t', str(win1 - win0), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/win.wav'])
 
 from faster_whisper import WhisperModel
@@ -156,7 +179,7 @@ for i in starts:
             continue
         talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
         act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref    # action on screen while they talk
-        score = 0.5 * talk + 0.05 * (j - i) / L + 1.5 * min(act, 1.3)
+        score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3)
         if score > best:
             best, pick = score, (i, j)
 if pick is None:
