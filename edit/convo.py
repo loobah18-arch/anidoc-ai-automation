@@ -114,12 +114,13 @@ _scan = WhisperModel('small', device='cpu', compute_type='int8')
 _ss, _ = _scan.transcribe(_sf.read('work/convo/full.wav', dtype='float32')[0], beam_size=1, vad_filter=True)
 speech = np.zeros(int(dur) + 1)
 for sg in _ss:
-    if len((sg.text or '').strip()) > 1:
+    if len((sg.text or '').split()) >= 3 and sg.avg_logprob > -1.0 and sg.no_speech_prob < 0.6:
         speech[int(lo + sg.start):int(lo + sg.end) + 1] = 1
+SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
 prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
 bs, bt = -1, fight
 for t in range(lo, hi - 40, 2):
-    if any(a_ - 40 < t < b_ for a_, b_ in prevc):
+    if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP):
         continue
     talk = speech[t:t + 38].mean()
     if talk < 0.45:
@@ -165,7 +166,11 @@ for sg in segs:
         for k, t in enumerate(toks):
             words.append(dict(w=t, s=win0 + a0 + (a1 - a0) * wts[k], e=win0 + a0 + (a1 - a0) * wts[k + 1], seg=id(sg)))
 if len(words) < 12:
-    raise SystemExit('not enough dialogue in the fight')
+    if len(SKIP) >= 4:
+        raise SystemExit('not enough dialogue in the fight')
+    print('too little dialogue there, trying the next fight moment', flush=True)
+    os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 
 # ------------------------------------------------------------------ 3. densest stretch of dialogue
 starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
