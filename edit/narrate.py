@@ -137,6 +137,10 @@ if info.language != 'en':                                             # Japanese
     task = 'translate'
     model = WhisperModel(os.environ.get('WHISPER_TRANSLATE', 'medium'), device='cpu', compute_type='int8')
     segs = list(model.transcribe(audio16, task='translate', language=info.language, beam_size=3, word_timestamps=True, vad_filter=True)[0])
+if len(segs) < 3:                                                     # misdetected (music) or VAD ate it: force Japanese -> English
+    task = 'translate'
+    segs = list(model.transcribe(audio16, task='translate', language='ja', beam_size=3, word_timestamps=True, vad_filter=False)[0])
+    segs = [sg for sg in segs if getattr(sg, 'no_speech_prob', 0) < 0.6 and len((sg.text or '').split()) >= 2]
 print('language', info.language, task, len(segs), 'segments', flush=True)
 words = []
 for sg in segs:
@@ -182,8 +186,8 @@ def llm(prompt):
             headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
         return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
     req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
-        data=json.dumps(dict(model='openai', messages=[dict(role='user', content=prompt)])).encode(),
-        headers={'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
+        data=json.dumps(dict(model='openai', messages=[dict(role='system', content='You write short documentary narration about anime.'), dict(role='user', content=prompt)])).encode(),
+        headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
     return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content']
 
 for _ in range(3):
@@ -192,7 +196,7 @@ for _ in range(3):
         if 20 <= len(narration.split()) <= 70:
             break
     except Exception as ex:
-        print('llm error', ex, flush=True); time.sleep(5)
+        print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(50)
 else:
     raise SystemExit('could not write the narration')
 print('narration', MODE, '|', narration, flush=True)
