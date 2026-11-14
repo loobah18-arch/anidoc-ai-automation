@@ -1,7 +1,7 @@
 """Conversation-first Shorts, styled like AOT EDIT's "Reze's battle iq":
    1.5 s cold-open hook  ->  ~30-40 s of a real character conversation with burned-in captions
    (white, all-caps extra-bold, soft glow whose colour follows the speaker, word-by-word reveal)
-   ->  ~20 s beat-synced AMV cut from the same episodes.   Full 9:16 (1080x1920).
+   ->  ~20 s beat-synced AMV cut from the same episodes.   3:4 (1080x1440).
 
 Steps
   1. pick anime + 3 episodes (newest / least used, like auto.py) from the Drive folder
@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE); sys.path.insert(0, HERE)
 from drive_index import library
 
-W, H, FPS = 1080, 1920, 30
+W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by default (1080x1440)
 TOTAL = float(os.environ.get('TOTAL_SECONDS', 59))
 HOOK = 1.5
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
