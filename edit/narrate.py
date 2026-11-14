@@ -186,7 +186,7 @@ def llm(prompt):
             headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
         return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
     req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
-        data=json.dumps(dict(model='openai', messages=[dict(role='system', content='You write short documentary narration about anime.'), dict(role='user', content=prompt)])).encode(),
+        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short documentary narration about anime.'), dict(role='user', content=prompt)])).encode(),
         headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
     return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content']
 
@@ -197,8 +197,11 @@ for _ in range(3):
             break
     except Exception as ex:
         print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(50)
-else:
-    raise SystemExit('could not write the narration')
+else:                                                                 # last resort: a safe, serious line that needs no facts
+    narration = rng.choice([
+        f"In {series_name}, strength is never given. It is carved out of pain, loss and a refusal to fall. Watch closely. This is the moment a fighter stops surviving and starts deciding how the battle ends.",
+        f"Some fights in {series_name} are won with power. This one is won with will. Every wound, every breath, every step forward is a promise kept to the people they swore to protect.",
+        f"This is {series_name} at its finest. Two forces collide, neither willing to yield, and in the space between their strikes, a legend quietly takes shape."])
 print('narration', MODE, '|', narration, flush=True)
 
 import edge_tts
