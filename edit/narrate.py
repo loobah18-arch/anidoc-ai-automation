@@ -133,10 +133,10 @@ audio16 = _sf.read('work/convo/win.wav', dtype='float32')[0]
 segs, info = model.transcribe(audio16, beam_size=3, word_timestamps=True, vad_filter=True)
 segs = list(segs)
 task = 'transcribe'
-if info.language != 'en':                                             # Japanese audio: English captions
+if True:                                                              # anime is Japanese audio; detection is fooled by music                                             # Japanese audio: English captions
     task = 'translate'
     model = WhisperModel(os.environ.get('WHISPER_TRANSLATE', 'medium'), device='cpu', compute_type='int8')
-    segs = list(model.transcribe(audio16, task='translate', language=info.language, beam_size=3, word_timestamps=True, vad_filter=True)[0])
+    segs = list(model.transcribe(audio16, task='translate', language='ja', beam_size=3, word_timestamps=True, vad_filter=True)[0])
 if len(segs) < 3:                                                     # misdetected (music) or VAD ate it: force Japanese -> English
     task = 'translate'
     segs = list(model.transcribe(audio16, task='translate', language='ja', beam_size=3, word_timestamps=True, vad_filter=False)[0])
