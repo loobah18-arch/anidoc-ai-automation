@@ -11,7 +11,8 @@
   "dygo_funk_infernal": 1,
   "zxvren_montagem_delirio_slowed": 1,
   "poker_face": 1,
-  "ncts_next_phonk": 1
+  "ncts_next_phonk": 1,
+  "ashreveal_manasha_phonk": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -41,7 +42,8 @@
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
   "jujutsu-kaisen:S2E19": 1,
   "jujutsu-kaisen:S3E12": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E22": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E22": 1,
+  "jujutsu-kaisen:S2E14": 1
  },
  "shots": [
   {
@@ -2047,6 +2049,238 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
    "s": 285.242
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1235.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1093.616
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1183.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1187.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1169.742
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1004.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1010.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1013.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1027.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1029.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1039.325
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1041.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1044.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1049.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1053.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1056.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1059.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1062.367
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1065.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1071.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1081.091
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1086.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1088.242
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1090.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1104.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1112.158
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1114.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1116.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1117.967
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1122.059
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1125.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1126.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1128.309
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1129.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1130.867
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1134.242
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1158.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1161.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1163.009
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1164.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1165.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1173.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1194.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1196.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1197.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1198.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1206.842
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1220.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1223.366
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1227.783
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1238.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1240.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1291.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1293.634
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1298.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1300.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1215.783
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1177.575
   }
  ],
  "runs": [
@@ -2183,6 +2417,16 @@
    "song": "ncts_next_phonk",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E22"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 11:12 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "ashreveal_manasha_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S2E14"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2426,10 +2670,20 @@
     1298.3,
     1350.7
    ]
+  ],
+  "jujutsu-kaisen:S2E14": [
+   [
+    326.1,
+    424.0
+   ],
+   [
+    1376.1,
+    1424.4
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 6,
+  "jujutsu-kaisen": 7,
   "demon-slayer-kimetsu-no-yaiba": 6
  },
  "known": [
@@ -2612,6 +2866,13 @@
    "e": 202.0,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_ncts_next_phonk.mp4",
    "time": "2026-11-15 09:35 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1145.2333333333333,
+   "e": 1155.7666666666667,
+   "file": "Jujutsu_Kaisen_convo_ashreveal_manasha_phonk.mp4",
+   "time": "2026-11-15 11:13 UTC"
   }
  ]
 }
