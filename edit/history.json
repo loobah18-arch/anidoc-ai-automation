@@ -9,7 +9,8 @@
   "mvsterious_slava_funk": 1,
   "glxxmstrider_dont_stop_slowed": 1,
   "dygo_funk_infernal": 1,
-  "zxvren_montagem_delirio_slowed": 1
+  "zxvren_montagem_delirio_slowed": 1,
+  "poker_face": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -37,7 +38,8 @@
   "jujutsu-kaisen:S1E13": 1,
   "jujutsu-kaisen:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
-  "jujutsu-kaisen:S2E19": 1
+  "jujutsu-kaisen:S2E19": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E07": 1
  },
  "shots": [
   {
@@ -1719,6 +1721,158 @@
   {
    "ep": "jujutsu-kaisen:S2E19",
    "s": 542.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1195.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1157.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1160.416
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1065.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1252.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 974.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1026.816
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1041.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1082.334
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1083.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1084.358
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1136.584
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1138.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1142.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1149.358
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1151.541
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1152.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1179.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1182.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1183.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1185.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1186.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1187.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1189.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1215.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1220.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1221.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1221.666
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1224.483
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1228.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1229.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1231.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1233.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1240.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1243.483
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1250.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1251.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1255.416
   }
  ],
  "runs": [
@@ -1835,6 +1989,16 @@
    "song": "zxvren_montagem_delirio_slowed",
    "episodes": [
     "jujutsu-kaisen:S2E19"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 13:11 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "poker_face",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E07"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2058,11 +2222,21 @@
     1354.2,
     1402.5
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E07": [
+   [
+    -1.2,
+    139.0
+   ],
+   [
+    1283.0,
+    1400.6
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 5,
-  "demon-slayer-kimetsu-no-yaiba": 5
+  "demon-slayer-kimetsu-no-yaiba": 6
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -2230,6 +2404,13 @@
    "e": 419.46666666666664,
    "file": "Jujutsu_Kaisen_convo_zxvren_montagem_delirio_slowed.mp4",
    "time": "2026-11-14 22:26 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1105.2,
+   "e": 1128.5666666666666,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_poker_face.mp4",
+   "time": "2026-11-15 13:11 UTC"
   }
  ]
 }
