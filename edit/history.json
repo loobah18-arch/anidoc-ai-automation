@@ -16,7 +16,8 @@
   "trashxrl_deus_do_olimpo": 1,
   "atlxs_passo_bem_solto_slowed": 1,
   "poker_face": 1,
-  "ncts_next_phonk": 1
+  "ncts_next_phonk": 1,
+  "nxxkz_loucura_letal_funk_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -51,7 +52,8 @@
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E24": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
-  "jujutsu-kaisen:S1E14": 1
+  "jujutsu-kaisen:S1E14": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E01": 1
  },
  "shots": [
   {
@@ -3017,6 +3019,186 @@
   {
    "ep": "jujutsu-kaisen:S1E14",
    "s": 881.908
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 978.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 936.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 951.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 944.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1100.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 911.608
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 916.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 924.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 931.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 940.275
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 948.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 956.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 964.775
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 971.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 988.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 993.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1024.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1025.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1026.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1028.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1031.709
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1034.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1035.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1037.709
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1039.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1041.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1043.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1044.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1045.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1047.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1050.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1054.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1057.608
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1062.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1066.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1071.166
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1075.316
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1079.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1082.275
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1083.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1086.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1090.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1093.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1097.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 1118.125
   }
  ],
  "runs": [
@@ -3203,6 +3385,16 @@
    "song": "ncts_next_phonk",
    "episodes": [
     "jujutsu-kaisen:S1E14"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 07:05 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "nxxkz_loucura_letal_funk_slowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E01"
    ],
    "file": "_amv_part.mp4"
   }
@@ -3500,11 +3692,17 @@
     1241.2,
     1340.2
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E01": [
+   [
+    1262.3,
+    1364.8
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 9,
-  "demon-slayer-kimetsu-no-yaiba": 8
+  "demon-slayer-kimetsu-no-yaiba": 9
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -3721,6 +3919,13 @@
    "e": 755.2666666666667,
    "file": "Jujutsu_Kaisen_narrated_ncts_next_phonk.mp4",
    "time": "2026-11-15 06:43 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "s": 998.0,
+   "e": 1017.5333333333333,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_nxxkz_loucura_letal_funk_slowed.mp4",
+   "time": "2026-11-15 07:06 UTC"
   }
  ],
  "styles": [
