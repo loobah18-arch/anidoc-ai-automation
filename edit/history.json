@@ -11,7 +11,7 @@
   "dygo_funk_infernal": 1,
   "rubikdice_montagem_pegadora_slowed": 1,
   "zxvren_montagem_delirio_slowed": 1,
-  "lonown_avangard_phonk": 1,
+  "lonown_avangard_phonk": 2,
   "ashreveal_manasha_phonk": 1,
   "trashxrl_deus_do_olimpo": 1,
   "atlxs_passo_bem_solto_slowed": 1,
@@ -57,7 +57,10 @@
   "jujutsu-kaisen:S2E12": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
   "jujutsu-kaisen:S3E11": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E04": 1
+  "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E06": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E07": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E04": 1
  },
  "shots": [
   {
@@ -3959,6 +3962,162 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
    "s": 1039.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 1201.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 740.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 1172.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 589.566
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1140.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 142.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 151.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 576.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 673.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 797.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 831.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 854.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 878.025
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 912.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 913.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 933.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 1099.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 114.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 223.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 248.942
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 262.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 267.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 417.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 518.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 956.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 1008.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 134.608
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 671.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 749.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 817.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 823.191
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 827.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 830.608
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 849.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 894.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1055.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1102.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1112.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1148.358
   }
  ],
  "runs": [
@@ -4195,6 +4354,18 @@
    "song": "cotneus_stereo_love_funk",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S2E04"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 12:29 UTC",
+   "pick": "nezuko",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "lonown_avangard_phonk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S3E06",
+    "demon-slayer-kimetsu-no-yaiba:S3E07",
+    "demon-slayer-kimetsu-no-yaiba:S4E04"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4538,11 +4709,61 @@
     1286.0,
     1385.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E06": [
+   [
+    76.1,
+    133.0
+   ],
+   [
+    152.6,
+    171.3
+   ],
+   [
+    1172.8,
+    1217.2
+   ],
+   [
+    1260.6,
+    1385.1
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E07": [
+   [
+    1.2,
+    102.1
+   ],
+   [
+    121.7,
+    140.4
+   ],
+   [
+    1286.1,
+    1385.1
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E04": [
+   [
+    22.2,
+    52.5
+   ],
+   [
+    80.9,
+    125.7
+   ],
+   [
+    139.4,
+    175.0
+   ],
+   [
+    1289.3,
+    1385.1
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 11,
-  "demon-slayer-kimetsu-no-yaiba": 11
+  "demon-slayer-kimetsu-no-yaiba": 12
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -4794,6 +5015,13 @@
    "e": 921.0,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_cotneus_stereo_love_funk.mp4",
    "time": "2026-11-15 11:35 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 158.0,
+   "e": 182.43333333333334,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
+   "time": "2026-11-15 12:30 UTC"
   }
  ],
  "styles": [
