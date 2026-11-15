@@ -381,7 +381,18 @@ name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_co
 BED_VOL = float(os.environ.get('BED_VOL', '0.22'))
 song_file = f"music/{plan['song']}.mp3"
 song_len = duration(song_file)
-bed_ss = (plan.get('song_start', 0.0) - CONV) % song_len           # ends exactly where the edit's music begins (wraps if needed)
+def _busy_part(path, length):                                        # the steadiest loud stretch of the song (no silent intro/outro/break)
+    import librosa as _lb
+    yy, ss = _lb.load(path, sr=11025, mono=True)
+    hop = ss // 2
+    r = _lb.feature.rms(y=yy, frame_length=hop * 2, hop_length=hop)[0]
+    n = max(1, int(length * 2))
+    if len(r) <= n:
+        return 0.0
+    score = [np.percentile(r[i:i + n], 15) for i in range(0, len(r) - n)]
+    return float(np.argmax(score)) / 2
+bed_ss = _busy_part(song_file, CONV + 0.5)                          # a full-energy part of the song, never a silent stretch
+print(f'song bed from {bed_ss:.1f}s', flush=True)
 fc = (
     f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
     f"[0:a]atrim={hook_at:.3f}:{hook_at + HOOK:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={HOOK - 0.25}:d=0.25,volume=0.8[ha];"
@@ -398,7 +409,7 @@ txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for 
 open('work/convo/captions_shift.ass', 'w').write(txt)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-i', VOICE,
-    '-stream_loop', '1', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV + 0.5:.3f}', '-i', song_file,
+    '-ss', f'{bed_ss:.3f}', '-t', f'{CONV + 0.5:.3f}', '-i', song_file,
     '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
     '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
