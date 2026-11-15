@@ -13,7 +13,8 @@
   "zxvren_montagem_delirio_slowed": 1,
   "lonown_avangard_phonk": 1,
   "ashreveal_manasha_phonk": 1,
-  "trashxrl_deus_do_olimpo": 1
+  "trashxrl_deus_do_olimpo": 1,
+  "atlxs_passo_bem_solto_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -45,7 +46,8 @@
   "jujutsu-kaisen:S1E23": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E07": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E05": 1,
-  "jujutsu-kaisen:S1E16": 1
+  "jujutsu-kaisen:S1E16": 1,
+  "jujutsu-kaisen:S1E24": 1
  },
  "shots": [
   {
@@ -2471,6 +2473,182 @@
   {
    "ep": "jujutsu-kaisen:S1E16",
    "s": 863.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 695.917
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 717.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 586.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 550.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 790.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 489.067
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 492.692
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 496.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 503.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 510.9
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 514.483
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 520.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 531.816
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 534.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 537.691
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 545.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 552.983
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 565.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 567.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 591.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 596.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 600.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 601.441
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 605.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 609.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 656.192
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 658.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 660.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 669.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 683.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 685.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 688.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 697.858
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 707.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 714.983
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 719.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 724.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 726.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 754.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 757.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 765.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 778.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 788.292
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 794.0
   }
  ],
  "runs": [
@@ -2627,6 +2805,16 @@
    "song": "trashxrl_deus_do_olimpo",
    "episodes": [
     "jujutsu-kaisen:S1E16"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 06:07 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "atlxs_passo_bem_solto_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E24"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2894,10 +3082,16 @@
     1241.2,
     1340.2
    ]
+  ],
+  "jujutsu-kaisen:S1E24": [
+   [
+    126.6,
+    215.4
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 7,
+  "jujutsu-kaisen": 8,
   "demon-slayer-kimetsu-no-yaiba": 7
  },
  "known": [
@@ -3094,6 +3288,13 @@
    "e": 716.8333333333334,
    "file": "Jujutsu_Kaisen_narrated_trashxrl_deus_do_olimpo.mp4",
    "time": "2026-11-15 05:52 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 634.0,
+   "e": 653.0333333333333,
+   "file": "Jujutsu_Kaisen_narrated_atlxs_passo_bem_solto_slowed.mp4",
+   "time": "2026-11-15 06:08 UTC"
   }
  ],
  "styles": [
