@@ -218,7 +218,7 @@ async def _tts():
     return bounds
 bounds = asyncio.run(_tts())
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/convo/narr.mp3', '-af',
-    'aecho=0.8:0.6:45:0.12,loudnorm=I=-14:TP=-1.5,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
+    'aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
 LEAD = 0.4
 narr_len = duration('work/convo/narr.wav')
 CONV = round((LEAD + narr_len + 0.7) * FPS) / FPS
@@ -395,7 +395,7 @@ P = 60.0 / plan['tempo']
 hook_at = (17 - 9) * P                                                # the first drop inside the AMV part
 name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_narrated_' + plan['song']
 # the same song plays quietly under the conversation and runs straight into the edit at full volume
-BED_VOL = float(os.environ.get('BED_VOL', '0.26'))
+BED_LUFS = float(os.environ.get('BED_LUFS', '-26'))                   # phonk under the narrator: fixed loudness, ducked further while he speaks
 song_file = f"music/{plan['song']}.mp3"
 song_len = duration(song_file)
 bed_ss = (plan.get('song_start', 0.0) - CONV) % song_len           # ends exactly where the edit's music begins (wraps if needed)
@@ -403,9 +403,10 @@ fc = (
     f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
     f"[0:a]atrim={hook_at:.3f}:{hook_at + HOOK:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={HOOK - 0.25}:d=0.25,volume=0.8[ha];"
     f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
-    f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo[dl];"
-    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,volume={BED_VOL},afade=t=in:d=0.4[bd];"
-    f"[dl][bd]amix=inputs=2:duration=first:normalize=0[ca];"
+    f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=9,aresample=48000,asplit=2[dl][sc];"
+    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,loudnorm=I={BED_LUFS}:TP=-9:LRA=7,aresample=48000,afade=t=in:d=0.4[bdr];"
+    f"[bdr][sc]sidechaincompress=threshold=0.03:ratio=6:attack=15:release=350:makeup=1[bd];"
+    f"[dl][bd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[ca];"
     f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
     f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]"
 )
