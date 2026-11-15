@@ -3,7 +3,7 @@
   "rayelo_ultraslowed": 1,
   "montagem_zora": 1,
   "cotneus_stereo_love_funk": 1,
-  "andromeda_montagem_coma": 1,
+  "andromeda_montagem_coma": 2,
   "montagem_vozes_profundas": 1,
   "andromeda_no_fear_phonk": 2,
   "mvsterious_slava_funk": 1,
@@ -55,7 +55,8 @@
   "jujutsu-kaisen:S1E14": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S2E12": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E10": 1
+  "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
+  "jujutsu-kaisen:S3E11": 1
  },
  "shots": [
   {
@@ -3577,6 +3578,166 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
    "s": 1165.367
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 431.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 421.817
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 404.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 418.942
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 434.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 374.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 382.9
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 390.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 397.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 409.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 411.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 414.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 416.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 426.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 429.941
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 437.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 441.192
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 434.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 390.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 416.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 418.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 409.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 426.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 397.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 432.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 441.192
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 421.817
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 374.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 404.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 434.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 390.775
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 416.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 418.942
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 409.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 426.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 397.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 431.816
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 441.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 421.817
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 374.375
   }
  ],
  "runs": [
@@ -3793,6 +3954,16 @@
    "song": "ncts_next_phonk",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S3E10"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 11:07 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "andromeda_montagem_coma",
+   "episodes": [
+    "jujutsu-kaisen:S3E11"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4112,10 +4283,20 @@
     0.1,
     136.1
    ]
+  ],
+  "jujutsu-kaisen:S3E11": [
+   [
+    266.1,
+    364.3
+   ],
+   [
+    1356.4,
+    1408.3
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 10,
+  "jujutsu-kaisen": 11,
   "demon-slayer-kimetsu-no-yaiba": 10
  },
  "known": [
@@ -4354,6 +4535,13 @@
    "e": 988.9,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_ncts_next_phonk.mp4",
    "time": "2026-11-15 09:21 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 334.0,
+   "e": 357.6,
+   "file": "Jujutsu_Kaisen_narrated_andromeda_montagem_coma.mp4",
+   "time": "2026-11-15 11:08 UTC"
   }
  ],
  "styles": [
