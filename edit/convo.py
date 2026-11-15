@@ -282,16 +282,30 @@ async def _synth_lines():
         txt = ' '.join(w['w'] for w in ln).strip()
         txt_clean = re.sub(r'[*"#]|\(.*?\)', '', txt)
         txt_clean = re.sub(r'\.\s+', ', ', txt_clean.rstrip('.'))
-        spk_pitch = PITCH_LIST[spk[li] % len(PITCH_LIST)]
-        com = edge_tts.Communicate(txt_clean, VOICE_NAME, rate=VOICE_RATE, pitch=spk_pitch, boundary='WordBoundary')
-        bounds = []
         out_mp3 = f'work/convo/tts/{li:02d}.mp3'
-        with open(out_mp3, 'wb') as f:
-            async for ch in com.stream():
-                if ch['type'] == 'audio':
-                    f.write(ch['data'])
-                elif ch['type'] == 'WordBoundary':
-                    bounds.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
+        bounds = []
+        if re.search(r'[A-Za-z0-9]', txt_clean):
+            spk_pitch = PITCH_LIST[spk[li] % len(PITCH_LIST)]
+            for attempt in range(2):
+                try:
+                    com = edge_tts.Communicate(txt_clean, VOICE_NAME, rate=VOICE_RATE, pitch=spk_pitch, boundary='WordBoundary')
+                    audio_bytes = bytearray()
+                    b_list = []
+                    async for ch in com.stream():
+                        if ch['type'] == 'audio':
+                            audio_bytes.extend(ch['data'])
+                        elif ch['type'] == 'WordBoundary':
+                            b_list.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
+                    if audio_bytes:
+                        with open(out_mp3, 'wb') as f:
+                            f.write(audio_bytes)
+                        bounds = b_list
+                        break
+                except Exception as ex:
+                    print(f'line {li} tts attempt {attempt}: {ex}', flush=True)
+                    await asyncio.sleep(0.4)
+        if not os.path.exists(out_mp3) or os.path.getsize(out_mp3) < 100:
+            sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=stereo:d=0.2', out_mp3])
         line_bounds.append((out_mp3, bounds))
     return line_bounds
 
