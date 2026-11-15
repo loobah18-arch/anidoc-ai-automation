@@ -212,10 +212,42 @@ if CONV < CMIN * 0.6:                                                 # too thin
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 print(f'conversation {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
 
+# natural pacing: any silence between two lines longer than MAX_GAP is cut down to KEEP_GAP (video, voice and captions together)
+MAX_GAP = float(os.environ.get('MAX_GAP', '0.45'))
+KEEP_GAP = float(os.environ.get('KEEP_GAP', '0.25'))
+CONV_SRC = CONV
+drop = []                                                             # (start, end) offsets from c0 to remove
+for w0_, w1_ in zip(cw[:-1], cw[1:]):
+    g0, g1 = w0_['e'] - c0, w1_['s'] - c0
+    if g1 - g0 > MAX_GAP:
+        a_, b_ = round((g0 + KEEP_GAP / 2) * FPS) / FPS, round((g1 - KEEP_GAP / 2) * FPS) / FPS
+        if b_ - a_ >= 2 / FPS:
+            drop.append((a_, b_))
+lead_cut = round(max(0.0, cw[0]['s'] - c0 - 0.2) * FPS) / FPS     # at most 0.2 s before the first word
+if lead_cut >= 2 / FPS:
+    drop.insert(0, (0.0, lead_cut))
+KEEP = []; t_ = 0.0
+for a_, b_ in drop:
+    if a_ > t_:
+        KEEP.append((t_, a_))
+    t_ = b_
+KEEP.append((t_, CONV_SRC))
+def tight(t):                                                         # source offset -> offset in the tightened conversation
+    return t - sum(min(max(t - a_, 0), b_ - a_) for a_, b_ in drop)
+for w in cw:
+    w['s0'], w['e0'] = w['s'], w['e']                                 # original timing (speaker voice features)
+    w['s'] = c0 + tight(w['s'] - c0); w['e'] = c0 + tight(w['e'] - c0)
+CONV = round(sum(b_ - a_ for a_, b_ in KEEP) * FPS) / FPS
+c1 = c0 + CONV
+print(f'pacing: {len(drop)} long pauses tightened, {CONV_SRC:.1f}s -> {CONV:.1f}s', flush=True)
+
 # ------------------------------------------------------------------ 4. caption lines + speakers
+CAP_SIZE = int(os.environ.get('CAPTION_SIZE', 68))                   # readable but never edge to edge
+SAFE_X = int(os.environ.get('CAPTION_MARGIN', 80))                   # px kept clear at the left and right edges
+LINE_CHARS = int(os.environ.get('CAPTION_LINE_CHARS', 14))           # wrap a caption line after ~14 characters
 lines, cur = [], []
 for k, w in enumerate(cw):
-    if cur and (len(cur) >= 5 or sum(len(x['w']) for x in cur) >= 22 or w['s'] - cur[-1]['e'] > 0.6 or w['seg'] != cur[-1]['seg'] or
+    if cur and (len(cur) >= 5 or sum(len(x['w']) + 1 for x in cur) + len(w['w']) > 2 * LINE_CHARS or w['s'] - cur[-1]['e'] > 0.6 or w['seg'] != cur[-1]['seg'] or
                 (cur[-1]['w'][-1:] in '.?!,' and len(cur) >= 3)):
         lines.append(cur); cur = []
     cur.append(w)
@@ -226,7 +258,7 @@ import librosa
 y, sr = librosa.load('work/convo/win.wav', sr=16000)
 feats = []
 for ln in lines:
-    a, b = int((ln[0]['s'] - win0) * sr), int((ln[-1]['e'] - win0) * sr)
+    a, b = int((ln[0].get('s0', ln[0]['s']) - win0) * sr), int((ln[-1].get('e0', ln[-1]['e']) - win0) * sr)
     seg = y[a:max(b, a + 1600)]
     f0 = librosa.yin(seg, fmin=70, fmax=500, sr=sr) if len(seg) > 2048 else np.array([150.0])
     mf = librosa.feature.mfcc(y=seg, sr=sr, n_mfcc=13).mean(axis=1) if len(seg) > 2048 else np.zeros(13)
@@ -278,11 +310,30 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cap,{FONT},98,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,3,0,1,0,3,5,60,60,0,1
+Style: Cap,{FONT},{CAP_SIZE},&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,2,0,1,0,3,5,{SAFE_X},{SAFE_X},0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"""]
 DIM = '&H00A0A0A0&'
+CHAR_W = 0.66 * CAP_SIZE + 2                                          # ~width of one upper-case Montserrat ExtraBold glyph + spacing
+
+
+def wrap_rows(toks):                                                  # greedy word wrap: each row <= LINE_CHARS characters
+    rows, row = [], []
+    for t in toks:
+        if row and len(' '.join(row + [t])) > LINE_CHARS:
+            rows.append(row); row = []
+        row.append(t)
+    if row:
+        rows.append(row)
+    return rows
+
+
+def fit_scale(rows):                                                  # a single very long word: shrink it so it still fits inside the margins
+    widest = max(len(' '.join(r)) for r in rows) * CHAR_W + 2 * 18   # + glow border on both sides
+    room = W - 2 * SAFE_X
+    return 100.0 if widest <= room else max(55.0, 100.0 * room / widest)
+
 for li, ln in enumerate(lines):
     col = colour_of[spk[li]]
     t_end = min(ln[-1]['e'] + 0.35, lines[li + 1][0]['s'] if li + 1 < len(lines) else c1) - c0 + HOOK
@@ -290,7 +341,11 @@ for li, ln in enumerate(lines):
     toks = [t for t in toks if t]
     if not toks:
         continue
-    split = len(toks) if len(toks) <= 3 or sum(map(len, toks)) <= 14 else (len(toks) + 1) // 2
+    rows = wrap_rows(toks)
+    breaks = set(); acc = 0
+    for r_ in rows[:-1]:
+        acc += len(r_); breaks.add(acc - 1)                          # index of the last word on each row
+    fit = fit_scale(rows)
     for k in range(len(toks)):                                        # word-by-word: spoken white, the rest dim
         a = ln[min(k, len(ln) - 1)]['s'] - c0 + HOOK
         b = (ln[k + 1]['s'] - c0 + HOOK) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
@@ -299,12 +354,13 @@ for li, ln in enumerate(lines):
         parts = []
         for m, t in enumerate(toks):
             parts.append(('{\\1c&H00FFFFFF&}' if m <= k else '{\\1c' + DIM + '}') + t)
-            if m == split - 1 and m != len(toks) - 1:
+            if m in breaks and m != len(toks) - 1:
                 parts.append('\\N')
             elif m != len(toks) - 1:
                 parts.append(' ')
         txt = ''.join(parts).replace(' \\N', '\\N')
-        pop = '{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else ''
+        pop = (f'{{\\fscx{fit * 1.06:.0f}\\fscy{fit * 1.06:.0f}\\t(0,90,\\fscx{fit:.0f}\\fscy{fit:.0f})}}' if k == 0
+               else f'{{\\fscx{fit:.0f}\\fscy{fit:.0f}}}')
         glow = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord18\\blur16\\3c{ass_col(col)}\\3a&H20&\\shad0\\1a&HFF&}}'
         main = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord4\\blur3\\3c{ass_col(col)}\\shad3}}'
         ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
@@ -315,13 +371,13 @@ json.dump(dict(ep=conv_ep, s=c0, e=c1, lines=[dict(t=' '.join(w['w'] for w in ln
 print('captions', len(lines), 'lines,', len(set(spk)), 'speaker colours', flush=True)
 
 # ------------------------------------------------------------------ 5. face-following 9:16 crop, shot by shot
-raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src, '-vf',
+raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{c0:.3f}', '-t', f'{CONV_SRC:.3f}', '-i', src, '-vf',
           'fps=12,scale=64:36,format=gray', '-f', 'rawvideo', '-'], binary=True)
 gg = np.frombuffer(raw, np.uint8).reshape(-1, 36, 64).astype(np.float32)
 d = np.abs(np.diff(gg, axis=0)).mean(axis=(1, 2))
-cuts = [0.0] + [(i + 1) / 12 for i in range(len(d)) if d[i] > max(18, 4 * np.median(d[max(0, i - 12):i + 12]))] + [CONV]
+cuts = [0.0] + [(i + 1) / 12 for i in range(len(d)) if d[i] > max(18, 4 * np.median(d[max(0, i - 12):i + 12]))] + [CONV_SRC]
 cuts = sorted(set(round(c * FPS) / FPS for c in cuts))
-cuts = [c for k, c in enumerate(cuts) if k == 0 or c - cuts[k - 1] >= 0.3 or c == CONV]
+cuts = [c for k, c in enumerate(cuts) if k == 0 or c - cuts[k - 1] >= 0.3 or c == CONV_SRC]
 iw, ih = map(int, sh(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', src]).strip().split(','))
 try:
     import cv2
@@ -347,7 +403,13 @@ for a, b in zip(cuts[:-1], cuts[1:]):
     xs.append(x)
 os.makedirs('work/convo/seg', exist_ok=True)
 lst = []
-for k, ((a, b), x) in enumerate(zip(zip(cuts[:-1], cuts[1:]), xs)):
+pieces = []                                                           # each shot, minus the tightened pauses
+for (a, b), x in zip(zip(cuts[:-1], cuts[1:]), xs):
+    for ka, kb in KEEP:
+        pa, pb = max(a, ka), min(b, kb)
+        if pb - pa >= 1 / FPS:
+            pieces.append(((pa, pb), x))
+for k, ((a, b), x) in enumerate(pieces):
     nf = round(b * FPS) - round(a * FPS)
     if nf <= 0:
         continue
@@ -362,9 +424,22 @@ open('work/convo/seg/list.txt', 'w').write(''.join(f"file '{os.path.basename(p)}
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', 'work/convo/seg/list.txt', '-c', 'copy', 'work/convo/video.mp4'])
 
 # ------------------------------------------------------------------ 5b. voices only: strip the anime's own music (copyright)
-sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src, '-vn', '-ac', '2', '-ar', '44100', 'work/convo/talk.wav'])
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{c0:.3f}', '-t', f'{CONV_SRC:.3f}', '-i', src, '-vn', '-ac', '2', '-ar', '44100', 'work/convo/talk.wav'])
 subprocess.run([sys.executable, '-m', 'demucs', '--two-stems=vocals', '-n', 'htdemucs', '-o', 'work/convo/sep', 'work/convo/talk.wav'], check=True)
-VOICE = 'work/convo/sep/htdemucs/talk/vocals.wav'
+VOICE_RAW = 'work/convo/sep/htdemucs/talk/vocals.wav'
+_va, _vsr = _sf.read(VOICE_RAW, dtype='float32')
+xf = int(0.012 * _vsr); out_a = None
+for ka, kb in KEEP:
+    piece = _va[int(ka * _vsr):int(kb * _vsr)].copy()
+    if out_a is None:
+        out_a = piece; continue
+    if len(out_a) > xf and len(piece) > xf:                          # 12 ms crossfade at each tightened pause
+        r_ = np.linspace(0, 1, xf)[:, None] if _va.ndim == 2 else np.linspace(0, 1, xf)
+        out_a[-xf:] = out_a[-xf:] * (1 - r_) + piece[:xf] * r_
+        piece = piece[xf:]
+    out_a = np.concatenate([out_a, piece])
+VOICE = 'work/convo/voice_tight.wav'
+_sf.write(VOICE, out_a, _vsr)
 print('voices separated from the anime music', flush=True)
 
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
@@ -377,31 +452,41 @@ plan = json.load(open('work/edit_plan.json'))
 P = 60.0 / plan['tempo']
 hook_at = (17 - 9) * P                                                # the first drop inside the AMV part
 name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_convo_' + plan['song']
-# the same song plays quietly under the conversation and runs straight into the edit at full volume
-BED_VOL = float(os.environ.get('BED_VOL', '0.22'))
+# ONE continuous phonk track under the hook, the conversation and the edit: never restarted, never cut.
+# Ducked with a volume expression under the dialogue (NOT sidechaincompress, which stops when the shorter voice
+# input ends and leaves the rest of the Short silent), then it rises smoothly into the edit.
 song_file = f"music/{plan['song']}.mp3"
 song_len = duration(song_file)
-def _busy_part(path, length):                                        # the steadiest loud stretch of the song (no silent intro/outro/break)
-    import librosa as _lb
-    yy, ss = _lb.load(path, sr=11025, mono=True)
-    hop = ss // 2
-    r = _lb.feature.rms(y=yy, frame_length=hop * 2, hop_length=hop)[0]
-    n = max(1, int(length * 2))
-    if len(r) <= n:
-        return 0.0
-    score = [np.percentile(r[i:i + n], 15) for i in range(0, len(r) - n)]
-    return float(np.argmax(score)) / 2
-bed_ss = _busy_part(song_file, CONV + 0.5)                          # a full-energy part of the song, never a silent stretch
-print(f'song bed from {bed_ss:.1f}s', flush=True)
+song_start = float(plan.get('song_start', 0.0))                      # where auto.py's beat grid starts the edit
+amv_dur = duration(amv)
+TOTAL_DUR = round((HOOK + CONV + amv_dur) * FPS) / FPS
+TALK_END = HOOK + CONV                                                # the edit starts here
+lead_in = HOOK + CONV
+t_edit = song_start
+if t_edit < lead_in:                                                  # not enough song before the edit: same spot a few whole bars later (beat grid kept)
+    t_edit = song_start + int(np.ceil((lead_in - song_start) / (4 * P))) * 4 * P
+bgm_ss = t_edit - lead_in
+if bgm_ss + TOTAL_DUR > song_len:                                     # song too short from there: move back by whole bars
+    bgm_ss = max(0.0, bgm_ss - int(np.ceil((bgm_ss + TOTAL_DUR - song_len) / (4 * P))) * 4 * P)
+DUCK = float(os.environ.get('DUCK_LEVEL', '0.20'))
+RISE = float(os.environ.get('DUCK_RISE', '0.6'))
+BGM_LUFS = float(os.environ.get('BGM_LUFS', '-12'))
+VOICE_END = TALK_END
+duck_expr = (f"if(lt(t,{HOOK - 0.3:.3f}),1.0,if(lt(t,{HOOK:.3f}),1.0-{1 - DUCK:.3f}*(t-{HOOK - 0.3:.3f})/0.3,"
+             f"if(lt(t,{VOICE_END:.3f}),{DUCK},{DUCK}+{1 - DUCK:.3f}*min(1,(t-{VOICE_END:.3f})/{RISE}))))")
+print(f'continuous bgm {bgm_ss:.2f}s -> {bgm_ss + TOTAL_DUR:.2f}s, ducked {HOOK:.2f}-{VOICE_END:.2f}s, total {TOTAL_DUR:.2f}s', flush=True)
 fc = (
     f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
-    f"[0:a]atrim={hook_at:.3f}:{hook_at + HOOK:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={HOOK - 0.25}:d=0.25,volume=0.8[ha];"
-    f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
-    f"[2:a]asetpts=PTS-STARTPTS,loudnorm=I=-15:TP=-1.5:LRA=11,aresample=48000,aformat=channel_layouts=stereo[dl];"
-    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,volume={BED_VOL},afade=t=in:d=0.4[bd];"
-    f"[dl][bd]amix=inputs=2:duration=first:normalize=0[ca];"
-    f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
-    f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]"
+    f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass,trim=duration={CONV:.3f}[cv];"
+    f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];"
+    f"[hv][cv][av]concat=n=3:v=1:a=0[v];"
+    f"[2:a]asetpts=PTS-STARTPTS,loudnorm=I=-15:TP=-1.5:LRA=11,aresample=48000,aformat=channel_layouts=stereo,"
+    f"adelay={int(HOOK * 1000)}|{int(HOOK * 1000)},apad=whole_dur={TOTAL_DUR:.3f}[dl];"
+    f"[3:a]atrim=start={bgm_ss:.3f}:duration={TOTAL_DUR:.3f},asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,"
+    f"loudnorm=I={BGM_LUFS}:TP=-1.5:LRA=11,aresample=48000,apad=whole_dur={TOTAL_DUR:.3f},"
+    f"volume=eval=frame:volume='{duck_expr}'[bg];"
+    f"[dl][bg]amix=inputs=2:duration=longest:normalize=0,alimiter=limit=0.95,"
+    f"afade=t=out:st={max(0.0, TOTAL_DUR - 1.2):.3f}:d=1.2,atrim=duration={TOTAL_DUR:.3f}[a]"
 )
 # captions were timed from the start of the short (hook included); the conversation clip starts at 0
 txt = open('work/convo/captions.ass').read()
@@ -409,7 +494,7 @@ txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for 
 open('work/convo/captions_shift.ass', 'w').write(txt)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-i', VOICE,
-    '-ss', f'{bed_ss:.3f}', '-t', f'{CONV + 0.5:.3f}', '-i', song_file,
+    '-i', song_file,
     '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
     '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
