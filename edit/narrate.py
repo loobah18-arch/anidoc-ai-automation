@@ -286,11 +286,11 @@ for a, b, t in bounds:                                                # map spok
     cw.append(dict(w=w, s=c0 + LEAD + a, e=c0 + LEAD + max(b, a + 0.12), seg=sent))
     if w[-1:] in '.?!':
         sent += 1
+    ti += 1
 if not bounds and toks:
     w_dur = narr_len / len(toks)
     for bi, t in enumerate(toks):
         cw.append(dict(w=t, s=c0 + LEAD + bi * w_dur, e=c0 + LEAD + (bi + 1) * w_dur, seg=0))
-    ti += 1
 words = cw
 print(f'narrated {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
 
@@ -485,18 +485,17 @@ fc = (
     f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];"
     f"[cv][av]concat=n=2:v=1:a=0[v];"
     f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,"
-    f"volume=eval=frame:volume='if(lt(t, {CONV:.3f}), 0.20, 1.0)'[bgm_curved];"
-    f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={CONV:.3f},"
-    f"aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=7,asplit=2[v_sc][v_mix];"
-    f"[bgm_curved][v_sc]sidechaincompress=threshold=0.03:ratio=4:attack=20:release=300:makeup=1[ducked_bgm];"
-    f"[ducked_bgm][v_mix]amix=inputs=2:duration=first:dropout_transition=0,"
+    f"volume=eval=frame:volume='if(lt(t, {CONV:.3f}), 0.20, 1.0)'[bgm];"
+    f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={TOTAL:.3f},"
+    f"aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=7[voice_padded];"
+    f"[bgm][voice_padded]amix=inputs=2:duration=first:normalize=0,"
     f"afade=t=out:st={TOTAL - 1.2:.2f}:d=1.2[a]"
 )
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-i', VOICE,
     '-ss', f'{bgm_start:.3f}', '-t', f'{TOTAL:.3f}', '-i', song_file,
     '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
-    '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
+    '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
 print('wrote', f'out/{name}.mp4', flush=True)
 
