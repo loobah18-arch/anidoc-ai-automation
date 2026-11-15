@@ -219,14 +219,85 @@ if CONV < CMIN * 0.6:                                                 # too thin
 print(f'conversation {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
 
 # ------------------------------------------------------------------ 4. caption lines + speakers
-lines, cur = [], []
+# Form complete dialogue utterances rather than fragmented 3-word chunks.
+# Never split on commas so thoughts and names stay together naturally.
+raw_lines, cur = [], []
 for k, w in enumerate(cw):
-    if cur and (len(cur) >= 5 or sum(len(x['w']) for x in cur) >= 22 or w['s'] - cur[-1]['e'] > 0.6 or w['seg'] != cur[-1]['seg'] or
-                (cur[-1]['w'][-1:] in '.?!,' and len(cur) >= 3)):
-        lines.append(cur); cur = []
+    split = False
+    if cur:
+        if w['seg'] != cur[-1]['seg']:
+            split = True
+        elif w['s'] - cur[-1]['e'] > 0.75:
+            split = True
+        elif cur[-1]['w'][-1:] in '.?!' and (len(cur) >= 4 or w['s'] - cur[-1]['e'] > 0.35):
+            split = True
+        elif len(cur) >= 12 or sum(len(x['w']) for x in cur) >= 45:
+            split = True
+    if split:
+        raw_lines.append(cur)
+        cur = []
     cur.append(w)
 if cur:
-    lines.append(cur)
+    raw_lines.append(cur)
+
+# Polish dialogue into natural combat lines and clean up untranslated phonetic Japanese terms
+def polish_dialogue(lines_in):
+    key = os.environ.get('GROQ_API_KEY')
+    if not key or not lines_in:
+        return lines_in
+    full_text = '\n'.join(f"{i+1}: {' '.join(w['w'] for w in ln)}" for i, ln in enumerate(lines_in))
+    prompt = (
+        "You are an expert anime dub dialogue scriptwriter. Below is auto-translated combat dialogue from an anime fight.\n"
+        "Polish the lines into natural, high-intensity English anime dialogue spoken between characters during combat.\n"
+        "Rules:\n"
+        "1. Replace raw romanized Japanese phrases (like 'Ki, Do, Ai, Raku' -> 'Joy, Anger, Sorrow, Pleasure') with their true English meaning.\n"
+        "2. Keep the exact number of lines and meaning.\n"
+        "3. Output ONLY the numbered lines (e.g. '1: ...', '2: ...'), nothing else.\n\n"
+        f"Input:\n{full_text}"
+    )
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            'https://api.groq.com/openai/v1/chat/completions',
+            method='POST',
+            data=json.dumps(dict(
+                model=os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+                temperature=0.3,
+                messages=[dict(role='user', content=prompt)]
+            )).encode(),
+            headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'convo/1.0'}
+        )
+        resp = json.load(urllib.request.urlopen(req, timeout=15))
+        content = resp['choices'][0]['message']['content'].strip()
+        cleaned = {}
+        for line in content.split('\n'):
+            m = re.match(r'^\s*(\d+)[\s.:-]+(.*)$', line)
+            if m:
+                idx = int(m.group(1)) - 1
+                txt = m.group(2).strip().strip('"\'')
+                if txt:
+                    cleaned[idx] = txt
+        if len(cleaned) == len(lines_in):
+            new_lines = []
+            for i, ln in enumerate(lines_in):
+                if i in cleaned:
+                    toks = cleaned[i].split()
+                    t0, t1 = ln[0]['s'], ln[-1]['e']
+                    seg_id = ln[0]['seg']
+                    wts = np.cumsum([0] + [len(t) + 2 for t in toks]); wts = wts / wts[-1]
+                    new_ln = []
+                    for k, t in enumerate(toks):
+                        new_ln.append(dict(w=t, s=t0 + (t1 - t0) * wts[k], e=t0 + (t1 - t0) * wts[k + 1], seg=seg_id))
+                    new_lines.append(new_ln)
+                else:
+                    new_lines.append(ln)
+            print('polished dialogue lines:', [' '.join(w['w'] for w in ln) for ln in new_lines], flush=True)
+            return new_lines
+    except Exception as ex:
+        print(f'dialogue polishing fallback: {ex}', flush=True)
+    return lines_in
+
+lines = polish_dialogue(raw_lines)
 
 import librosa
 y, sr = librosa.load('work/convo/win.wav', sr=16000)
@@ -322,22 +393,19 @@ async def _synth_lines():
 
 tts_results = asyncio.run(_synth_lines())
 
-# Calculate sequential start times so character dialogue never has long dead pauses or overlaps
+# Calculate sequential start times: snappy, rapid-fire anime conversational pacing (zero dead air)
 cur_s = 0.2
 line_starts = []
 for li, (wav_path, bnds) in enumerate(tts_results):
     dur = float(duration(wav_path))
-    raw_s = max(0.0, lines[li][0]['s'] - c0)
     if li == 0:
-        s = raw_s if raw_s <= 1.2 else 0.2
+        s = 0.2
     else:
         prev_end = cur_s
-        if raw_s >= prev_end + 0.1 and raw_s <= prev_end + 1.2:
-            s = raw_s
-        elif raw_s < prev_end + 0.1:
-            s = prev_end + 0.25
-        else:
-            s = prev_end + 0.4
+        turn_change = (spk[li] != spk[li - 1])
+        # 0.26s when different characters speak; 0.16s when the same character continues
+        gap = 0.26 if turn_change else 0.16
+        s = prev_end + gap
     line_starts.append(s)
     cur_s = s + dur
 
@@ -413,33 +481,53 @@ Style: Cap,{FONT},68,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"""]
+def paginate_words(word_list, max_words=5, max_chars=20):
+    pages = []
+    cur_p = []
+    cur_len = 0
+    for w in word_list:
+        cw_len = len(clean(w['w']))
+        if cur_p and (len(cur_p) >= max_words or cur_len + 1 + cw_len > max_chars):
+            pages.append(cur_p)
+            cur_p = []
+            cur_len = 0
+        cur_p.append(w)
+        cur_len += cw_len + 1
+    if cur_p:
+        pages.append(cur_p)
+    return pages
+
 DIM = '&H00A0A0A0&'
 for li, ln in enumerate(lines):
     col = colour_of[spk[li]]
-    t_end = min(ln[-1]['e'] + 0.35, lines[li + 1][0]['s'] if li + 1 < len(lines) else c1) - c0
-    toks = [clean(w['w']) for w in ln]
-    toks = [t for t in toks if t]
-    if not toks:
-        continue
-    brks = get_wrap_breaks(toks, max_chars=14, max_words=3)
-    for k in range(len(toks)):                                        # word-by-word: spoken white, the rest dim
-        a = ln[min(k, len(ln) - 1)]['s'] - c0
-        b = (ln[k + 1]['s'] - c0) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
-        if b <= a:
+    pages = paginate_words(ln, max_words=5, max_chars=20)
+    for pi, page in enumerate(pages):
+        toks = [clean(w['w']) for w in page]
+        toks = [t for t in toks if t]
+        if not toks:
             continue
-        parts = []
-        for m, t in enumerate(toks):
-            parts.append(('{\\1c&H00FFFFFF&}' if m <= k else '{\\1c' + DIM + '}') + t)
-            if m in brks:
-                parts.append('\\N')
-            elif m != len(toks) - 1:
-                parts.append(' ')
-        txt = ''.join(parts).replace(' \\N', '\\N')
-        pop = '{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else ''
-        glow = f'{{\\pos({W // 2},{int(H * 0.54)})\\bord12\\blur10\\3c{ass_col(col)}\\3a&H25&\\shad0\\1a&HFF&}}'
-        main = f'{{\\pos({W // 2},{int(H * 0.54)})\\bord3.5\\blur2\\3c{ass_col(col)}\\shad2}}'
-        ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
-        ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
+        brks = get_wrap_breaks(toks, max_chars=13, max_words=3)
+        p_end = min(page[-1]['e'] + 0.25, c1) - c0
+        if pi + 1 < len(pages):
+            p_end = min(p_end, pages[pi + 1][0]['s'] - c0)
+        for k in range(len(toks)):
+            a = max(0.0, page[min(k, len(page) - 1)]['s'] - c0)
+            b = min((page[k + 1]['s'] - c0) if k + 1 < len(toks) and k + 1 < len(page) else p_end, c1 - c0)
+            if b <= a:
+                continue
+            parts = []
+            for m, t in enumerate(toks):
+                parts.append(('{\\1c&H00FFFFFF&}' if m <= k else '{\\1c' + DIM + '}') + t)
+                if m in brks:
+                    parts.append('\\N')
+                elif m != len(toks) - 1:
+                    parts.append(' ')
+            txt = ''.join(parts).replace(' \\N', '\\N')
+            pop = '{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else ''
+            glow = f'{{\\pos({W // 2},{int(H * 0.54)})\\bord12\\blur10\\3c{ass_col(col)}\\3a&H25&\\shad0\\1a&HFF&}}'
+            main = f'{{\\pos({W // 2},{int(H * 0.54)})\\bord3.5\\blur2\\3c{ass_col(col)}\\shad2}}'
+            ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
+            ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
 open('work/convo/captions.ass', 'w').write('\n'.join(ass) + '\n')
 json.dump(dict(ep=conv_ep, s=c0, e=c1, lines=[dict(t=' '.join(w['w'] for w in ln), speaker=int(spk[i]), colour=colour_of[spk[i]])
                                                for i, ln in enumerate(lines)]), open('work/convo/convo.json', 'w'), indent=1)
