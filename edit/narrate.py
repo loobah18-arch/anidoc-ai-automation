@@ -170,15 +170,15 @@ heard = {}
 for nm, d in LORE.items():                                            # who is named in the scene's dialogue
     n = sum(len(re.findall(r'\b' + re.escape(a) + r'\b', context.lower())) for a in d['names'])
     if n: heard[nm] = n
-if not heard:                                                         # names are rarely said inside 60 s: listen to ~5 min of Japanese around the fight
+if not heard:                                                         # names are rarely said inside 60 s: listen to ~5 min around the fight (dub or Japanese)
     w0, w1 = max(0, bt - 180), bt + 120
     sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(w0), '-t', str(w1 - w0), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/wide.wav'])
     jtxt = ' '.join(sg.text for sg in WhisperModel('small', device='cpu', compute_type='int8').transcribe(
-        _sf.read('work/convo/wide.wav', dtype='float32')[0], language='ja', beam_size=1, vad_filter=True)[0])
+        _sf.read('work/convo/wide.wav', dtype='float32')[0], language=info.language if info.language in ('en', 'ja') else None, beam_size=1, vad_filter=True)[0])
     for nm, d in LORE.items():
-        n = sum(jtxt.count(a) for a in d.get('ja', []))
+        n = sum(jtxt.count(a) for a in d.get('ja', [])) + sum(len(re.findall(r'\b' + re.escape(a) + r'\b', jtxt.lower())) for a in d['names'])
         if n: heard[nm] = n
-    print('names in wider Japanese audio:', heard, flush=True)
+    print('names in wider audio:', heard, flush=True)
 CHAR = max(heard, key=heard.get) if heard else None
 MODE = os.environ.get('NARRATION') or ('character' if CHAR and rng.random() < 0.5 else 'rhyme')
 if MODE == 'character' and not CHAR:
