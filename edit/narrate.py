@@ -437,10 +437,27 @@ song_start = float(plan.get('song_start', 0.0))
 bed_ss = song_start - CONV
 if bed_ss >= 0:
     sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV:.3f}', '-i', song_file, '-ac', '2', '-ar', '48000', 'work/convo/bed.wav'])
-else:                                                                 # edit starts early in the song: lead in with its loudest part, then the run-up
-    head = -bed_ss; busy = _busy_part(song_file, head + 0.5)
-    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{busy:.3f}', '-t', f'{head + 0.4:.3f}', '-i', song_file, '-ss', '0', '-t', f'{song_start:.3f}', '-i', song_file,
-        '-filter_complex', '[0:a][1:a]acrossfade=d=0.4:c1=tri:c2=tri,aresample=48000[a]', '-map', '[a]', '-ac', '2', 'work/convo/bed.wav'])
+else:                                                                 # edit starts in the intro: borrow a later bar that sounds the same as the edit's
+    import librosa as _lb                                             # first bar (phonk repeats in phrases), so the hand-off is seamless
+    yy, sr = _lb.load(song_file, sr=22050, mono=True)
+    P_ = 60.0 / plan['tempo']
+    ch = _lb.feature.chroma_cqt(y=yy, sr=sr, hop_length=512); rms = _lb.feature.rms(y=yy, hop_length=512)[0]
+    fr = lambda t: int(t * sr / 512)
+    def look(t, d=4.0):
+        v = ch[:, fr(t):fr(t + d)]; return v / (np.linalg.norm(v) + 1e-9) if v.shape[1] >= fr(d) - 1 else None
+    ref = look(song_start); cands = []
+    for k in range(4, 400, 4):                                        # whole bars after the edit start
+        t = song_start + k * P_
+        if t + 4 > len(yy) / sr: break
+        v = look(t)
+        if t < CONV or v is None or ref is None or v.shape != ref.shape: continue
+        cands.append((float((v * ref).sum()), float(np.percentile(rms[fr(t - CONV):fr(t)], 20)), t))
+    top = max((c[0] for c in cands), default=0)
+    best = (0, max((c for c in cands if c[0] >= top - 0.05), key=lambda c: c[1])[2] if cands else None)
+    print('bed borrowed from bar at', best[1], f'(similarity {top:.2f})', flush=True)
+    t = best[1] if best[1] is not None else _busy_part(song_file, CONV) + CONV
+    bed_ss = t - CONV
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV:.3f}', '-i', song_file, '-ac', '2', '-ar', '48000', 'work/convo/bed.wav'])
 print(f'song bed {bed_ss:.1f}s -> {song_start:.1f}s (edit starts there)', flush=True)
 fc = (
     f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
