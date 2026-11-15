@@ -205,7 +205,7 @@ def llm(prompt):
 
 for _ in range(3):
     try:
-        narration = re.sub(r'\s+', ' ', re.sub(r'(?<![.,!?;:])[ \t]*\n+', '. ', re.sub(r'[*"#]|\(.*?\)', '', llm(prompt).strip()))).strip()
+        narration = re.sub(r'\s+', ' ', re.sub(r'(?<![.,!?;:])[ \t]*\n+', '. ', re.sub(r'[*"#]|\(.*?\)', '', re.sub(r'[ \t]+\n', '\n', llm(prompt).strip())))).strip()
         if 20 <= len(narration.split()) <= 70 and (MODE != 'character' or CHAR.split()[0] in narration):
             break
     except Exception as ex:
