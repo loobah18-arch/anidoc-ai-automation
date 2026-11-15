@@ -7,7 +7,7 @@
   "montagem_vozes_profundas": 1,
   "andromeda_no_fear_phonk": 1,
   "mvsterious_slava_funk": 1,
-  "glxxmstrider_dont_stop_slowed": 1,
+  "glxxmstrider_dont_stop_slowed": 2,
   "dygo_funk_infernal": 1,
   "rubikdice_montagem_pegadora_slowed": 1,
   "zxvren_montagem_delirio_slowed": 1,
@@ -57,7 +57,9 @@
   "jujutsu-kaisen:S3E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E08": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E11": 1
+  "demon-slayer-kimetsu-no-yaiba:S3E11": 1,
+  "jujutsu-kaisen:S3E05": 1,
+  "jujutsu-kaisen:S3E06": 1
  },
  "shots": [
   {
@@ -3587,6 +3589,278 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
    "s": 1474.483
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 339.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 514.734
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 337.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 171.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 836.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 45.958
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 65.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 110.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 123.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 124.542
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 184.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 257.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 335.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 338.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 342.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 508.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 760.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 774.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 811.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 831.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 834.292
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 837.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 842.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 846.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 848.292
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 879.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 882.917
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 887.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 896.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 902.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 906.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 910.192
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 916.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 921.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 1064.875
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 60.209
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 61.542
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 62.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 67.917
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 114.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 141.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 149.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 444.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 539.9
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 684.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 688.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 689.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 692.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 699.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 703.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 706.584
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 714.917
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 735.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 757.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 758.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 792.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 400.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 524.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 704.9
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 822.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 825.875
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 847.292
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 856.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 888.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 915.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 921.416
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1136.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1196.583
   }
  ],
  "runs": [
@@ -3806,6 +4080,17 @@
     "demon-slayer-kimetsu-no-yaiba:S3E09",
     "demon-slayer-kimetsu-no-yaiba:S3E10",
     "demon-slayer-kimetsu-no-yaiba:S3E11"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 15:56 UTC",
+   "pick": "naoya",
+   "series": "jujutsu-kaisen",
+   "song": "glxxmstrider_dont_stop_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S3E05",
+    "jujutsu-kaisen:S3E06"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4149,10 +4434,34 @@
     -4.0,
     38.2
    ]
+  ],
+  "jujutsu-kaisen:S3E05": [
+   [
+    386.3,
+    474.2
+   ],
+   [
+    1310.0,
+    1329.0
+   ],
+   [
+    1371.4,
+    1423.2
+   ]
+  ],
+  "jujutsu-kaisen:S3E06": [
+   [
+    187.3,
+    292.2
+   ],
+   [
+    1371.4,
+    1423.3
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 10,
+  "jujutsu-kaisen": 11,
   "demon-slayer-kimetsu-no-yaiba": 10
  },
  "known": [
@@ -4392,6 +4701,14 @@
    "character": "gyutaro",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_montagem_zora.mp4",
    "time": "2026-11-15 15:40 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 862.0,
+   "e": 874.3666666666667,
+   "character": "naoya",
+   "file": "Jujutsu_Kaisen_narrated_glxxmstrider_dont_stop_slowed.mp4",
+   "time": "2026-11-15 15:57 UTC"
   }
  ],
  "styles": [
@@ -4409,6 +4726,7 @@
   }
  ],
  "narr_chars": {
-  "gyutaro": 1
+  "gyutaro": 1,
+  "naoya": 1
  }
 }
