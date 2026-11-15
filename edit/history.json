@@ -10,7 +10,8 @@
   "glxxmstrider_dont_stop_slowed": 1,
   "dygo_funk_infernal": 1,
   "zxvren_montagem_delirio_slowed": 1,
-  "poker_face": 1
+  "poker_face": 1,
+  "ncts_next_phonk": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -39,7 +40,8 @@
   "jujutsu-kaisen:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
   "jujutsu-kaisen:S2E19": 1,
-  "jujutsu-kaisen:S3E12": 1
+  "jujutsu-kaisen:S3E12": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E22": 1
  },
  "shots": [
   {
@@ -1881,6 +1883,170 @@
   {
    "ep": "jujutsu-kaisen:S3E12",
    "s": 1013.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 348.492
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 63.825
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 336.642
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 77.45
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 342.367
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 36.2
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 39.783
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 44.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 49.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 55.075
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 58.742
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 69.7
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 83.717
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 89.45
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 95.434
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 210.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 221.283
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 231.783
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 242.783
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 252.908
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 259.759
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 264.45
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 269.7
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 274.934
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 279.934
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 285.242
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 288.408
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 291.658
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 295.466
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 298.808
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 301.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 311.408
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 321.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 324.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 327.242
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 330.992
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 342.367
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 301.116
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 39.8
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 36.2
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 285.242
   }
  ],
  "runs": [
@@ -2007,6 +2173,16 @@
    "song": "poker_face",
    "episodes": [
     "jujutsu-kaisen:S3E12"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 09:35 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "ncts_next_phonk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E22"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2236,11 +2412,25 @@
     1661.3,
     1713.2
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E22": [
+   [
+    -4.0,
+    29.5
+   ],
+   [
+    93.9,
+    191.0
+   ],
+   [
+    1298.3,
+    1350.7
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 6,
-  "demon-slayer-kimetsu-no-yaiba": 5
+  "demon-slayer-kimetsu-no-yaiba": 6
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -2415,6 +2605,13 @@
    "e": 875.4333333333333,
    "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
    "time": "2026-11-15 08:21 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 176.46666666666667,
+   "e": 202.0,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_ncts_next_phonk.mp4",
+   "time": "2026-11-15 09:35 UTC"
   }
  ]
 }
