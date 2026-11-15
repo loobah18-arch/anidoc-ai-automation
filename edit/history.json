@@ -9,7 +9,8 @@
   "mvsterious_slava_funk": 1,
   "glxxmstrider_dont_stop_slowed": 1,
   "dygo_funk_infernal": 1,
-  "zxvren_montagem_delirio_slowed": 1
+  "zxvren_montagem_delirio_slowed": 1,
+  "poker_face": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -37,7 +38,8 @@
   "jujutsu-kaisen:S1E13": 1,
   "jujutsu-kaisen:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
-  "jujutsu-kaisen:S2E19": 1
+  "jujutsu-kaisen:S2E19": 1,
+  "jujutsu-kaisen:S3E12": 1
  },
  "shots": [
   {
@@ -1719,6 +1721,166 @@
   {
    "ep": "jujutsu-kaisen:S2E19",
    "s": 542.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 797.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 815.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 930.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 945.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 910.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 704.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 711.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 714.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 730.875
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 735.608
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 739.275
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 821.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 845.775
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 847.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 849.483
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 880.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 881.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 886.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 895.567
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 900.692
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 905.958
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 913.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 914.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 923.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 931.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 933.567
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 935.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 937.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 939.983
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 953.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 956.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 957.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 958.775
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 968.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 974.191
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 975.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 996.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1002.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1007.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1013.707
   }
  ],
  "runs": [
@@ -1835,6 +1997,16 @@
    "song": "zxvren_montagem_delirio_slowed",
    "episodes": [
     "jujutsu-kaisen:S2E19"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 08:20 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "poker_face",
+   "episodes": [
+    "jujutsu-kaisen:S3E12"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2058,10 +2230,16 @@
     1354.2,
     1402.5
    ]
+  ],
+  "jujutsu-kaisen:S3E12": [
+   [
+    1661.3,
+    1713.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 5,
+  "jujutsu-kaisen": 6,
   "demon-slayer-kimetsu-no-yaiba": 5
  },
  "known": [
@@ -2230,6 +2408,13 @@
    "e": 419.46666666666664,
    "file": "Jujutsu_Kaisen_convo_zxvren_montagem_delirio_slowed.mp4",
    "time": "2026-11-14 22:26 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 853.8,
+   "e": 875.4333333333333,
+   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
+   "time": "2026-11-15 08:21 UTC"
   }
  ]
 }
