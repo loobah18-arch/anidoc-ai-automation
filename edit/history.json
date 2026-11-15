@@ -16,7 +16,7 @@
   "trashxrl_deus_do_olimpo": 1,
   "atlxs_passo_bem_solto_slowed": 1,
   "poker_face": 1,
-  "ncts_next_phonk": 1,
+  "ncts_next_phonk": 2,
   "nxxkz_loucura_letal_funk_slowed": 1
  },
  "episodes": {
@@ -54,7 +54,8 @@
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
   "jujutsu-kaisen:S1E14": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
-  "jujutsu-kaisen:S2E12": 1
+  "jujutsu-kaisen:S2E12": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E10": 1
  },
  "shots": [
   {
@@ -3364,6 +3365,218 @@
   {
    "ep": "jujutsu-kaisen:S2E12",
    "s": 797.325
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 895.95
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1099.408
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 890.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 961.158
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1160.033
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 827.033
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 830.992
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 835.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 838.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 845.742
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 864.242
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 877.117
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 880.342
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 883.658
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 886.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 887.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 888.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 889.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 891.575
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 902.7
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 908.675
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 925.533
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 942.242
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 953.683
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 957.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1007.242
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1019.367
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1022.658
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1026.133
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1029.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1035.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1040.7
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1045.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1052.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1059.491
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1066.366
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1075.866
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1085.283
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1089.634
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1094.2
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1101.575
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1103.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1104.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1105.075
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1111.617
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1118.117
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1125.133
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1136.2
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1143.325
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1149.908
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1156.491
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1163.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1165.367
   }
  ],
  "runs": [
@@ -3570,6 +3783,16 @@
    "song": "andromeda_no_fear_phonk",
    "episodes": [
     "jujutsu-kaisen:S2E12"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 09:21 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "ncts_next_phonk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S3E10"
    ],
    "file": "_amv_part.mp4"
   }
@@ -3883,11 +4106,17 @@
     1376.1,
     1424.4
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E10": [
+   [
+    0.1,
+    136.1
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 10,
-  "demon-slayer-kimetsu-no-yaiba": 9
+  "demon-slayer-kimetsu-no-yaiba": 10
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -4118,6 +4347,13 @@
    "e": 709.3333333333334,
    "file": "Jujutsu_Kaisen_narrated_andromeda_no_fear_phonk.mp4",
    "time": "2026-11-15 08:19 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 974.0,
+   "e": 988.9,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_ncts_next_phonk.mp4",
+   "time": "2026-11-15 09:21 UTC"
   }
  ],
  "styles": [
