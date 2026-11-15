@@ -186,22 +186,18 @@ if not heard:                                                         # names ar
         if n: heard[nm] = n
     print('names in wider audio:', heard, flush=True)
 CHAR = max(heard, key=heard.get) if heard else None
-MODE = os.environ.get('NARRATION') or ('character' if CHAR and rng.random() < 0.5 else 'rhyme')
-if MODE == 'character' and not CHAR:
-    MODE = 'rhyme'                                                    # never guess who is on screen
-if MODE == 'character':
-    ASK = (f"Introduce {CHAR} and explain their power to someone who has never watched the anime. "
-           f"Use ONLY these facts, reworded: {LORE[CHAR]['power']} Do not add any other names, techniques, numbers or events.")
-    WORDS = '34 to 46 words of narration'
-else:
-    who = f"{CHAR}, using their ideals, struggle and power ({LORE[CHAR]['power']})" if CHAR else 'the fighters in this scene and what is at stake'
-    ASK = (f"Write a rhyming quote, like a dark motivational poem, about {who}. "
-           "Four to six short lines in rhyming couplets (AABB), every line ending in a strong rhyme. Do not name any techniques, places or people other than "
-           + (CHAR.split()[0] if CHAR else 'none') + ".")
-    WORDS = '30 to 46 words'
+if not CHAR and LORE:
+    CHAR = next(iter(LORE))
+MODE = 'character'
+ASK = (f"Introduce {CHAR} and explain their power, lethal combat abilities, and why they dominate the battlefield. "
+       f"Use ONLY these lore facts, reworded: {LORE[CHAR]['power']} "
+       "Make it sound like an elite, dark anime documentary. Serious, authoritative, cold, deep. "
+       "STRICT RULES: Absolutely NO rhyming. NO poetry. NO cheesy motivational quotes. "
+       "Deliver direct, hard-hitting factual sentences.")
+WORDS = '50 to 65 words of narration'
 prompt = (f"Anime: {series_name}, episode {conv_ep.split(':')[-1]}.\n"
           f"Dialogue heard in the scene (auto-translated, may contain errors): {context or '(no clear dialogue)'}\n\n"
-          f"{ASK}\nWrite {WORDS} for a YouTube Short, serious, deep, cinematic tone. "
+          f"{ASK}\nWrite {WORDS} for a YouTube Short, serious, deep, cinematic documentary tone. "
           "Write in a fluid, continuous cinematic rhythm without choppy pauses or staccato breaks. "
           "Never invent facts. Plain sentences, no emojis, "
           "no hashtags, no quotes, no stage directions, no titles. Reply with the text only.")
@@ -215,29 +211,27 @@ def llm(prompt):
             headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
         return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
     req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
-        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
+        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short narration and character facts about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
         headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
     return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content']
 
 for _ in range(3):
     try:
         narration = re.sub(r'\s+', ' ', re.sub(r'(?<![.,!?;:])[ \t]*\n+', '. ', re.sub(r'[*"#]|\(.*?\)', '', re.sub(r'[ \t]+\n', '\n', llm(prompt).strip())))).strip()
-        if 20 <= len(narration.split()) <= 70 and (MODE != 'character' or CHAR.split()[0] in narration):
+        if 35 <= len(narration.split()) <= 85 and CHAR.split()[0] in narration:
             break
     except Exception as ex:
         print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(50)
 else:                                                                 # last resort: safe lines that need no invented facts
-    nm = CHAR.split()[0] if CHAR else 'the fighter'
-    narration = (f"This is {CHAR}. {LORE[CHAR]['power']}" if MODE == 'character' else rng.choice([
-        f"They said to kneel, they said to fall. {nm} rose up and faced it all. Every scar became a vow, the weak one is the hunter now.",
-        f"Pain is the teacher, blood is the test. {nm} gives everything, nothing less. When the world says stop, the heart says go, the strongest fire burns slow."]))
+    narration = f"{CHAR} stands as one of the deadliest fighters in {series_name}. {LORE[CHAR]['power']}"
 print('narration', MODE, CHAR, '|', narration, flush=True)
 
 import edge_tts
 VOICE_NAME = os.environ.get('VOICE', 'en-US-ChristopherNeural')
-VOICE_RATE = os.environ.get('VOICE_RATE', '+2%')
-VOICE_PITCH = os.environ.get('VOICE_PITCH', '-2Hz')
-# Replace period pauses with commas so edge-tts maintains snappy cinematic flow without long pauses
+VOICE_RATE = os.environ.get('VOICE_RATE', '-3%')
+VOICE_PITCH = os.environ.get('VOICE_PITCH', '-6Hz')
+DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
+# Replace period pauses with commas so edge-tts maintains snappy cinematic flow without long dead pauses
 narration_tts = re.sub(r'\.\s+', ', ', narration.rstrip('.'))
 async def _tts():
     com = edge_tts.Communicate(narration_tts, VOICE_NAME, rate=VOICE_RATE, pitch=VOICE_PITCH, boundary='WordBoundary')
@@ -250,9 +244,10 @@ async def _tts():
                 bounds.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
     return bounds
 bounds = asyncio.run(_tts())
-# Clean studio voice mastering: crisp presence + warmth + broadcast loudnorm (no robotic pitch degradation or muddling echo)
+# The exact heavy trailer voice from the JJK video (user's preferred 'grok' voice):
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/convo/narr.mp3', '-af',
-    'aresample=48000,highpass=f=75,lowpass=f=12000,bass=g=3:f=110,loudnorm=I=-11:TP=-1.0:LRA=7,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
+    f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'
+    'bass=g=4:f=110,aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
 LEAD = 0.05                                                           # the narrator speaks from the first frame
 narr_len = duration('work/convo/narr.wav')
 CONV = round((LEAD + narr_len + 0.7) * FPS) / FPS
