@@ -4,7 +4,7 @@
   "montagem_zora": 2,
   "cotneus_stereo_love_funk": 1,
   "andromeda_montagem_coma": 1,
-  "montagem_vozes_profundas": 1,
+  "montagem_vozes_profundas": 2,
   "andromeda_no_fear_phonk": 1,
   "mvsterious_slava_funk": 1,
   "glxxmstrider_dont_stop_slowed": 2,
@@ -58,8 +58,8 @@
   "demon-slayer-kimetsu-no-yaiba:S3E08": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E11": 1,
-  "jujutsu-kaisen:S3E05": 1,
-  "jujutsu-kaisen:S3E06": 1,
+  "jujutsu-kaisen:S3E05": 2,
+  "jujutsu-kaisen:S3E06": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E12": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E06": 1,
@@ -4069,6 +4069,146 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
    "s": 1235.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 718.891
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1021.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1246.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 844.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 872.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 298.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 322.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 495.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 580.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 689.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 736.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 742.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 754.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 758.516
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 765.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 790.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 811.433
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 851.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 854.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 954.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 131.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 443.934
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 986.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 992.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1009.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1025.434
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1031.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1073.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1083.391
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1086.958
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1095.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1105.891
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1108.542
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1217.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E06",
+   "s": 1242.042
   }
  ],
  "runs": [
@@ -4312,6 +4452,17 @@
     "demon-slayer-kimetsu-no-yaiba:S1E12",
     "demon-slayer-kimetsu-no-yaiba:S3E06",
     "demon-slayer-kimetsu-no-yaiba:S4E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 16:34 UTC",
+   "pick": "naoya",
+   "series": "jujutsu-kaisen",
+   "song": "montagem_vozes_profundas",
+   "episodes": [
+    "jujutsu-kaisen:S3E05",
+    "jujutsu-kaisen:S3E06"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4730,7 +4881,7 @@
   ]
  },
  "series": {
-  "jujutsu-kaisen": 11,
+  "jujutsu-kaisen": 12,
   "demon-slayer-kimetsu-no-yaiba": 11
  },
  "known": [
@@ -4986,6 +5137,14 @@
    "character": "tanjiro",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_dygo_funk_infernal.mp4",
    "time": "2026-11-15 16:08 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 882.0,
+   "e": 902.0,
+   "character": "naoya",
+   "file": "Jujutsu_Kaisen_narrated_montagem_vozes_profundas.mp4",
+   "time": "2026-11-15 16:35 UTC"
   }
  ],
  "styles": [
@@ -5004,7 +5163,7 @@
  ],
  "narr_chars": {
   "gyutaro": 1,
-  "naoya": 1,
+  "naoya": 2,
   "tanjiro": 1
  }
 }
