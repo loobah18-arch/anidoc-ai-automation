@@ -233,9 +233,9 @@ else:                                                                 # last res
 print('narration', MODE, CHAR, '|', narration, flush=True)
 
 import edge_tts
-VOICE_NAME = os.environ.get('VOICE', 'en-US-ChristopherNeural')
-async def _tts():
-    com = edge_tts.Communicate(narration, VOICE_NAME, rate=os.environ.get('VOICE_RATE', '-10%'), pitch=os.environ.get('VOICE_PITCH', '-6Hz'), boundary='WordBoundary')
+VOICE_NAME = os.environ.get('VOICE', 'en-US-AndrewNeural')   # calm, low, dry narrator (Nanami-style), user-picked sample 2
+async def _tts(pitch):
+    com = edge_tts.Communicate(narration, VOICE_NAME, rate=os.environ.get('VOICE_RATE', '-10%'), pitch=pitch, boundary='WordBoundary')
     bounds = []
     with open('work/convo/narr.mp3', 'wb') as f:
         async for ch in com.stream():
@@ -244,11 +244,20 @@ async def _tts():
             elif ch['type'] == 'WordBoundary':
                 bounds.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
     return bounds
-bounds = asyncio.run(_tts())
+bounds = None
+for _i in range(4):                                                  # edge-tts sometimes returns no audio for a pitch shift: retry, then drop it
+    try:
+        bounds = asyncio.run(_tts(os.environ.get('VOICE_PITCH', '-8Hz') if _i < 2 else '+0Hz')); break
+    except Exception as _e:
+        print('tts retry', _i, _e, flush=True); time.sleep(2)
+if bounds is None:
+    raise SystemExit('tts failed')
 DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/convo/narr.mp3', '-af',
     f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'   # pitch and formants down, same timing: a heavy trailer voice
-    'bass=g=4:f=110,aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
+    'highpass=f=45,bass=g=3:f=120,equalizer=f=2500:t=q:w=1:g=1.5,'                          # warm chest, clear consonants
+    'acompressor=threshold=-20dB:ratio=2.5:attack=10:release=150:makeup=1.5,'                 # even, close, no echo: a dry calm read
+    'loudnorm=I=-12:TP=-1.0,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
 LEAD = 0.05                                                           # the narrator speaks from the first frame
 narr_len = duration('work/convo/narr.wav')
 CONV = round((LEAD + narr_len + 0.7) * FPS) / FPS
