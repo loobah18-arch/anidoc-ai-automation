@@ -303,7 +303,17 @@ def _groq(prompt):
     if not key:
         raise LookupError('no GROQ_API_KEY')
     last = None
-    for mdl in dict.fromkeys([os.environ.get('GROQ_MODEL') or 'llama-3.3-70b-versatile', 'llama-3.1-8b-instant']):
+    avail = []
+    try:                                                               # ask Groq which models this key can use (names change over time)
+        r = urllib.request.Request('https://api.groq.com/openai/v1/models', headers={'Authorization': f'Bearer {key}', 'User-Agent': 'narrate/1.0'})
+        avail = [m['id'] for m in json.load(urllib.request.urlopen(r, timeout=30))['data']]
+        print('groq models:', avail, flush=True)
+    except Exception as ex:
+        print('groq model list failed:', ex, flush=True)
+    pref = ['llama-3.3-70b', 'llama-4', 'gpt-oss-120b', 'qwen', 'kimi', 'gpt-oss', 'llama', 'gemma', 'mistral']
+    ranked = sorted([m for m in avail if not re.search(r'whisper|guard|tts|embed|vision|compound', m)],
+                    key=lambda m: next((i for i, p in enumerate(pref) if p in m), 99))
+    for mdl in dict.fromkeys([os.environ.get('GROQ_MODEL') or 'llama-3.3-70b-versatile'] + ranked[:3] + ['llama-3.1-8b-instant']):
         try:
             req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST',
                 data=json.dumps(dict(model=mdl, temperature=0.8, max_tokens=400,
@@ -623,7 +633,7 @@ fc = (
     f"[bdr][sc]sidechaincompress=threshold=0.03:ratio=6:attack=15:release=350:makeup=1[bd];"
     f"[dl][bd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[ca];"
     f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
-    f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a]"
+    f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a0];[a0]alimiter=limit=0.7:attack=2:release=60:level=disabled[a]"
 )
 # captions were timed from the start of the short (hook included); the conversation clip starts at 0
 txt = open('work/convo/captions.ass').read()
