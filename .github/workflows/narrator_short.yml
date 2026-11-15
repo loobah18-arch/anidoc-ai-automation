@@ -3,7 +3,7 @@ name: Narrated Short (narrator over the fight, then the edit)
 on:
   push:
     branches: [narrator-trailer-v2]
-    paths: ['edit/narrate.py', 'edit/auto.py', 'edit/charvis.py', 'edit/characters.json', 'edit/lore.json', 'edit/drive_index.py', 'edit/pro_fx.py', '.github/workflows/narrator_short.yml']
+    paths: ['edit/narrate.py', 'edit/auto.py', 'edit/charvis.py', 'edit/voice.py', 'edit/characters.json', 'edit/lore.json', 'edit/drive_index.py', 'edit/pro_fx.py', '.github/workflows/narrator_short.yml']
   workflow_dispatch:
     inputs:
       character:

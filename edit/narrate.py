@@ -308,28 +308,10 @@ else:                                                                 # last res
     narration = f"This is {CHAR}. {FACTS}" if FACTS else f"This is {nm}, and this is the fight."
 print('narration', MODE, CHAR, '|', narration, flush=True)
 
-import edge_tts
-VOICE_NAME = os.environ.get('VOICE', 'en-US-AndrewNeural')   # calm, low, dry narrator (Nanami-style), user-picked sample 2
-async def _tts(pitch):
-    com = edge_tts.Communicate(narration, VOICE_NAME, rate=os.environ.get('VOICE_RATE', '-10%'), pitch=pitch, boundary='WordBoundary')
-    bounds = []
-    with open('work/convo/narr.mp3', 'wb') as f:
-        async for ch in com.stream():
-            if ch['type'] == 'audio':
-                f.write(ch['data'])
-            elif ch['type'] == 'WordBoundary':
-                bounds.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
-    return bounds
-bounds = None
-for _i in range(4):                                                  # edge-tts sometimes returns no audio for a pitch shift: retry, then drop it
-    try:
-        bounds = asyncio.run(_tts(os.environ.get('VOICE_PITCH', '-8Hz') if _i < 2 else '+0Hz')); break
-    except Exception as _e:
-        print('tts retry', _i, _e, flush=True); time.sleep(2)
-if bounds is None:
-    raise SystemExit('tts failed')
+from voice import speak                                              # expressive phrase-by-phrase read (edit/voice.py)
+narr_raw, bounds = speak(narration, 'work/convo/narr_raw.wav', seed=SEED)
 DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
-sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/convo/narr.mp3', '-af',
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', narr_raw, '-af',
     f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'   # pitch and formants down, same timing: a heavy trailer voice
     'highpass=f=45,bass=g=3:f=120,equalizer=f=2500:t=q:w=1:g=1.5,'                          # warm chest, clear consonants
     'acompressor=threshold=-20dB:ratio=2.5:attack=10:release=150:makeup=1.5,'                 # even, close, no echo: a dry calm read
