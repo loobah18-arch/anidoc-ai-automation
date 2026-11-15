@@ -226,23 +226,51 @@ else:                                                                 # last res
     narration = f"{CHAR} stands as one of the deadliest fighters in {series_name}. {LORE[CHAR]['power']}"
 print('narration', MODE, CHAR, '|', narration, flush=True)
 
-import edge_tts
+import edge_tts, asyncio
 VOICE_NAME = os.environ.get('VOICE', 'en-US-ChristopherNeural')
 VOICE_RATE = os.environ.get('VOICE_RATE', '-3%')
 VOICE_PITCH = os.environ.get('VOICE_PITCH', '-6Hz')
 DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
+
+# Clean Unicode punctuation/spaces that can cause edge-tts parsing issues
+narration_clean = (
+    narration.replace('\u2011', '-').replace('\u2010', '-').replace('\u2013', '-').replace('\u2014', ', ')
+    .replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"')
+    .replace('\u00a0', ' ').replace('\u2026', '...')
+)
 # Replace period pauses with commas so edge-tts maintains snappy cinematic flow without long dead pauses
-narration_tts = re.sub(r'\.\s+', ', ', narration.rstrip('.'))
+narration_tts = re.sub(r'\.\s+', ', ', narration_clean.rstrip('.'))
+narration_tts = re.sub(r'[*_#`~]', '', narration_tts)
+
 async def _tts():
-    com = edge_tts.Communicate(narration_tts, VOICE_NAME, rate=VOICE_RATE, pitch=VOICE_PITCH, boundary='WordBoundary')
-    bounds = []
+    for attempt in range(4):
+        try:
+            com = edge_tts.Communicate(narration_tts, VOICE_NAME, rate=VOICE_RATE, pitch=VOICE_PITCH, boundary='WordBoundary')
+            audio_bytes = bytearray()
+            bounds_list = []
+            async for ch in com.stream():
+                if ch['type'] == 'audio':
+                    audio_bytes.extend(ch['data'])
+                elif ch['type'] == 'WordBoundary':
+                    bounds_list.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
+            if audio_bytes and len(audio_bytes) > 1000:
+                with open('work/convo/narr.mp3', 'wb') as f:
+                    f.write(audio_bytes)
+                return bounds_list
+        except Exception as ex:
+            print(f'tts attempt {attempt + 1} failed: {ex}', flush=True)
+            await asyncio.sleep(1.5 * (attempt + 1))
+    print('trying fallback tts without pitch offset', flush=True)
+    com = edge_tts.Communicate(narration_clean, VOICE_NAME, rate=VOICE_RATE, boundary='WordBoundary')
+    bounds_list = []
     with open('work/convo/narr.mp3', 'wb') as f:
         async for ch in com.stream():
             if ch['type'] == 'audio':
                 f.write(ch['data'])
             elif ch['type'] == 'WordBoundary':
-                bounds.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
-    return bounds
+                bounds_list.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
+    return bounds_list
+
 bounds = asyncio.run(_tts())
 # The exact heavy trailer voice from the JJK video (user's preferred 'grok' voice):
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/convo/narr.mp3', '-af',
@@ -258,6 +286,10 @@ for a, b, t in bounds:                                                # map spok
     cw.append(dict(w=w, s=c0 + LEAD + a, e=c0 + LEAD + max(b, a + 0.12), seg=sent))
     if w[-1:] in '.?!':
         sent += 1
+if not bounds and toks:
+    w_dur = narr_len / len(toks)
+    for bi, t in enumerate(toks):
+        cw.append(dict(w=t, s=c0 + LEAD + bi * w_dur, e=c0 + LEAD + (bi + 1) * w_dur, seg=0))
     ti += 1
 words = cw
 print(f'narrated {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
