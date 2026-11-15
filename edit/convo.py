@@ -143,10 +143,14 @@ audio16 = _sf.read('work/convo/win.wav', dtype='float32')[0]
 segs, info = model.transcribe(audio16, beam_size=3, word_timestamps=True, vad_filter=True)
 segs = list(segs)
 task = 'transcribe'
-if info.language != 'en':                                             # Japanese audio: English captions
+if True:                                                              # anime is Japanese audio; detection is fooled by music                                             # Japanese audio: English captions
     task = 'translate'
     model = WhisperModel(os.environ.get('WHISPER_TRANSLATE', 'medium'), device='cpu', compute_type='int8')
-    segs = list(model.transcribe(audio16, task='translate', language=info.language, beam_size=3, word_timestamps=True, vad_filter=True)[0])
+    segs = list(model.transcribe(audio16, task='translate', language='ja', beam_size=3, word_timestamps=True, vad_filter=True)[0])
+if len(segs) < 3:                                                     # misdetected (music) or VAD ate it: force Japanese -> English
+    task = 'translate'
+    segs = list(model.transcribe(audio16, task='translate', language='ja', beam_size=3, word_timestamps=True, vad_filter=False)[0])
+    segs = [sg for sg in segs if getattr(sg, 'no_speech_prob', 0) < 0.6 and len((sg.text or '').split()) >= 2]
 print('language', info.language, task, len(segs), 'segments', flush=True)
 words = []
 for sg in segs:
@@ -172,7 +176,7 @@ if len(words) < 12:
         raise SystemExit('not enough dialogue in the fight')
     print('too little dialogue there, trying the next fight moment', flush=True)
     os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
-    os.execv(sys.executable, [sys.executable] + sys.argv)
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 
 # ------------------------------------------------------------------ 3. densest stretch of dialogue
 starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
@@ -200,6 +204,12 @@ cw = words[pick[0]:pick[1] + 1]
 c0 = max(win0, cw[0]['s'] - 0.35); c1 = min(win1, cw[-1]['e'] + 0.8)
 c0 = round(c0 * FPS) / FPS; c1 = round(c1 * FPS) / FPS
 CONV = c1 - c0
+if CONV < CMIN * 0.6:                                                 # too thin to be a conversation: next fight moment
+    if len(SKIP) >= 4:
+        raise SystemExit('no real conversation found in the fights')
+    print(f'conversation only {CONV:.1f}s, trying the next fight moment', flush=True)
+    os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 print(f'conversation {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
 
 # ------------------------------------------------------------------ 4. caption lines + speakers

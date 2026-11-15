@@ -1,0 +1,87 @@
+name: Anime Shorts Pipeline (alternating convo / narrated, protected uploads)
+
+on:
+  schedule:
+    - cron: '30 6 * * *'          # 12:00 PM IST daily (only fires from the default branch)
+  workflow_dispatch:
+    inputs:
+      style:
+        description: 'auto (alternate), convo or narrated'
+        required: false
+        default: 'auto'
+      pick:
+        description: 'auto, an anime name, or a character'
+        required: false
+        default: 'auto'
+      upload:
+        description: 'upload to YouTube (protection layers still apply)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shorts-pipeline
+  cancel-in-progress: false
+
+jobs:
+  preflight_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      proceed: ${{ steps.gate.outputs.proceed }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: gate
+        name: Layer 0 pre-flight (24 h spacing, skip render if too soon)
+        env:
+          PREFLIGHT_BYPASS: ${{ github.event_name == 'workflow_dispatch' && 'true' || '' }}
+        run: python3 preflight_gate.py
+
+  render:
+    needs: preflight_gate
+    if: needs.preflight_gate.outputs.proceed == 'true'
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    timeout-minutes: 170
+    steps:
+      - name: Install tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates libsndfile1 libglib2.0-0t64 fonts-montserrat fontconfig
+          pip3 install --break-system-packages gdown numpy librosa soundfile scikit-learn faster-whisper "opencv-python-headless<5" edge-tts requests google-api-python-client google-auth
+          pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 torchaudio==2.7.1
+          pip3 install --break-system-packages demucs
+      - uses: actions/checkout@v4
+      - name: Make the Short (alternating style)
+        env:
+          STYLE: ${{ github.event.inputs.style || 'auto' }}
+          PICK: ${{ github.event.inputs.pick || 'auto' }}
+          DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python3 edit/pipeline.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anime-short-${{ github.run_number }}
+          path: |
+            out/*.mp4
+            out/meta.json
+          retention-days: 30
+      - name: Upload with protection layers (0 spacing, 1 momentum, 2 velocity, block retry)
+        if: github.event_name == 'schedule' || github.event.inputs.upload == 'true'
+        env:
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID || secrets.CLIENT_ID }}
+          YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
+        run: python3 publish.py
+      - name: Save history and gate state
+        if: always()
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "amv-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add edit/history.json metadata/youtube_upload_history.json metadata/candle_gate_state.json 2>/dev/null || true
+          git commit -m "history: anime short ${{ github.run_number }} [skip ci]" || exit 0
+          git pull --rebase origin ${{ github.ref_name }} && git push origin HEAD:${{ github.ref_name }}
