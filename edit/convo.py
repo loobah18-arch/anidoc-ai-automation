@@ -313,7 +313,11 @@ async def _synth_lines():
                     await asyncio.sleep(0.4)
         if not os.path.exists(out_mp3) or os.path.getsize(out_mp3) < 100:
             sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=stereo:d=0.2', out_mp3])
-        line_bounds.append((out_mp3, bounds))
+        out_wav = f'work/convo/tts/{li:02d}.wav'
+        sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', out_mp3, '-af',
+            f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'
+            'bass=g=4:f=110,aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0,aresample=48000', '-ac', '2', out_wav])
+        line_bounds.append((out_wav, bounds))
     return line_bounds
 
 tts_results = asyncio.run(_synth_lines())
@@ -321,8 +325,8 @@ tts_results = asyncio.run(_synth_lines())
 # Calculate sequential start times so character dialogue never has long dead pauses or overlaps
 cur_s = 0.2
 line_starts = []
-for li, (mp3_path, bnds) in enumerate(tts_results):
-    dur = float(duration(mp3_path))
+for li, (wav_path, bnds) in enumerate(tts_results):
+    dur = float(duration(wav_path))
     raw_s = max(0.0, lines[li][0]['s'] - c0)
     if li == 0:
         s = raw_s if raw_s <= 1.2 else 0.2
@@ -343,7 +347,7 @@ if cur_s + 0.6 > CONV and c0 + cur_s + 0.6 <= win1:
     CONV = c1 - c0
 
 # Map word boundaries back onto lines to sync captions with the English speech
-for li, (mp3_path, bnds) in enumerate(tts_results):
+for li, (wav_path, bnds) in enumerate(tts_results):
     ln = lines[li]
     line_s = line_starts[li]
     if bnds:
@@ -353,28 +357,26 @@ for li, (mp3_path, bnds) in enumerate(tts_results):
                 ln[bi]['e'] = c0 + line_s + max(bb, ba + 0.12)
         ln[-1]['e'] = max(ln[-1]['e'], c0 + line_s + bnds[-1][1] + 0.1)
     else:
-        dur = float(duration(mp3_path))
+        dur = float(duration(wav_path))
         w_dur = dur / max(1, len(ln))
         for bi in range(len(ln)):
             ln[bi]['s'] = c0 + line_s + bi * w_dur
             ln[bi]['e'] = c0 + line_s + (bi + 1) * w_dur
 
-# Mix the dialogue audio files into one single stereo track with deep trailer voice processing
+# Mix the dialogue audio files into one single stereo track
 mix_inputs = []
 mix_filters = []
-for li, (mp3_path, _) in enumerate(tts_results):
+for li, (wav_path, _) in enumerate(tts_results):
     line_s = line_starts[li]
     delay_ms = int(line_s * 1000)
-    mix_inputs.extend(['-i', mp3_path])
+    mix_inputs.extend(['-i', wav_path])
     mix_filters.append(f'[{li}:a]adelay={delay_ms}|{delay_ms}[a{li}];')
 
 n_lines = len(tts_results)
 pads = ''.join(f'[a{i}]' for i in range(n_lines))
 mix_fc = (
     ''.join(mix_filters) + (f'{pads}amix=inputs={n_lines}:normalize=0,' if n_lines > 1 else '[a0]') +
-    f'apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,'
-    f'asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'
-    f'bass=g=4:f=110,aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0:LRA=7,aresample=48000[out]'
+    f'apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo[out]'
 )
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y'] + mix_inputs + ['-filter_complex', mix_fc, '-map', '[out]', 'work/convo/talk.wav'])
 VOICE = 'work/convo/talk.wav'
@@ -513,18 +515,17 @@ fc = (
     f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];"
     f"[cv][av]concat=n=2:v=1:a=0[v];"
     f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,"
-    f"volume=eval=frame:volume='if(lt(t, {CONV:.3f}), 0.20, 1.0)'[bgm_curved];"
-    f"[2:a]asetpts=PTS-STARTPTS,apad=whole_dur={CONV:.3f},"
-    f"aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=7,asplit=2[v_sc][v_mix];"
-    f"[bgm_curved][v_sc]sidechaincompress=threshold=0.03:ratio=4:attack=20:release=300:makeup=1[ducked_bgm];"
-    f"[ducked_bgm][v_mix]amix=inputs=2:duration=first:dropout_transition=0,"
+    f"volume=eval=frame:volume='if(lt(t, {CONV:.3f}), 0.20, 1.0)'[bgm];"
+    f"[2:a]asetpts=PTS-STARTPTS,apad=whole_dur={TOTAL:.3f},"
+    f"aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=7[voice_padded];"
+    f"[bgm][voice_padded]amix=inputs=2:duration=first:normalize=0,"
     f"afade=t=out:st={TOTAL - 1.2:.2f}:d=1.2[a]"
 )
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-i', VOICE,
     '-ss', f'{bgm_start:.3f}', '-t', f'{TOTAL:.3f}', '-i', song_file,
     '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
-    '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
+    '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
 print('wrote', f'out/{name}.mp4', flush=True)
 
