@@ -14,7 +14,7 @@
   "lonown_avangard_phonk": 1,
   "ashreveal_manasha_phonk": 1,
   "trashxrl_deus_do_olimpo": 1,
-  "atlxs_passo_bem_solto_slowed": 1,
+  "atlxs_passo_bem_solto_slowed": 2,
   "poker_face": 1,
   "ncts_next_phonk": 1,
   "nxxkz_loucura_letal_funk_slowed": 2
@@ -56,7 +56,8 @@
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S3E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E01": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E10": 1
+  "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
+  "jujutsu-kaisen:S1E11": 1
  },
  "shots": [
   {
@@ -3726,6 +3727,222 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
    "s": 957.442
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 266.709
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 131.442
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 112.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 257.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 120.041
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 117.817
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 119.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 123.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 128.084
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 134.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 231.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 240.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 250.566
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 260.209
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 262.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 265.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 120.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 260.209
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 231.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 262.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 250.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 266.692
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 257.275
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 134.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 265.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 240.691
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 119.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 127.834
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 120.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 260.459
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 231.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 262.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 250.816
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 266.959
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 257.275
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 134.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 264.817
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 240.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 119.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 127.817
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 120.041
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 260.442
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 231.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 262.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 250.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 266.692
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 257.275
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 134.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 264.817
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 240.691
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 119.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 127.817
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 120.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 260.209
   }
  ],
  "runs": [
@@ -3952,6 +4169,16 @@
    "song": "montagem_zora",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S3E10"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 20:26 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "atlxs_passo_bem_solto_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E11"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4277,10 +4504,32 @@
     0.1,
     136.1
    ]
+  ],
+  "jujutsu-kaisen:S1E11": [
+   [
+    -4.0,
+    30.0
+   ],
+   [
+    135.8,
+    226.4
+   ],
+   [
+    266.7,
+    313.1
+   ],
+   [
+    892.1,
+    911.1
+   ],
+   [
+    1316.2,
+    1412.3
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 10,
+  "jujutsu-kaisen": 11,
   "demon-slayer-kimetsu-no-yaiba": 11
  },
  "known": [
@@ -4532,6 +4781,19 @@
    "writer": "pollinations",
    "mode": "character",
    "title": "Zenitsu's power is unreal \ud83d\ude33 #shorts"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 186.0,
+   "e": 195.6,
+   "file": "Jujutsu_Kaisen_narrated_atlxs_passo_bem_solto_slowed.mp4",
+   "time": "2026-11-15 20:27 UTC",
+   "character": "mahito",
+   "song": "atlxs_passo_bem_solto_slowed",
+   "voice": "en-US-AndrewNeural",
+   "writer": "template",
+   "mode": "rhyme",
+   "title": "Mahito quote that hits hard \ud83e\udd76 #shorts"
   }
  ],
  "styles": [
@@ -4549,18 +4811,25 @@
   }
  ],
  "narr_chars": {
-  "zenitsu": 1
+  "zenitsu": 1,
+  "mahito": 1
  },
  "narr_lines": {
   "zenitsu": [
    "Zenitsu Agatsuma, a demon slayer, wields Thunder Breathing, mastering only the First Form: Thunderclap and Flash.",
    "Though usually terrified, he turns lethal while asleep, striking with a speed that surpasses the eye's perception in the darkness."
+  ],
+  "mahito": [
+   "They said to kneel, they said to fall.",
+   "Mahito rose up and faced it all.",
+   "Every scar became a vow, the weak one is the hunter now."
   ]
  },
  "lore_used": {
   "zenitsu": {
    "A demon slayer who uses Thunder Breathing but only ever mast": 1,
    "Usually terrified, he becomes lethal when he falls asleep, s": 1
-  }
+  },
+  "mahito": {}
  }
 }

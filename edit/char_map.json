@@ -368,6 +368,315 @@
     }
    },
    "scanned": "2026-11-15 20:03 UTC"
+  },
+  "jujutsu-kaisen:S1E09": {
+   "frames": 230,
+   "face_frames": 41,
+   "step": 5.0,
+   "chars": {
+    "Yuji Itadori": {
+     "share": 0.1,
+     "top3": 0.3913,
+     "peak": 0.7869
+    },
+    "Megumi Fushiguro": {
+     "share": 0.0043,
+     "top3": 0.0522,
+     "peak": 0.7157
+    },
+    "Nobara Kugisaki": {
+     "share": 0.0261,
+     "top3": 0.0957,
+     "peak": 0.7286
+    },
+    "Satoru Gojo": {
+     "share": 0.1174,
+     "top3": 0.3435,
+     "peak": 0.7974
+    },
+    "Ryomen Sukuna": {
+     "share": 0.0565,
+     "top3": 0.1522,
+     "peak": 0.7386
+    },
+    "Kento Nanami": {
+     "share": 0.1304,
+     "top3": 0.2652,
+     "peak": 0.7751
+    },
+    "Aoi Todo": {
+     "share": 0.0,
+     "top3": 0.113,
+     "peak": 0.729
+    },
+    "Mahito": {
+     "share": 0.0609,
+     "top3": 0.1652,
+     "peak": 0.7676
+    },
+    "Jogo": {
+     "share": 0.0304,
+     "top3": 0.1652,
+     "peak": 0.7455
+    },
+    "Hanami": {
+     "share": 0.0043,
+     "top3": 0.0348,
+     "peak": 0.6951
+    },
+    "Choso": {
+     "share": 0.0261,
+     "top3": 0.0826,
+     "peak": 0.7359
+    },
+    "Toji Fushiguro": {
+     "share": 0.0087,
+     "top3": 0.0391,
+     "peak": 0.7348
+    },
+    "Suguru Geto": {
+     "share": 0.0043,
+     "top3": 0.0261,
+     "peak": 0.7091
+    },
+    "Yuta Okkotsu": {
+     "share": 0.0348,
+     "top3": 0.1826,
+     "peak": 0.7293
+    },
+    "Maki Zenin": {
+     "share": 0.0087,
+     "top3": 0.087,
+     "peak": 0.7135
+    },
+    "Toge Inumaki": {
+     "share": 0.0696,
+     "top3": 0.2696,
+     "peak": 0.7792
+    },
+    "Kinji Hakari": {
+     "share": 0.1043,
+     "top3": 0.2522,
+     "peak": 0.7179
+    },
+    "Hiromi Higuruma": {
+     "share": 0.0522,
+     "top3": 0.2,
+     "peak": 0.7381
+    },
+    "Naoya Zenin": {
+     "share": 0.013,
+     "top3": 0.0826,
+     "peak": 0.7107
+    }
+   },
+   "scanned": "2026-11-15 20:28 UTC"
+  },
+  "jujutsu-kaisen:S1E10": {
+   "frames": 230,
+   "face_frames": 45,
+   "step": 5.0,
+   "chars": {
+    "Yuji Itadori": {
+     "share": 0.0957,
+     "top3": 0.287,
+     "peak": 0.7537
+    },
+    "Megumi Fushiguro": {
+     "share": 0.0261,
+     "top3": 0.0522,
+     "peak": 0.7156
+    },
+    "Nobara Kugisaki": {
+     "share": 0.0174,
+     "top3": 0.1478,
+     "peak": 0.7495
+    },
+    "Satoru Gojo": {
+     "share": 0.0913,
+     "top3": 0.2652,
+     "peak": 0.7639
+    },
+    "Ryomen Sukuna": {
+     "share": 0.0609,
+     "top3": 0.1217,
+     "peak": 0.7138
+    },
+    "Kento Nanami": {
+     "share": 0.1783,
+     "top3": 0.3,
+     "peak": 0.7725
+    },
+    "Aoi Todo": {
+     "share": 0.0348,
+     "top3": 0.1435,
+     "peak": 0.7284
+    },
+    "Mahito": {
+     "share": 0.1087,
+     "top3": 0.3304,
+     "peak": 0.7607
+    },
+    "Jogo": {
+     "share": 0.0261,
+     "top3": 0.1435,
+     "peak": 0.7209
+    },
+    "Hanami": {
+     "share": 0.0,
+     "top3": 0.0565,
+     "peak": 0.7074
+    },
+    "Choso": {
+     "share": 0.013,
+     "top3": 0.1,
+     "peak": 0.718
+    },
+    "Toji Fushiguro": {
+     "share": 0.0087,
+     "top3": 0.0565,
+     "peak": 0.7182
+    },
+    "Suguru Geto": {
+     "share": 0.0174,
+     "top3": 0.1348,
+     "peak": 0.7419
+    },
+    "Yuta Okkotsu": {
+     "share": 0.0522,
+     "top3": 0.2217,
+     "peak": 0.7535
+    },
+    "Maki Zenin": {
+     "share": 0.013,
+     "top3": 0.0826,
+     "peak": 0.719
+    },
+    "Toge Inumaki": {
+     "share": 0.0783,
+     "top3": 0.2,
+     "peak": 0.7746
+    },
+    "Kinji Hakari": {
+     "share": 0.0435,
+     "top3": 0.1913,
+     "peak": 0.7128
+    },
+    "Hiromi Higuruma": {
+     "share": 0.0043,
+     "top3": 0.0957,
+     "peak": 0.7424
+    },
+    "Naoya Zenin": {
+     "share": 0.0174,
+     "top3": 0.0696,
+     "peak": 0.7118
+    }
+   },
+   "scanned": "2026-11-15 20:29 UTC"
+  },
+  "jujutsu-kaisen:S1E11": {
+   "frames": 230,
+   "face_frames": 61,
+   "step": 5.0,
+   "chars": {
+    "Yuji Itadori": {
+     "share": 0.0565,
+     "top3": 0.2826,
+     "peak": 0.745
+    },
+    "Megumi Fushiguro": {
+     "share": 0.0261,
+     "top3": 0.0913,
+     "peak": 0.7203
+    },
+    "Nobara Kugisaki": {
+     "share": 0.0609,
+     "top3": 0.1478,
+     "peak": 0.7425
+    },
+    "Satoru Gojo": {
+     "share": 0.0522,
+     "top3": 0.213,
+     "peak": 0.7588
+    },
+    "Ryomen Sukuna": {
+     "share": 0.0435,
+     "top3": 0.1087,
+     "peak": 0.7246
+    },
+    "Kento Nanami": {
+     "share": 0.0739,
+     "top3": 0.2217,
+     "peak": 0.741
+    },
+    "Aoi Todo": {
+     "share": 0.0304,
+     "top3": 0.1565,
+     "peak": 0.733
+    },
+    "Mahito": {
+     "share": 0.0652,
+     "top3": 0.1652,
+     "peak": 0.7541
+    },
+    "Jogo": {
+     "share": 0.0478,
+     "top3": 0.1957,
+     "peak": 0.7403
+    },
+    "Hanami": {
+     "share": 0.0,
+     "top3": 0.0087,
+     "peak": 0.6732
+    },
+    "Choso": {
+     "share": 0.0087,
+     "top3": 0.0652,
+     "peak": 0.7138
+    },
+    "Toji Fushiguro": {
+     "share": 0.0043,
+     "top3": 0.1087,
+     "peak": 0.7268
+    },
+    "Suguru Geto": {
+     "share": 0.0261,
+     "top3": 0.0913,
+     "peak": 0.7384
+    },
+    "Yuta Okkotsu": {
+     "share": 0.1087,
+     "top3": 0.313,
+     "peak": 0.7503
+    },
+    "Maki Zenin": {
+     "share": 0.0,
+     "top3": 0.1217,
+     "peak": 0.7203
+    },
+    "Toge Inumaki": {
+     "share": 0.1,
+     "top3": 0.2261,
+     "peak": 0.7762
+    },
+    "Kinji Hakari": {
+     "share": 0.1217,
+     "top3": 0.2565,
+     "peak": 0.7304
+    },
+    "Hiromi Higuruma": {
+     "share": 0.0261,
+     "top3": 0.1043,
+     "peak": 0.7243
+    },
+    "Naoya Zenin": {
+     "share": 0.0174,
+     "top3": 0.1217,
+     "peak": 0.7194
+    }
+   },
+   "scanned": "2026-11-15 20:30 UTC"
   }
  },
  "corrections": [
@@ -381,16 +690,16 @@
   }
  ],
  "stats": {
-  "episodes_cached": 3,
+  "episodes_cached": 6,
   "episodes_total": 122,
-  "updated": "2026-11-15 20:03 UTC",
+  "updated": "2026-11-15 20:30 UTC",
   "refs": {
-   "demon-slayer-kimetsu-no-yaiba": {
-    "characters": 23,
-    "with_stills": 23,
-    "with_faces": 22,
-    "stills": 171,
-    "faces": 57
+   "jujutsu-kaisen": {
+    "characters": 19,
+    "with_stills": 19,
+    "with_faces": 17,
+    "stills": 150,
+    "faces": 35
    }
   }
  }
