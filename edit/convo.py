@@ -182,24 +182,30 @@ if len(words) < 12:
 starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
 best, pick = -1, None
 for i in starts:
-    for j in range(i + 6, len(words)):
+    for j in range(i + 4, len(words)):
         L = words[j]['e'] - words[i]['s']
         if L > CMAX:
             break
+        # Reject windows with dead pauses > 2.5s between words
+        if any(words[k + 1]['s'] - words[k]['e'] > 2.5 for k in range(i, j)):
+            continue
         # only end where the character has finished: sentence end AND a real pause (or nothing after)
-        done = words[j]['w'][-1:] in '.?!' and (j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.7)
+        done = words[j]['w'][-1:] in '.?!' and (j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.5)
         if L < CMIN or not done:
             continue
         talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
         act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref    # action on screen while they talk
-        score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3)
+        score = 1.5 * talk + 0.1 * (j - i) / L + 1.0 * min(act, 1.3)
         if score > best:
             best, pick = score, (i, j)
 if pick is None:
-    i = starts[0]
-    ends = [k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX and words[k]['w'][-1:] in '.?!']
-    j = max(ends) if ends else max(k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX)
-    pick = (i, j)
+    for i in starts:
+        ends = [k for k in range(i + 3, len(words)) if words[k]['e'] - words[i]['s'] <= CMAX and not any(words[m + 1]['s'] - words[m]['e'] > 3.0 for m in range(i, k))]
+        if ends:
+            pick = (i, ends[-1])
+            break
+    if pick is None:
+        pick = (starts[0], min(len(words) - 1, starts[0] + 12))
 cw = words[pick[0]:pick[1] + 1]
 c0 = max(win0, cw[0]['s'] - 0.35); c1 = min(win1, cw[-1]['e'] + 0.8)
 c0 = round(c0 * FPS) / FPS; c1 = round(c1 * FPS) / FPS
@@ -272,8 +278,9 @@ def ts(t):
 # ------------------------------------------------------------------ 4b. English voiceover (edge-tts Christopher voice)
 import edge_tts, asyncio
 VOICE_NAME = os.environ.get('VOICE', 'en-US-ChristopherNeural')
-VOICE_RATE = os.environ.get('VOICE_RATE', '+2%')
-PITCH_LIST = ['+0Hz', '-6Hz', '+5Hz', '-3Hz', '+3Hz']
+VOICE_RATE = os.environ.get('VOICE_RATE', '-3%')
+PITCH_LIST = ['-6Hz', '-8Hz', '-4Hz', '-10Hz', '-2Hz']
+DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
 
 os.makedirs('work/convo/tts', exist_ok=True)
 async def _synth_lines():
@@ -311,32 +318,67 @@ async def _synth_lines():
 
 tts_results = asyncio.run(_synth_lines())
 
+# Calculate sequential start times so character dialogue never has long dead pauses or overlaps
+cur_s = 0.2
+line_starts = []
+for li, (mp3_path, bnds) in enumerate(tts_results):
+    dur = float(duration(mp3_path))
+    raw_s = max(0.0, lines[li][0]['s'] - c0)
+    if li == 0:
+        s = raw_s if raw_s <= 1.2 else 0.2
+    else:
+        prev_end = cur_s
+        if raw_s >= prev_end + 0.1 and raw_s <= prev_end + 1.2:
+            s = raw_s
+        elif raw_s < prev_end + 0.1:
+            s = prev_end + 0.25
+        else:
+            s = prev_end + 0.4
+    line_starts.append(s)
+    cur_s = s + dur
+
+# Adjust c1/CONV if dialogue needs slightly more room
+if cur_s + 0.6 > CONV and c0 + cur_s + 0.6 <= win1:
+    c1 = round((c0 + cur_s + 0.6) * FPS) / FPS
+    CONV = c1 - c0
+
 # Map word boundaries back onto lines to sync captions with the English speech
 for li, (mp3_path, bnds) in enumerate(tts_results):
     ln = lines[li]
-    line_s = max(0.0, ln[0]['s'] - c0)
+    line_s = line_starts[li]
     if bnds:
         for bi, (ba, bb, bt) in enumerate(bnds):
             if bi < len(ln):
                 ln[bi]['s'] = c0 + line_s + ba
                 ln[bi]['e'] = c0 + line_s + max(bb, ba + 0.12)
         ln[-1]['e'] = max(ln[-1]['e'], c0 + line_s + bnds[-1][1] + 0.1)
+    else:
+        dur = float(duration(mp3_path))
+        w_dur = dur / max(1, len(ln))
+        for bi in range(len(ln)):
+            ln[bi]['s'] = c0 + line_s + bi * w_dur
+            ln[bi]['e'] = c0 + line_s + (bi + 1) * w_dur
 
-# Mix the dialogue audio files into one single stereo track
+# Mix the dialogue audio files into one single stereo track with deep trailer voice processing
 mix_inputs = []
 mix_filters = []
 for li, (mp3_path, _) in enumerate(tts_results):
-    line_s = max(0.0, lines[li][0]['s'] - c0)
+    line_s = line_starts[li]
     delay_ms = int(line_s * 1000)
     mix_inputs.extend(['-i', mp3_path])
     mix_filters.append(f'[{li}:a]adelay={delay_ms}|{delay_ms}[a{li}];')
 
 n_lines = len(tts_results)
 pads = ''.join(f'[a{i}]' for i in range(n_lines))
-mix_fc = ''.join(mix_filters) + (f'{pads}amix=inputs={n_lines}:normalize=0,' if n_lines > 1 else '[a0]') + f'apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,highpass=f=75,lowpass=f=12000,bass=g=3:f=110,loudnorm=I=-11:TP=-1.0:LRA=7[out]'
+mix_fc = (
+    ''.join(mix_filters) + (f'{pads}amix=inputs={n_lines}:normalize=0,' if n_lines > 1 else '[a0]') +
+    f'apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,'
+    f'asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'
+    f'bass=g=4:f=110,aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0:LRA=7,aresample=48000[out]'
+)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y'] + mix_inputs + ['-filter_complex', mix_fc, '-map', '[out]', 'work/convo/talk.wav'])
 VOICE = 'work/convo/talk.wav'
-print(f'synthesized {n_lines} lines of English dialogue with {VOICE_NAME}', flush=True)
+print(f'synthesized {n_lines} lines of English dialogue with {VOICE_NAME} (deep={DEEP})', flush=True)
 
 
 def get_wrap_breaks(toks, max_chars=14, max_words=3):
