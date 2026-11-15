@@ -23,7 +23,7 @@ from drive_index import library
 
 W, H, FPS = int(os.environ.get('W', 1080)), int(os.environ.get('H', 1080)), 30   # 1:1 square
 PICK = (os.environ.get('PICK') or os.environ.get('CHARACTER') or 'auto').strip().lower()
-SONG = os.environ.get('SONG', '').strip()
+SONG = (os.environ.get('SONG') or os.environ.get('BGM') or '').strip().lower()
 SEED = int(os.environ.get('SEED', time.time()))
 TEMPLATE_BEATS = 130            # length of the edit in beats (60 s at 130 BPM)
 DROP_BEAT = 17                  # first drop, same as the Gojo AMV
@@ -87,7 +87,11 @@ if new_eps:
     print('new in Drive since last run:', new_eps, flush=True)
 
 songs = sorted(f[:-4] for f in os.listdir('music') if f.endswith('.mp3'))
-song = SONG if SONG in songs else least_used(songs, hist['songs'], 1)[0]
+if SONG and SONG != 'auto':
+    match_song = [s for s in songs if s.lower() == SONG or SONG in s.lower() or s.lower().startswith(SONG)]
+    song = match_song[0] if match_song else (least_used(songs, hist['songs'], 1)[0])
+else:
+    song = least_used(songs, hist['songs'], 1)[0]
 if FORCE_EPS:
     eps = list(FORCE_EPS); series = EPISODES[eps[0]]['series']; title = series
 elif PICK in CHARS:                                                     # a character: its fight episodes

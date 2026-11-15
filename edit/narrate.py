@@ -16,7 +16,7 @@ W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by defau
 TOTAL = float(os.environ.get('TOTAL_SECONDS', 59))
 CMIN, CMAX = float(os.environ.get('CONV_MIN', 14)), float(os.environ.get('CONV_MAX', 27))   # short talk, long edit
 HOOK = 1.5
-PICK = (os.environ.get('PICK') or 'auto').strip().lower()
+PICK = (os.environ.get('CHARACTER') or os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
 COLORS = ['#FF3B5C', '#3DFF7A', '#B266FF', '#33D6FF', '#FFC533']      # pink-red, green, purple, cyan, gold
 FONT = os.environ.get('CAPTION_FONT', 'Montserrat ExtraBold')
@@ -485,6 +485,27 @@ sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/vide
     '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
 print('wrote', f'out/{name}.mp4', flush=True)
+
+out_dir = os.path.abspath('../out')
+os.makedirs(out_dir, exist_ok=True)
+video_file = os.path.join(out_dir, f'{name}.mp4')
+series_key = conv_ep.split(':')[0]
+series_title = series_key.replace('-', ' ').title()
+tag_series = series_key.replace('-', '')
+rng_m = random.Random()
+first = CHAR.split()[0] if CHAR else series_title
+if MODE == 'character' and CHAR and CHAR in LORE:
+    meta_title = rng_m.choice([f'Who is {CHAR}? 🤯', f'{CHAR} explained in 20 seconds 🔥', f"{first}'s power is unreal 😳"])
+    meta_desc = f"{CHAR}'s power, explained.\n\n{LORE[CHAR].get('power', '')}"
+else:
+    meta_title = rng_m.choice([f'{first} hits different 🥶', f'This {series_title} edit goes hard 🔥', f'{first} quote that hits hard 🥶'])
+    meta_desc = ' '.join(' '.join(w['w'] for w in ln) for ln in lines) if lines else f"{series_title} anime edit"
+
+meta_title = meta_title[:90] + ' #shorts'
+tags = ['shorts', 'anime', 'animeedit', tag_series, 'phonk', 'amv']
+meta_desc = f"{meta_desc}\n\n#{tag_series} #animeedit #anime #phonk #shorts"
+meta = dict(file=video_file, style='narrated', ep=conv_ep, title=meta_title, description=meta_desc, tags=tags)
+json.dump(meta, open(os.path.join(out_dir, 'meta.json'), 'w'), indent=1, ensure_ascii=False)
 
 hist = json.load(open('history.json'))
 hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())))
