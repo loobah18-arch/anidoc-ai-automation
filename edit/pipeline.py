@@ -35,8 +35,8 @@ rng = random.Random()
 if style == 'narrated':
     first = re.split(r'(?<=[.!?])\s', ' '.join(lines))[0].strip()
     hook = first if len(first) <= 70 else ' '.join(first.split()[:9]) + '...'
-    title = rng.choice([f'{hook} 🔥', f'The truth about this {series} fight 😳', f'This {series} moment is pure aura 🔥'])
-    desc = ' '.join(lines)
+    title = rng.choice([f'The truth about this {series} fight 😳', f'This {series} moment is pure aura 🔥', f'{series} stakes have never been higher 🔥'])
+    desc = f'Narrated {series} fight edit.'  # never publish free-LLM text (it invents names)
 else:
     best = max(lines, key=len) if lines else ''
     quote = best if len(best) <= 60 else ' '.join(best.split()[:8]) + '...'
