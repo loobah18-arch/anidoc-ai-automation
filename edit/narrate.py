@@ -229,7 +229,7 @@ print('narration', MODE, CHAR, '|', narration, flush=True)
 import edge_tts
 VOICE_NAME = os.environ.get('VOICE', 'en-US-ChristopherNeural')
 async def _tts():
-    com = edge_tts.Communicate(narration, VOICE_NAME, rate='-6%', pitch='-4Hz', boundary='WordBoundary')
+    com = edge_tts.Communicate(narration, VOICE_NAME, rate=os.environ.get('VOICE_RATE', '-10%'), pitch=os.environ.get('VOICE_PITCH', '-12Hz'), boundary='WordBoundary')
     bounds = []
     with open('work/convo/narr.mp3', 'wb') as f:
         async for ch in com.stream():
@@ -239,9 +239,11 @@ async def _tts():
                 bounds.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
     return bounds
 bounds = asyncio.run(_tts())
+DEEP = float(os.environ.get('VOICE_DEEP', '0.86'))
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/convo/narr.mp3', '-af',
-    'aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
-LEAD = 0.4
+    f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'   # pitch and formants down, same timing: a heavy trailer voice
+    'bass=g=4:f=110,aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
+LEAD = 0.05                                                           # the narrator speaks from the first frame
 narr_len = duration('work/convo/narr.wav')
 CONV = round((LEAD + narr_len + 0.7) * FPS) / FPS
 c0 = float(min(max(lo, fight), hi - CONV)); c0 = round(c0 * FPS) / FPS; c1 = c0 + CONV
@@ -407,7 +409,7 @@ sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i
 VOICE = 'work/convo/narr.wav'
 
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
-amv_len = max(14.0, TOTAL - HOOK - CONV)
+amv_len = max(14.0, TOTAL - CONV)                                   # no cold-open hook any more: the narrator opens the Short
 env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 150:.1f}|{c1 + 150:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK)
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
@@ -430,18 +432,24 @@ def _busy_part(path, length):                                        # the stead
         return 0.0
     score = [np.percentile(r[i:i + n], 15) for i in range(0, len(r) - n)]
     return float(np.argmax(score)) / 2
-bed_ss = _busy_part(song_file, CONV + 0.5)                          # a full-energy part of the song, never a silent stretch
-print(f'song bed from {bed_ss:.1f}s', flush=True)
+# the bed is the stretch of the song right BEFORE the edit's own start, so the phonk runs on without restarting
+song_start = float(plan.get('song_start', 0.0))
+bed_ss = song_start - CONV
+if bed_ss >= 0:
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV:.3f}', '-i', song_file, '-ac', '2', '-ar', '48000', 'work/convo/bed.wav'])
+else:                                                                 # edit starts early in the song: lead in with its loudest part, then the run-up
+    head = -bed_ss; busy = _busy_part(song_file, head + 0.5)
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{busy:.3f}', '-t', f'{head + 0.4:.3f}', '-i', song_file, '-ss', '0', '-t', f'{song_start:.3f}', '-i', song_file,
+        '-filter_complex', '[0:a][1:a]acrossfade=d=0.4:c1=tri:c2=tri,aresample=48000[a]', '-map', '[a]', '-ac', '2', 'work/convo/bed.wav'])
+print(f'song bed {bed_ss:.1f}s -> {song_start:.1f}s (edit starts there)', flush=True)
 fc = (
-    f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
-    f"[0:a]atrim={hook_at:.3f}:{hook_at + HOOK:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={HOOK - 0.25}:d=0.25,volume=0.8[ha];"
     f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
     f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=9,aresample=48000,asplit=2[dl][sc];"
-    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,loudnorm=I={BED_LUFS}:TP=-9:LRA=7,aresample=48000,afade=t=in:d=0.4[bdr];"
+    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,loudnorm=I={BED_LUFS}:TP=-9:LRA=7,aresample=48000[bdr];"
     f"[bdr][sc]sidechaincompress=threshold=0.03:ratio=6:attack=15:release=350:makeup=1[bd];"
     f"[dl][bd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[ca];"
     f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
-    f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]"
+    f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a]"
 )
 # captions were timed from the start of the short (hook included); the conversation clip starts at 0
 txt = open('work/convo/captions.ass').read()
@@ -449,7 +457,7 @@ txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for 
 open('work/convo/captions_shift.ass', 'w').write(txt)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-i', VOICE,
-    '-ss', f'{bed_ss:.3f}', '-t', f'{CONV + 0.5:.3f}', '-i', song_file,
+    '-i', 'work/convo/bed.wav',
     '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
     '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
