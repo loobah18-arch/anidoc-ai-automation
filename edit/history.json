@@ -17,7 +17,7 @@
   "atlxs_passo_bem_solto_slowed": 1,
   "poker_face": 1,
   "ncts_next_phonk": 1,
-  "nxxkz_loucura_letal_funk_slowed": 1
+  "nxxkz_loucura_letal_funk_slowed": 2
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -53,7 +53,8 @@
   "jujutsu-kaisen:S1E24": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
   "jujutsu-kaisen:S1E14": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E01": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
+  "jujutsu-kaisen:S3E10": 1
  },
  "shots": [
   {
@@ -3199,6 +3200,190 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
    "s": 1118.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 792.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 741.066
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 783.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 758.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 836.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 729.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 730.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 731.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 732.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 733.983
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 749.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 753.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 755.608
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 761.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 767.442
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 778.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 789.066
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 796.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 799.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 801.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 804.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 809.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 838.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 841.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 844.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 849.275
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 854.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 855.792
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 874.275
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 878.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 880.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 880.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 882.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 884.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 891.942
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 899.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 905.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 907.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 912.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 921.067
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 926.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 932.691
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 938.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 941.858
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 945.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 948.858
   }
  ],
  "runs": [
@@ -3395,6 +3580,16 @@
    "song": "nxxkz_loucura_letal_funk_slowed",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E01"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 13:05 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "nxxkz_loucura_letal_funk_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S3E10"
    ],
    "file": "_amv_part.mp4"
   }
@@ -3698,10 +3893,20 @@
     1262.3,
     1364.8
    ]
+  ],
+  "jujutsu-kaisen:S3E10": [
+   [
+    -4.0,
+    94.2
+   ],
+   [
+    1356.4,
+    1408.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 9,
+  "jujutsu-kaisen": 10,
   "demon-slayer-kimetsu-no-yaiba": 9
  },
  "known": [
@@ -3926,6 +4131,13 @@
    "e": 1017.5333333333333,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_nxxkz_loucura_letal_funk_slowed.mp4",
    "time": "2026-11-15 07:06 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E10",
+   "s": 814.0,
+   "e": 832.0666666666667,
+   "file": "Jujutsu_Kaisen_narrated_nxxkz_loucura_letal_funk_slowed.mp4",
+   "time": "2026-11-15 13:06 UTC"
   }
  ],
  "styles": [
