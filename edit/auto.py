@@ -71,9 +71,14 @@ def sh(cmd, **kw):
     return r.stdout
 
 
-def least_used(options, counts, k):
+PERF = hist.get('perf', {}) if isinstance(hist.get('perf'), dict) else {}
+PERF_W = float(os.environ.get('PERF_WEIGHT', 1.5))                # how many "uses" a top performer is worth (learn.py)
+
+
+def least_used(options, counts, k, perf=None):
     opts = list(options); rng.shuffle(opts)
-    opts.sort(key=lambda o: counts.get(o, 0))
+    perf = perf or {}
+    opts.sort(key=lambda o: counts.get(o, 0) - PERF_W * float(perf.get(o, 0) or 0))   # least used, nudged toward what viewers watched
     return opts[:k]
 
 
@@ -89,9 +94,11 @@ if new_eps:
 songs = sorted(f[:-4] for f in os.listdir('music') if f.endswith('.mp3'))
 if SONG and SONG != 'auto':
     match_song = [s for s in songs if s.lower() == SONG or SONG in s.lower() or s.lower().startswith(SONG)]
-    song = match_song[0] if match_song else (least_used(songs, hist['songs'], 1)[0])
+    song = match_song[0] if match_song else (least_used(songs, hist['songs'], 1, PERF.get('song'))[0])
 else:
-    song = least_used(songs, hist['songs'], 1)[0]
+    song = least_used(songs, hist['songs'], 1, PERF.get('song'))[0]
+    if PERF.get('song'):
+        print('song pick weighted by past performance:', {k: round(v, 2) for k, v in PERF['song'].items()}, flush=True)
 if FORCE_EPS:
     eps = list(FORCE_EPS); series = EPISODES[eps[0]]['series']; title = series
 elif PICK in CHARS:                                                     # a character: its fight episodes
@@ -269,6 +276,54 @@ for i, s in enumerate(pool):
     s['impact'] = float(0.55 * M[i] + 0.35 * P_[i] + 0.25 * C[i] + 0.2 * S[i] + 0.15 * min(B[i], 1.0))
     s['calm'] = float(-0.6 * abs(M[i] + 0.3) + 0.4 * C[i] + 0.3 * S[i] + 0.3 * min(2.5, s['e'] - s['s']))
 
+# ---------------------------------------------------------------- 4b. keep only shots where the topic character is on screen, fighting
+CHAR_NAME = os.environ.get('CHAR_NAME', '')
+def _char_filter(pool):
+    import charvis
+    cv_ = charvis.get(CHAR_NAME, os.environ.get('CHAR_SERIES', ''))
+    if cv_ is not None:
+        cands = sorted(pool, key=lambda s: -s['impact'])[:int(os.environ.get('CHAR_CANDS', 420))]
+        sc_ = cv_.score([(SRC(s['ep']), (s['s'] + s['e']) / 2) for s in cands])
+        cands = [s for s, v in zip(cands, sc_) if v]
+        for s, v in zip(cands, [v for v in sc_ if v]):
+            s.update(char=v['char'], action=v['action'], rel=v.get('rel', 0.0))
+        if len(cands) >= 20:
+            Cz, Az = z([s['char'] for s in cands]), z([s['action'] for s in cands])
+            for i, s in enumerate(cands):
+                s['char_z'], s['act_z'] = float(Cz[i]), float(Az[i])
+            per_ep = {}
+            for s in cands:
+                per_ep.setdefault(s['ep'], []).append(s['char_z'])
+            rel_ep = {}
+            for s in cands:
+                rel_ep.setdefault(s['ep'], []).append(s.get('rel', 0) > -0.03)
+            share = {e: float(np.mean(v)) for e, v in rel_ep.items()}
+            print('character presence per episode (mean of top 10 z):',
+                  {e: round(float(np.mean(sorted(v)[-10:])), 2) for e, v in per_ep.items()},
+                  '| share of shots that look like them:', {e: round(v, 2) for e, v in share.items()}, flush=True)
+            weak = [e for e, v in share.items() if v < 0.04 and max(share.values()) >= 0.12]   # character barely in this episode: drop it
+            if weak and len(weak) < len(share):
+                print('dropping episodes without the character:', weak, flush=True)
+                cands = [s for s in cands if s['ep'] not in weak]
+            n_need = int(os.environ.get('CHAR_MIN_SHOTS', 45))
+            for thr in (0.6, 0.35, 0.1, -0.15, -0.4):                   # strictest bar that still fills the edit
+                keep = [s for s in cands if s['char_z'] >= thr and s['act_z'] >= -0.8]
+                if len(keep) >= n_need:
+                    break
+            for s in keep:                                            # action + character lift the drops and the fast cuts
+                s['impact'] += 0.9 * s['char_z'] + 0.6 * s['act_z']
+                s['calm'] += 0.8 * s['char_z']
+            print(f'character filter "{CHAR_NAME}": kept {len(keep)} of {len(cands)} scored shots (bar z>={thr})', flush=True)
+            pool = keep
+    return pool
+
+
+if CHAR_NAME:
+    try:
+        pool = _char_filter(pool)
+    except Exception as ex:                                           # fail-safe: motion-only picks
+        print('character filter failed, motion-only picks:', ex, flush=True)
+
 # ---------------------------------------------------------------- 5. music
 song_path = f'music/{song}.mp3'
 import librosa
@@ -345,6 +400,16 @@ take(heroes, 'impact', 0.5)                                          # the two d
 rest = [i for i in range(n) if i not in assign]
 k = len(rest)
 top = sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact'])[:k]
+if os.environ.get('BALANCE_EPS') == '1' and len({s['ep'] for s in pool}) > 1:   # multi-fight edit: spread the cuts over every episode
+    by_ep = {}
+    for s in sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact']):
+        by_ep.setdefault(s['ep'], []).append(s)
+    top, qs = [], list(by_ep.values())
+    while len(top) < k and any(qs):
+        for q in qs:
+            if q and len(top) < k:
+                top.append(q.pop(0))
+    print('balanced cuts per episode:', {e: sum(t['ep'] == e for t in top) for e in by_ep}, flush=True)
 top.sort(key=lambda s: (s['ep'], s['s']))                            # story order through the fights
 for i, s in zip(rest, top):
     assign[i] = s; taken.add(id(s))

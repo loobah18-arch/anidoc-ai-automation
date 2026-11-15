@@ -33,8 +33,13 @@ def sh(cmd, binary=False):
     return r.stdout
 
 
-def least_used(options, counts, k):
-    opts = list(options); rng.shuffle(opts); opts.sort(key=lambda o: counts.get(o, 0)); return opts[:k]
+PERF = hist.get('perf', {}) if isinstance(hist.get('perf'), dict) else {}     # learned from views (learn.py); empty = no effect
+PERF_W = float(os.environ.get('PERF_WEIGHT', 1.5))
+
+
+def least_used(options, counts, k, perf=None):
+    opts = list(options); rng.shuffle(opts); perf = perf or {}
+    opts.sort(key=lambda o: counts.get(o, 0) - PERF_W * float(perf.get(o, 0) or 0)); return opts[:k]
 
 
 def fetch(code):
@@ -62,11 +67,26 @@ chars = {c: [e if ':' in e else f'jujutsu-kaisen:{e}' for e in v] for c, v in ch
 used_eps = {(k if ':' in k else f'jujutsu-kaisen:{k}'): v for k, v in hist.get('episodes', {}).items()}
 for c in hist.get('convos', []):
     used_eps[c['ep']] = used_eps.get(c['ep'], 0) + 2                  # conversation episodes rest longer
-if PICK in chars:
-    cand = [e for e in chars[PICK] if e in EPISODES]
-else:
+# every Short is about ONE topic character: the narration names them and the edit only uses shots where they are on screen
+LORE_ALL = json.load(open('lore.json'))
+def lore_name(key, series):
+    for nm, d in LORE_ALL.get(series, {}).items():
+        if key in d['names'] or key == nm.lower():
+            return nm
+    return None
+avail = {c: [e for e in v if e in EPISODES] for c, v in chars.items()}
+avail = {c: v for c, v in avail.items() if v and lore_name(c, EPISODES[v[0]]['series'])}
+if PICK in avail:
+    TOPIC = PICK
+else:                                                                 # auto / an anime name: rotate through that anime's characters
     series = match[0] if match else (EPISODES[new_eps[0]]['series'] if new_eps else least_used(series_all, hist.get('series', {}), 1)[0])
-    cand = [k for k, v in EPISODES.items() if v['series'] == series]
+    pool_c = [c for c, v in avail.items() if EPISODES[v[0]]['series'] == series] or list(avail)
+    TOPIC = least_used(pool_c, hist.get('narr_chars', {}), 1, PERF.get('character'))[0]
+    if PERF.get('character'):
+        print('character pick weighted by past performance:', {k: round(v, 2) for k, v in PERF['character'].items()}, flush=True)
+cand = avail[TOPIC]
+TOPIC_NAME = lore_name(TOPIC, EPISODES[cand[0]]['series'])
+print('topic character', TOPIC, '->', TOPIC_NAME, '|', len(cand), 'mapped episodes', flush=True)
 fresh = [e for e in new_eps if e in cand][:3]
 eps = fresh + least_used([e for e in cand if e not in fresh], used_eps, 3 - len(fresh))
 SF, SW, SH_ = 4, 64, 36
@@ -118,6 +138,7 @@ for sg in _ss:
 SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
 prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
 bs, bt = -1, fight
+win_sc = []
 for t in range(lo, hi - 40, 2):
     if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP):
         continue
@@ -127,6 +148,28 @@ for t in range(lo, hi - 40, 2):
     sc = min(act, 1.3) * min(lnd, 1.3) + 0.5 * min(np.percentile(per_s[t:t + 24], 25) / mref, 1.0)   # sustained motion AND loud audio = a real fight
     if sc > bs:
         bs, bt = sc, t
+    win_sc.append((sc, t))
+# among the strongest windows, prefer the one where the topic character is actually on screen
+top_w = []
+for sc, t in sorted(win_sc, reverse=True):
+    if all(abs(t - u) >= 30 for _, u in top_w):
+        top_w.append((sc, t))
+    if len(top_w) >= 6:
+        break
+try:
+    import charvis
+    _cv = charvis.get(TOPIC_NAME or '', EPISODES[conv_ep]['series'].replace('-', ' ').title()) if len(top_w) > 1 else None
+    if _cv is not None:
+        res = []
+        for sc, t in top_w:
+            vs = [v for v in _cv.score([(src, t + k) for k in (2, 8, 14, 20)]) if v]
+            ch = float(np.mean(sorted(v['char'] for v in vs)[-2:])) if vs else 0.0
+            res.append((sc, t, ch))
+        chs = np.array([r[2] for r in res]); chz = (chs - chs.mean()) / (chs.std() + 1e-6)
+        sc, bt, _ = max(((r[0] + 0.35 * cz, r[1], r[2]) for r, cz in zip(res, chz)), key=lambda r: r[0])
+        print('narration window by character presence:', [(t, round(c, 3)) for _, t, c in res], '->', bt, flush=True)
+except Exception as ex:
+    print('narration window character check skipped', ex, flush=True)
 fight = bt
 win0, win1 = max(lo, bt - 12), min(hi, bt + 52)
 print('conversation from', conv_ep, f'| talking fight at {bt}s (score {bs:.2f}), transcribing {win0}-{win1}s', flush=True)
@@ -176,7 +219,7 @@ heard = {}
 for nm, d in LORE.items():                                            # who is named in the scene's dialogue
     n = sum(len(re.findall(r'\b' + re.escape(a) + r'\b', context.lower())) for a in d['names'])
     if n: heard[nm] = n
-if not heard:                                                         # names are rarely said inside 60 s: listen to ~5 min around the fight (dub or Japanese)
+if not heard and TOPIC_NAME not in LORE:                              # names are rarely said inside 60 s: listen to ~5 min around the fight (dub or Japanese)
     w0, w1 = max(0, bt - 180), bt + 120
     sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(w0), '-t', str(w1 - w0), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/wide.wav'])
     jtxt = ' '.join(sg.text for sg in WhisperModel('small', device='cpu', compute_type='int8').transcribe(
@@ -185,7 +228,7 @@ if not heard:                                                         # names ar
         n = sum(jtxt.count(a) for a in d.get('ja', [])) + sum(len(re.findall(r'\b' + re.escape(a) + r'\b', jtxt.lower())) for a in d['names'])
         if n: heard[nm] = n
     print('names in wider audio:', heard, flush=True)
-CHAR = max(heard, key=heard.get) if heard else None
+CHAR = TOPIC_NAME if TOPIC_NAME in LORE else (max(heard, key=heard.get) if heard else None)   # the topic character, never a guess
 MODE = os.environ.get('NARRATION') or ('character' if CHAR and rng.random() < 0.5 else 'rhyme')
 if MODE == 'character' and not CHAR:
     MODE = 'rhyme'                                                    # never guess who is on screen
@@ -199,37 +242,129 @@ else:
            "Four to six short lines in rhyming couplets (AABB), every line ending in a strong rhyme. Do not name any techniques, places or people other than "
            + (CHAR.split()[0] if CHAR else 'none') + ".")
     WORDS = '30 to 46 words'
+# ---- no repeated lines: what this character's past Shorts already said, and which lore facts were used most
+HKEY = TOPIC or (CHAR or '_scene')
+PAST_LINES = [l for l in hist.get('narr_lines', {}).get(HKEY, []) if l][-int(os.environ.get('NO_REPEAT_LINES', 18)):]
+FACT_SENTS = [x.strip() for x in re.split(r'(?<=[.!?])\s+', LORE[CHAR]['power']) if x.strip()] if CHAR in LORE else []
+_fu = hist.get('lore_used', {}).get(HKEY, {})
+FRESH_FACTS = sorted(FACT_SENTS, key=lambda f_: _fu.get(f_[:60], 0))[:2] if FACT_SENTS else []
+_STOPW = set('the a an and or of to in on at for with from into is are was were be been his her their its this that they them he she it as by not no but all one who what when your you our we'.split())
+
+
+def _content(t):
+    return [w for w in re.findall(r"[a-z']+", t.lower()) if len(w) > 2 and w not in _STOPW]
+
+
+def _units(t):                                                        # lines / sentences of a narration
+    return [u.strip() for u in re.split(r'(?<=[.!?;])\s+|\n+|,\s+(?=[A-Z])', t) if len(u.split()) >= 3]
+
+
+def repeat_score(text):
+    """0..1: how much of this narration was already said in an earlier Short about the same character"""
+    if not PAST_LINES:
+        return 0.0, ''
+    past_sets = [(set(_content(l)), l) for l in PAST_LINES]
+    past_ngrams = set()
+    for l in PAST_LINES:
+        w = _content(l); past_ngrams |= {tuple(w[i:i + 3]) for i in range(len(w) - 2)}
+    worst, which = 0.0, ''
+    for u in _units(text):
+        cu = set(_content(u))
+        if len(cu) < 2:
+            continue
+        for ps, l in past_sets:
+            j = len(cu & ps) / max(1, len(cu | ps))
+            if j > worst:
+                worst, which = j, l
+        w = _content(u); ng = [tuple(w[i:i + 3]) for i in range(len(w) - 2)]
+        if ng and sum(g in past_ngrams for g in ng) / len(ng) >= 0.5 and worst < 0.75:
+            worst, which = max(worst, 0.75), u
+    return worst, which
+
+
+AVOID = ''
+if PAST_LINES:
+    AVOID += ("\nThese lines were already used in earlier Shorts about this character. Do NOT repeat them, their rhymes or their key phrases:\n- "
+              + '\n- '.join(PAST_LINES[-12:]) + "\n")
+if FRESH_FACTS and len(FACT_SENTS) > 2:
+    AVOID += "Build mainly on these facts, which were used least so far: " + ' '.join(FRESH_FACTS) + "\n"
+print(f'no-repeat memory for {HKEY}: {len(PAST_LINES)} past lines, fresh facts: {FRESH_FACTS}', flush=True)
 prompt = (f"Anime: {series_name}, episode {conv_ep.split(':')[-1]}.\n"
           f"Dialogue heard in the scene (auto-translated, may contain errors): {context or '(no clear dialogue)'}\n\n"
           f"{ASK}\nWrite {WORDS} for a YouTube Short, serious, deep, cinematic tone. "
           "Never invent facts. Plain sentences, no emojis, "
-          "no hashtags, no quotes, no stage directions, no titles. Reply with the text only.")
+          "no hashtags, no quotes, no stage directions, no titles. Reply with the text only." + AVOID)
+
+WRITER = 'none'
+
+
+def _groq(prompt):
+    key = os.environ.get('GROQ_API_KEY', '').strip()
+    if not key:
+        raise LookupError('no GROQ_API_KEY')
+    last = None
+    for mdl in dict.fromkeys([os.environ.get('GROQ_MODEL') or 'llama-3.3-70b-versatile', 'llama-3.1-8b-instant']):
+        try:
+            req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST',
+                data=json.dumps(dict(model=mdl, temperature=0.8, max_tokens=400,
+                                     messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'),
+                                               dict(role='user', content=prompt)])).encode(),
+                headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
+            return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content'], f'groq:{mdl}'
+        except Exception as ex:
+            last = ex
+            print('groq', mdl, 'failed:', ex, getattr(ex, 'read', lambda: b'')()[:200], flush=True)
+    raise last
+
+
+def _pollinations(prompt):
+    req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
+        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', seed=random.randint(1, 10**6),
+                             messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
+        headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
+    return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content'], 'pollinations'
+
 
 def llm(prompt):
-    key = os.environ.get('GROQ_API_KEY')
-    if key:
-        req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST',
-            data=json.dumps(dict(model=os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile'), temperature=0.7,
-                                 messages=[dict(role='user', content=prompt)])).encode(),
-            headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
-        return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
-    req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
-        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
-        headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
-    return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content']
-
-for _ in range(3):
+    """Groq first (GROQ_API_KEY secret), then the free Pollinations endpoint. Sets WRITER to whoever answered."""
+    global WRITER
     try:
-        narration = re.sub(r'\s+', ' ', re.sub(r'(?<![.,!?;:])[ \t]*\n+', '. ', re.sub(r'[*"#]|\(.*?\)', '', re.sub(r'[ \t]+\n', '\n', llm(prompt).strip())))).strip()
-        if 20 <= len(narration.split()) <= 70 and (MODE != 'character' or CHAR.split()[0] in narration):
-            break
+        txt, WRITER = _groq(prompt)
     except Exception as ex:
-        print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(50)
-else:                                                                 # last resort: safe lines that need no invented facts
+        print(f'writer fallback -> pollinations ({ex})', flush=True)
+        txt, WRITER = _pollinations(prompt)
+    print('writer used:', WRITER, flush=True)
+    return txt
+
+
+narration, best_rep, n_try = None, None, int(os.environ.get('LLM_TRIES', 4))
+for i in range(n_try):
+    try:
+        ask = prompt if i == 0 else prompt + f"\n(Take {i + 1}: completely fresh wording.)"
+        cand_txt = re.sub(r'\s+', ' ', re.sub(r'(?<![.,!?;:])[ \t]*\n+', '. ', re.sub(r'[*"#]|\(.*?\)', '', re.sub(r'[ \t]+\n', '\n', llm(ask).strip())))).strip()
+        if not (20 <= len(cand_txt.split()) <= 70 and (MODE != 'character' or CHAR.split()[0] in cand_txt)):
+            print('draft rejected (length / name)', '|', cand_txt[:160], flush=True)
+            continue
+        rs, which = repeat_score(cand_txt)
+        if best_rep is None or rs < best_rep[0]:
+            best_rep = (rs, cand_txt, WRITER)
+        if rs >= float(os.environ.get('REPEAT_MAX', 0.5)):
+            print(f'draft rejected: repeats an earlier line ({rs:.2f}: "{which}")', flush=True)
+            continue
+        narration = cand_txt
+        break
+    except Exception as ex:
+        print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(30)
+if narration is None and best_rep is not None:                       # every draft overlapped a little: keep the freshest one
+    narration, WRITER = best_rep[1], best_rep[2]
+    print(f'using the least repetitive draft (overlap {best_rep[0]:.2f})', flush=True)
+if narration is None:                                                 # last resort: safe lines that need no invented facts
+    WRITER = 'template'
     nm = CHAR.split()[0] if CHAR else 'the fighter'
     narration = (f"This is {CHAR}. {LORE[CHAR]['power']}" if MODE == 'character' else rng.choice([
         f"They said to kneel, they said to fall. {nm} rose up and faced it all. Every scar became a vow, the weak one is the hunter now.",
         f"Pain is the teacher, blood is the test. {nm} gives everything, nothing less. When the world says stop, the heart says go, the strongest fire burns slow."]))
+print('narration writer:', WRITER, flush=True)
 print('narration', MODE, CHAR, '|', narration, flush=True)
 
 from voice import speak                                              # expressive phrase-by-phrase read (edit/voice.py)
@@ -325,6 +460,27 @@ Style: Cap,{FONT},98,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"""]
 DIM = '&H00A0A0A0&'
+SAFE_X = int(os.environ.get('CAPTION_SAFE_X', 60))                  # px kept clear left/right (same as the style margins)
+try:
+    from PIL import ImageFont
+    _fp = subprocess.run(['fc-match', '-f', '%{file}', FONT], capture_output=True, text=True).stdout.strip()
+    _font = ImageFont.truetype(_fp, 98) if _fp else None
+except Exception:
+    _font = None
+
+
+def row_w(t):                                                         # rendered width of one caption row at size 98, spacing 3
+    if _font is not None:
+        return _font.getlength(t) + 3 * max(0, len(t) - 1) + 2 * 4
+    return len(t) * (0.66 * 98 + 3) + 8
+
+
+def fit_scale(rows):                                                  # 100 unless a row would cross the safe frame
+    widest = max(row_w(r) for r in rows) * 1.06                       # the 106% pop-in included
+    room = W - 2 * SAFE_X
+    return 100.0 if widest <= room else max(55.0, 100.0 * room / widest)
+
+
 for li, ln in enumerate(lines):
     col = colour_of[spk[li]]
     t_end = min(ln[-1]['e'] + 0.35, lines[li + 1][0]['s'] if li + 1 < len(lines) else c1) - c0 + HOOK
@@ -333,6 +489,7 @@ for li, ln in enumerate(lines):
     if not toks:
         continue
     split = len(toks) if len(toks) <= 3 or sum(map(len, toks)) <= 14 else (len(toks) + 1) // 2
+    fit = fit_scale([' '.join(toks[:split]), ' '.join(toks[split:])] if split < len(toks) else [' '.join(toks)])
     for k in range(len(toks)):                                        # word-by-word: spoken white, the rest dim
         a = ln[min(k, len(ln) - 1)]['s'] - c0 + HOOK
         b = (ln[k + 1]['s'] - c0 + HOOK) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
@@ -346,13 +503,15 @@ for li, ln in enumerate(lines):
             elif m != len(toks) - 1:
                 parts.append(' ')
         txt = ''.join(parts).replace(' \\N', '\\N')
-        pop = '{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else ''
+        pop = ('{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else '') if fit >= 100 else \
+              (f'{{\\fscx{fit * 1.06:.0f}\\fscy{fit * 1.06:.0f}\\t(0,90,\\fscx{fit:.0f}\\fscy{fit:.0f})}}' if k == 0 else f'{{\\fscx{fit:.0f}\\fscy{fit:.0f}}}')
         glow = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord18\\blur16\\3c{ass_col(col)}\\3a&H20&\\shad0\\1a&HFF&}}'
         main = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord4\\blur3\\3c{ass_col(col)}\\shad3}}'
         ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
         ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
 open('work/convo/captions.ass', 'w').write('\n'.join(ass) + '\n')
-json.dump(dict(ep=conv_ep, s=c0, e=c1, mode=MODE, character=CHAR, lines=[dict(t=' '.join(w['w'] for w in ln), speaker=int(spk[i]), colour=colour_of[spk[i]])
+json.dump(dict(ep=conv_ep, s=c0, e=c1, mode=MODE, character=CHAR, topic=TOPIC, topic_name=TOPIC_NAME, writer=WRITER,
+               narration=narration, conv_len=CONV, lines=[dict(t=' '.join(w['w'] for w in ln), speaker=int(spk[i]), colour=colour_of[spk[i]])
                                                for i, ln in enumerate(lines)]), open('work/convo/convo.json', 'w'), indent=1)
 print('captions', len(lines), 'lines,', len(set(spk)), 'speaker colours', flush=True)
 
@@ -408,7 +567,8 @@ VOICE = 'work/convo/narr.wav'
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
 amv_len = max(14.0, TOTAL - CONV)                                   # no cold-open hook any more: the narrator opens the Short
 env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 60:.1f}|{c1 + 90:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
-           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK)
+           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
+           CHAR_NAME=TOPIC_NAME or '', CHAR_SERIES=series_name)          # auto.py keeps only shots where the topic character is on screen
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))
@@ -495,9 +655,24 @@ else:
 meta_title = meta_title[:90] + ' #shorts'
 tags = ['shorts', 'anime', 'animeedit', tag_series, 'phonk', 'amv']
 meta_desc = f"{meta_desc}\n\n#{tag_series} #animeedit #anime #phonk #shorts"
-meta = dict(file=video_file, style='narrated', ep=conv_ep, title=meta_title, description=meta_desc, tags=tags)
+meta = dict(file=video_file, style='narrated', ep=conv_ep, title=meta_title, description=meta_desc, tags=tags,
+            character=TOPIC, character_name=TOPIC_NAME, song=plan['song'], voice=os.environ.get('VOICE', 'en-US-AndrewNeural'), writer=WRITER)
 json.dump(meta, open(os.path.join(out_dir, 'meta.json'), 'w'), indent=1, ensure_ascii=False)
 
 hist = json.load(open('history.json'))
-hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())))
+hist.setdefault('narr_chars', {})[TOPIC] = hist.get('narr_chars', {}).get(TOPIC, 0) + 1
+hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime()),
+                                          character=TOPIC, song=plan['song'], voice=os.environ.get('VOICE', 'en-US-AndrewNeural'),
+                                          writer=WRITER, mode=MODE, title=meta_title))
+# no repeated lines next time: remember what was said and which lore facts it used
+_nl = hist.setdefault('narr_lines', {}).setdefault(HKEY, [])
+_nl += [u for u in _units(narration) if u not in _nl]
+hist['narr_lines'][HKEY] = _nl[-60:]
+if FACT_SENTS:
+    _lu = hist.setdefault('lore_used', {}).setdefault(HKEY, {})
+    _nw = set(_content(narration))
+    for f_ in FACT_SENTS:
+        cw_ = set(_content(f_))
+        if cw_ and len(cw_ & _nw) / len(cw_) >= 0.4:
+            _lu[f_[:60]] = _lu.get(f_[:60], 0) + 1
 json.dump(hist, open('history.json', 'w'), indent=1)

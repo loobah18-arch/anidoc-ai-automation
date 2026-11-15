@@ -47,8 +47,29 @@ jobs:
           apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates libsndfile1 libglib2.0-0t64 fonts-montserrat fontconfig
           fc-list | grep -i "montserrat" | grep -i "extrabold" | head -2
           pip3 install --break-system-packages gdown numpy librosa soundfile scikit-learn faster-whisper "opencv-python-headless<5" edge-tts requests google-api-python-client google-auth
+          pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch torchvision || echo "torch install failed: character filter off"
+          pip3 install --break-system-packages open_clip_torch pillow || echo "open_clip install failed: character filter off"
       - uses: actions/checkout@v4
+      - name: Restore character reference pictures + CLIP weights
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            edit/work/refs
+            /github/home/.cache/huggingface
+          key: charvis-refs-v1-${{ github.run_id }}
+          restore-keys: |
+            charvis-refs-v1-
+      - name: Learn from views (no-op without uploads / YouTube creds)
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID || secrets.CLIENT_ID }}
+        run: python3 edit/learn.py
       - name: Make the Short
+        id: make
         env:
           PICK: ${{ github.event.inputs.character || github.event.inputs.pick || 'auto' }}
           CHARACTER: ${{ github.event.inputs.character || github.event.inputs.pick || 'auto' }}
@@ -58,17 +79,29 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           NARRATION: ${{ github.event.inputs.narration }}
         run: python3 edit/narrate.py
+      - name: Quality gate (character on screen, loudness, caption safe frame)
+        id: gate
+        continue-on-error: true
+        timeout-minutes: 20
+        run: python3 edit/gate.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: narrated-short-${{ github.run_number }}
           path: |
             out/*.mp4
             out/meta.json
+            out/gate.json
             edit/work/convo/convo.json
             edit/work/convo/captions.ass
           retention-days: 30
+      - name: Upload skipped
+        if: steps.make.outcome == 'success' && (steps.gate.outputs.gate == 'fail' || (github.event.inputs.upload != 'public' && github.event.inputs.upload != 'private'))
+        run: |
+          echo "upload=${{ github.event.inputs.upload || 'none' }} gate=${{ steps.gate.outputs.gate || 'n/a' }} -> not uploading to YouTube. The video is in this run's artifact narrated-short-${{ github.run_number }}." | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 -c "import json; g=json.load(open('out/gate.json')); print('gate reasons:', g['reasons'])" || true
       - name: Upload to YouTube
-        if: github.event.inputs.upload == 'public' || github.event.inputs.upload == 'private'
+        if: (github.event.inputs.upload == 'public' || github.event.inputs.upload == 'private') && steps.gate.outputs.gate != 'fail'
         env:
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
@@ -76,12 +109,19 @@ jobs:
           YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
           PRIVACY_STATUS: ${{ github.event.inputs.upload }}
         run: python3 publish.py
+      - name: Character map (scan new episodes once, correct characters.json)
+        if: always()
+        continue-on-error: true
+        timeout-minutes: 25
+        env:
+          DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
+        run: python3 edit/charmap.py
       - name: Remember what was used
         if: always()
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "amv-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add edit/history.json metadata/youtube_upload_history.json metadata/candle_gate_state.json 2>/dev/null || true
+          for f in edit/history.json edit/char_map.json edit/characters.json metadata/youtube_upload_history.json metadata/candle_gate_state.json; do [ -e "$f" ] && git add "$f"; done; true
           git commit -m "history: narrated short ${{ github.run_number }}" || exit 0
           git pull --rebase -X theirs origin "${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"
