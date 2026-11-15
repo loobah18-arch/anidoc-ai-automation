@@ -1,23 +1,23 @@
 {
   "candle_evaluation": {
-    "decision": "UPLOAD_CLEARED",
-    "can_upload": true,
+    "decision": "SPACING_WAIT_INLINE",
+    "can_upload": false,
     "requires_timer": false,
     "timer_seconds": 3600,
-    "requires_spacing_sleep": false,
-    "spacing_sleep_seconds": 0,
-    "active_layer": "All Layers Cleared",
-    "recommendation": "Active video velocity (0 views/hr, peak: 43/hr) is below 2,500 views/hr threshold. Cleared to upload next video.",
+    "requires_spacing_sleep": true,
+    "spacing_sleep_seconds": 2777,
+    "active_layer": "Layer 0 (24-Hour Spacing: Inline Wait)",
+    "recommendation": "\u23f1\ufe0f 24-Hour Spacing Guard: Active video was uploaded 23.2h ago. Remaining wait (46.2 min) is within inline window (240 min). Waiting inline for 46m before upload to maintain daily cadence.",
     "layer0": {
       "layer": 0,
-      "decision": "SPACING_CLEARED",
-      "can_upload": true,
-      "requires_spacing_sleep": false,
-      "spacing_sleep_seconds": 0,
-      "elapsed_hours": 24.22,
+      "decision": "SPACING_WAIT_INLINE",
+      "can_upload": false,
+      "requires_spacing_sleep": true,
+      "spacing_sleep_seconds": 2777,
+      "elapsed_hours": 23.23,
       "min_spacing_hours": 24.0,
-      "remaining_hours": 0.0,
-      "recommendation": "\u2705 24-Hour Spacing Cleared: Active video has been up for 24.2h (>= 24h). Evaluating performance under Layer 1 & Layer 2."
+      "remaining_hours": 0.77,
+      "recommendation": "\u23f1\ufe0f 24-Hour Spacing Guard: Active video was uploaded 23.2h ago. Remaining wait (46.2 min) is within inline window (240 min). Waiting inline for 46m before upload to maintain daily cadence."
     },
     "layer1": {
       "layer": 1,
@@ -25,20 +25,20 @@
       "can_upload": true,
       "requires_timer": false,
       "timer_seconds": 3600,
-      "total_views": 998,
-      "elapsed_hours": 24.22,
-      "recommendation": "Video is past the initial 24h window (24.2h elapsed). Layer 1 passed; evaluating under Layer 2."
+      "total_views": 836,
+      "elapsed_hours": 23.23,
+      "recommendation": "Video has 836 views in 23.2h (< 2,000 threshold). Layer 1 cleared; evaluating under Layer 2."
     },
     "layer2": {
       "decision": "UPLOAD_CLEARED",
       "can_upload": true,
-      "consecutive_hours_below": 6,
+      "consecutive_hours_below": 7,
       "required_hours": 24,
       "threshold": 2500,
-      "current_hourly_rate": 0,
+      "current_hourly_rate": 35,
       "peak_hourly_rate": 43,
-      "total_candles": 6,
-      "recommendation": "Active video velocity (0 views/hr, peak: 43/hr) is below 2,500 views/hr threshold. Cleared to upload next video."
+      "total_candles": 7,
+      "recommendation": "Active video velocity (35 views/hr, peak: 43/hr) is below 2,500 views/hr threshold. Cleared to upload next video."
     }
   },
   "hourly_candles": [
@@ -47,14 +47,15 @@
     15,
     24,
     43,
-    0
+    0,
+    35
   ],
   "last_snapshot": {
-    "video_id": "RiU3tLZv6bk",
-    "title": "Toji Fushiguro The Sorcerer Killer \ud83d\udde1\ufe0f #toji #jjk #jujutsukaisen #animeedit #4kedit #shorts",
-    "total_views": 998,
-    "timestamp": "2026-11-14T15:14:35.711657+00:00",
-    "hourly_velocity": 0,
-    "elapsed_hours": 24.22
+    "video_id": "iSrOTe-hDig",
+    "title": "The Coldest Hashira Giyu Tomioka \ud83e\udd76\ud83c\udf0a #giyu #demonslayer #animeedit #shorts",
+    "total_views": 836,
+    "timestamp": "2026-11-15T14:29:19.666716+00:00",
+    "hourly_velocity": 35,
+    "elapsed_hours": 23.23
   }
 }
