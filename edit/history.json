@@ -14,7 +14,8 @@
   "lonown_avangard_phonk": 1,
   "ashreveal_manasha_phonk": 1,
   "trashxrl_deus_do_olimpo": 1,
-  "atlxs_passo_bem_solto_slowed": 1
+  "atlxs_passo_bem_solto_slowed": 1,
+  "poker_face": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -47,7 +48,8 @@
   "demon-slayer-kimetsu-no-yaiba:S2E07": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E05": 1,
   "jujutsu-kaisen:S1E16": 1,
-  "jujutsu-kaisen:S1E24": 1
+  "jujutsu-kaisen:S1E24": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E10": 1
  },
  "shots": [
   {
@@ -2649,6 +2651,182 @@
   {
    "ep": "jujutsu-kaisen:S1E24",
    "s": 794.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1040.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1047.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 872.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 883.025
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 957.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 854.483
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 858.608
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 862.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 864.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 892.692
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 896.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 900.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 905.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 908.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 916.942
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 922.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 925.025
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 936.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 944.275
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 950.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 952.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 954.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 959.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 966.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 979.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1026.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1032.608
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1049.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1054.441
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1064.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1074.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1078.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1081.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1084.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1111.316
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1116.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1118.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1138.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1141.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1148.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1157.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1160.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1165.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1168.042
   }
  ],
  "runs": [
@@ -2815,6 +2993,16 @@
    "song": "atlxs_passo_bem_solto_slowed",
    "episodes": [
     "jujutsu-kaisen:S1E24"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 06:30 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "poker_face",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S4E10"
    ],
    "file": "_amv_part.mp4"
   }
@@ -3088,11 +3276,21 @@
     126.6,
     215.4
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E10": [
+   [
+    37.2,
+    135.0
+   ],
+   [
+    1286.1,
+    1385.1
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 8,
-  "demon-slayer-kimetsu-no-yaiba": 7
+  "demon-slayer-kimetsu-no-yaiba": 8
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -3295,6 +3493,13 @@
    "e": 653.0333333333333,
    "file": "Jujutsu_Kaisen_narrated_atlxs_passo_bem_solto_slowed.mp4",
    "time": "2026-11-15 06:08 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "s": 1000.0,
+   "e": 1020.4,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_poker_face.mp4",
+   "time": "2026-11-15 06:31 UTC"
   }
  ],
  "styles": [
