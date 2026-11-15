@@ -208,54 +208,68 @@ first_name = CHAR.split()[0] if CHAR else 'the fighter'
 ASK = (f"Write a hype poem about {CHAR} from {series_name}, voiced by a deep movie-trailer narrator, like spoken-word bars.\n"
        f"Facts you may use (and ONLY these, reworded): {FACTS}\n"
        "Rules:\n"
-       "- 6 short lines, rhyming couplets (AABB), each line 5 to 9 words, every line ending on a hard rhyme.\n"
+       "- 6 short lines, 5 to 9 words each. Lines 1 and 2 rhyme, lines 3 and 4 rhyme, lines 5 and 6 rhyme. Never end two lines on the same word, and never tack an extra rhyme word onto the end of a line.\n"
        f"- Name {first_name} in the first line.\n"
        "- Every single line must point at a real power, technique, battle or piece of lore from the facts above"
        + (f" (for example: {', '.join(sorted(TERMS)[:6])})" if TERMS else '') + ". No generic filler like 'rise up' or 'never give up'.\n"
        "- Do not invent names, numbers, techniques or events that are not in the facts.\n"
+       "- Rhyme with plain, real English words that make sense (no forced or nonsense rhymes).\n"
+       "- Style example for a different character (do not copy it): Six Eyes open, he sees it all, / Limitless space makes every fist stall,\n"
        "- One line per row, a comma or full stop at the end of each line, no title.")
 prompt = (f"Anime: {series_name}. Scene: episode {conv_ep.split(':')[-1]}.\n"
           f"Dialogue heard in the scene (auto-translated, may contain errors): {context[:600] or '(no clear dialogue)'}\n\n"
           f"{ASK}\nNo emojis, no hashtags, no quotes, no stage directions. Reply with the six lines only.")
 
-def _rhymes(text):                                                    # loose check: couplet endings share their last 2 letters or a vowel+tail
-    ends = [re.sub(r'[^a-z]', '', l.split()[-1].lower()) for l in re.split(r'[.,;!?]\s*|\n', text) if l.strip()]
-    pairs = list(zip(ends[0::2], ends[1::2]))
-    tail = lambda w: re.search(r'[aeiouy]+[^aeiouy]*$', w).group(0) if re.search(r'[aeiouy]', w) else w
-    return sum(a[-2:] == b[-2:] or tail(a) == tail(b) for a, b in pairs) >= max(1, len(pairs) - 1)
+_STOP = set('the and with that this from into their they them have has had been were when which while will would can could only also more most than then over under after before about against there where what your his her its one two who whom same must each other just like very upon'.split())
+LORE_WORDS = {w for w in re.findall(r"[a-z][a-z'-]{3,}", FACTS.lower()) if w not in _STOP} | {t.lower() for t in TERMS}
 
-def _on_topic(text):
-    low = text.lower()
-    hits = sum(t.lower() in low for t in TERMS)
-    return first_name.lower() in low and hits >= min(2, len(TERMS))
+def _lines(raw):
+    ls = [l.strip(' -\u2014') for l in re.split(r'\n', raw) if len(l.split()) >= 3]
+    return ls[:6]
 
-def llm(prompt):
-    key = os.environ.get('GROQ_API_KEY')
-    if key:
-        req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST',
-            data=json.dumps(dict(model=os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile'), temperature=0.7,
-                                 messages=[dict(role='user', content=prompt)])).encode(),
-            headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
-        return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
-    req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
-        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
-        headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
-    return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content']
+def _end(l):
+    w = re.sub(r'[^a-z]', '', (l.split() or [''])[-1].lower())
+    return w
 
-for _ in range(3):
+def _rhyme_pair(a, b):
+    if not a or not b or a == b:
+        return False
+    tail = lambda w: (re.search(r'[aeiouy]+[^aeiouy]*$', w).group(0) if re.search(r'[aeiouy]', w) else w)
+    return a[-3:] == b[-3:] or tail(a) == tail(b) and len(tail(a)) >= 2 or a[-2:] == b[-2:]
+
+def _score(raw):                                                      # higher is better; returns (score, lines)
+    ls = _lines(raw)
+    if len(ls) < 6:
+        return -1, ls
+    ends = [_end(l) for l in ls]
+    rhymed = sum(_rhyme_pair(ends[i], ends[i + 1]) for i in (0, 2, 4))
+    lore = sum(any(w in l.lower() for w in LORE_WORDS) for l in ls)     # lines that point at real powers / lore
+    named = first_name.lower() in ' '.join(ls).lower()
+    repeats = len(ends) - len(set(ends))
+    words = sum(len(l.split()) for l in ls)
+    sc = rhymed * 3 + lore + (3 if named else -6) - repeats * 2 - (4 if not 24 <= words <= 64 else 0)
+    return sc, ls
+
+best = (-99, [])
+for i in range(5):
     try:
-        raw_txt = re.sub(r'[*"#]|\(.*?\)', '', re.sub(r'[ \t]+\n', '\n', llm(prompt).strip()))
-        raw_txt = '\n'.join(l.strip() for l in raw_txt.splitlines() if l.strip() and not l.strip().endswith(':'))
-        narration = re.sub(r'\s+', ' ', re.sub(r'(?<![.,!?;:])[ \t]*\n+', ', ', raw_txt)).strip()   # line breaks -> commas: flowing bars, no full stop pause
-        ok = 25 <= len(narration.split()) <= 64 and _on_topic(narration) and _rhymes(raw_txt)
-        print('draft', 'ok' if ok else 'rejected', '|', narration, flush=True)
+        ask = prompt + f"\n(Take {i + 1}: fresh wording, different rhymes.)"   # new text each try, so a cached reply is never reused
+        raw_txt = re.sub(r'[*"#]|\(.*?\)', '', llm(ask).strip())
+        sc, ls = _score(raw_txt)
+        ok = len(ls) == 6 and sc >= 9 + 4                              # all 3 couplets rhyme, named, 4+ lore lines
+        print('draft', 'ok' if ok else 'rejected', sc, '|', ' / '.join(ls), flush=True)
+        if sc > best[0]:
+            best = (sc, ls)
         if ok:
             break
     except Exception as ex:
-        print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(50)
+        print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(20)
+if best[0] >= 9:                                                      # at least two rhyming couplets, named, on-lore
+    narration = ' '.join(l if l[-1] in '.,!?;' else l + ',' for l in best[1]).rstrip(',') + '.'
+    narration = re.sub(r'\s+', ' ', narration)
 else:                                                                 # last resort: safe lines that need no invented facts
     nm = CHAR.split()[0] if CHAR else 'the fighter'
-    narration = f"This is {CHAR}. {FACTS}" if FACTS else f"This is {nm}, and this is the fight."   # facts only, never filler rhymes
+    narration = f"This is {CHAR}. {FACTS}" if FACTS else f"This is {nm}, and this is the fight."
 print('narration', MODE, CHAR, '|', narration, flush=True)
 
 import edge_tts
