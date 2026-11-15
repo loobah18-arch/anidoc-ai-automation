@@ -33,10 +33,15 @@ lines = [l['t'] for l in info.get('lines', [])]
 rng = random.Random()
 
 if style == 'narrated':
-    first = re.split(r'(?<=[.!?])\s', ' '.join(lines))[0].strip()
-    hook = first if len(first) <= 70 else ' '.join(first.split()[:9]) + '...'
-    title = rng.choice([f'The truth about this {series} fight 😳', f'This {series} moment is pure aura 🔥', f'{series} stakes have never been higher 🔥'])
-    desc = f'Narrated {series} fight edit.'  # never publish free-LLM text (it invents names)
+    char, mode = info.get('character'), info.get('mode')
+    lore = json.load(open(os.path.join(HERE, 'lore.json'))).get(series_key, {})
+    first = char.split()[0] if char else series
+    if mode == 'character' and char in lore:
+        title = rng.choice([f'Who is {char}? 🤯', f'{char} explained in 20 seconds 🔥', f"{first}'s power is unreal 😳"])
+        desc = f"{char}'s power, explained.\n\n{lore[char]['power']}"
+    else:
+        title = rng.choice([f'{first} hits different 🥶', f'This {series} edit goes hard 🔥', f'{first} quote that hits hard 🥶'])
+        desc = ' '.join(lines)
 else:
     best = max(lines, key=len) if lines else ''
     quote = best if len(best) <= 60 else ' '.join(best.split()[:8]) + '...'

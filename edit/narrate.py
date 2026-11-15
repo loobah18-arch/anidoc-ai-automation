@@ -165,17 +165,30 @@ for sg in segs:
 import urllib.request, asyncio
 series_name = EPISODES[conv_ep]['series'].replace('-', ' ').title()
 context = ' '.join(w['w'] for w in words)[:1800]
-MODE = os.environ.get('NARRATION') or rng.choice(['scene', 'facts', 'praise'] if os.environ.get('GROQ_API_KEY') else ['scene', 'praise'])   # free writer invents facts
-ASK = {
-    'scene': 'Narrate what is happening in this fight scene and what is at stake, like a movie trailer narrator.',
-    'facts': 'Pick the main character fighting in this scene and tell 2 striking, TRUE facts about them (abilities, rank, feats, backstory).',
-    'praise': 'Pick the main character fighting in this scene and praise their strength, will and fighting spirit with gravity and respect.',
-}[MODE]
+LORE = json.load(open('lore.json')).get(EPISODES[conv_ep]['series'], {})
+heard = {}
+for nm, d in LORE.items():                                            # who is named in the scene's dialogue
+    n = sum(len(re.findall(r'\b' + re.escape(a) + r'\b', context.lower())) for a in d['names'])
+    if n: heard[nm] = n
+CHAR = max(heard, key=heard.get) if heard else None
+MODE = os.environ.get('NARRATION') or ('character' if CHAR and rng.random() < 0.5 else 'rhyme')
+if MODE == 'character' and not CHAR:
+    MODE = 'rhyme'                                                    # never guess who is on screen
+if MODE == 'character':
+    ASK = (f"Introduce {CHAR} and explain their power to someone who has never watched the anime. "
+           f"Use ONLY these facts, reworded: {LORE[CHAR]['power']} Do not add any other names, techniques, numbers or events.")
+    WORDS = '34 to 46 words of narration'
+else:
+    who = f"{CHAR}, using their ideals, struggle and power ({LORE[CHAR]['power']})" if CHAR else 'the fighters in this scene and what is at stake'
+    ASK = (f"Write a rhyming quote, like a dark motivational poem, about {who}. "
+           "Four to six short lines in rhyming couplets (AABB), every line ending in a strong rhyme. Do not name any techniques, places or people other than "
+           + (CHAR.split()[0] if CHAR else 'none') + ".")
+    WORDS = '30 to 46 words'
 prompt = (f"Anime: {series_name}, episode {conv_ep.split(':')[-1]}.\n"
           f"Dialogue heard in the scene (auto-translated, may contain errors): {context or '(no clear dialogue)'}\n\n"
-          f"{ASK}\nWrite 34 to 46 words of narration for a YouTube Short, serious, deep, cinematic tone. "
-          "Only state facts you are 100% sure of; never invent techniques, numbers, feats or events. When unsure, describe the emotion, stakes and resolve instead of specifics. Plain sentences, no emojis, "
-          "no hashtags, no quotes, no stage directions. Reply with the narration only.")
+          f"{ASK}\nWrite {WORDS} for a YouTube Short, serious, deep, cinematic tone. "
+          "Never invent facts. Plain sentences, no emojis, "
+          "no hashtags, no quotes, no stage directions, no titles. Reply with the text only.")
 
 def llm(prompt):
     key = os.environ.get('GROQ_API_KEY')
@@ -186,23 +199,23 @@ def llm(prompt):
             headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
         return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
     req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
-        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short documentary narration about anime.'), dict(role='user', content=prompt)])).encode(),
+        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
         headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
     return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content']
 
 for _ in range(3):
     try:
-        narration = re.sub(r'\s+', ' ', re.sub(r'[*"#]|\(.*?\)', '', llm(prompt))).strip()
-        if 20 <= len(narration.split()) <= 70:
+        narration = re.sub(r'\s+', ' ', re.sub(r'(?<![.,!?;:])[ \t]*\n+', '. ', re.sub(r'[*"#]|\(.*?\)', '', llm(prompt).strip()))).strip()
+        if 20 <= len(narration.split()) <= 70 and (MODE != 'character' or CHAR.split()[0] in narration):
             break
     except Exception as ex:
         print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(50)
-else:                                                                 # last resort: a safe, serious line that needs no facts
-    narration = rng.choice([
-        f"In {series_name}, strength is never given. It is carved out of pain, loss and a refusal to fall. Watch closely. This is the moment a fighter stops surviving and starts deciding how the battle ends.",
-        f"Some fights in {series_name} are won with power. This one is won with will. Every wound, every breath, every step forward is a promise kept to the people they swore to protect.",
-        f"This is {series_name} at its finest. Two forces collide, neither willing to yield, and in the space between their strikes, a legend quietly takes shape."])
-print('narration', MODE, '|', narration, flush=True)
+else:                                                                 # last resort: safe lines that need no invented facts
+    nm = CHAR.split()[0] if CHAR else 'the fighter'
+    narration = (f"This is {CHAR}. {LORE[CHAR]['power']}" if MODE == 'character' else rng.choice([
+        f"They said to kneel, they said to fall. {nm} rose up and faced it all. Every scar became a vow, the weak one is the hunter now.",
+        f"Pain is the teacher, blood is the test. {nm} gives everything, nothing less. When the world says stop, the heart says go, the strongest fire burns slow."]))
+print('narration', MODE, CHAR, '|', narration, flush=True)
 
 import edge_tts
 VOICE_NAME = os.environ.get('VOICE', 'en-US-ChristopherNeural')
@@ -331,7 +344,7 @@ for li, ln in enumerate(lines):
         ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
         ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
 open('work/convo/captions.ass', 'w').write('\n'.join(ass) + '\n')
-json.dump(dict(ep=conv_ep, s=c0, e=c1, lines=[dict(t=' '.join(w['w'] for w in ln), speaker=int(spk[i]), colour=colour_of[spk[i]])
+json.dump(dict(ep=conv_ep, s=c0, e=c1, mode=MODE, character=CHAR, lines=[dict(t=' '.join(w['w'] for w in ln), speaker=int(spk[i]), colour=colour_of[spk[i]])
                                                for i, ln in enumerate(lines)]), open('work/convo/convo.json', 'w'), indent=1)
 print('captions', len(lines), 'lines,', len(set(spk)), 'speaker colours', flush=True)
 
