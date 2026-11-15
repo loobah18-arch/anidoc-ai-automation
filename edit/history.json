@@ -15,7 +15,8 @@
   "ashreveal_manasha_phonk": 1,
   "trashxrl_deus_do_olimpo": 1,
   "atlxs_passo_bem_solto_slowed": 1,
-  "poker_face": 1
+  "poker_face": 1,
+  "ncts_next_phonk": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -49,7 +50,8 @@
   "demon-slayer-kimetsu-no-yaiba:S2E05": 1,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E24": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E10": 1
+  "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
+  "jujutsu-kaisen:S1E14": 1
  },
  "shots": [
   {
@@ -2827,6 +2829,194 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
    "s": 1168.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 766.45
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 660.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 668.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 625.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 621.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 590.242
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 596.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 605.684
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 613.434
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 615.825
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 617.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 627.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 629.05
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 630.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 632.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 634.683
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 636.783
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 639.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 642.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 644.742
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 650.717
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 657.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 663.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 672.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 675.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 678.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 680.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 683.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 686.008
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 693.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 695.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 700.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 773.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 777.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 779.367
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 784.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 790.242
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 800.866
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 805.091
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 830.866
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 849.366
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 851.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 853.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 862.367
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 869.742
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 879.492
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 881.908
   }
  ],
  "runs": [
@@ -3003,6 +3193,16 @@
    "song": "poker_face",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S4E10"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 06:43 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "ncts_next_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S1E14"
    ],
    "file": "_amv_part.mp4"
   }
@@ -3286,10 +3486,24 @@
     1286.1,
     1385.1
    ]
+  ],
+  "jujutsu-kaisen:S1E14": [
+   [
+    200.1,
+    285.0
+   ],
+   [
+    701.2,
+    718.8
+   ],
+   [
+    1241.2,
+    1340.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 8,
+  "jujutsu-kaisen": 9,
   "demon-slayer-kimetsu-no-yaiba": 8
  },
  "known": [
@@ -3500,6 +3714,13 @@
    "e": 1020.4,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_poker_face.mp4",
    "time": "2026-11-15 06:31 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E14",
+   "s": 734.0,
+   "e": 755.2666666666667,
+   "file": "Jujutsu_Kaisen_narrated_ncts_next_phonk.mp4",
+   "time": "2026-11-15 06:43 UTC"
   }
  ],
  "styles": [
