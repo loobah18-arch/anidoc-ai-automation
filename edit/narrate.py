@@ -250,6 +250,19 @@ def _score(raw):                                                      # higher i
     sc = rhymed * 3 + lore + (3 if named else -6) - repeats * 2 - (4 if not 24 <= words <= 64 else 0)
     return sc, ls
 
+def llm(prompt):
+    key = os.environ.get('GROQ_API_KEY')
+    if key:
+        req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST',
+            data=json.dumps(dict(model=os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile'), temperature=0.7,
+                                 messages=[dict(role='user', content=prompt)])).encode(),
+            headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
+        return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
+    req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
+        data=json.dumps(dict(model="openai", max_tokens=3000, seed=random.randint(1, 10**6), temperature=0.9, reasoning_effort='low', messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
+        headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
+    return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content']
+
 best = (-99, [])
 for i in range(5):
     try:
@@ -265,7 +278,7 @@ for i in range(5):
     except Exception as ex:
         print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(20)
 if best[0] >= 9:                                                      # at least two rhyming couplets, named, on-lore
-    narration = ' '.join(l if l[-1] in '.,!?;' else l + ',' for l in best[1]).rstrip(',') + '.'
+    narration = ' '.join(l if l[-1] in '.,!?;' else l + ',' for l in best[1]).rstrip(',.!?;') + '.'
     narration = re.sub(r'\s+', ' ', narration)
 else:                                                                 # last resort: safe lines that need no invented facts
     nm = CHAR.split()[0] if CHAR else 'the fighter'
