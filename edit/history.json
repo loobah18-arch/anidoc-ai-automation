@@ -12,7 +12,8 @@
   "rubikdice_montagem_pegadora_slowed": 1,
   "zxvren_montagem_delirio_slowed": 1,
   "lonown_avangard_phonk": 1,
-  "ashreveal_manasha_phonk": 1
+  "ashreveal_manasha_phonk": 1,
+  "trashxrl_deus_do_olimpo": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -43,7 +44,8 @@
   "jujutsu-kaisen:S1E17": 1,
   "jujutsu-kaisen:S1E23": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E07": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E05": 1
+  "demon-slayer-kimetsu-no-yaiba:S2E05": 1,
+  "jujutsu-kaisen:S1E16": 1
  },
  "shots": [
   {
@@ -2269,6 +2271,206 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
    "s": 302.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 858.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 840.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 720.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 832.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 842.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 552.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 555.867
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 561.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 564.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 565.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 566.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 575.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 587.508
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 590.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 593.559
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 614.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 624.408
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 649.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 674.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 684.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 691.675
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 725.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 729.491
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 734.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 749.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 752.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 754.867
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 761.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 763.008
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 766.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 771.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 774.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 775.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 776.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 777.867
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 780.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 787.867
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 792.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 796.592
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 800.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 802.991
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 808.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 814.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 821.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 837.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 846.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 848.884
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 852.367
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 855.367
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 863.6
   }
  ],
  "runs": [
@@ -2415,6 +2617,16 @@
    "song": "ashreveal_manasha_phonk",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S2E05"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 05:51 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "trashxrl_deus_do_olimpo",
+   "episodes": [
+    "jujutsu-kaisen:S1E16"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2672,10 +2884,20 @@
     1132.2,
     1231.1
    ]
+  ],
+  "jujutsu-kaisen:S1E16": [
+   [
+    229.1,
+    314.0
+   ],
+   [
+    1241.2,
+    1340.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 6,
+  "jujutsu-kaisen": 7,
   "demon-slayer-kimetsu-no-yaiba": 7
  },
  "known": [
@@ -2865,6 +3087,13 @@
    "e": 223.23333333333335,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_ashreveal_manasha_phonk.mp4",
    "time": "2026-11-15 05:20 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E16",
+   "s": 700.0,
+   "e": 716.8333333333334,
+   "file": "Jujutsu_Kaisen_narrated_trashxrl_deus_do_olimpo.mp4",
+   "time": "2026-11-15 05:52 UTC"
   }
  ],
  "styles": [
