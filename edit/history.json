@@ -9,7 +9,8 @@
   "mvsterious_slava_funk": 1,
   "glxxmstrider_dont_stop_slowed": 1,
   "dygo_funk_infernal": 1,
-  "rubikdice_montagem_pegadora_slowed": 1
+  "rubikdice_montagem_pegadora_slowed": 1,
+  "zxvren_montagem_delirio_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -37,7 +38,8 @@
   "jujutsu-kaisen:S1E13": 1,
   "jujutsu-kaisen:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
-  "jujutsu-kaisen:S1E17": 1
+  "jujutsu-kaisen:S1E17": 1,
+  "jujutsu-kaisen:S1E23": 1
  },
  "shots": [
   {
@@ -1755,6 +1757,142 @@
   {
    "ep": "jujutsu-kaisen:S1E17",
    "s": 812.567
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 656.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 875.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 881.542
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 681.683
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 791.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 602.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 608.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 612.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 632.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 651.308
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 658.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 676.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 688.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 690.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 692.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 696.266
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 704.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 707.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 719.766
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 724.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 728.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 734.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 771.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 777.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 780.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 784.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 812.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 815.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 854.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 864.959
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 872.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 877.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 878.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 879.516
   }
  ],
  "runs": [
@@ -1871,6 +2009,16 @@
    "song": "rubikdice_montagem_pegadora_slowed",
    "episodes": [
     "jujutsu-kaisen:S1E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 04:48 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "zxvren_montagem_delirio_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E23"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2098,10 +2246,24 @@
     1233.8,
     1340.2
    ]
+  ],
+  "jujutsu-kaisen:S1E23": [
+   [
+    324.9,
+    429.4
+   ],
+   [
+    828.1,
+    845.8
+   ],
+   [
+    1241.1,
+    1340.1
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 5,
+  "jujutsu-kaisen": 6,
   "demon-slayer-kimetsu-no-yaiba": 5
  },
  "known": [
@@ -2270,6 +2432,13 @@
    "e": 684.8333333333334,
    "file": "Jujutsu_Kaisen_narrated_rubikdice_montagem_pegadora_slowed.mp4",
    "time": "2026-11-14 22:32 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E23",
+   "s": 744.0,
+   "e": 763.7333333333333,
+   "file": "Jujutsu_Kaisen_narrated_zxvren_montagem_delirio_slowed.mp4",
+   "time": "2026-11-15 04:49 UTC"
   }
  ]
 }
