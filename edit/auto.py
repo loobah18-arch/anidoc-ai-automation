@@ -289,17 +289,22 @@ def level(t0, t1):
     return float(rms[m].mean()) if m.any() else 0.0
 
 
+start_offset = float(os.environ.get('START_OFFSET', 0.0))
+need_lead = (DROP_BEAT - START_BEAT) * P
 best, drop_t = -1e9, None
 for b in beats:
-    if b - DROP_BEAT * P < 0 or b - DROP_BEAT * P + need > song_len:
+    if b - need_lead < start_offset or b - need_lead + need > song_len:
         continue
     jump = level(b, b + 8 * P) - level(b - 8 * P, b)
     if jump > best:
         best, drop_t = jump, float(b)
-if drop_t is None:
-    drop_t = DROP_BEAT * P
-song_start = max(0.0, drop_t - (DROP_BEAT - START_BEAT) * P)
-print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t:.2f}s start {song_start:.2f}s', flush=True)
+if drop_t is not None:
+    song_start = max(0.0, drop_t - need_lead)
+elif start_offset > 0:
+    song_start = start_offset
+else:
+    song_start = max(0.0, (beats[DROP_BEAT] if len(beats) > DROP_BEAT else DROP_BEAT * P) - need_lead)
+print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t or 0:.2f}s start {song_start:.2f}s (offset {start_offset:.2f}s)', flush=True)
 
 # ---------------------------------------------------------------- 6. fill the template
 tmpl = [tuple(map(int, l.split()[:2])) for l in open('template.txt')]
