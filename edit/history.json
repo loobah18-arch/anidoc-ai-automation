@@ -5,7 +5,7 @@
   "cotneus_stereo_love_funk": 1,
   "andromeda_montagem_coma": 1,
   "montagem_vozes_profundas": 1,
-  "andromeda_no_fear_phonk": 1,
+  "andromeda_no_fear_phonk": 2,
   "mvsterious_slava_funk": 1,
   "glxxmstrider_dont_stop_slowed": 1,
   "dygo_funk_infernal": 1,
@@ -53,7 +53,8 @@
   "jujutsu-kaisen:S1E24": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
   "jujutsu-kaisen:S1E14": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E01": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
+  "jujutsu-kaisen:S2E12": 1
  },
  "shots": [
   {
@@ -3199,6 +3200,170 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
    "s": 1118.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 711.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 626.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 776.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 756.366
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 643.616
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 624.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 625.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 630.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 639.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 648.116
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 649.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 657.866
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 664.633
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 666.741
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 669.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 670.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 677.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 679.492
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 680.783
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 713.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 714.341
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 716.116
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 719.616
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 724.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 727.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 730.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 731.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 732.866
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 734.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 735.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 736.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 737.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 738.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 741.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 743.366
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 745.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 747.616
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 759.45
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 761.55
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 791.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 797.325
   }
  ],
  "runs": [
@@ -3395,6 +3560,16 @@
    "song": "nxxkz_loucura_letal_funk_slowed",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E01"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 08:18 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "andromeda_no_fear_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S2E12"
    ],
    "file": "_amv_part.mp4"
   }
@@ -3698,10 +3873,20 @@
     1262.3,
     1364.8
    ]
+  ],
+  "jujutsu-kaisen:S2E12": [
+   [
+    47.1,
+    145.0
+   ],
+   [
+    1376.1,
+    1424.4
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 9,
+  "jujutsu-kaisen": 10,
   "demon-slayer-kimetsu-no-yaiba": 9
  },
  "known": [
@@ -3926,6 +4111,13 @@
    "e": 1017.5333333333333,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_nxxkz_loucura_letal_funk_slowed.mp4",
    "time": "2026-11-15 07:06 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 684.0,
+   "e": 709.3333333333334,
+   "file": "Jujutsu_Kaisen_narrated_andromeda_no_fear_phonk.mp4",
+   "time": "2026-11-15 08:19 UTC"
   }
  ],
  "styles": [
