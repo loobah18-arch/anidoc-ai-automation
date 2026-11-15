@@ -104,12 +104,15 @@ class Scorer:
         crops = [c for im in imgs for c in self._faces(im)]
         self.ref = self._img(imgs) if imgs else None
         self.ref_face = self._img(crops) if crops else None
-        look = ''
+        look, others = '', []
         try:
             for d in json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lore.json'))).values():
-                look = (d.get(name) or {}).get('look', '') or look
+                if name in d:
+                    look = d[name].get('look', '')
+                    others = [f'anime screenshot of {v["look"]}' for k, v in d.items() if k != name and v.get('look')]
         except Exception:
             pass
+        self.t_others = self._txt(others) if others else None
         self.look = look
         names_t = [f'{name} from {series}, anime screenshot', f'anime screenshot of {look}' if look else f'{name}, anime character',
                    f'{name}, {look}' if look else f'{name} fighting']
@@ -179,7 +182,9 @@ class Scorer:
             named = float((self.t_name @ e).max())
             face = float((self.ref_face @ f.T).max()) if (self.ref_face is not None and f is not None) else 0.0
             act = float((self.t_act @ e).max() - (self.t_calm @ e).max())
-            out.append(dict(char=max(whole, face) + 1.0 * named, face=face, whole=whole, named=named, action=act))
+            look_self = float(self.t_name[1] @ e)
+            rel = look_self - float((self.t_others @ e).max()) if self.t_others is not None else 0.0   # >0: looks more like them than anyone else in the anime
+            out.append(dict(char=max(whole, face) + 1.0 * named + 2.0 * rel, rel=rel, face=face, whole=whole, named=named, action=act))
         return out
 
 

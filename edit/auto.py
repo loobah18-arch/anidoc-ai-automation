@@ -287,8 +287,17 @@ if CHAR_NAME:
             per_ep = {}
             for s in cands:
                 per_ep.setdefault(s['ep'], []).append(s['char_z'])
+            rel_ep = {}
+            for s in cands:
+                rel_ep.setdefault(s['ep'], []).append(s.get('rel', 0) > -0.03)
+            share = {e: float(np.mean(v)) for e, v in rel_ep.items()}
             print('character presence per episode (mean of top 10 z):',
-                  {e: round(float(np.mean(sorted(v)[-10:])), 2) for e, v in per_ep.items()}, flush=True)
+                  {e: round(float(np.mean(sorted(v)[-10:])), 2) for e, v in per_ep.items()},
+                  '| share of shots that look like them:', {e: round(v, 2) for e, v in share.items()}, flush=True)
+            weak = [e for e, v in share.items() if v < 0.04 and max(share.values()) >= 0.12]   # character barely in this episode: drop it
+            if weak and len(weak) < len(share):
+                print('dropping episodes without the character:', weak, flush=True)
+                cands = [s for s in cands if s['ep'] not in weak]
             n_need = int(os.environ.get('CHAR_MIN_SHOTS', 45))
             for thr in (0.6, 0.35, 0.1, -0.15, -0.4):                   # strictest bar that still fills the edit
                 keep = [s for s in cands if s['char_z'] >= thr and s['act_z'] >= -0.8]
