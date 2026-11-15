@@ -1,7 +1,7 @@
 {
  "songs": {
   "rayelo_ultraslowed": 1,
-  "montagem_zora": 1,
+  "montagem_zora": 2,
   "cotneus_stereo_love_funk": 1,
   "andromeda_montagem_coma": 1,
   "montagem_vozes_profundas": 1,
@@ -37,7 +37,7 @@
   "demon-slayer-kimetsu-no-yaiba:S5E07": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E16": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E24": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E23": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E11": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
@@ -54,7 +54,10 @@
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
   "jujutsu-kaisen:S1E14": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
-  "jujutsu-kaisen:S3E10": 1
+  "jujutsu-kaisen:S3E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E08": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E11": 1
  },
  "shots": [
   {
@@ -3384,6 +3387,206 @@
   {
    "ep": "jujutsu-kaisen:S3E10",
    "s": 948.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 365.3
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 1296.883
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 896.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 503.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 783.383
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 134.092
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 142.092
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 426.692
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 437.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 443.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 613.675
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 778.383
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1036.825
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1105.342
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1115.525
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1199.025
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 394.717
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 522.883
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 543.508
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 686.258
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 821.633
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 988.175
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1022.467
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1067.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1115.358
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1138.675
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1199.175
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 484.508
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 762.592
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 792.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 925.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 960.842
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1007.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1045.566
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1075.8
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1105.008
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1111.55
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1143.259
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1156.425
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 52.492
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 91.8
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 271.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 376.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 377.134
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 378.675
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 385.675
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 571.425
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 572.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 1323.259
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "s": 1474.483
   }
  ],
  "runs": [
@@ -3590,6 +3793,19 @@
    "song": "nxxkz_loucura_letal_funk_slowed",
    "episodes": [
     "jujutsu-kaisen:S3E10"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 15:38 UTC",
+   "pick": "gyutaro",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "montagem_zora",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S3E08",
+    "demon-slayer-kimetsu-no-yaiba:S3E09",
+    "demon-slayer-kimetsu-no-yaiba:S3E10",
+    "demon-slayer-kimetsu-no-yaiba:S3E11"
    ],
    "file": "_amv_part.mp4"
   }
@@ -3903,11 +4119,41 @@
     1356.4,
     1408.2
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E08": [
+   [
+    67.1,
+    128.7
+   ],
+   [
+    141.7,
+    162.3
+   ],
+   [
+    1302.5,
+    1385.1
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E10": [
+   [
+    0.1,
+    146.8
+   ],
+   [
+    1157.6,
+    1192.8
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E11": [
+   [
+    -4.0,
+    38.2
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 10,
-  "demon-slayer-kimetsu-no-yaiba": 9
+  "demon-slayer-kimetsu-no-yaiba": 10
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -4138,6 +4384,14 @@
    "e": 832.0666666666667,
    "file": "Jujutsu_Kaisen_narrated_nxxkz_loucura_letal_funk_slowed.mp4",
    "time": "2026-11-15 13:06 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 974.0,
+   "e": 986.1333333333333,
+   "character": "gyutaro",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_montagem_zora.mp4",
+   "time": "2026-11-15 15:40 UTC"
   }
  ],
  "styles": [
@@ -4153,5 +4407,8 @@
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
    "time": "2026-11-15 05:07 UTC"
   }
- ]
+ ],
+ "narr_chars": {
+  "gyutaro": 1
+ }
 }
