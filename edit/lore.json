@@ -11,7 +11,8 @@
     "悠仁",
     "いたどり",
     "ゆうじ"
-   ]
+   ],
+   "look": "young man with spiky pink hair with dark undercut, dark navy school uniform with red hood"
   },
   "Megumi Fushiguro": {
    "names": [
@@ -22,7 +23,8 @@
    "ja": [
     "伏黒",
     "めぐみ"
-   ]
+   ],
+   "look": "young man with spiky black hair, dark navy school uniform, summoning black shadow dogs"
   },
   "Nobara Kugisaki": {
    "names": [
@@ -34,7 +36,8 @@
     "釘崎",
     "野薔薇",
     "のばら"
-   ]
+   ],
+   "look": "young woman with short orange-brown bob hair, holding a hammer and nails"
   },
   "Satoru Gojo": {
    "names": [
@@ -45,7 +48,8 @@
    "ja": [
     "五条",
     "ごじょう"
-   ]
+   ],
+   "look": "tall man with spiky white hair and black blindfold or bright blue eyes, black high-collar uniform"
   },
   "Ryomen Sukuna": {
    "names": [
@@ -57,7 +61,8 @@
     "宿儺",
     "すくな",
     "スクナ"
-   ]
+   ],
+   "look": "man with pink hair and black facial tattoo markings, four red eyes, white kimono"
   },
   "Kento Nanami": {
    "names": [
@@ -69,7 +74,8 @@
     "七海",
     "ななみ",
     "ナナミン"
-   ]
+   ],
+   "look": "man with neat blond hair, tinted goggles, beige suit and patterned tie, blade wrapped in cloth"
   },
   "Aoi Todo": {
    "names": [
@@ -80,7 +86,8 @@
    "ja": [
     "東堂",
     "とうどう"
-   ]
+   ],
+   "look": "huge muscular man with dark hair tied up, scar on face, white tank top"
   },
   "Mahito": {
    "names": [
@@ -90,7 +97,8 @@
    "ja": [
     "真人",
     "まひと"
-   ]
+   ],
+   "look": "patchwork grey-blue skinned man with stitched scars and long blue-grey hair"
   },
   "Jogo": {
    "names": [
@@ -100,7 +108,8 @@
    "ja": [
     "漏瑚",
     "じょうご"
-   ]
+   ],
+   "look": "short curse with a volcano-shaped head and one eye, white robe, lava and fire"
   },
   "Hanami": {
    "names": [
@@ -110,7 +119,8 @@
    "ja": [
     "花御",
     "はなみ"
-   ]
+   ],
+   "look": "tall curse with wooden horn-like eyes, white cloth, plants and flowers"
   },
   "Choso": {
    "names": [
@@ -120,7 +130,8 @@
    "ja": [
     "脹相",
     "ちょうそう"
-   ]
+   ],
+   "look": "man with black hair in two spiky tufts, dark line across nose, blood manipulation"
   },
   "Toji Fushiguro": {
    "names": [
@@ -130,7 +141,8 @@
    "ja": [
     "甚爾",
     "とうじ"
-   ]
+   ],
+   "look": "muscular man with short black hair, scar on lip, tight black shirt, holding a weapon"
   },
   "Suguru Geto": {
    "names": [
@@ -141,7 +153,8 @@
    "ja": [
     "夏油",
     "げとう"
-   ]
+   ],
+   "look": "man with long black hair in a half bun, stretched earlobes, black monk robes"
   },
   "Yuta Okkotsu": {
    "names": [
@@ -153,7 +166,8 @@
     "乙骨",
     "憂太",
     "ゆうた"
-   ]
+   ],
+   "look": "young man with messy black hair and tired eyes, white uniform, katana, huge curse Rika"
   },
   "Maki Zenin": {
    "names": [
@@ -163,7 +177,8 @@
    "ja": [
     "真希",
     "まき"
-   ]
+   ],
+   "look": "young woman with green hair in ponytail and glasses or scarred face, wielding a polearm"
   },
   "Toge Inumaki": {
    "names": [
@@ -174,7 +189,8 @@
    "ja": [
     "狗巻",
     "いぬまき"
-   ]
+   ],
+   "look": "young man with light grey hair, high collar covering mouth"
   },
   "Kinji Hakari": {
    "names": [
@@ -184,7 +200,8 @@
    "ja": [
     "はかり",
     "秤先輩"
-   ]
+   ],
+   "look": "man with blond quiff hair, green jacket, pachinko and jackpot lights"
   },
   "Hiromi Higuruma": {
    "names": [
@@ -194,7 +211,8 @@
    "ja": [
     "日車",
     "ひぐるま"
-   ]
+   ],
+   "look": "man with messy black hair and stubble, lawyer badge, giant gavel"
   },
   "Naoya Zenin": {
    "names": [
@@ -204,7 +222,8 @@
    "ja": [
     "直哉",
     "なおや"
-   ]
+   ],
+   "look": "man with dyed blond hair with dark roots, multiple ear piercings, dark kimono, moving at blur speed"
   }
  },
  "demon-slayer-kimetsu-no-yaiba": {
@@ -218,7 +237,8 @@
     "炭治郎",
     "たんじろう",
     "タンジロウ"
-   ]
+   ],
+   "look": "boy with dark red hair, scar on forehead, hanafuda earrings, green and black checkered haori, sword with water or fire"
   },
   "Nezuko Kamado": {
    "names": [
@@ -229,7 +249,8 @@
     "禰豆子",
     "ねずこ",
     "ネズコ"
-   ]
+   ],
+   "look": "girl with long black hair fading to orange, bamboo muzzle, pink kimono"
   },
   "Zenitsu Agatsuma": {
    "names": [
@@ -240,7 +261,8 @@
    "ja": [
     "善逸",
     "ぜんいつ"
-   ]
+   ],
+   "look": "boy with yellow-orange hair, yellow haori with white triangles, lightning sword slash"
   },
   "Inosuke Hashibira": {
    "names": [
@@ -250,7 +272,8 @@
    "ja": [
     "伊之助",
     "いのすけ"
-   ]
+   ],
+   "look": "shirtless muscular boy wearing a boar head mask, two jagged swords"
   },
   "Kyojuro Rengoku": {
    "names": [
@@ -262,7 +285,8 @@
     "煉獄",
     "杏寿郎",
     "れんごく"
-   ]
+   ],
+   "look": "man with flaming yellow and red hair, white flame-patterned cape, fire sword attacks"
   },
   "Akaza": {
    "names": [
@@ -272,7 +296,8 @@
    "ja": [
     "猗窩座",
     "あかざ"
-   ]
+   ],
+   "look": "demon with pink hair and blue line tattoos all over his body, martial arts fighting"
   },
   "Tengen Uzui": {
    "names": [
@@ -284,7 +309,8 @@
     "宇髄",
     "天元",
     "うずい"
-   ]
+   ],
+   "look": "tall man with white hair, jeweled headband, red eye makeup, twin cleavers with chains"
   },
   "Daki": {
    "names": [
@@ -294,7 +320,8 @@
    "ja": [
     "堕姫",
     "だき"
-   ]
+   ],
+   "look": "demon woman with long black or white hair, flower hair ornaments, flowing obi sash belts"
   },
   "Gyutaro": {
    "names": [
@@ -304,7 +331,8 @@
    "ja": [
     "妓夫太郎",
     "ぎゅうたろう"
-   ]
+   ],
+   "look": "thin hunched demon with green-black hair, black spots on his face, blood sickles"
   },
   "Giyu Tomioka": {
    "names": [
@@ -316,7 +344,8 @@
     "義勇",
     "冨岡",
     "ぎゆう"
-   ]
+   ],
+   "look": "man with long dark hair in low ponytail, split haori half red half pattern, water breathing"
   },
   "Shinobu Kocho": {
    "names": [
@@ -327,7 +356,8 @@
    "ja": [
     "しのぶ",
     "胡蝶"
-   ]
+   ],
+   "look": "small woman with butterfly hair ornament, butterfly-pattern haori, thin stinger sword"
   },
   "Muichiro Tokito": {
    "names": [
@@ -339,7 +369,8 @@
     "無一郎",
     "時透",
     "むいちろう"
-   ]
+   ],
+   "look": "young boy with long black hair fading to mint green, blank stare, mist sword"
   },
   "Mitsuri Kanroji": {
    "names": [
@@ -351,7 +382,8 @@
     "蜜璃",
     "甘露寺",
     "みつり"
-   ]
+   ],
+   "look": "woman with long pink and green braided hair, flexible whip sword"
   },
   "Rui": {
    "names": [
@@ -360,7 +392,8 @@
    "power": "Lower Rank Five, a spider demon. His threads are sharp enough to slice through flesh and steel, and he forces other demons to act as his fake family.",
    "ja": [
     "るい"
-   ]
+   ],
+   "look": "pale demon child with white hair and red eye marks, spider threads"
   },
   "Enmu": {
    "names": [
@@ -370,7 +403,8 @@
    "ja": [
     "魘夢",
     "えんむ"
-   ]
+   ],
+   "look": "demon with dark hair and eyes on his hands, dream manipulation on a train"
   },
   "Hantengu": {
    "names": [
@@ -380,7 +414,8 @@
    "ja": [
     "半天狗",
     "はんてんぐ"
-   ]
+   ],
+   "look": "old small demon with horns and bumps on his forehead, splitting into emotion clones"
   },
   "Gyokko": {
    "names": [
@@ -390,7 +425,8 @@
    "ja": [
     "玉壺",
     "ぎょっこ"
-   ]
+   ],
+   "look": "demon with eyes in place of mouth and mouth in place of eyes, vases and fish"
   },
   "Kokushibo": {
    "names": [
@@ -400,7 +436,8 @@
    "ja": [
     "黒死牟",
     "こくしぼう"
-   ]
+   ],
+   "look": "samurai demon with six eyes, long black ponytail, purple kimono, moon blade"
   },
   "Doma": {
    "names": [
@@ -410,7 +447,8 @@
    "ja": [
     "童磨",
     "どうま"
-   ]
+   ],
+   "look": "demon with white-blonde hair, rainbow eyes, smiling, golden fans, ice powers"
   },
   "Muzan Kibutsuji": {
    "names": [
@@ -421,7 +459,8 @@
    "ja": [
     "無惨",
     "むざん"
-   ]
+   ],
+   "look": "pale man with black wavy hair, red eyes, white fedora or suit, flesh whips"
   },
   "Sanemi Shinazugawa": {
    "names": [
@@ -432,7 +471,8 @@
     "実弥",
     "不死川",
     "さねみ"
-   ]
+   ],
+   "look": "man with spiky white hair and many scars, open white uniform, wind sword"
   },
   "Gyomei Himejima": {
    "names": [
@@ -443,7 +483,8 @@
    "ja": [
     "悲鳴嶼",
     "行冥"
-   ]
+   ],
+   "look": "giant blind man with scar on forehead, prayer beads, flail axe and chain"
   },
   "Obanai Iguro": {
    "names": [
@@ -455,7 +496,8 @@
     "小芭内",
     "伊黒",
     "おばない"
-   ]
+   ],
+   "look": "man with black hair, heterochromia, bandaged mouth, white snake on shoulders"
   }
  }
 }

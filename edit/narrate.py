@@ -131,6 +131,7 @@ for sg in _ss:
 SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
 prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
 bs, bt = -1, fight
+win_sc = []
 for t in range(lo, hi - 40, 2):
     if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP):
         continue
@@ -140,6 +141,28 @@ for t in range(lo, hi - 40, 2):
     sc = min(act, 1.3) * min(lnd, 1.3) + 0.5 * min(np.percentile(per_s[t:t + 24], 25) / mref, 1.0)   # sustained motion AND loud audio = a real fight
     if sc > bs:
         bs, bt = sc, t
+    win_sc.append((sc, t))
+# among the strongest windows, prefer the one where the topic character is actually on screen
+top_w = []
+for sc, t in sorted(win_sc, reverse=True):
+    if all(abs(t - u) >= 30 for _, u in top_w):
+        top_w.append((sc, t))
+    if len(top_w) >= 6:
+        break
+try:
+    import charvis
+    _cv = charvis.get(TOPIC_NAME or '', EPISODES[conv_ep]['series'].replace('-', ' ').title()) if len(top_w) > 1 else None
+    if _cv is not None:
+        res = []
+        for sc, t in top_w:
+            vs = [v for v in _cv.score([(src, t + k) for k in (2, 8, 14, 20)]) if v]
+            ch = float(np.mean(sorted(v['char'] for v in vs)[-2:])) if vs else 0.0
+            res.append((sc, t, ch))
+        chs = np.array([r[2] for r in res]); chz = (chs - chs.mean()) / (chs.std() + 1e-6)
+        sc, bt, _ = max(((r[0] + 0.35 * cz, r[1], r[2]) for r, cz in zip(res, chz)), key=lambda r: r[0])
+        print('narration window by character presence:', [(t, round(c, 3)) for _, t, c in res], '->', bt, flush=True)
+except Exception as ex:
+    print('narration window character check skipped', ex, flush=True)
 fight = bt
 win0, win1 = max(lo, bt - 12), min(hi, bt + 52)
 print('conversation from', conv_ep, f'| talking fight at {bt}s (score {bs:.2f}), transcribing {win0}-{win1}s', flush=True)
@@ -539,7 +562,7 @@ amv_eps = amv_eps[:max(2, AMV_EPS)]
 print('AMV episodes for', CHAR, ':', amv_eps, flush=True)
 env = {k: v for k, v in os.environ.items() if k != 'INCLUDE'}
 env.update(FORCE_EPS=','.join(amv_eps), START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
-           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=TOPIC, BALANCE_EPS='1')
+           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=TOPIC, BALANCE_EPS='1', CHAR_NAME=TOPIC_NAME or '', CHAR_SERIES=series_name)
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))

@@ -269,6 +269,37 @@ for i, s in enumerate(pool):
     s['impact'] = float(0.55 * M[i] + 0.35 * P_[i] + 0.25 * C[i] + 0.2 * S[i] + 0.15 * min(B[i], 1.0))
     s['calm'] = float(-0.6 * abs(M[i] + 0.3) + 0.4 * C[i] + 0.3 * S[i] + 0.3 * min(2.5, s['e'] - s['s']))
 
+# ---------------------------------------------------------------- 4b. keep only shots where the topic character is on screen, fighting
+CHAR_NAME = os.environ.get('CHAR_NAME', '')
+if CHAR_NAME:
+    import charvis
+    cv_ = charvis.get(CHAR_NAME, os.environ.get('CHAR_SERIES', ''))
+    if cv_ is not None:
+        cands = sorted(pool, key=lambda s: -s['impact'])[:int(os.environ.get('CHAR_CANDS', 420))]
+        sc_ = cv_.score([(SRC(s['ep']), (s['s'] + s['e']) / 2) for s in cands])
+        cands = [s for s, v in zip(cands, sc_) if v]
+        for s, v in zip(cands, [v for v in sc_ if v]):
+            s.update(char=v['char'], action=v['action'])
+        if len(cands) >= 20:
+            Cz, Az = z([s['char'] for s in cands]), z([s['action'] for s in cands])
+            for i, s in enumerate(cands):
+                s['char_z'], s['act_z'] = float(Cz[i]), float(Az[i])
+            per_ep = {}
+            for s in cands:
+                per_ep.setdefault(s['ep'], []).append(s['char_z'])
+            print('character presence per episode (mean of top 10 z):',
+                  {e: round(float(np.mean(sorted(v)[-10:])), 2) for e, v in per_ep.items()}, flush=True)
+            n_need = int(os.environ.get('CHAR_MIN_SHOTS', 45))
+            for thr in (0.6, 0.35, 0.1, -0.15, -0.4):                   # strictest bar that still fills the edit
+                keep = [s for s in cands if s['char_z'] >= thr and s['act_z'] >= -0.8]
+                if len(keep) >= n_need:
+                    break
+            for s in keep:                                            # action + character lift the drops and the fast cuts
+                s['impact'] += 0.9 * s['char_z'] + 0.6 * s['act_z']
+                s['calm'] += 0.8 * s['char_z']
+            print(f'character filter "{CHAR_NAME}": kept {len(keep)} of {len(cands)} scored shots (bar z>={thr})', flush=True)
+            pool = keep
+
 # ---------------------------------------------------------------- 5. music
 song_path = f'music/{song}.mp3'
 import librosa
