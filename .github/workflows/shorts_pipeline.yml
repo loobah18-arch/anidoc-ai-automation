@@ -1,6 +1,9 @@
 name: Anime Shorts Pipeline (alternating convo / narrated, protected uploads)
 
 on:
+  push:
+    branches: [narrator-edit]
+    paths: ['edit/pipeline.py', 'publish.py', 'preflight_gate.py', '.github/workflows/shorts_pipeline.yml']
   schedule:
     - cron: '30 6 * * *'          # 12:00 PM IST daily (only fires from the default branch)
   workflow_dispatch:
@@ -36,7 +39,7 @@ jobs:
       - id: gate
         name: Layer 0 pre-flight (24 h spacing, skip render if too soon)
         env:
-          PREFLIGHT_BYPASS: ${{ github.event_name == 'workflow_dispatch' && 'true' || '' }}
+          PREFLIGHT_BYPASS: ${{ github.event_name != 'schedule' && 'true' || '' }}
         run: python3 preflight_gate.py
 
   render:
