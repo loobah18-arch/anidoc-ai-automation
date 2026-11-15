@@ -186,19 +186,22 @@ if not heard:                                                         # names ar
         if n: heard[nm] = n
     print('names in wider audio:', heard, flush=True)
 CHAR = max(heard, key=heard.get) if heard else None
-if not CHAR and LORE:
-    CHAR = next(iter(LORE))
-MODE = 'character'
-ASK = (f"Introduce {CHAR} and explain their power, lethal combat abilities, and why they dominate the battlefield. "
-       f"Use ONLY these lore facts, reworded: {LORE[CHAR]['power']} "
-       "Make it sound like an elite, dark anime documentary. Serious, authoritative, cold, deep. "
-       "STRICT RULES: Absolutely NO rhyming. NO poetry. NO cheesy motivational quotes. "
-       "Deliver direct, hard-hitting factual sentences.")
-WORDS = '50 to 65 words of narration'
+MODE = os.environ.get('NARRATION') or ('character' if CHAR and rng.random() < 0.5 else 'rhyme')
+if MODE == 'character' and not CHAR:
+    MODE = 'rhyme'                                                    # never guess who is on screen
+if MODE == 'character':
+    ASK = (f"Introduce {CHAR} and explain their power to someone who has never watched the anime. "
+           f"Use ONLY these facts, reworded: {LORE[CHAR]['power']} Do not add any other names, techniques, numbers or events.")
+    WORDS = '34 to 46 words of narration'
+else:
+    who = f"{CHAR}, using their ideals, struggle and power ({LORE[CHAR]['power']})" if CHAR else 'the fighters in this scene and what is at stake'
+    ASK = (f"Write a rhyming quote, like a dark motivational poem, about {who}. "
+           "Four to six short lines in rhyming couplets (AABB), every line ending in a strong rhyme. Do not name any techniques, places or people other than "
+           + (CHAR.split()[0] if CHAR else 'none') + ".")
+    WORDS = '30 to 46 words'
 prompt = (f"Anime: {series_name}, episode {conv_ep.split(':')[-1]}.\n"
           f"Dialogue heard in the scene (auto-translated, may contain errors): {context or '(no clear dialogue)'}\n\n"
-          f"{ASK}\nWrite {WORDS} for a YouTube Short, serious, deep, cinematic documentary tone. "
-          "Write in a fluid, continuous cinematic rhythm without choppy pauses or staccato breaks. "
+          f"{ASK}\nWrite {WORDS} for a YouTube Short, serious, deep, cinematic tone. "
           "Never invent facts. Plain sentences, no emojis, "
           "no hashtags, no quotes, no stage directions, no titles. Reply with the text only.")
 
@@ -211,70 +214,40 @@ def llm(prompt):
             headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
         return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
     req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
-        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short narration and character facts about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
+        data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
         headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
     return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content']
 
 for _ in range(3):
     try:
         narration = re.sub(r'\s+', ' ', re.sub(r'(?<![.,!?;:])[ \t]*\n+', '. ', re.sub(r'[*"#]|\(.*?\)', '', re.sub(r'[ \t]+\n', '\n', llm(prompt).strip())))).strip()
-        if 35 <= len(narration.split()) <= 85 and CHAR.split()[0] in narration:
+        if 20 <= len(narration.split()) <= 70 and (MODE != 'character' or CHAR.split()[0] in narration):
             break
     except Exception as ex:
         print('llm error', ex, getattr(ex, 'read', lambda: b'')()[:300], flush=True); time.sleep(50)
 else:                                                                 # last resort: safe lines that need no invented facts
-    narration = f"{CHAR} stands as one of the deadliest fighters in {series_name}. {LORE[CHAR]['power']}"
+    nm = CHAR.split()[0] if CHAR else 'the fighter'
+    narration = (f"This is {CHAR}. {LORE[CHAR]['power']}" if MODE == 'character' else rng.choice([
+        f"They said to kneel, they said to fall. {nm} rose up and faced it all. Every scar became a vow, the weak one is the hunter now.",
+        f"Pain is the teacher, blood is the test. {nm} gives everything, nothing less. When the world says stop, the heart says go, the strongest fire burns slow."]))
 print('narration', MODE, CHAR, '|', narration, flush=True)
 
-import edge_tts, asyncio
+import edge_tts
 VOICE_NAME = os.environ.get('VOICE', 'en-US-ChristopherNeural')
-VOICE_RATE = os.environ.get('VOICE_RATE', '-3%')
-VOICE_PITCH = os.environ.get('VOICE_PITCH', '-6Hz')
-DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
-
-# Clean Unicode punctuation/spaces that can cause edge-tts parsing issues
-narration_clean = (
-    narration.replace('\u2011', '-').replace('\u2010', '-').replace('\u2013', '-').replace('\u2014', ', ')
-    .replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"')
-    .replace('\u00a0', ' ').replace('\u2026', '...')
-)
-# Replace period pauses with commas so edge-tts maintains snappy cinematic flow without long dead pauses
-narration_tts = re.sub(r'\.\s+', ', ', narration_clean.rstrip('.'))
-narration_tts = re.sub(r'[*_#`~]', '', narration_tts)
-
 async def _tts():
-    for attempt in range(4):
-        try:
-            com = edge_tts.Communicate(narration_tts, VOICE_NAME, rate=VOICE_RATE, pitch=VOICE_PITCH, boundary='WordBoundary')
-            audio_bytes = bytearray()
-            bounds_list = []
-            async for ch in com.stream():
-                if ch['type'] == 'audio':
-                    audio_bytes.extend(ch['data'])
-                elif ch['type'] == 'WordBoundary':
-                    bounds_list.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
-            if audio_bytes and len(audio_bytes) > 1000:
-                with open('work/convo/narr.mp3', 'wb') as f:
-                    f.write(audio_bytes)
-                return bounds_list
-        except Exception as ex:
-            print(f'tts attempt {attempt + 1} failed: {ex}', flush=True)
-            await asyncio.sleep(1.5 * (attempt + 1))
-    print('trying fallback tts without pitch offset', flush=True)
-    com = edge_tts.Communicate(narration_clean, VOICE_NAME, rate=VOICE_RATE, boundary='WordBoundary')
-    bounds_list = []
+    com = edge_tts.Communicate(narration, VOICE_NAME, rate=os.environ.get('VOICE_RATE', '-10%'), pitch=os.environ.get('VOICE_PITCH', '-6Hz'), boundary='WordBoundary')
+    bounds = []
     with open('work/convo/narr.mp3', 'wb') as f:
         async for ch in com.stream():
             if ch['type'] == 'audio':
                 f.write(ch['data'])
             elif ch['type'] == 'WordBoundary':
-                bounds_list.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
-    return bounds_list
-
+                bounds.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
+    return bounds
 bounds = asyncio.run(_tts())
-# The exact heavy trailer voice from the JJK video (user's preferred 'grok' voice):
+DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/convo/narr.mp3', '-af',
-    f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'
+    f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'   # pitch and formants down, same timing: a heavy trailer voice
     'bass=g=4:f=110,aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
 LEAD = 0.05                                                           # the narrator speaks from the first frame
 narr_len = duration('work/convo/narr.wav')
@@ -287,10 +260,6 @@ for a, b, t in bounds:                                                # map spok
     if w[-1:] in '.?!':
         sent += 1
     ti += 1
-if not bounds and toks:
-    w_dur = narr_len / len(toks)
-    for bi, t in enumerate(toks):
-        cw.append(dict(w=t, s=c0 + LEAD + bi * w_dur, e=c0 + LEAD + (bi + 1) * w_dur, seg=0))
 words = cw
 print(f'narrated {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
 
@@ -351,23 +320,6 @@ def ts(t):
     return f'{h}:{m:02d}:{s:05.2f}'
 
 
-def get_wrap_breaks(toks, max_chars=14, max_words=3):
-    breaks = set()
-    cur_len = 0
-    cur_words = 0
-    for i, t in enumerate(toks[:-1]):
-        cur_words += 1
-        cur_len += len(t)
-        next_w_len = len(toks[i + 1])
-        if cur_len + 1 + next_w_len > max_chars or cur_words >= max_words:
-            breaks.add(i)
-            cur_len = 0
-            cur_words = 0
-        else:
-            cur_len += 1
-    return breaks
-
-
 ass = [f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: {W}
@@ -377,35 +329,35 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Cap,{FONT},68,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,1,0,1,3.5,2,5,80,80,0,1
+Style: Cap,{FONT},98,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,3,0,1,0,3,5,60,60,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"""]
 DIM = '&H00A0A0A0&'
 for li, ln in enumerate(lines):
     col = colour_of[spk[li]]
-    t_end = min(ln[-1]['e'] + 0.35, lines[li + 1][0]['s'] if li + 1 < len(lines) else c1) - c0
+    t_end = min(ln[-1]['e'] + 0.35, lines[li + 1][0]['s'] if li + 1 < len(lines) else c1) - c0 + HOOK
     toks = [clean(w['w']) for w in ln]
     toks = [t for t in toks if t]
     if not toks:
         continue
-    brks = get_wrap_breaks(toks, max_chars=14, max_words=3)
+    split = len(toks) if len(toks) <= 3 or sum(map(len, toks)) <= 14 else (len(toks) + 1) // 2
     for k in range(len(toks)):                                        # word-by-word: spoken white, the rest dim
-        a = ln[min(k, len(ln) - 1)]['s'] - c0
-        b = (ln[k + 1]['s'] - c0) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
+        a = ln[min(k, len(ln) - 1)]['s'] - c0 + HOOK
+        b = (ln[k + 1]['s'] - c0 + HOOK) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
         if b <= a:
             continue
         parts = []
         for m, t in enumerate(toks):
             parts.append(('{\\1c&H00FFFFFF&}' if m <= k else '{\\1c' + DIM + '}') + t)
-            if m in brks:
+            if m == split - 1 and m != len(toks) - 1:
                 parts.append('\\N')
             elif m != len(toks) - 1:
                 parts.append(' ')
         txt = ''.join(parts).replace(' \\N', '\\N')
         pop = '{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else ''
-        glow = f'{{\\pos({W // 2},{int(H * 0.54)})\\bord12\\blur10\\3c{ass_col(col)}\\3a&H25&\\shad0\\1a&HFF&}}'
-        main = f'{{\\pos({W // 2},{int(H * 0.54)})\\bord3.5\\blur2\\3c{ass_col(col)}\\shad2}}'
+        glow = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord18\\blur16\\3c{ass_col(col)}\\3a&H20&\\shad0\\1a&HFF&}}'
+        main = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord4\\blur3\\3c{ass_col(col)}\\shad3}}'
         ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
         ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
 open('work/convo/captions.ass', 'w').write('\n'.join(ass) + '\n')
@@ -463,69 +415,74 @@ sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i
 VOICE = 'work/convo/narr.wav'
 
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
-amv_len = max(14.0, TOTAL - CONV)                                   # the narrator opens the Short
-
-# Match the narrated character against characters.json so the AMV features multiple fight scenes
-# strictly starring ONLY this character across the anime series in Google Drive
-char_key = None
-if CHAR:
-    for k in chars:
-        if k in CHAR.lower() or CHAR.lower().startswith(k):
-            char_key = k
-            break
-    if not char_key:
-        char_key = CHAR.lower().split()[0]
-
-amv_pick = char_key if (char_key and char_key in chars) else PICK
-env = dict(os.environ, START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
-           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=amv_pick, START_OFFSET=f'{CONV:.2f}')
-
-if amv_pick in chars:
-    char_eps = [e for e in chars[amv_pick] if e in EPISODES]
-    if conv_ep in char_eps:
-        other_eps = [e for e in char_eps if e != conv_ep]
-        chosen_eps = [conv_ep] + least_used(other_eps, used_eps, 2)
-    else:
-        chosen_eps = least_used(char_eps, used_eps, 3)
-    env['FORCE_EPS'] = ','.join(chosen_eps)
-    # Crucial: omit INCLUDE so auto.py features fight scenes across all chosen episodes, not just one scene
-    env.pop('INCLUDE', None)
-    print(f'character-exclusive multi-fight AMV for {CHAR} ({amv_pick}): episodes {chosen_eps}', flush=True)
-else:
-    print(f'fallback AMV edit for {conv_ep}', flush=True)
-    env['FORCE_EPS'] = conv_ep
-    env['INCLUDE'] = f'{conv_ep}|{c0 - 60:.1f}|{c1 + 90:.1f}'
-
+amv_len = max(14.0, TOTAL - CONV)                                   # no cold-open hook any more: the narrator opens the Short
+env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 60:.1f}|{c1 + 90:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK)
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))
+P = 60.0 / plan['tempo']
+hook_at = (17 - 9) * P                                                # the first drop inside the AMV part
+name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_narrated_' + plan['song']
+# the same song plays quietly under the conversation and runs straight into the edit at full volume
+BED_LUFS = float(os.environ.get('BED_LUFS', '-26'))                   # phonk under the narrator: fixed loudness, ducked further while he speaks
 song_file = f"music/{plan['song']}.mp3"
 song_len = duration(song_file)
+def _busy_part(path, length):                                        # the steadiest loud stretch of the song (no silent intro/outro/break)
+    import librosa as _lb
+    yy, ss = _lb.load(path, sr=11025, mono=True)
+    hop = ss // 2
+    r = _lb.feature.rms(y=yy, frame_length=hop * 2, hop_length=hop)[0]
+    n = max(1, int(length * 2))
+    if len(r) <= n:
+        return 0.0
+    score = [np.percentile(r[i:i + n], 15) for i in range(0, len(r) - n)]
+    return float(np.argmax(score)) / 2
+# the bed is the stretch of the song right BEFORE the edit's own start, so the phonk runs on without restarting
 song_start = float(plan.get('song_start', 0.0))
-# One continuous phonk audio stream throughout the whole Short (zero restarting):
-bgm_start = max(0.0, song_start - CONV)
-if bgm_start + TOTAL > song_len:
-    bgm_start = max(0.0, song_len - TOTAL)
-print(f'continuous song {bgm_start:.2f}s -> {bgm_start + TOTAL:.2f}s (AMV edit hits at t={CONV:.2f}s, song_start={song_start:.2f}s)', flush=True)
-
-name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_narrated_' + plan['song']
-
+bed_ss = song_start - CONV
+if bed_ss >= 0:
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV:.3f}', '-i', song_file, '-ac', '2', '-ar', '48000', 'work/convo/bed.wav'])
+else:                                                                 # edit starts in the intro: borrow a later bar that sounds the same as the edit's
+    import librosa as _lb                                             # first bar (phonk repeats in phrases), so the hand-off is seamless
+    yy, sr = _lb.load(song_file, sr=22050, mono=True)
+    P_ = 60.0 / plan['tempo']
+    ch = _lb.feature.chroma_cqt(y=yy, sr=sr, hop_length=512); rms = _lb.feature.rms(y=yy, hop_length=512)[0]
+    fr = lambda t: int(t * sr / 512)
+    def look(t, d=4.0):
+        v = ch[:, fr(t):fr(t + d)]; return v / (np.linalg.norm(v) + 1e-9) if v.shape[1] >= fr(d) - 1 else None
+    ref = look(song_start); cands = []
+    for k in range(4, 400, 4):                                        # whole bars after the edit start
+        t = song_start + k * P_
+        if t + 4 > len(yy) / sr: break
+        v = look(t)
+        if t < CONV or v is None or ref is None or v.shape != ref.shape: continue
+        cands.append((float((v * ref).sum()), float(np.percentile(rms[fr(t - CONV):fr(t)], 20)), t))
+    top = max((c[0] for c in cands), default=0)
+    best = (0, max((c for c in cands if c[0] >= top - 0.05), key=lambda c: c[1])[2] if cands else None)
+    print('bed borrowed from bar at', best[1], f'(similarity {top:.2f})', flush=True)
+    t = best[1] if best[1] is not None else _busy_part(song_file, CONV) + CONV
+    bed_ss = t - CONV
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV:.3f}', '-i', song_file, '-ac', '2', '-ar', '48000', 'work/convo/bed.wav'])
+print(f'song bed {bed_ss:.1f}s -> {song_start:.1f}s (edit starts there)', flush=True)
 fc = (
-    f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions.ass[cv];"
-    f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];"
-    f"[cv][av]concat=n=2:v=1:a=0[v];"
-    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,"
-    f"volume=eval=frame:volume='if(lt(t, {CONV:.3f}), 0.20, 1.0)'[bgm];"
-    f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={TOTAL:.3f},"
-    f"aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=7[voice_padded];"
-    f"[bgm][voice_padded]amix=inputs=2:duration=first:normalize=0,"
-    f"afade=t=out:st={TOTAL - 1.2:.2f}:d=1.2[a]"
+    f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
+    f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=9,aresample=48000,asplit=2[dl][sc];"
+    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,loudnorm=I={BED_LUFS}:TP=-9:LRA=7,aresample=48000[bdr];"
+    f"[bdr][sc]sidechaincompress=threshold=0.03:ratio=6:attack=15:release=350:makeup=1[bd];"
+    f"[dl][bd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[ca];"
+    f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
+    f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a]"
 )
+# captions were timed from the start of the short (hook included); the conversation clip starts at 0
+txt = open('work/convo/captions.ass').read()
+txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for x, f in zip(m.group(1).split(':'), (3600, 60, 1))) - HOOK)), txt)
+open('work/convo/captions_shift.ass', 'w').write(txt)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-i', VOICE,
-    '-ss', f'{bgm_start:.3f}', '-t', f'{TOTAL:.3f}', '-i', song_file,
+    '-i', 'work/convo/bed.wav',
     '-filter_complex', fc, '-map', '[v]', '-map', '[a]', '-c:v', 'libx264', '-preset', 'medium', '-crf', '18',
-    '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-movflags', '+faststart', f'../out/{name}.mp4'])
+    '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', f'../out/{name}.mp4'])
 os.remove(amv)
 print('wrote', f'out/{name}.mp4', flush=True)
 
