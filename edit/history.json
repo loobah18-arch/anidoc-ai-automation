@@ -12,7 +12,8 @@
   "zxvren_montagem_delirio_slowed": 1,
   "poker_face": 1,
   "ncts_next_phonk": 1,
-  "ashreveal_manasha_phonk": 1
+  "ashreveal_manasha_phonk": 1,
+  "nxxkz_loucura_letal_funk_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -43,7 +44,8 @@
   "jujutsu-kaisen:S2E19": 1,
   "jujutsu-kaisen:S3E12": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E22": 1,
-  "jujutsu-kaisen:S2E14": 1
+  "jujutsu-kaisen:S2E14": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E07": 1
  },
  "shots": [
   {
@@ -2281,6 +2283,198 @@
   {
    "ep": "jujutsu-kaisen:S2E14",
    "s": 1177.575
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 287.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 303.191
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 194.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 253.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 128.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 132.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 138.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 176.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 180.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 182.483
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 186.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 189.959
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 192.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 195.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 196.775
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 200.541
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 208.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 223.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 234.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 235.316
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 238.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 240.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 244.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 250.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 255.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 259.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 262.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 264.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 267.441
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 272.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 274.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 276.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 278.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 281.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 294.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 298.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 308.275
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 312.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 128.483
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 138.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 223.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 132.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 238.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 234.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 235.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 278.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 192.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 208.25
   }
  ],
  "runs": [
@@ -2427,6 +2621,16 @@
    "song": "ashreveal_manasha_phonk",
    "episodes": [
     "jujutsu-kaisen:S2E14"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 11:34 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "nxxkz_loucura_letal_funk_slowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S4E07"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2680,11 +2884,21 @@
     1376.1,
     1424.4
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E07": [
+   [
+    27.8,
+    125.0
+   ],
+   [
+    1289.4,
+    1385.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 7,
-  "demon-slayer-kimetsu-no-yaiba": 6
+  "demon-slayer-kimetsu-no-yaiba": 7
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -2873,6 +3087,13 @@
    "e": 1155.7666666666667,
    "file": "Jujutsu_Kaisen_convo_ashreveal_manasha_phonk.mp4",
    "time": "2026-11-15 11:13 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 151.9,
+   "e": 167.76666666666668,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_nxxkz_loucura_letal_funk_slowed.mp4",
+   "time": "2026-11-15 11:35 UTC"
   }
  ]
 }
