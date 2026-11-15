@@ -1,48 +1,461 @@
 {
  "jujutsu-kaisen": {
-  "Yuji Itadori": {"names": ["itadori", "yuji"], "power": "A high schooler with superhuman physical strength who swallowed one of Sukuna's fingers and became the vessel of the King of Curses. He fights hand to hand with Divergent Fist, where his cursed energy hits a split second after his punch, and he can land Black Flash, a strike that distorts space and amplifies cursed energy."},
-  "Megumi Fushiguro": {"names": ["megumi", "fushiguro"], "power": "A first-year sorcerer who uses the Ten Shadows Technique, summoning shikigami from his own shadow like the Divine Dogs and the bird Nue. The strongest of them, Mahoraga, has never been tamed by anyone. His domain is called Chimera Shadow Garden."},
-  "Nobara Kugisaki": {"names": ["nobara", "kugisaki"], "power": "A first-year sorcerer who fights with a hammer and cursed nails through the Straw Doll Technique. With Resonance, she strikes a straw doll and the damage lands directly on her target, even from a distance."},
-  "Satoru Gojo": {"names": ["gojo", "satoru"], "power": "The strongest sorcerer alive. Born with both the Limitless and the Six Eyes, he is surrounded by Infinity, so attacks slow down and never reach him. He fires Blue, which pulls, Red, which repels, and fuses them into Hollow Purple. His domain is Unlimited Void."},
-  "Ryomen Sukuna": {"names": ["sukuna", "ryomen"], "power": "The King of Curses, whose power was sealed into twenty fingers. He slices everything around him with Dismantle and Cleave, and his domain, Malevolent Shrine, is drawn without a barrier, cutting everything in range."},
-  "Kento Nanami": {"names": ["nanami", "kento"], "power": "A former salaryman turned grade one sorcerer. His Ratio Technique divides any target into ten parts and creates a weak point at the seven to three line, and when he works past his set hours, Overtime makes him even stronger."},
-  "Aoi Todo": {"names": ["todo", "aoi"], "power": "A grade one sorcerer with brutal physical strength. His technique, Boogie Woogie, swaps the positions of anything with cursed energy the instant he claps his hands."},
-  "Mahito": {"names": ["mahito"], "power": "A special grade curse born from human hatred of each other. His Idle Transfiguration reshapes the soul by touch, twisting the body along with it, and his domain is Self-Embodiment of Perfection."},
-  "Jogo": {"names": ["jogo"], "power": "A special grade curse born from humanity's fear of the earth and volcanoes. He commands fire and magma, and his domain is Coffin of the Iron Mountain."},
-  "Hanami": {"names": ["hanami"], "power": "A special grade curse born from humanity's fear of the forests. It controls plants and roots and is extremely durable."},
-  "Choso": {"names": ["choso"], "power": "The eldest of the Death Painting Wombs, part human and part curse. He uses Blood Manipulation, compressing his own blood into Piercing Blood, a shot faster than sound."},
-  "Toji Fushiguro": {"names": ["toji"], "power": "The Sorcerer Killer. Heavenly Restriction left him with zero cursed energy but a monstrous body and senses. He hunts sorcerers with cursed tools like the Inverted Spear of Heaven, which cancels techniques it touches."},
-  "Suguru Geto": {"names": ["geto", "suguru"], "power": "A special grade sorcerer and Gojo's former best friend. His Cursed Spirit Manipulation lets him absorb defeated curses and command them, and he can fuse them into Maximum Uzumaki."},
-  "Yuta Okkotsu": {"names": ["yuta", "okkotsu"], "power": "A special grade sorcerer bound to the cursed spirit Rika. With Rika he can copy other sorcerers' techniques, and he has massive reserves of cursed energy."},
-  "Maki Zenin": {"names": ["maki"], "power": "A sorcerer born with Heavenly Restriction, so she has almost no cursed energy but superhuman strength. She fights with cursed tools like spears and swords."},
-  "Toge Inumaki": {"names": ["inumaki", "toge"], "power": "A sorcerer of the Inumaki clan with Cursed Speech. Whatever he commands out loud happens, so in daily life he speaks only in rice ball ingredients."},
-  "Kinji Hakari": {"names": ["hakari"], "power": "A third-year sorcerer whose domain, Idle Death Gamble, works like a pachinko machine. When he hits the jackpot, he gets endless cursed energy and heals from almost any wound for over four minutes."},
-  "Hiromi Higuruma": {"names": ["higuruma"], "power": "A former lawyer whose domain, Deadly Sentencing, puts opponents on trial before the shikigami Judgeman. A guilty verdict can confiscate their technique, and the harshest gives him the Executioner's Sword, which kills in one cut."},
-  "Naoya Zenin": {"names": ["naoya"], "power": "A Zenin clan sorcerer with Projection Sorcery. He splits one second into twenty-four frames and moves at insane speed, freezing anyone who breaks his rules."}
+  "Yuji Itadori": {
+   "names": [
+    "itadori",
+    "yuji"
+   ],
+   "power": "A high schooler with superhuman physical strength who swallowed one of Sukuna's fingers and became the vessel of the King of Curses. He fights hand to hand with Divergent Fist, where his cursed energy hits a split second after his punch, and he can land Black Flash, a strike that distorts space and amplifies cursed energy.",
+   "ja": [
+    "虎杖",
+    "悠仁",
+    "いたどり",
+    "ゆうじ"
+   ]
+  },
+  "Megumi Fushiguro": {
+   "names": [
+    "megumi",
+    "fushiguro"
+   ],
+   "power": "A first-year sorcerer who uses the Ten Shadows Technique, summoning shikigami from his own shadow like the Divine Dogs and the bird Nue. The strongest of them, Mahoraga, has never been tamed by anyone. His domain is called Chimera Shadow Garden.",
+   "ja": [
+    "伏黒",
+    "めぐみ"
+   ]
+  },
+  "Nobara Kugisaki": {
+   "names": [
+    "nobara",
+    "kugisaki"
+   ],
+   "power": "A first-year sorcerer who fights with a hammer and cursed nails through the Straw Doll Technique. With Resonance, she strikes a straw doll and the damage lands directly on her target, even from a distance.",
+   "ja": [
+    "釘崎",
+    "野薔薇",
+    "のばら"
+   ]
+  },
+  "Satoru Gojo": {
+   "names": [
+    "gojo",
+    "satoru"
+   ],
+   "power": "The strongest sorcerer alive. Born with both the Limitless and the Six Eyes, he is surrounded by Infinity, so attacks slow down and never reach him. He fires Blue, which pulls, Red, which repels, and fuses them into Hollow Purple. His domain is Unlimited Void.",
+   "ja": [
+    "五条",
+    "ごじょう"
+   ]
+  },
+  "Ryomen Sukuna": {
+   "names": [
+    "sukuna",
+    "ryomen"
+   ],
+   "power": "The King of Curses, whose power was sealed into twenty fingers. He slices everything around him with Dismantle and Cleave, and his domain, Malevolent Shrine, is drawn without a barrier, cutting everything in range.",
+   "ja": [
+    "宿儺",
+    "すくな",
+    "スクナ"
+   ]
+  },
+  "Kento Nanami": {
+   "names": [
+    "nanami",
+    "kento"
+   ],
+   "power": "A former salaryman turned grade one sorcerer. His Ratio Technique divides any target into ten parts and creates a weak point at the seven to three line, and when he works past his set hours, Overtime makes him even stronger.",
+   "ja": [
+    "七海",
+    "ななみ",
+    "ナナミン"
+   ]
+  },
+  "Aoi Todo": {
+   "names": [
+    "todo",
+    "aoi"
+   ],
+   "power": "A grade one sorcerer with brutal physical strength. His technique, Boogie Woogie, swaps the positions of anything with cursed energy the instant he claps his hands.",
+   "ja": [
+    "東堂",
+    "とうどう"
+   ]
+  },
+  "Mahito": {
+   "names": [
+    "mahito"
+   ],
+   "power": "A special grade curse born from human hatred of each other. His Idle Transfiguration reshapes the soul by touch, twisting the body along with it, and his domain is Self-Embodiment of Perfection.",
+   "ja": [
+    "真人",
+    "まひと"
+   ]
+  },
+  "Jogo": {
+   "names": [
+    "jogo"
+   ],
+   "power": "A special grade curse born from humanity's fear of the earth and volcanoes. He commands fire and magma, and his domain is Coffin of the Iron Mountain.",
+   "ja": [
+    "漏瑚",
+    "じょうご"
+   ]
+  },
+  "Hanami": {
+   "names": [
+    "hanami"
+   ],
+   "power": "A special grade curse born from humanity's fear of the forests. It controls plants and roots and is extremely durable.",
+   "ja": [
+    "花御",
+    "はなみ"
+   ]
+  },
+  "Choso": {
+   "names": [
+    "choso"
+   ],
+   "power": "The eldest of the Death Painting Wombs, part human and part curse. He uses Blood Manipulation, compressing his own blood into Piercing Blood, a shot faster than sound.",
+   "ja": [
+    "脹相",
+    "ちょうそう"
+   ]
+  },
+  "Toji Fushiguro": {
+   "names": [
+    "toji"
+   ],
+   "power": "The Sorcerer Killer. Heavenly Restriction left him with zero cursed energy but a monstrous body and senses. He hunts sorcerers with cursed tools like the Inverted Spear of Heaven, which cancels techniques it touches.",
+   "ja": [
+    "甚爾",
+    "とうじ"
+   ]
+  },
+  "Suguru Geto": {
+   "names": [
+    "geto",
+    "suguru"
+   ],
+   "power": "A special grade sorcerer and Gojo's former best friend. His Cursed Spirit Manipulation lets him absorb defeated curses and command them, and he can fuse them into Maximum Uzumaki.",
+   "ja": [
+    "夏油",
+    "げとう"
+   ]
+  },
+  "Yuta Okkotsu": {
+   "names": [
+    "yuta",
+    "okkotsu"
+   ],
+   "power": "A special grade sorcerer bound to the cursed spirit Rika. With Rika he can copy other sorcerers' techniques, and he has massive reserves of cursed energy.",
+   "ja": [
+    "乙骨",
+    "憂太",
+    "ゆうた"
+   ]
+  },
+  "Maki Zenin": {
+   "names": [
+    "maki"
+   ],
+   "power": "A sorcerer born with Heavenly Restriction, so she has almost no cursed energy but superhuman strength. She fights with cursed tools like spears and swords.",
+   "ja": [
+    "真希",
+    "まき"
+   ]
+  },
+  "Toge Inumaki": {
+   "names": [
+    "inumaki",
+    "toge"
+   ],
+   "power": "A sorcerer of the Inumaki clan with Cursed Speech. Whatever he commands out loud happens, so in daily life he speaks only in rice ball ingredients.",
+   "ja": [
+    "狗巻",
+    "いぬまき"
+   ]
+  },
+  "Kinji Hakari": {
+   "names": [
+    "hakari"
+   ],
+   "power": "A third-year sorcerer whose domain, Idle Death Gamble, works like a pachinko machine. When he hits the jackpot, he gets endless cursed energy and heals from almost any wound for over four minutes.",
+   "ja": [
+    "はかり",
+    "秤先輩"
+   ]
+  },
+  "Hiromi Higuruma": {
+   "names": [
+    "higuruma"
+   ],
+   "power": "A former lawyer whose domain, Deadly Sentencing, puts opponents on trial before the shikigami Judgeman. A guilty verdict can confiscate their technique, and the harshest gives him the Executioner's Sword, which kills in one cut.",
+   "ja": [
+    "日車",
+    "ひぐるま"
+   ]
+  },
+  "Naoya Zenin": {
+   "names": [
+    "naoya"
+   ],
+   "power": "A Zenin clan sorcerer with Projection Sorcery. He splits one second into twenty-four frames and moves at insane speed, freezing anyone who breaks his rules.",
+   "ja": [
+    "直哉",
+    "なおや"
+   ]
+  }
  },
  "demon-slayer-kimetsu-no-yaiba": {
-  "Tanjiro Kamado": {"names": ["tanjiro", "kamado"], "power": "A demon slayer with an incredible sense of smell who uses Water Breathing. He also inherited Hinokami Kagura, his family's dance of the fire god, which is tied to Sun Breathing."},
-  "Nezuko Kamado": {"names": ["nezuko"], "power": "Tanjiro's younger sister, turned into a demon, who refuses to eat humans. She can change her size and uses the Blood Demon Art Exploding Blood, which burns demons."},
-  "Zenitsu Agatsuma": {"names": ["zenitsu", "agatsuma"], "power": "A demon slayer who uses Thunder Breathing but only ever mastered the First Form, Thunderclap and Flash. Usually terrified, he becomes lethal when he falls asleep, striking faster than the eye can follow."},
-  "Inosuke Hashibira": {"names": ["inosuke"], "power": "A demon slayer raised by boars who wears a boar head mask. He fights with two jagged blades using Beast Breathing, a style he created himself, and his body is flexible enough to dislocate his joints."},
-  "Kyojuro Rengoku": {"names": ["rengoku", "kyojuro"], "power": "The Flame Hashira, one of the strongest demon slayers. He uses Flame Breathing, and his ultimate technique, Ninth Form Rengoku, carries his own name."},
-  "Akaza": {"names": ["akaza"], "power": "Upper Rank Three of the Twelve Kizuki, a demon martial artist. His Blood Demon Art, Destructive Death, launches shockwave punches, and Compass Needle lets him sense every move his opponent makes."},
-  "Tengen Uzui": {"names": ["uzui", "tengen"], "power": "The Sound Hashira, a former shinobi who calls everything flashy. He fights with two chained cleaver blades using Sound Breathing, and his Musical Score reads an opponent's attack rhythm to find openings."},
-  "Daki": {"names": ["daki"], "power": "One half of Upper Rank Six. She attacks with living obi sashes that slice like blades, and she can only be killed if her brother Gyutaro is beheaded at the same time."},
-  "Gyutaro": {"names": ["gyutaro"], "power": "The true strength of Upper Rank Six, sharing the rank with his sister Daki. He throws poisoned blood sickles, and the two must be beheaded at the same moment to die."},
-  "Giyu Tomioka": {"names": ["giyu", "tomioka"], "power": "The Water Hashira, the calm swordsman who spared Tanjiro and Nezuko. He uses Water Breathing and created his own Eleventh Form, Dead Calm, which neutralizes every attack in his range."},
-  "Shinobu Kocho": {"names": ["shinobu", "kocho"], "power": "The Insect Hashira. Too small to behead demons, she kills them with poison made from wisteria, delivered through a needle-like sword with Insect Breathing."},
-  "Muichiro Tokito": {"names": ["muichiro", "tokito"], "power": "The Mist Hashira, who became a Hashira just two months after picking up a sword. He uses Mist Breathing and created his own Seventh Form, Obscuring Clouds."},
-  "Mitsuri Kanroji": {"names": ["mitsuri", "kanroji"], "power": "The Love Hashira, whose muscles are eight times denser than normal. She fights with a sword thin and flexible like a whip using Love Breathing."},
-  "Rui": {"names": ["rui"], "power": "Lower Rank Five, a spider demon. His threads are sharp enough to slice through flesh and steel, and he forces other demons to act as his fake family."},
-  "Enmu": {"names": ["enmu"], "power": "Lower Rank One, a demon who traps his victims in dreams so he can kill them while they sleep."},
-  "Hantengu": {"names": ["hantengu"], "power": "Upper Rank Four, a cowardly demon who splits into clones of his emotions, like Anger, Joy, Sorrow and Pleasure, while his real body hides."},
-  "Gyokko": {"names": ["gyokko"], "power": "Upper Rank Five, a demon who lives in vases and calls itself an artist. It teleports between pots and summons fish creatures."},
-  "Kokushibo": {"names": ["kokushibo"], "power": "Upper Rank One, the strongest of the Twelve Kizuki. A former demon slayer with six eyes, he wields Moon Breathing with a sword made of his own flesh."},
-  "Doma": {"names": ["doma"], "power": "Upper Rank Two, a smiling cult leader demon who uses ice. His frozen blood mist destroys the lungs of anyone who breathes it."},
-  "Muzan Kibutsuji": {"names": ["muzan", "kibutsuji"], "power": "The first demon and the king of all demons. Every demon was created by his blood, and he is the one Tanjiro has sworn to destroy."},
-  "Sanemi Shinazugawa": {"names": ["sanemi"], "power": "The Wind Hashira, covered in scars. His rare blood intoxicates demons, and he slices with Wind Breathing."},
-  "Gyomei Himejima": {"names": ["himejima", "gyomei"], "power": "The Stone Hashira, considered the strongest Hashira. He is blind but fights with a spiked flail and an axe joined by a chain using Stone Breathing."},
-  "Obanai Iguro": {"names": ["iguro", "obanai"], "power": "The Serpent Hashira, who fights alongside his white snake Kaburamaru with a twisting blade and Serpent Breathing."}
+  "Tanjiro Kamado": {
+   "names": [
+    "tanjiro",
+    "kamado"
+   ],
+   "power": "A demon slayer with an incredible sense of smell who uses Water Breathing. He also inherited Hinokami Kagura, his family's dance of the fire god, which is tied to Sun Breathing.",
+   "ja": [
+    "炭治郎",
+    "たんじろう",
+    "タンジロウ"
+   ]
+  },
+  "Nezuko Kamado": {
+   "names": [
+    "nezuko"
+   ],
+   "power": "Tanjiro's younger sister, turned into a demon, who refuses to eat humans. She can change her size and uses the Blood Demon Art Exploding Blood, which burns demons.",
+   "ja": [
+    "禰豆子",
+    "ねずこ",
+    "ネズコ"
+   ]
+  },
+  "Zenitsu Agatsuma": {
+   "names": [
+    "zenitsu",
+    "agatsuma"
+   ],
+   "power": "A demon slayer who uses Thunder Breathing but only ever mastered the First Form, Thunderclap and Flash. Usually terrified, he becomes lethal when he falls asleep, striking faster than the eye can follow.",
+   "ja": [
+    "善逸",
+    "ぜんいつ"
+   ]
+  },
+  "Inosuke Hashibira": {
+   "names": [
+    "inosuke"
+   ],
+   "power": "A demon slayer raised by boars who wears a boar head mask. He fights with two jagged blades using Beast Breathing, a style he created himself, and his body is flexible enough to dislocate his joints.",
+   "ja": [
+    "伊之助",
+    "いのすけ"
+   ]
+  },
+  "Kyojuro Rengoku": {
+   "names": [
+    "rengoku",
+    "kyojuro"
+   ],
+   "power": "The Flame Hashira, one of the strongest demon slayers. He uses Flame Breathing, and his ultimate technique, Ninth Form Rengoku, carries his own name.",
+   "ja": [
+    "煉獄",
+    "杏寿郎",
+    "れんごく"
+   ]
+  },
+  "Akaza": {
+   "names": [
+    "akaza"
+   ],
+   "power": "Upper Rank Three of the Twelve Kizuki, a demon martial artist. His Blood Demon Art, Destructive Death, launches shockwave punches, and Compass Needle lets him sense every move his opponent makes.",
+   "ja": [
+    "猗窩座",
+    "あかざ"
+   ]
+  },
+  "Tengen Uzui": {
+   "names": [
+    "uzui",
+    "tengen"
+   ],
+   "power": "The Sound Hashira, a former shinobi who calls everything flashy. He fights with two chained cleaver blades using Sound Breathing, and his Musical Score reads an opponent's attack rhythm to find openings.",
+   "ja": [
+    "宇髄",
+    "天元",
+    "うずい"
+   ]
+  },
+  "Daki": {
+   "names": [
+    "daki"
+   ],
+   "power": "One half of Upper Rank Six. She attacks with living obi sashes that slice like blades, and she can only be killed if her brother Gyutaro is beheaded at the same time.",
+   "ja": [
+    "堕姫",
+    "だき"
+   ]
+  },
+  "Gyutaro": {
+   "names": [
+    "gyutaro"
+   ],
+   "power": "The true strength of Upper Rank Six, sharing the rank with his sister Daki. He throws poisoned blood sickles, and the two must be beheaded at the same moment to die.",
+   "ja": [
+    "妓夫太郎",
+    "ぎゅうたろう"
+   ]
+  },
+  "Giyu Tomioka": {
+   "names": [
+    "giyu",
+    "tomioka"
+   ],
+   "power": "The Water Hashira, the calm swordsman who spared Tanjiro and Nezuko. He uses Water Breathing and created his own Eleventh Form, Dead Calm, which neutralizes every attack in his range.",
+   "ja": [
+    "義勇",
+    "冨岡",
+    "ぎゆう"
+   ]
+  },
+  "Shinobu Kocho": {
+   "names": [
+    "shinobu",
+    "kocho"
+   ],
+   "power": "The Insect Hashira. Too small to behead demons, she kills them with poison made from wisteria, delivered through a needle-like sword with Insect Breathing.",
+   "ja": [
+    "しのぶ",
+    "胡蝶"
+   ]
+  },
+  "Muichiro Tokito": {
+   "names": [
+    "muichiro",
+    "tokito"
+   ],
+   "power": "The Mist Hashira, who became a Hashira just two months after picking up a sword. He uses Mist Breathing and created his own Seventh Form, Obscuring Clouds.",
+   "ja": [
+    "無一郎",
+    "時透",
+    "むいちろう"
+   ]
+  },
+  "Mitsuri Kanroji": {
+   "names": [
+    "mitsuri",
+    "kanroji"
+   ],
+   "power": "The Love Hashira, whose muscles are eight times denser than normal. She fights with a sword thin and flexible like a whip using Love Breathing.",
+   "ja": [
+    "蜜璃",
+    "甘露寺",
+    "みつり"
+   ]
+  },
+  "Rui": {
+   "names": [
+    "rui"
+   ],
+   "power": "Lower Rank Five, a spider demon. His threads are sharp enough to slice through flesh and steel, and he forces other demons to act as his fake family.",
+   "ja": [
+    "るい"
+   ]
+  },
+  "Enmu": {
+   "names": [
+    "enmu"
+   ],
+   "power": "Lower Rank One, a demon who traps his victims in dreams so he can kill them while they sleep.",
+   "ja": [
+    "魘夢",
+    "えんむ"
+   ]
+  },
+  "Hantengu": {
+   "names": [
+    "hantengu"
+   ],
+   "power": "Upper Rank Four, a cowardly demon who splits into clones of his emotions, like Anger, Joy, Sorrow and Pleasure, while his real body hides.",
+   "ja": [
+    "半天狗",
+    "はんてんぐ"
+   ]
+  },
+  "Gyokko": {
+   "names": [
+    "gyokko"
+   ],
+   "power": "Upper Rank Five, a demon who lives in vases and calls itself an artist. It teleports between pots and summons fish creatures.",
+   "ja": [
+    "玉壺",
+    "ぎょっこ"
+   ]
+  },
+  "Kokushibo": {
+   "names": [
+    "kokushibo"
+   ],
+   "power": "Upper Rank One, the strongest of the Twelve Kizuki. A former demon slayer with six eyes, he wields Moon Breathing with a sword made of his own flesh.",
+   "ja": [
+    "黒死牟",
+    "こくしぼう"
+   ]
+  },
+  "Doma": {
+   "names": [
+    "doma"
+   ],
+   "power": "Upper Rank Two, a smiling cult leader demon who uses ice. His frozen blood mist destroys the lungs of anyone who breathes it.",
+   "ja": [
+    "童磨",
+    "どうま"
+   ]
+  },
+  "Muzan Kibutsuji": {
+   "names": [
+    "muzan",
+    "kibutsuji"
+   ],
+   "power": "The first demon and the king of all demons. Every demon was created by his blood, and he is the one Tanjiro has sworn to destroy.",
+   "ja": [
+    "無惨",
+    "むざん"
+   ]
+  },
+  "Sanemi Shinazugawa": {
+   "names": [
+    "sanemi"
+   ],
+   "power": "The Wind Hashira, covered in scars. His rare blood intoxicates demons, and he slices with Wind Breathing.",
+   "ja": [
+    "実弥",
+    "不死川",
+    "さねみ"
+   ]
+  },
+  "Gyomei Himejima": {
+   "names": [
+    "himejima",
+    "gyomei"
+   ],
+   "power": "The Stone Hashira, considered the strongest Hashira. He is blind but fights with a spiked flail and an axe joined by a chain using Stone Breathing.",
+   "ja": [
+    "悲鳴嶼",
+    "行冥"
+   ]
+  },
+  "Obanai Iguro": {
+   "names": [
+    "iguro",
+    "obanai"
+   ],
+   "power": "The Serpent Hashira, who fights alongside his white snake Kaburamaru with a twisting blade and Serpent Breathing.",
+   "ja": [
+    "小芭内",
+    "伊黒",
+    "おばない"
+   ]
+  }
  }
 }

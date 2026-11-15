@@ -11,7 +11,7 @@ on:
         required: false
         default: 'auto'
       narration:
-        description: 'scene, facts or praise (empty = random)'
+        description: 'character or rhyme (empty = random)'
         required: false
         default: ''
 
