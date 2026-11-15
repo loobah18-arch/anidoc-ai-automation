@@ -68,11 +68,11 @@ async def _one(text, rate, pitch, vol, path):
 
 
 def _say(text, rate, pitch, vol, path):
-    for i in range(4):                                               # edge-tts sometimes drops a pitch shift: retry, then flatten
+    for i in range(7):                                               # the service drops requests now and then: retry the same read, flatten only as a last resort
         try:
-            return asyncio.run(_one(text, rate, pitch if i < 2 else '+0Hz', vol, path))
+            return asyncio.run(_one(text, rate, pitch if i < 5 else '+0Hz', vol, path))
         except Exception as e:
-            print('tts retry', i, e, flush=True); time.sleep(2)
+            print('tts retry', i, e, flush=True); time.sleep(1.5 * (i + 1))
     raise SystemExit('tts failed')
 
 
