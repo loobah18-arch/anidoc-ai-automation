@@ -464,8 +464,38 @@ VOICE = 'work/convo/narr.wav'
 
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
 amv_len = max(14.0, TOTAL - CONV)                                   # the narrator opens the Short
-env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 60:.1f}|{c1 + 90:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
-           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK, START_OFFSET=f'{CONV:.2f}')
+
+# Match the narrated character against characters.json so the AMV features multiple fight scenes
+# strictly starring ONLY this character across the anime series in Google Drive
+char_key = None
+if CHAR:
+    for k in chars:
+        if k in CHAR.lower() or CHAR.lower().startswith(k):
+            char_key = k
+            break
+    if not char_key:
+        char_key = CHAR.lower().split()[0]
+
+amv_pick = char_key if (char_key and char_key in chars) else PICK
+env = dict(os.environ, START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=amv_pick, START_OFFSET=f'{CONV:.2f}')
+
+if amv_pick in chars:
+    char_eps = [e for e in chars[amv_pick] if e in EPISODES]
+    if conv_ep in char_eps:
+        other_eps = [e for e in char_eps if e != conv_ep]
+        chosen_eps = [conv_ep] + least_used(other_eps, used_eps, 2)
+    else:
+        chosen_eps = least_used(char_eps, used_eps, 3)
+    env['FORCE_EPS'] = ','.join(chosen_eps)
+    # Crucial: omit INCLUDE so auto.py features fight scenes across all chosen episodes, not just one scene
+    env.pop('INCLUDE', None)
+    print(f'character-exclusive multi-fight AMV for {CHAR} ({amv_pick}): episodes {chosen_eps}', flush=True)
+else:
+    print(f'fallback AMV edit for {conv_ep}', flush=True)
+    env['FORCE_EPS'] = conv_ep
+    env['INCLUDE'] = f'{conv_ep}|{c0 - 60:.1f}|{c1 + 90:.1f}'
+
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))
