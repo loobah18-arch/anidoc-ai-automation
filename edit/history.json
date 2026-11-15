@@ -10,7 +10,8 @@
   "glxxmstrider_dont_stop_slowed": 1,
   "dygo_funk_infernal": 1,
   "zxvren_montagem_delirio_slowed": 1,
-  "poker_face": 1
+  "poker_face": 1,
+  "rubikdice_montagem_pegadora_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -39,7 +40,8 @@
   "jujutsu-kaisen:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
   "jujutsu-kaisen:S2E19": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E07": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E07": 1,
+  "jujutsu-kaisen:S1E11": 1
  },
  "shots": [
   {
@@ -1873,6 +1875,166 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
    "s": 1255.416
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 630.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 627.425
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 537.409
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 710.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 497.608
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 515.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 522.55
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 525.409
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 528.534
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 541.9
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 579.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 580.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 611.966
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 619.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 639.491
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 669.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 671.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 679.05
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 684.067
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 687.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 695.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 704.692
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 706.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 715.284
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 716.534
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 717.608
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 720.067
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 724.3
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 728.567
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 733.325
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 739.408
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 748.983
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 766.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 774.408
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 777.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 778.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 782.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 790.775
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 798.467
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 806.159
   }
  ],
  "runs": [
@@ -1999,6 +2161,16 @@
    "song": "poker_face",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 15:39 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "rubikdice_montagem_pegadora_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E11"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2232,10 +2404,32 @@
     1283.0,
     1400.6
    ]
+  ],
+  "jujutsu-kaisen:S1E11": [
+   [
+    -4.0,
+    30.0
+   ],
+   [
+    135.8,
+    226.4
+   ],
+   [
+    266.7,
+    313.1
+   ],
+   [
+    892.1,
+    911.1
+   ],
+   [
+    1316.2,
+    1412.3
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 5,
+  "jujutsu-kaisen": 6,
   "demon-slayer-kimetsu-no-yaiba": 6
  },
  "known": [
@@ -2411,6 +2605,13 @@
    "e": 1128.5666666666666,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_poker_face.mp4",
    "time": "2026-11-15 13:11 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E11",
+   "s": 646.0666666666667,
+   "e": 661.4666666666667,
+   "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
+   "time": "2026-11-15 15:39 UTC"
   }
  ]
 }
