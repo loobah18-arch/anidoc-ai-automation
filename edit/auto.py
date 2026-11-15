@@ -345,6 +345,16 @@ take(heroes, 'impact', 0.5)                                          # the two d
 rest = [i for i in range(n) if i not in assign]
 k = len(rest)
 top = sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact'])[:k]
+if os.environ.get('BALANCE_EPS') == '1' and len({s['ep'] for s in pool}) > 1:   # multi-fight edit: spread the cuts over every episode
+    by_ep = {}
+    for s in sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact']):
+        by_ep.setdefault(s['ep'], []).append(s)
+    top, qs = [], list(by_ep.values())
+    while len(top) < k and any(qs):
+        for q in qs:
+            if q and len(top) < k:
+                top.append(q.pop(0))
+    print('balanced cuts per episode:', {e: sum(t['ep'] == e for t in top) for e in by_ep}, flush=True)
 top.sort(key=lambda s: (s['ep'], s['s']))                            # story order through the fights
 for i, s in zip(rest, top):
     assign[i] = s; taken.add(id(s))
