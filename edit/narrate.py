@@ -106,6 +106,11 @@ import soundfile as _sf
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(lo), '-t', str(hi - lo), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/full.wav'])
 _scan = WhisperModel('small', device='cpu', compute_type='int8')
 _ss, _ = _scan.transcribe(_sf.read('work/convo/full.wav', dtype='float32')[0], beam_size=1, vad_filter=True)
+_fw = _sf.read('work/convo/full.wav', dtype='float32')[0]
+loud = np.zeros(int(dur) + 1)                                         # per-second loudness: fights are loud (impacts, screams, score)
+for k in range(len(_fw) // 16000):
+    loud[lo + k] = np.sqrt(np.mean(_fw[k * 16000:(k + 1) * 16000] ** 2))
+lref = np.percentile(loud[lo:hi], 90) + 1e-6
 speech = np.zeros(int(dur) + 1)
 for sg in _ss:
     if len((sg.text or '').split()) >= 3 and sg.avg_logprob > -1.0 and sg.no_speech_prob < 0.6:
@@ -118,7 +123,8 @@ for t in range(lo, hi - 40, 2):
         continue
     talk = speech[t:t + 24].mean()
     act = per_s[t:t + 24].mean() / mref
-    sc = 0.3 * talk + 1.5 * min(act, 1.3)                         # narrator: action first, some talk for context
+    lnd = loud[t:t + 24].mean() / lref
+    sc = min(act, 1.3) * min(lnd, 1.3) + 0.5 * min(np.percentile(per_s[t:t + 24], 25) / mref, 1.0)   # sustained motion AND loud audio = a real fight
     if sc > bs:
         bs, bt = sc, t
 fight = bt
@@ -229,7 +235,7 @@ print('narration', MODE, CHAR, '|', narration, flush=True)
 import edge_tts
 VOICE_NAME = os.environ.get('VOICE', 'en-US-ChristopherNeural')
 async def _tts():
-    com = edge_tts.Communicate(narration, VOICE_NAME, rate=os.environ.get('VOICE_RATE', '-10%'), pitch=os.environ.get('VOICE_PITCH', '-12Hz'), boundary='WordBoundary')
+    com = edge_tts.Communicate(narration, VOICE_NAME, rate=os.environ.get('VOICE_RATE', '-10%'), pitch=os.environ.get('VOICE_PITCH', '-6Hz'), boundary='WordBoundary')
     bounds = []
     with open('work/convo/narr.mp3', 'wb') as f:
         async for ch in com.stream():
@@ -239,7 +245,7 @@ async def _tts():
                 bounds.append((ch['offset'] / 1e7, (ch['offset'] + ch['duration']) / 1e7, ch['text']))
     return bounds
 bounds = asyncio.run(_tts())
-DEEP = float(os.environ.get('VOICE_DEEP', '0.86'))
+DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', 'work/convo/narr.mp3', '-af',
     f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'   # pitch and formants down, same timing: a heavy trailer voice
     'bass=g=4:f=110,aecho=0.8:0.6:45:0.12,loudnorm=I=-11:TP=-1.0,aresample=48000', '-ac', '2', 'work/convo/narr.wav'])
@@ -410,7 +416,7 @@ VOICE = 'work/convo/narr.wav'
 
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
 amv_len = max(14.0, TOTAL - CONV)                                   # no cold-open hook any more: the narrator opens the Short
-env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 150:.1f}|{c1 + 150:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 60:.1f}|{c1 + 90:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK)
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
