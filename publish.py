@@ -12,3 +12,10 @@ res = upload_video_with_block_retry(Path(meta['file']), meta['title'], meta['des
 print(json.dumps(res, indent=1, default=str))
 if res.get('status') == 'error':
     sys.exit(1)
+if str(res.get('status', '')).startswith('deferred'):
+    # held back by Layer 1/2: give this style its turn again next run
+    hp = Path('edit/history.json'); h = json.load(open(hp))
+    if h.get('styles'):
+        h['styles'].pop()
+        json.dump(h, open(hp, 'w'), indent=1)
+    print('upload deferred by the candle gate; style will be retried next run')

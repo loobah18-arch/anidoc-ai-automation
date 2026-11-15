@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from publishers.candle_gate import CandleGate
 
 DEFAULT_HISTORY = Path(__file__).resolve().parent / "metadata" / "youtube_upload_history.json"
-DEFAULT_MIN_SPACING_HOURS = 24.0
+DEFAULT_MIN_SPACING_HOURS = 22.5  # render takes ~1 h; the upload step enforces the real 24 h (with a short inline wait)
 DEFAULT_MAX_INLINE_WAIT_HOURS = 0.5
 HARD_SLEEP_CAP_SECONDS = 1900  # defensive: below the preflight job's 45-min timeout
 
