@@ -1,7 +1,7 @@
 {
  "songs": {
   "rayelo_ultraslowed": 1,
-  "montagem_zora": 1,
+  "montagem_zora": 2,
   "cotneus_stereo_love_funk": 1,
   "andromeda_montagem_coma": 1,
   "montagem_vozes_profundas": 1,
@@ -55,7 +55,8 @@
   "jujutsu-kaisen:S1E14": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S3E10": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E01": 1
+  "demon-slayer-kimetsu-no-yaiba:S5E01": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E10": 1
  },
  "shots": [
   {
@@ -3545,6 +3546,186 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S5E01",
    "s": 335.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1089.55
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1045.3
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1104.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 890.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1159.967
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 835.05
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 845.675
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 886.066
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 889.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 891.508
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 942.175
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 947.55
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 953.367
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 957.175
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 961.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1029.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1085.217
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1094.133
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1101.509
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1103.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1105.008
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1118.05
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1156.425
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1163.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1168.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1045.3
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1104.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1159.967
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 960.842
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1163.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1089.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1101.509
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 957.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1105.275
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1118.05
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 889.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1156.425
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1045.3
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1104.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1159.95
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 960.842
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1163.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1089.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1101.509
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 957.442
   }
  ],
  "runs": [
@@ -3761,6 +3942,16 @@
    "song": "mvsterious_slava_funk",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S5E01"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 20:00 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "montagem_zora",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S3E10"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4080,11 +4271,17 @@
     2629.1,
     2679.6
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E10": [
+   [
+    0.1,
+    136.1
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 10,
-  "demon-slayer-kimetsu-no-yaiba": 10
+  "demon-slayer-kimetsu-no-yaiba": 11
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -4322,6 +4519,19 @@
    "e": 220.26666666666665,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_mvsterious_slava_funk.mp4",
    "time": "2026-11-15 17:27 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 974.0,
+   "e": 991.5666666666667,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_montagem_zora.mp4",
+   "time": "2026-11-15 20:01 UTC",
+   "character": "zenitsu",
+   "song": "montagem_zora",
+   "voice": "en-US-AndrewNeural",
+   "writer": "pollinations",
+   "mode": "character",
+   "title": "Zenitsu's power is unreal \ud83d\ude33 #shorts"
   }
  ],
  "styles": [
@@ -4337,5 +4547,20 @@
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
    "time": "2026-11-15 05:07 UTC"
   }
- ]
+ ],
+ "narr_chars": {
+  "zenitsu": 1
+ },
+ "narr_lines": {
+  "zenitsu": [
+   "Zenitsu Agatsuma, a demon slayer, wields Thunder Breathing, mastering only the First Form: Thunderclap and Flash.",
+   "Though usually terrified, he turns lethal while asleep, striking with a speed that surpasses the eye's perception in the darkness."
+  ]
+ },
+ "lore_used": {
+  "zenitsu": {
+   "A demon slayer who uses Thunder Breathing but only ever mast": 1,
+   "Usually terrified, he becomes lethal when he falls asleep, s": 1
+  }
+ }
 }

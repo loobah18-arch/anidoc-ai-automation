@@ -1,0 +1,397 @@
+{
+ "episodes": {
+  "demon-slayer-kimetsu-no-yaiba:S1E11": {
+   "frames": 227,
+   "face_frames": 45,
+   "step": 5.0,
+   "chars": {
+    "Tanjiro Kamado": {
+     "share": 0.2907,
+     "top3": 0.5154,
+     "peak": 0.8299
+    },
+    "Nezuko Kamado": {
+     "share": 0.0088,
+     "top3": 0.0837,
+     "peak": 0.7399
+    },
+    "Zenitsu Agatsuma": {
+     "share": 0.1982,
+     "top3": 0.3789,
+     "peak": 0.7616
+    },
+    "Inosuke Hashibira": {
+     "share": 0.0485,
+     "top3": 0.1101,
+     "peak": 0.7305
+    },
+    "Kyojuro Rengoku": {
+     "share": 0.0132,
+     "top3": 0.0881,
+     "peak": 0.7114
+    },
+    "Akaza": {
+     "share": 0.0132,
+     "top3": 0.0969,
+     "peak": 0.7372
+    },
+    "Tengen Uzui": {
+     "share": 0.0132,
+     "top3": 0.0352,
+     "peak": 0.6934
+    },
+    "Daki": {
+     "share": 0.0088,
+     "top3": 0.0352,
+     "peak": 0.7149
+    },
+    "Gyutaro": {
+     "share": 0.0308,
+     "top3": 0.0925,
+     "peak": 0.7169
+    },
+    "Giyu Tomioka": {
+     "share": 0.022,
+     "top3": 0.185,
+     "peak": 0.76
+    },
+    "Shinobu Kocho": {
+     "share": 0.0485,
+     "top3": 0.2687,
+     "peak": 0.784
+    },
+    "Muichiro Tokito": {
+     "share": 0.0,
+     "top3": 0.0352,
+     "peak": 0.7448
+    },
+    "Mitsuri Kanroji": {
+     "share": 0.0,
+     "top3": 0.1322,
+     "peak": 0.7348
+    },
+    "Rui": {
+     "share": 0.0,
+     "top3": 0.0044,
+     "peak": 0.6455
+    },
+    "Enmu": {
+     "share": 0.0969,
+     "top3": 0.3568,
+     "peak": 0.7909
+    },
+    "Hantengu": {
+     "share": 0.0,
+     "top3": 0.0617,
+     "peak": 0.7343
+    },
+    "Gyokko": {
+     "share": 0.0088,
+     "top3": 0.0176,
+     "peak": 0.6797
+    },
+    "Kokushibo": {
+     "share": 0.0264,
+     "top3": 0.0925,
+     "peak": 0.7045
+    },
+    "Doma": {
+     "share": 0.0088,
+     "top3": 0.0441,
+     "peak": 0.7172
+    },
+    "Muzan Kibutsuji": {
+     "share": 0.0132,
+     "top3": 0.1013,
+     "peak": 0.7389
+    },
+    "Sanemi Shinazugawa": {
+     "share": 0.0,
+     "top3": 0.0749,
+     "peak": 0.7288
+    },
+    "Gyomei Himejima": {
+     "share": 0.0176,
+     "top3": 0.1322,
+     "peak": 0.7433
+    },
+    "Obanai Iguro": {
+     "share": 0.0,
+     "top3": 0.0573,
+     "peak": 0.7209
+    }
+   },
+   "scanned": "2026-11-15 20:02 UTC"
+  },
+  "demon-slayer-kimetsu-no-yaiba:S1E17": {
+   "frames": 226,
+   "face_frames": 19,
+   "step": 5.0,
+   "chars": {
+    "Tanjiro Kamado": {
+     "share": 0.0398,
+     "top3": 0.1858,
+     "peak": 0.7446
+    },
+    "Nezuko Kamado": {
+     "share": 0.0044,
+     "top3": 0.0796,
+     "peak": 0.731
+    },
+    "Zenitsu Agatsuma": {
+     "share": 0.1549,
+     "top3": 0.2965,
+     "peak": 0.7548
+    },
+    "Inosuke Hashibira": {
+     "share": 0.0752,
+     "top3": 0.2168,
+     "peak": 0.7524
+    },
+    "Kyojuro Rengoku": {
+     "share": 0.0221,
+     "top3": 0.0796,
+     "peak": 0.6971
+    },
+    "Akaza": {
+     "share": 0.031,
+     "top3": 0.1947,
+     "peak": 0.7403
+    },
+    "Tengen Uzui": {
+     "share": 0.0664,
+     "top3": 0.1903,
+     "peak": 0.7144
+    },
+    "Daki": {
+     "share": 0.0177,
+     "top3": 0.1062,
+     "peak": 0.7447
+    },
+    "Gyutaro": {
+     "share": 0.0265,
+     "top3": 0.1018,
+     "peak": 0.7193
+    },
+    "Giyu Tomioka": {
+     "share": 0.0177,
+     "top3": 0.0708,
+     "peak": 0.7333
+    },
+    "Shinobu Kocho": {
+     "share": 0.0487,
+     "top3": 0.115,
+     "peak": 0.748
+    },
+    "Muichiro Tokito": {
+     "share": 0.0088,
+     "top3": 0.0531,
+     "peak": 0.7314
+    },
+    "Mitsuri Kanroji": {
+     "share": 0.0,
+     "top3": 0.0575,
+     "peak": 0.7127
+    },
+    "Rui": {
+     "share": 0.0,
+     "top3": 0.0177,
+     "peak": 0.6517
+    },
+    "Enmu": {
+     "share": 0.2301,
+     "top3": 0.4956,
+     "peak": 0.7601
+    },
+    "Hantengu": {
+     "share": 0.0088,
+     "top3": 0.1062,
+     "peak": 0.7149
+    },
+    "Gyokko": {
+     "share": 0.0088,
+     "top3": 0.1283,
+     "peak": 0.693
+    },
+    "Kokushibo": {
+     "share": 0.0177,
+     "top3": 0.0487,
+     "peak": 0.6691
+    },
+    "Doma": {
+     "share": 0.0044,
+     "top3": 0.0929,
+     "peak": 0.7239
+    },
+    "Muzan Kibutsuji": {
+     "share": 0.0044,
+     "top3": 0.0265,
+     "peak": 0.6952
+    },
+    "Sanemi Shinazugawa": {
+     "share": 0.0619,
+     "top3": 0.1549,
+     "peak": 0.7403
+    },
+    "Gyomei Himejima": {
+     "share": 0.031,
+     "top3": 0.1239,
+     "peak": 0.7302
+    },
+    "Obanai Iguro": {
+     "share": 0.0133,
+     "top3": 0.0575,
+     "peak": 0.7307
+    }
+   },
+   "scanned": "2026-11-15 20:02 UTC"
+  },
+  "demon-slayer-kimetsu-no-yaiba:S3E09": {
+   "frames": 227,
+   "face_frames": 39,
+   "step": 5.0,
+   "chars": {
+    "Tanjiro Kamado": {
+     "share": 0.0441,
+     "top3": 0.1938,
+     "peak": 0.7651
+    },
+    "Nezuko Kamado": {
+     "share": 0.0969,
+     "top3": 0.1322,
+     "peak": 0.7699
+    },
+    "Zenitsu Agatsuma": {
+     "share": 0.0308,
+     "top3": 0.141,
+     "peak": 0.6992
+    },
+    "Inosuke Hashibira": {
+     "share": 0.0837,
+     "top3": 0.1718,
+     "peak": 0.7447
+    },
+    "Kyojuro Rengoku": {
+     "share": 0.022,
+     "top3": 0.0352,
+     "peak": 0.6921
+    },
+    "Akaza": {
+     "share": 0.0793,
+     "top3": 0.2952,
+     "peak": 0.7481
+    },
+    "Tengen Uzui": {
+     "share": 0.0705,
+     "top3": 0.2159,
+     "peak": 0.7982
+    },
+    "Daki": {
+     "share": 0.0485,
+     "top3": 0.2203,
+     "peak": 0.7744
+    },
+    "Gyutaro": {
+     "share": 0.0352,
+     "top3": 0.0925,
+     "peak": 0.7413
+    },
+    "Giyu Tomioka": {
+     "share": 0.0,
+     "top3": 0.0749,
+     "peak": 0.7333
+    },
+    "Shinobu Kocho": {
+     "share": 0.0176,
+     "top3": 0.1366,
+     "peak": 0.7449
+    },
+    "Muichiro Tokito": {
+     "share": 0.0044,
+     "top3": 0.0396,
+     "peak": 0.7337
+    },
+    "Mitsuri Kanroji": {
+     "share": 0.0088,
+     "top3": 0.0264,
+     "peak": 0.7015
+    },
+    "Rui": {
+     "share": 0.0,
+     "top3": 0.022,
+     "peak": 0.6513
+    },
+    "Enmu": {
+     "share": 0.2687,
+     "top3": 0.5286,
+     "peak": 0.7936
+    },
+    "Hantengu": {
+     "share": 0.0044,
+     "top3": 0.0881,
+     "peak": 0.7164
+    },
+    "Gyokko": {
+     "share": 0.0132,
+     "top3": 0.1101,
+     "peak": 0.71
+    },
+    "Kokushibo": {
+     "share": 0.0264,
+     "top3": 0.0881,
+     "peak": 0.7005
+    },
+    "Doma": {
+     "share": 0.0088,
+     "top3": 0.0793,
+     "peak": 0.724
+    },
+    "Muzan Kibutsuji": {
+     "share": 0.0,
+     "top3": 0.1057,
+     "peak": 0.7444
+    },
+    "Sanemi Shinazugawa": {
+     "share": 0.0088,
+     "top3": 0.1013,
+     "peak": 0.7369
+    },
+    "Gyomei Himejima": {
+     "share": 0.0176,
+     "top3": 0.0881,
+     "peak": 0.7396
+    },
+    "Obanai Iguro": {
+     "share": 0.0088,
+     "top3": 0.0132,
+     "peak": 0.7119
+    }
+   },
+   "scanned": "2026-11-15 20:03 UTC"
+  }
+ },
+ "corrections": [
+  {
+   "char": "zenitsu",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "action": "drop",
+   "share": 0.0308,
+   "best": 0.198,
+   "time": "2026-11-15"
+  }
+ ],
+ "stats": {
+  "episodes_cached": 3,
+  "episodes_total": 122,
+  "updated": "2026-11-15 20:03 UTC",
+  "refs": {
+   "demon-slayer-kimetsu-no-yaiba": {
+    "characters": 23,
+    "with_stills": 23,
+    "with_faces": 22,
+    "stills": 171,
+    "faces": 57
+   }
+  }
+ }
+}
