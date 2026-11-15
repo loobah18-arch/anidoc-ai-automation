@@ -13,7 +13,8 @@
   "poker_face": 1,
   "ncts_next_phonk": 1,
   "ashreveal_manasha_phonk": 1,
-  "nxxkz_loucura_letal_funk_slowed": 1
+  "nxxkz_loucura_letal_funk_slowed": 1,
+  "atlxs_passo_bem_solto_slowed": 1
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 1,
@@ -45,7 +46,8 @@
   "jujutsu-kaisen:S3E12": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E22": 1,
   "jujutsu-kaisen:S2E14": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E07": 1
+  "demon-slayer-kimetsu-no-yaiba:S4E07": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E05": 1
  },
  "shots": [
   {
@@ -2475,6 +2477,182 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
    "s": 208.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1057.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1066.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1120.291
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1136.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1191.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1004.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1007.942
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1028.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1032.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1041.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1050.192
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1073.584
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1077.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1083.041
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1088.941
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1093.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1098.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1104.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1124.816
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1130.525
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1144.416
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1146.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1176.191
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1180.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1183.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1184.691
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1185.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1186.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1187.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1196.084
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1202.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1208.041
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1209.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1210.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1212.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1216.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1219.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1235.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1239.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1244.192
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1269.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1276.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1278.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1286.691
   }
  ],
  "runs": [
@@ -2631,6 +2809,16 @@
    "song": "nxxkz_loucura_letal_funk_slowed",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S4E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 12:31 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "atlxs_passo_bem_solto_slowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S4E05"
    ],
    "file": "_amv_part.mp4"
   }
@@ -2894,11 +3082,21 @@
     1289.4,
     1385.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E05": [
+   [
+    103.5,
+    198.0
+   ],
+   [
+    1289.4,
+    1385.1
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 7,
-  "demon-slayer-kimetsu-no-yaiba": 7
+  "demon-slayer-kimetsu-no-yaiba": 8
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -3094,6 +3292,13 @@
    "e": 167.76666666666668,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_nxxkz_loucura_letal_funk_slowed.mp4",
    "time": "2026-11-15 11:35 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1151.7666666666667,
+   "e": 1171.5333333333333,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_atlxs_passo_bem_solto_slowed.mp4",
+   "time": "2026-11-15 12:32 UTC"
   }
  ]
 }
