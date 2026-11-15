@@ -6,7 +6,7 @@
   "andromeda_montagem_coma": 1,
   "montagem_vozes_profundas": 2,
   "andromeda_no_fear_phonk": 1,
-  "mvsterious_slava_funk": 1,
+  "mvsterious_slava_funk": 2,
   "glxxmstrider_dont_stop_slowed": 2,
   "dygo_funk_infernal": 2,
   "rubikdice_montagem_pegadora_slowed": 1,
@@ -63,7 +63,10 @@
   "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E12": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E06": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E09": 1
+  "demon-slayer-kimetsu-no-yaiba:S4E09": 1,
+  "jujutsu-kaisen:S3E01": 1,
+  "jujutsu-kaisen:S3E02": 1,
+  "jujutsu-kaisen:S3E04": 1
  },
  "shots": [
   {
@@ -4209,6 +4212,166 @@
   {
    "ep": "jujutsu-kaisen:S3E06",
    "s": 1242.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1372.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 936.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1125.325
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 236.8
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 159.917
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 564.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 567.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 678.092
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 901.409
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 943.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1104.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1186.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1246.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1257.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1258.925
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1275.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 144.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 152.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 165.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 167.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 169.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 171.709
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 196.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 219.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 222.05
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 227.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 276.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E02",
+   "s": 307.958
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 406.709
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1118.509
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1122.092
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1271.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1286.408
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1316.05
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1323.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1326.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1343.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1379.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1436.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1491.0
   }
  ],
  "runs": [
@@ -4463,6 +4626,18 @@
    "episodes": [
     "jujutsu-kaisen:S3E05",
     "jujutsu-kaisen:S3E06"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-15 16:54 UTC",
+   "pick": "naoya",
+   "series": "jujutsu-kaisen",
+   "song": "mvsterious_slava_funk",
+   "episodes": [
+    "jujutsu-kaisen:S3E01",
+    "jujutsu-kaisen:S3E02",
+    "jujutsu-kaisen:S3E04"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4878,10 +5053,40 @@
     1288.1,
     1387.1
    ]
+  ],
+  "jujutsu-kaisen:S3E01": [
+   [
+    220.1,
+    318.3
+   ],
+   [
+    1371.4,
+    1423.2
+   ]
+  ],
+  "jujutsu-kaisen:S3E02": [
+   [
+    -4.0,
+    94.2
+   ],
+   [
+    1371.4,
+    1425.1
+   ]
+  ],
+  "jujutsu-kaisen:S3E04": [
+   [
+    -4.0,
+    94.2
+   ],
+   [
+    1621.3,
+    1673.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 12,
+  "jujutsu-kaisen": 13,
   "demon-slayer-kimetsu-no-yaiba": 11
  },
  "known": [
@@ -5145,6 +5350,14 @@
    "character": "naoya",
    "file": "Jujutsu_Kaisen_narrated_montagem_vozes_profundas.mp4",
    "time": "2026-11-15 16:35 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 910.0,
+   "e": 928.1,
+   "character": "naoya",
+   "file": "Jujutsu_Kaisen_narrated_mvsterious_slava_funk.mp4",
+   "time": "2026-11-15 16:55 UTC"
   }
  ],
  "styles": [
@@ -5163,7 +5376,7 @@
  ],
  "narr_chars": {
   "gyutaro": 1,
-  "naoya": 2,
+  "naoya": 3,
   "tanjiro": 1
  }
 }
