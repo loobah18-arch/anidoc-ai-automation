@@ -6,10 +6,23 @@ on:
     paths: ['edit/convo.py', 'edit/auto.py', 'edit/drive_index.py', 'edit/pro_fx.py', '.github/workflows/convo_short.yml']
   workflow_dispatch:
     inputs:
-      pick:
-        description: 'auto (newest/least-used anime in Drive), an anime name (e.g. demon slayer), or a character (gojo, sukuna, yuji, toji, megumi)'
+      character:
+        description: 'Character or anime (e.g. gojo, sukuna, yuji, toji, megumi, demon-slayer, jujutsu-kaisen, or auto)'
         required: false
         default: 'auto'
+      bgm:
+        description: 'BGM / Phonk track (e.g. dygo_funk_infernal, montagem_zora, lonown_avangard_phonk, or auto)'
+        required: false
+        default: 'auto'
+      upload:
+        description: 'Upload to YouTube: none (skip upload, phone artifact only), private, or public'
+        required: false
+        default: 'none'
+        type: choice
+        options:
+          - 'none'
+          - 'private'
+          - 'public'
 
 permissions:
   contents: write
@@ -29,13 +42,16 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates libsndfile1 libglib2.0-0t64 fonts-montserrat fontconfig
           fc-list | grep -i "montserrat" | grep -i "extrabold" | head -2
-          pip3 install --break-system-packages gdown numpy librosa soundfile scikit-learn faster-whisper "opencv-python-headless<5"
+          pip3 install --break-system-packages gdown numpy librosa soundfile scikit-learn faster-whisper "opencv-python-headless<5" requests google-api-python-client google-auth
           pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 torchaudio==2.7.1
           pip3 install --break-system-packages demucs
       - uses: actions/checkout@v4
       - name: Make the Short
         env:
-          PICK: ${{ github.event.inputs.pick || 'auto' }}
+          PICK: ${{ github.event.inputs.character || github.event.inputs.pick || 'auto' }}
+          CHARACTER: ${{ github.event.inputs.character || github.event.inputs.pick || 'auto' }}
+          BGM: ${{ github.event.inputs.bgm || 'auto' }}
+          SONG: ${{ github.event.inputs.bgm || 'auto' }}
           DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
         run: python3 edit/convo.py
       - uses: actions/upload-artifact@v4
@@ -43,14 +59,25 @@ jobs:
           name: convo-short-${{ github.run_number }}
           path: |
             out/*.mp4
+            out/meta.json
             edit/work/convo/convo.json
             edit/work/convo/captions.ass
           retention-days: 30
+      - name: Upload to YouTube
+        if: github.event.inputs.upload == 'public' || github.event.inputs.upload == 'private'
+        env:
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID || secrets.CLIENT_ID }}
+          YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
+          PRIVACY_STATUS: ${{ github.event.inputs.upload }}
+        run: python3 publish.py
       - name: Remember what was used
+        if: always()
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "amv-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add edit/history.json
+          git add edit/history.json metadata/youtube_upload_history.json metadata/candle_gate_state.json 2>/dev/null || true
           git commit -m "history: convo short ${{ github.run_number }}" || exit 0
           git pull --rebase origin convo-edit && git push origin HEAD:convo-edit

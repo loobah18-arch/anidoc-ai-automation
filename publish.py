@@ -1,0 +1,24 @@
+"""Upload out/meta.json's Short through the same protection layers as main / auto-clipper:
+   Layer 0 (24 h spacing), Layer 1 (early momentum >= 2k views in 24 h), Layer 2 (velocity >= 2.5k views/h),
+   plus block detection: a blocked upload is deleted, remediated and retried."""
+import json, os, sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from publishers.youtube_publisher import upload_video_with_block_retry
+
+meta = json.load(open('out/meta.json'))
+privacy = os.environ.get('PRIVACY_STATUS', 'public').strip().lower()
+if privacy not in ('public', 'private', 'unlisted'):
+    privacy = 'public'
+res = upload_video_with_block_retry(Path(meta['file']), meta['title'], meta['description'], meta['tags'],
+                                    privacy_status=privacy, gate_check=(privacy == 'public'))
+print(json.dumps(res, indent=1, default=str))
+if res.get('status') == 'error':
+    sys.exit(1)
+if str(res.get('status', '')).startswith('deferred'):
+    # held back by Layer 1/2: give this style its turn again next run
+    hp = Path('edit/history.json'); h = json.load(open(hp))
+    if h.get('styles'):
+        h['styles'].pop()
+        json.dump(h, open(hp, 'w'), indent=1)
+    print('upload deferred by the candle gate; style will be retried next run')
