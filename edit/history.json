@@ -7,7 +7,7 @@
   "montagem_vozes_profundas": 1,
   "andromeda_no_fear_phonk": 2,
   "mvsterious_slava_funk": 2,
-  "glxxmstrider_dont_stop_slowed": 1,
+  "glxxmstrider_dont_stop_slowed": 2,
   "dygo_funk_infernal": 2,
   "rubikdice_montagem_pegadora_slowed": 1,
   "zxvren_montagem_delirio_slowed": 2,
@@ -66,7 +66,8 @@
   "jujutsu-kaisen:S2E16": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 1,
-  "jujutsu-kaisen:S3E08": 1
+  "jujutsu-kaisen:S3E08": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E17": 1
  },
  "shots": [
   {
@@ -5488,6 +5489,262 @@
   {
    "ep": "jujutsu-kaisen:S3E09",
    "s": 668.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1080.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1071.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 862.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1099.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1006.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 806.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 810.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 814.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 817.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 819.959
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 825.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 830.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 833.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 834.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 834.916
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 837.916
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 842.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 853.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 858.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 860.692
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 863.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 865.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 869.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 875.041
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 879.541
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 882.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 886.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 891.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 894.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 908.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 928.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 934.859
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 936.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 938.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 941.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 945.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 979.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 986.275
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 991.084
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 995.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1001.334
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1011.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1014.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1018.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1021.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1025.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1028.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1033.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1037.483
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1040.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1042.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1048.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1056.584
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1059.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1062.709
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1084.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 803.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 847.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 997.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1090.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1105.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1110.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1113.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1115.5
   }
  ],
  "runs": [
@@ -5800,6 +6057,16 @@
    "episodes": [
     "jujutsu-kaisen:S3E08",
     "jujutsu-kaisen:S3E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-16 22:28 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "glxxmstrider_dont_stop_slowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E17"
    ],
    "file": "_amv_part.mp4"
   }
@@ -6237,11 +6504,21 @@
     1371.4,
     1426.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E17": [
+   [
+    123.2,
+    220.3
+   ],
+   [
+    1306.7,
+    1372.8
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 15,
-  "demon-slayer-kimetsu-no-yaiba": 14
+  "demon-slayer-kimetsu-no-yaiba": 15
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -6570,6 +6847,13 @@
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
    "title": "Hiromi hits different \ud83e\udd76 #shorts"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 949.7333333333333,
+   "e": 969.1666666666666,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
+   "time": "2026-11-16 22:29 UTC"
   }
  ],
  "styles": [
@@ -6584,6 +6868,12 @@
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
    "time": "2026-11-15 05:07 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
+   "time": "2026-11-16 22:29 UTC"
   }
  ],
  "narr_chars": {
