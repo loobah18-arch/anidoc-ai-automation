@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       style:
-        description: 'narrated (default), convo, or auto'
+        description: 'auto (alternate 50/50 convo & narrated), convo, or narrated'
         required: false
-        default: 'narrated'
+        default: 'auto'
       pick:
         description: 'auto, an anime name, or a character'
         required: false
@@ -57,9 +57,9 @@ jobs:
           pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 torchaudio==2.7.1
           pip3 install --break-system-packages demucs
       - uses: actions/checkout@v4
-      - name: Make the Short (narrated 4K style)
+      - name: Make the Short (alternating 50/50 convo / narrated)
         env:
-          STYLE: ${{ github.event.inputs.style || 'narrated' }}
+          STYLE: ${{ github.event.inputs.style || 'auto' }}
           PICK: ${{ github.event.inputs.pick || 'auto' }}
           DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
