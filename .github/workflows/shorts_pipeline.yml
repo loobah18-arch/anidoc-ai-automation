@@ -5,13 +5,13 @@ on:
     branches: [narrator-edit]
     paths: ['edit/pipeline.py', 'publish.py', 'preflight_gate.py', '.github/workflows/shorts_pipeline.yml']
   schedule:
-    - cron: '30 6 * * *'          # 12:00 PM IST daily (only fires from the default branch)
+    - cron: '0 */2 * * *'          # Runs every 2 hours; pre-flight sleeps inline up to 2.5h to hit the exact 24h upload mark
   workflow_dispatch:
     inputs:
       style:
-        description: 'auto (alternate), convo or narrated'
+        description: 'narrated (default), convo, or auto'
         required: false
-        default: 'auto'
+        default: 'narrated'
       pick:
         description: 'auto, an anime name, or a character'
         required: false
@@ -31,7 +31,7 @@ concurrency:
 jobs:
   preflight_gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 160
     outputs:
       proceed: ${{ steps.gate.outputs.proceed }}
     steps:
@@ -57,9 +57,9 @@ jobs:
           pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 torchaudio==2.7.1
           pip3 install --break-system-packages demucs
       - uses: actions/checkout@v4
-      - name: Make the Short (alternating style)
+      - name: Make the Short (narrated 4K style)
         env:
-          STYLE: ${{ github.event.inputs.style || 'auto' }}
+          STYLE: ${{ github.event.inputs.style || 'narrated' }}
           PICK: ${{ github.event.inputs.pick || 'auto' }}
           DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
