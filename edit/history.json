@@ -8,7 +8,7 @@
   "andromeda_no_fear_phonk": 2,
   "mvsterious_slava_funk": 2,
   "glxxmstrider_dont_stop_slowed": 1,
-  "dygo_funk_infernal": 1,
+  "dygo_funk_infernal": 2,
   "rubikdice_montagem_pegadora_slowed": 1,
   "zxvren_montagem_delirio_slowed": 2,
   "lonown_avangard_phonk": 1,
@@ -43,7 +43,7 @@
   "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
   "jujutsu-kaisen:S1E10": 1,
   "jujutsu-kaisen:S1E13": 1,
-  "jujutsu-kaisen:S3E09": 1,
+  "jujutsu-kaisen:S3E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
   "jujutsu-kaisen:S1E17": 1,
   "jujutsu-kaisen:S1E23": 1,
@@ -65,7 +65,8 @@
   "jujutsu-kaisen:S1E02": 1,
   "jujutsu-kaisen:S2E16": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E06": 1
+  "demon-slayer-kimetsu-no-yaiba:S2E06": 1,
+  "jujutsu-kaisen:S3E08": 1
  },
  "shots": [
   {
@@ -5271,6 +5272,222 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 937.555
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 981.783
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 365.325
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 806.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 359.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 669.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 211.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 283.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 806.309
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1000.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1019.617
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1074.491
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1078.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1092.55
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1203.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1209.434
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1245.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1251.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1253.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E08",
+   "s": 1272.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 181.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 300.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 303.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 307.825
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 362.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 502.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 516.825
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 520.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 521.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 676.966
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 701.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 743.308
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 751.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 752.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 758.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 778.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 825.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 886.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1002.408
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1024.383
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1059.617
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1061.616
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1064.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1067.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1071.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1089.158
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 1107.45
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 667.471
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 670.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 738.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 739.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 741.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 744.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 745.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 668.707
   }
  ],
  "runs": [
@@ -5572,6 +5789,17 @@
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S2E06",
     "demon-slayer-kimetsu-no-yaiba:S2E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-16 14:26 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "dygo_funk_infernal",
+   "episodes": [
+    "jujutsu-kaisen:S3E08",
+    "jujutsu-kaisen:S3E09"
    ],
    "file": "_amv_part.mp4"
   }
@@ -5999,10 +6227,20 @@
     1210.3,
     1244.7
    ]
+  ],
+  "jujutsu-kaisen:S3E08": [
+   [
+    -4.0,
+    94.2
+   ],
+   [
+    1371.4,
+    1426.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 14,
+  "jujutsu-kaisen": 15,
   "demon-slayer-kimetsu-no-yaiba": 14
  },
  "known": [
@@ -6319,6 +6557,19 @@
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
    "title": "Akaza quote that hits hard \ud83e\udd76 #shorts"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E09",
+   "s": 604.0,
+   "e": 618.8666666666667,
+   "file": "Jujutsu_Kaisen_narrated_dygo_funk_infernal.mp4",
+   "time": "2026-11-16 14:27 UTC",
+   "character": "higuruma",
+   "song": "dygo_funk_infernal",
+   "voice": "en-US-AndrewNeural",
+   "writer": "groq:openai/gpt-oss-120b",
+   "mode": "rhyme",
+   "title": "Hiromi hits different \ud83e\udd76 #shorts"
   }
  ],
  "styles": [
@@ -6341,7 +6592,8 @@
   "daki": 1,
   "hakari": 1,
   "sukuna": 1,
-  "akaza": 1
+  "akaza": 1,
+  "higuruma": 1
  },
  "narr_lines": {
   "zenitsu": [
@@ -6376,6 +6628,12 @@
    "He strikes with wrath, ere darkness yields to that fire.",
    "His heart, a tempest, seeks battles as a spear",
    "Thus he doth rise, forever feared by thy spear."
+  ],
+  "higuruma": [
+   "Behold Hiromi, whose mind doth pierce the night",
+   "His judgment swift, a blade of endless fright",
+   "In halls of law he forged a cursed domain",
+   "Where guilty souls fall, their power wanes again."
   ]
  },
  "lore_used": {
@@ -6389,7 +6647,8 @@
   "sukuna": {
    "The King of Curses, whose power was sealed into twenty finge": 1
   },
-  "akaza": {}
+  "akaza": {},
+  "higuruma": {}
  },
  "credit_zones": {
   "demon-slayer-kimetsu-no-yaiba:S3E07": [
@@ -6484,6 +6743,42 @@
    [
     25.0,
     60.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E08": [
+   [
+    0.0,
+    96.0
+   ],
+   [
+    485.0,
+    543.0
+   ],
+   [
+    564.0,
+    593.0
+   ],
+   [
+    1350.0,
+    1426.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E09": [
+   [
+    0.0,
+    96.0
+   ],
+   [
+    223.0,
+    261.0
+   ],
+   [
+    897.0,
+    945.0
+   ],
+   [
+    1249.0,
+    1325.0
    ]
   ]
  }
