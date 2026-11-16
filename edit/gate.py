@@ -98,7 +98,7 @@ def c_character():
         nar_items = [(SRC(convo['ep']), s0 + (s1 - s0) * f) for f in (0.15, 0.4, 0.65, 0.9)]
     if len(items) < 4:
         return dict(status='skipped', why='edit plan / source episodes missing')
-    pres = cv.present(items + nar_items)
+    pres = cv.present(items + nar_items, margin=float(os.environ.get('CHAR_REL_MIN', 0.02)))
     cuts = [p for p in pres[:len(items)] if p is not None]
     narr = [p for p in pres[len(items):] if p is not None]
     share = sum(cuts) / max(1, len(cuts))

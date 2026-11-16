@@ -309,8 +309,13 @@ def _char_filter(pool):
                 print('dropping episodes without the character:', weak, flush=True)
                 cands = [s for s in cands if s['ep'] not in weak]
             n_need = int(os.environ.get('CHAR_MIN_SHOTS', 45))
-            for thr in (0.6, 0.35, 0.1, -0.15, -0.4):                   # strictest bar that still fills the edit
-                keep = [s for s in cands if s['char_z'] >= thr and s['act_z'] >= -0.8]
+            REL_MIN = float(os.environ.get('CHAR_REL_MIN', 0.02))     # identity is never relaxed: the shot must look more like
+            ident = [s for s in cands if s.get('rel', 0) >= REL_MIN]     # the topic than like ANY other character (Nezuko vs Daki)
+            print(f'identity check "{CHAR_NAME}": {len(ident)} of {len(cands)} shots clearly them (rel>={REL_MIN})', flush=True)
+            if len(ident) < int(os.environ.get('CHAR_MIN_IDENT', 10)):
+                raise SystemExit(f'character gate: only {len(ident)} shots clearly show {CHAR_NAME}; refusing to fill with look-alikes')
+            for thr in (0.6, 0.35, 0.1, -0.15, -0.4):                   # strictest bar that still fills the edit (only the bar, never identity)
+                keep = [s for s in ident if s['char_z'] >= thr and s['act_z'] >= -0.8]
                 if len(keep) >= n_need:
                     break
             for s in keep:                                            # action + character lift the drops and the fast cuts
@@ -348,14 +353,17 @@ def level(t0, t1):
 
 
 best, drop_t = -1e9, None
+MIN_START = float(os.environ.get('MIN_SONG_START', 0))               # narration bed plays the song right before the edit
 for b in beats:
+    if b - (DROP_BEAT - START_BEAT) * P < MIN_START:
+        continue
     if b - DROP_BEAT * P < 0 or b - DROP_BEAT * P + need > song_len:
         continue
     jump = level(b, b + 8 * P) - level(b - 8 * P, b)
     if jump > best:
         best, drop_t = jump, float(b)
 if drop_t is None:
-    drop_t = DROP_BEAT * P
+    drop_t = max(DROP_BEAT * P, MIN_START + (DROP_BEAT - START_BEAT) * P)
 song_start = max(0.0, drop_t - (DROP_BEAT - START_BEAT) * P)
 print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t:.2f}s start {song_start:.2f}s', flush=True)
 

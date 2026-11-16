@@ -610,7 +610,7 @@ VOICE = 'work/convo/narr.wav'
 amv_len = max(14.0, TOTAL - CONV)                                   # no cold-open hook any more: the narrator opens the Short
 env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 60:.1f}|{c1 + 90:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
-           CHAR_NAME=TOPIC_NAME or '', CHAR_SERIES=series_name,
+           CHAR_NAME=TOPIC_NAME or '', CHAR_SERIES=series_name, MIN_SONG_START=f'{CONV:.3f}',
            CREDITS=';'.join(f'{e}|{a:.1f}|{b:.1f}' for e in eps for a, b in CZ.get(e, [])))          # auto.py keeps only shots where the topic character is on screen
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
