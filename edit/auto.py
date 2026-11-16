@@ -216,6 +216,9 @@ with ThreadPoolExecutor(3) as ex:
     scans = list(ex.map(scan, eps + refs))
 allshots = sum((sh_ for c, sh_, _ in scans if c in eps), [])
 allshots = [s for s in allshots if not any(s['ep'] == ep and s['e'] > float(a) - 2 and s['s'] < float(b) + 2 for ep, a, b in EXCLUDE)]
+CREDITS = [x.rsplit('|', 2) for x in os.environ.get('CREDITS', '').split(';') if x]   # openings / endings / recaps: never used
+allshots = [s for s in allshots if not any(s['ep'] == ep and s['e'] > float(a) - 1 and s['s'] < float(b) + 1 for ep, a, b in CREDITS)]
+ep_all = list(allshots)
 if INCLUDE:                                                           # widen around the scene only as far as needed
     iep, ia, ib = INCLUDE.rsplit('|', 2); ia, ib = float(ia), float(ib)
     for pad in range(0, 421, 30):
@@ -413,11 +416,51 @@ if os.environ.get('BALANCE_EPS') == '1' and len({s['ep'] for s in pool}) > 1:   
 top.sort(key=lambda s: (s['ep'], s['s']))                            # story order through the fights
 for i, s in zip(rest, top):
     assign[i] = s; taken.add(id(s))
-if len(assign) < n:                                                   # small pool (one scene): reuse the strongest shots
-    print(f'pool short ({len(assign)}/{n}), reusing top shots', flush=True)
-    best = sorted(pool, key=lambda s: -s['impact'])
-    for j, i in enumerate(x for x in range(n) if x not in assign):
-        assign[i] = best[j % max(1, min(len(best), 12))]
+if len(assign) < n:                                                   # small pool: never show the same footage twice
+    print(f'pool short ({len(assign)}/{n}), filling without repeats', flush=True)
+    sd = lambda i: (tmpl[i][1] - tmpl[i][0]) * P
+
+    def shown(s, d):
+        L = s['e'] - s['s']
+        return (s['s'] + (L - d) / 2, s['s'] + (L + d) / 2) if L >= d else (s['s'], s['e'])
+    on = {}
+    for i, s in assign.items():
+        on.setdefault(s['ep'], []).append(shown(s, sd(i)))
+    free = lambda ep, a, b: all(b <= x - 0.3 or a >= y + 0.3 for x, y in on.get(ep, []))
+
+    def unused_piece(s, d):                                           # a part of a long shot nobody has seen yet
+        t = s['s']
+        while t + d <= s['e'] + 1e-6:
+            if free(s['ep'], t, t + d):
+                return dict(s, s=round(t, 3), e=round(t + d, 3))
+            t += 0.25
+        return None
+    near = sorted((s for s in ep_all if id(s) not in taken and all(id(s) != id(p) for p in pool)),
+                  key=lambda s: abs((s['s'] + s['e']) / 2 - (float(INCLUDE.rsplit('|', 2)[1]) if INCLUDE else s['s'])))
+    for i in [x for x in range(n) if x not in assign]:
+        d = sd(i); got = None
+        for s in sorted(pool, key=lambda s: -s['impact']):            # 1. same fight, an unseen part of a long shot
+            got = unused_piece(s, d)
+            if got:
+                break
+        if got is None:                                               # 2. the nearest unused shot of the same episode
+            for s in near:
+                if id(s) not in taken and s['e'] - s['s'] >= min(d * 0.6, 2.0) and free(s['ep'], s['s'], s['e']):
+                    got = s; taken.add(id(s)); break
+        if got is not None:
+            assign[i] = got; on.setdefault(got['ep'], []).append(shown(got, d))
+    miss = [x for x in range(n) if x not in assign]
+    if miss:                                                          # 3. still short: let the previous cut run longer instead
+        print('merging', len(miss), 'beats into the cut before them', flush=True)
+        keep = [i for i in range(n) if i in assign]
+        new_t, new_a = [], {}
+        for i in range(n):
+            if i in assign:
+                new_t.append(list(tmpl[i])); new_a[len(new_t) - 1] = assign[i]
+            elif new_t:
+                new_t[-1][1] = tmpl[i][1]
+        tmpl = [tuple(x) for x in new_t]; assign = new_a; n = len(tmpl)
+        second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 if len(assign) < n:
     sys.exit(f'not enough shots ({len(assign)}/{n})')
 impact_cut = np.percentile([s['impact'] for s in pool], 85)

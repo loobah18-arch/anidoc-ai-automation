@@ -102,14 +102,39 @@ def motion(src):
 
 # ------------------------------------------------------------------ 2. pick the episode with the biggest fight, find it
 FW = 90
-best_all = None
+# ---- openings / endings / title cards / recaps: footage repeated in another episode of the season never gets used
+import credits
+_season = lambda c: (EPISODES[c]['series'], re.match(r'.*?(S\d+)', c.split(':')[-1]).group(1) if re.match(r'.*?(S\d+)', c.split(':')[-1]) else '')
+CZ = hist.setdefault('credit_zones', {})
 for ep in eps:
     fetch(ep)
+try:
+    need = [e for e in eps if e not in CZ]
+    if need:
+        group = {e: SRC(e) for e in eps}
+        for e in need:                                                # every episode needs a partner from its own season
+            if not any(o != e and _season(o) == _season(e) for o in group):
+                peers = sorted((o for o in EPISODES if o != e and _season(o) == _season(e)),
+                               key=lambda o: (o in hist.get('credit_zones', {}), o))
+                if peers:
+                    fetch(peers[0]); group[peers[0]] = SRC(peers[0])
+        by_season = {}
+        for e, pth in group.items():
+            by_season.setdefault(_season(e), {})[e] = pth
+        for grp in by_season.values():
+            if len(grp) >= 2:
+                CZ.update(credits.zones(grp))
+        print('credit/recap zones:', {e: CZ.get(e) for e in eps}, flush=True)
+except Exception as ex:
+    print('credit zone scan failed, using fixed margins only:', ex, flush=True)
+json.dump({e: CZ.get(e, []) for e in eps}, open('work/credit_zones.json', 'w'))
+best_all = None
+for ep in eps:
     d_ = duration(SRC(ep)); ps = motion(SRC(ep))
     lo_, hi_ = 150, int(d_) - 150                                        # skip openings and the ending/preview
     prev = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == ep]
     for t in range(lo_, hi_ - FW, 5):
-        if any(a_ - FW < t < b_ for a_, b_ in prev):
+        if any(a_ - FW < t < b_ for a_, b_ in prev) or credits.hit(CZ.get(ep), t, t + FW):
             continue
         v = ps[t:t + FW].mean()
         if best_all is None or v > best_all[0]:
@@ -140,7 +165,7 @@ prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
 bs, bt = -1, fight
 win_sc = []
 for t in range(lo, hi - 40, 2):
-    if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP):
+    if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP) or credits.hit(CZ.get(conv_ep), t - 12, t + 52):
         continue
     talk = speech[t:t + 24].mean()
     act = per_s[t:t + 24].mean() / mref
@@ -585,7 +610,8 @@ VOICE = 'work/convo/narr.wav'
 amv_len = max(14.0, TOTAL - CONV)                                   # no cold-open hook any more: the narrator opens the Short
 env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 60:.1f}|{c1 + 90:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
-           CHAR_NAME=TOPIC_NAME or '', CHAR_SERIES=series_name)          # auto.py keeps only shots where the topic character is on screen
+           CHAR_NAME=TOPIC_NAME or '', CHAR_SERIES=series_name,
+           CREDITS=';'.join(f'{e}|{a:.1f}|{b:.1f}' for e in eps for a, b in CZ.get(e, [])))          # auto.py keeps only shots where the topic character is on screen
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))
@@ -677,6 +703,7 @@ meta = dict(file=video_file, style='narrated', ep=conv_ep, title=meta_title, des
 json.dump(meta, open(os.path.join(out_dir, 'meta.json'), 'w'), indent=1, ensure_ascii=False)
 
 hist = json.load(open('history.json'))
+hist.setdefault('credit_zones', {}).update(CZ)                       # remember openings/endings so they're found once
 hist.setdefault('narr_chars', {})[TOPIC] = hist.get('narr_chars', {}).get(TOPIC, 0) + 1
 hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime()),
                                           character=TOPIC, song=plan['song'], voice=os.environ.get('VOICE', 'en-US-AndrewNeural'),

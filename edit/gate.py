@@ -178,7 +178,39 @@ def c_captions():
                 why='' if not bad else f'{len(bad)} caption rows leave the safe frame, e.g. "{bad[0]}"')
 
 
+def _shown():
+    P = 60.0 / float(plan.get('tempo') or 120)
+    out = []
+    for k, x in enumerate(plan.get('plan') or []):
+        d = (x['beats'][1] - x['beats'][0]) * P * float(x.get('speed') or 1)
+        out.append((k, x['ep'], float(x['start']), float(x['start']) + d))
+    if convo.get('ep') and convo.get('s') is not None:
+        out.append(('narration', convo['ep'], float(convo['s']), float(convo['e'])))
+    return out
+
+
+def c_repeats():
+    sh_ = _shown()
+    if not sh_:
+        return dict(status='skipped', why='no edit plan')
+    bad = [(a[0], b[0]) for i, a in enumerate(sh_) for b in sh_[i + 1:]
+           if a[1] == b[1] and min(a[3], b[3]) - max(a[2], b[2]) > 0.2]
+    return dict(status='fail' if bad else 'pass', cuts=len(sh_), repeats=len(bad),
+                why='' if not bad else f'{len(bad)} cuts show footage already used, e.g. cuts {bad[0]}')
+
+
+def c_credits():
+    zs = jload('work/credit_zones.json', None)
+    if zs is None:
+        return dict(status='skipped', why='no credit zone scan')
+    bad = [k for k, ep, a, b in _shown() if any(a < z1 and b > z0 for z0, z1 in zs.get(ep, []))]
+    return dict(status='fail' if bad else 'pass', zones=sum(len(v) for v in zs.values()),
+                why='' if not bad else f'{len(bad)} cuts come from an opening/ending/recap, e.g. {bad[0]}')
+
+
 run('video', c_video)
+run('repeats', c_repeats)
+run('credits', c_credits)
 run('captions', c_captions)
 run('loudness', c_loudness)
 if os.environ.get('GATE_CHARACTER', '1') != '0':
