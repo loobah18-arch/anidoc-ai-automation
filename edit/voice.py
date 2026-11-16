@@ -102,12 +102,12 @@ def _orpheus(text, i, n, path):
     for k in range(4):
         try:
             r = _u.Request('https://api.groq.com/openai/v1/audio/speech', body,
-                           {'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'})
+                           {'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'anidoc-narrator/1.0'})
             data = _u.urlopen(r, timeout=60).read()
             if data[:4] == b'RIFF':
                 open(path, 'wb').write(data); print(f'voice orpheus/{ORPHEUS_VOICE} {tag or "-"}  {text}', flush=True); return True
         except Exception as e:
-            print('orpheus retry', k, e, flush=True); time.sleep(2 * (k + 1))
+            print('orpheus retry', k, e, getattr(e, 'read', lambda: b'')()[:200], flush=True); time.sleep(2 * (k + 1))
     return False
 
 
