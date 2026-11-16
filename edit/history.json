@@ -1,6 +1,6 @@
 {
  "songs": {
-  "rayelo_ultraslowed": 1,
+  "rayelo_ultraslowed": 2,
   "montagem_zora": 2,
   "cotneus_stereo_love_funk": 1,
   "andromeda_montagem_coma": 1,
@@ -58,7 +58,8 @@
   "demon-slayer-kimetsu-no-yaiba:S5E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
   "jujutsu-kaisen:S1E11": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E07": 1
+  "demon-slayer-kimetsu-no-yaiba:S3E07": 1,
+  "jujutsu-kaisen:S3E05": 1
  },
  "shots": [
   {
@@ -4148,6 +4149,222 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
    "s": 287.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 811.617
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 806.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 955.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 821.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 859.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 816.617
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 837.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 846.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 861.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 861.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 901.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 908.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 809.054
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 810.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 813.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 814.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 943.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 945.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 946.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 947.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 948.888
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 950.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 951.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 952.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 953.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 956.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 957.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 958.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 959.888
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 961.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 962.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 963.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 964.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 965.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 805.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 819.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 822.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 815.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 797.383
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 790.325
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 783.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 966.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 807.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 829.491
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 831.408
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 778.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 773.966
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 768.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 765.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 847.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 760.45
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 851.325
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 758.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 853.091
   }
  ],
  "runs": [
@@ -4394,6 +4611,16 @@
    "song": "andromeda_no_fear_phonk",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S3E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-16 05:33 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "rayelo_ultraslowed",
+   "episodes": [
+    "jujutsu-kaisen:S3E05"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4755,10 +4982,20 @@
     1286.1,
     1385.1
    ]
+  ],
+  "jujutsu-kaisen:S3E05": [
+   [
+    386.3,
+    474.2
+   ],
+   [
+    1371.4,
+    1423.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 11,
+  "jujutsu-kaisen": 12,
   "demon-slayer-kimetsu-no-yaiba": 12
  },
  "known": [
@@ -5036,6 +5273,19 @@
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
    "title": "Daki hits different \ud83e\udd76 #shorts"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 866.0,
+   "e": 880.4,
+   "file": "Jujutsu_Kaisen_narrated_rayelo_ultraslowed.mp4",
+   "time": "2026-11-16 05:34 UTC",
+   "character": "hakari",
+   "song": "rayelo_ultraslowed",
+   "voice": "en-US-AndrewNeural",
+   "writer": "groq:openai/gpt-oss-120b",
+   "mode": "rhyme",
+   "title": "Kinji quote that hits hard \ud83e\udd76 #shorts"
   }
  ],
  "styles": [
@@ -5055,7 +5305,8 @@
  "narr_chars": {
   "zenitsu": 1,
   "mahito": 1,
-  "daki": 1
+  "daki": 1,
+  "hakari": 1
  },
  "narr_lines": {
   "zenitsu": [
@@ -5072,6 +5323,12 @@
    "She weaves the crimson tide, yet ne\u2019er shall she fade.",
    "Bound to her brother\u2019s doom, she stands till twin heads fall",
    "Then darkness yields, and silence crowns her fall"
+  ],
+  "hakari": [
+   "Behold Kinji, whose gamble doth fate entwine",
+   "When jackpot sings, cursed fire doth divine.",
+   "Four minutes thou art healed, wounds fade to naught",
+   "In idle death's domain, his power is brought."
   ]
  },
  "lore_used": {
@@ -5080,7 +5337,8 @@
    "Usually terrified, he becomes lethal when he falls asleep, s": 1
   },
   "mahito": {},
-  "daki": {}
+  "daki": {},
+  "hakari": {}
  },
  "credit_zones": {
   "demon-slayer-kimetsu-no-yaiba:S3E07": [
@@ -5119,6 +5377,26 @@
    [
     1277.0,
     1364.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E05": [
+   [
+    374.0,
+    476.0
+   ],
+   [
+    1334.0,
+    1426.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E06": [
+   [
+    192.0,
+    294.0
+   ],
+   [
+    1334.0,
+    1426.0
    ]
   ]
  }
