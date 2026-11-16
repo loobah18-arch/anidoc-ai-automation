@@ -28,13 +28,13 @@ on:
         required: false
         default: ''
       volume_mode:
-        description: 'Music volume mode: constant (same volume across narration & edit) or ducked'
+        description: 'Music volume mode: ducked (phonk bed under narrator, full volume drop at edit) or constant'
         required: false
-        default: 'constant'
+        default: 'ducked'
         type: choice
         options:
-          - 'constant'
           - 'ducked'
+          - 'constant'
 
 permissions:
   contents: write
@@ -86,7 +86,7 @@ jobs:
           DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           NARRATION: ${{ github.event.inputs.narration }}
-          VOLUME_MODE: ${{ github.event.inputs.volume_mode || 'constant' }}
+          VOLUME_MODE: ${{ github.event.inputs.volume_mode || 'ducked' }}
         run: python3 edit/narrate.py
       - name: Quality gate (character on screen, loudness, caption safe frame)
         id: gate

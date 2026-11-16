@@ -663,7 +663,7 @@ else:                                                                 # edit sta
     sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV:.3f}', '-i', song_file, '-ac', '2', '-ar', '48000', 'work/convo/bed.wav'])
 print(f'song bed {bed_ss:.1f}s -> {song_start:.1f}s (edit starts there)', flush=True)
 
-VOLUME_MODE = os.environ.get('VOLUME_MODE', 'constant').strip().lower()
+VOLUME_MODE = os.environ.get('VOLUME_MODE', 'ducked').strip().lower()
 
 if VOLUME_MODE == 'constant':
     print('audio graph: constant music volume across narration and edit (no ducking)', flush=True)
