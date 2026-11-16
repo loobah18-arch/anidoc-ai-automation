@@ -662,15 +662,29 @@ else:                                                                 # edit sta
     bed_ss = t - CONV
     sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{bed_ss:.3f}', '-t', f'{CONV:.3f}', '-i', song_file, '-ac', '2', '-ar', '48000', 'work/convo/bed.wav'])
 print(f'song bed {bed_ss:.1f}s -> {song_start:.1f}s (edit starts there)', flush=True)
-fc = (
-    f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
-    f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=9,aresample=48000,asplit=2[dl][sc];"
-    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,loudnorm=I={BED_LUFS}:TP=-9:LRA=7,aresample=48000[bdr];"
-    f"[bdr][sc]sidechaincompress=threshold=0.03:ratio=6:attack=15:release=350:makeup=1[bd];"
-    f"[dl][bd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[ca];"
-    f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
-    f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a0];[a0]alimiter=limit=0.7:attack=2:release=60:level=0[a]"
-)
+
+VOLUME_MODE = os.environ.get('VOLUME_MODE', 'constant').strip().lower()
+
+if VOLUME_MODE == 'constant':
+    print('audio graph: constant music volume across narration and edit (no ducking)', flush=True)
+    fc = (
+        f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
+        f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,equalizer=f=3000:t=q:w=1.2:g=3,loudnorm=I=-10:TP=-0.5:LRA=9,aresample=48000[dl];"
+        f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[bd];"
+        f"[dl][bd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[ca];"
+        f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
+        f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a0];[a0]alimiter=limit=0.85:attack=2:release=60:level=0[a]"
+    )
+else:
+    fc = (
+        f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
+        f"[2:a]asetpts=PTS-STARTPTS,adelay={int(LEAD * 1000)}|{int(LEAD * 1000)},apad=whole_dur={CONV:.3f},aresample=48000,aformat=channel_layouts=stereo,loudnorm=I=-11:TP=-1.0:LRA=9,aresample=48000,asplit=2[dl][sc];"
+        f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,loudnorm=I={BED_LUFS}:TP=-9:LRA=7,aresample=48000[bdr];"
+        f"[bdr][sc]sidechaincompress=threshold=0.03:ratio=6:attack=15:release=350:makeup=1[bd];"
+        f"[dl][bd]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[ca];"
+        f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
+        f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a0];[a0]alimiter=limit=0.7:attack=2:release=60:level=0[a]"
+    )
 # captions were timed from the start of the short (hook included); the conversation clip starts at 0
 txt = open('work/convo/captions.ass').read()
 txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for x, f in zip(m.group(1).split(':'), (3600, 60, 1))) - HOOK)), txt)
