@@ -446,7 +446,11 @@ if len(assign) < n:                                                   # small po
         if got is None:                                               # 2. the nearest unused shot of the same episode
             for s in near:
                 if id(s) not in taken and s['e'] - s['s'] >= min(d * 0.6, 2.0) and free(s['ep'], s['s'], s['e']):
-                    got = s; taken.add(id(s)); break
+                    got = s; taken.add(id(s))
+                    _lo = min((p['impact'] for p in pool), default=0.0)
+                    for k_, v_ in (('impact', _lo), ('calm', 0.0)):
+                        got.setdefault(k_, v_)
+                    break
         if got is not None:
             assign[i] = got; on.setdefault(got['ep'], []).append(shown(got, d))
     miss = [x for x in range(n) if x not in assign]
