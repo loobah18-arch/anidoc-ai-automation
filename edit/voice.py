@@ -85,18 +85,58 @@ def _trim(y, thr=0.006):
     return y[a:b], a / SR
 
 
+ORPHEUS_VOICE = os.environ.get('ORPHEUS_VOICE', 'troy')            # Groq Orpheus: human, emotional read; edge-tts is the fallback
+_SOFT = re.compile(r'\b(alone|tears?|lost|mother|brother|sister|silence|quiet|dead|death|grave|last|never again|gone)\b', re.I)
+
+
+def _orpheus(text, i, n, path):
+    import json as _j, urllib.request as _u
+    key = os.environ.get('GROQ_API_KEY')
+    if not key:
+        return False
+    tag = '[dramatic]' if i == 0 or STRONG.search(text) else ''
+    if i == n - 1 or (_SOFT.search(text) and i > 0):
+        tag = '[whisper]' if i == n - 1 else tag or ''
+    body = _j.dumps(dict(model='canopylabs/orpheus-v1-english', voice=ORPHEUS_VOICE, response_format='wav',
+                         input=f'{tag} {text}'.strip()[:200])).encode()
+    for k in range(4):
+        try:
+            r = _u.Request('https://api.groq.com/openai/v1/audio/speech', body,
+                           {'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'})
+            data = _u.urlopen(r, timeout=60).read()
+            if data[:4] == b'RIFF':
+                open(path, 'wb').write(data); print(f'voice orpheus/{ORPHEUS_VOICE} {tag or "-"}  {text}', flush=True); return True
+        except Exception as e:
+            print('orpheus retry', k, e, flush=True); time.sleep(2 * (k + 1))
+    return False
+
+
+def _even_bounds(text, dur):
+    ws = text.split(); tot = sum(len(w) + 1 for w in ws) or 1; t, out = 0.0, []
+    for w in ws:
+        d = dur * (len(w) + 1) / tot; out.append((t, t + d * 0.92, w)); t += d
+    return out
+
+
 def speak(text, out='work/convo/narr_raw.wav', seed=None):
     rng = random.Random(seed)
+    use_orpheus = os.environ.get('TTS', 'orpheus') == 'orpheus' and bool(os.environ.get('GROQ_API_KEY'))
     phrases = _phrases(text)
     os.makedirs(os.path.dirname(out) or '.', exist_ok=True)
     audio, bounds, t = [], [], 0.0
     for i, p in enumerate(phrases):
         rate, pitch, vol, pause = _style(i, len(phrases), p, rng)
         mp3 = f'{out}.{i}.mp3'
-        b = _say(p, rate, pitch, vol, mp3)
+        if use_orpheus and _orpheus(p, i, len(phrases), mp3):
+            b = None
+        else:
+            use_orpheus = False                                      # one voice per Short: never mix engines mid-read
+            b = _say(p, rate, pitch, vol, mp3)
         y = np.frombuffer(subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-i', mp3, '-f', 's16le', '-ac', '1', '-ar', str(SR), '-'],
                                          capture_output=True, check=True).stdout, np.int16).astype(np.float32) / 32768
         y, cut = _trim(y)
+        if b is None:
+            b = [(a + cut, e + cut, w) for a, e, w in _even_bounds(p, len(y) / SR)]
         bounds += [(float(max(0.0, t + a - cut)), float(t + e - cut), w) for a, e, w in b]
         audio += [y, np.zeros(int(pause * SR), np.float32)]
         t += len(y) / SR + pause
