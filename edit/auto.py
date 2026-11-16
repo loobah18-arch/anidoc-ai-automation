@@ -309,9 +309,10 @@ def _char_filter(pool):
                 print('dropping episodes without the character:', weak, flush=True)
                 cands = [s for s in cands if s['ep'] not in weak]
             n_need = int(os.environ.get('CHAR_MIN_SHOTS', 45))
-            REL_MIN = float(os.environ.get('CHAR_REL_MIN', 0.02))     # identity is never relaxed: the shot must look more like
-            ident = [s for s in cands if s.get('rel', 0) >= REL_MIN]     # the topic than like ANY other character (Nezuko vs Daki)
-            print(f'identity check "{CHAR_NAME}": {len(ident)} of {len(cands)} shots clearly them (rel>={REL_MIN})', flush=True)
+            REL_MIN = float(os.environ.get('CHAR_REL_MIN', 0.04))     # identity is never relaxed: the shot must look more like
+            ACT_MIN = float(os.environ.get('CHAR_ACT_MIN', 0.0))           # after the narration: fight shots only, never relaxed
+            ident = [s for s in cands if s.get('rel', 0) >= REL_MIN and s['act_z'] >= ACT_MIN]     # the topic than like ANY other character (Nezuko vs Daki)
+            print(f'identity check "{CHAR_NAME}": {len(ident)} of {len(cands)} shots clearly them in a fight (rel>={REL_MIN}, act_z>={ACT_MIN})', flush=True)
             if len(ident) < int(os.environ.get('CHAR_MIN_IDENT', 10)):
                 raise SystemExit(f'character gate: only {len(ident)} shots clearly show {CHAR_NAME}; refusing to fill with look-alikes')
             for thr in (0.6, 0.35, 0.1, -0.15, -0.4):                   # strictest bar that still fills the edit (only the bar, never identity)
@@ -451,7 +452,7 @@ if len(assign) < n:                                                   # small po
             got = unused_piece(s, d)
             if got:
                 break
-        if got is None:                                               # 2. the nearest unused shot of the same episode
+        if got is None and not CHAR_NAME:                             # 2. the nearest unused shot (never with a topic: it may be someone else)
             for s in near:
                 if id(s) not in taken and s['e'] - s['s'] >= min(d * 0.6, 2.0) and free(s['ep'], s['s'], s['e']):
                     got = s; taken.add(id(s))
