@@ -8,7 +8,7 @@ import asyncio, os, random, re, subprocess, time
 import numpy as np
 import soundfile as sf
 
-VOICE = os.environ.get('VOICE', 'en-US-AndrewNeural')               # calm, low, dry narrator (Nanami-style), user-picked
+VOICE = os.environ.get('VOICE', 'en-US-BrianNeural')               # calm, low, dry narrator (Nanami-style), user-picked
 BASE_RATE = int(os.environ.get('VOICE_RATE', '-10%').rstrip('%'))
 BASE_PITCH = int(os.environ.get('VOICE_PITCH', '-8Hz').rstrip('Hz'))
 SR = 24000

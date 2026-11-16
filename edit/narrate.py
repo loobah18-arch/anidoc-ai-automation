@@ -289,11 +289,14 @@ if PAST_LINES:
 if FRESH_FACTS and len(FACT_SENTS) > 2:
     AVOID += "Build mainly on these facts, which were used least so far: " + ' '.join(FRESH_FACTS) + "\n"
 print(f'no-repeat memory for {HKEY}: {len(PAST_LINES)} past lines, fresh facts: {FRESH_FACTS}', flush=True)
+STYLE = ("\nSpeak like a storyteller of old Britain: archaic English with thee, thou, thy, doth, hath, 'tis, ere, nay, aye, "
+         "hark, behold, verily, mine, whence, wherefore, used naturally, still easy to follow. Keep names and facts exactly as given."
+         if os.environ.get('NARR_STYLE', 'old_british') == 'old_british' else '')
 prompt = (f"Anime: {series_name}, episode {conv_ep.split(':')[-1]}.\n"
           f"Dialogue heard in the scene (auto-translated, may contain errors): {context or '(no clear dialogue)'}\n\n"
           f"{ASK}\nWrite {WORDS} for a YouTube Short, serious, deep, cinematic tone. "
           "Never invent facts. Plain sentences, no emojis, "
-          "no hashtags, no quotes, no stage directions, no titles. Reply with the text only." + AVOID)
+          "no hashtags, no quotes, no stage directions, no titles. Reply with the text only." + STYLE + AVOID)
 
 WRITER = 'none'
 
@@ -316,11 +319,15 @@ def _groq(prompt):
     for mdl in dict.fromkeys([os.environ.get('GROQ_MODEL') or 'llama-3.3-70b-versatile'] + ranked[:3] + ['llama-3.1-8b-instant']):
         try:
             req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST',
-                data=json.dumps(dict(model=mdl, temperature=0.8, max_tokens=400,
+                data=json.dumps(dict(model=mdl, temperature=0.8, max_tokens=2000, **({'reasoning_effort': 'low'} if 'gpt-oss' in mdl or 'qwen3' in mdl else {}),
                                      messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'),
                                                dict(role='user', content=prompt)])).encode(),
                 headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
-            return json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content'], f'groq:{mdl}'
+            out = (json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message'].get('content') or '').strip()
+            out = re.sub(r'(?s)<think>.*?</think>', '', out).strip()
+            if not out:
+                raise ValueError('empty reply')                        # reasoning ate the budget: try the next model
+            return out, f'groq:{mdl}'
         except Exception as ex:
             last = ex
             print('groq', mdl, 'failed:', ex, getattr(ex, 'read', lambda: b'')()[:200], flush=True)
@@ -372,14 +379,14 @@ if narration is None:                                                 # last res
     WRITER = 'template'
     nm = CHAR.split()[0] if CHAR else 'the fighter'
     narration = (f"This is {CHAR}. {LORE[CHAR]['power']}" if MODE == 'character' else rng.choice([
-        f"They said to kneel, they said to fall. {nm} rose up and faced it all. Every scar became a vow, the weak one is the hunter now.",
-        f"Pain is the teacher, blood is the test. {nm} gives everything, nothing less. When the world says stop, the heart says go, the strongest fire burns slow."]))
+        f"Hark, they bade thee kneel, they bade thee fall. Yet {nm} rose and faced them all. Each scar became a sacred vow, the meek one is the hunter now.",
+        f"Pain is thy teacher, blood thy test. {nm} giveth all and naught the less. When the world doth cry halt, the heart sayeth go, the mightiest fire burneth slow."]))
 print('narration writer:', WRITER, flush=True)
 print('narration', MODE, CHAR, '|', narration, flush=True)
 
 from voice import speak                                              # expressive phrase-by-phrase read (edit/voice.py)
 narr_raw, bounds = speak(narration, 'work/convo/narr_raw.wav', seed=SEED)
-DEEP = float(os.environ.get('VOICE_DEEP', '0.93'))
+DEEP = float(os.environ.get('VOICE_DEEP', '0.96'))
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', narr_raw, '-af',
     f'aresample=48000,asetrate={int(48000 * DEEP)},aresample=48000,atempo={1 / DEEP:.5f},'   # pitch and formants down, same timing: a heavy trailer voice
     'highpass=f=45,bass=g=3:f=120,equalizer=f=2500:t=q:w=1:g=1.5,'                          # warm chest, clear consonants
