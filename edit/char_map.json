@@ -677,6 +677,129 @@
     }
    },
    "scanned": "2026-11-15 20:30 UTC"
+  },
+  "demon-slayer-kimetsu-no-yaiba:S2E05": {
+   "frames": 208,
+   "face_frames": 21,
+   "step": 5.0,
+   "chars": {
+    "Tanjiro Kamado": {
+     "share": 0.1106,
+     "top3": 0.2837,
+     "peak": 0.7834
+    },
+    "Nezuko Kamado": {
+     "share": 0.0337,
+     "top3": 0.0865,
+     "peak": 0.7297
+    },
+    "Zenitsu Agatsuma": {
+     "share": 0.0481,
+     "top3": 0.1346,
+     "peak": 0.7155
+    },
+    "Inosuke Hashibira": {
+     "share": 0.1394,
+     "top3": 0.2692,
+     "peak": 0.7765
+    },
+    "Kyojuro Rengoku": {
+     "share": 0.0529,
+     "top3": 0.0962,
+     "peak": 0.7799
+    },
+    "Akaza": {
+     "share": 0.024,
+     "top3": 0.2019,
+     "peak": 0.7462
+    },
+    "Tengen Uzui": {
+     "share": 0.0673,
+     "top3": 0.2163,
+     "peak": 0.6649
+    },
+    "Daki": {
+     "share": 0.0096,
+     "top3": 0.149,
+     "peak": 0.7253
+    },
+    "Gyutaro": {
+     "share": 0.0048,
+     "top3": 0.0481,
+     "peak": 0.6726
+    },
+    "Giyu Tomioka": {
+     "share": 0.0288,
+     "top3": 0.1442,
+     "peak": 0.7695
+    },
+    "Shinobu Kocho": {
+     "share": 0.0144,
+     "top3": 0.0625,
+     "peak": 0.7503
+    },
+    "Muichiro Tokito": {
+     "share": 0.0,
+     "top3": 0.0096,
+     "peak": 0.7086
+    },
+    "Mitsuri Kanroji": {
+     "share": 0.0,
+     "top3": 0.0096,
+     "peak": 0.6896
+    },
+    "Rui": {
+     "share": 0.0,
+     "top3": 0.0048,
+     "peak": 0.6278
+    },
+    "Enmu": {
+     "share": 0.2933,
+     "top3": 0.5721,
+     "peak": 0.789
+    },
+    "Hantengu": {
+     "share": 0.0096,
+     "top3": 0.0962,
+     "peak": 0.7014
+    },
+    "Gyokko": {
+     "share": 0.0144,
+     "top3": 0.125,
+     "peak": 0.6559
+    },
+    "Kokushibo": {
+     "share": 0.024,
+     "top3": 0.0962,
+     "peak": 0.6566
+    },
+    "Doma": {
+     "share": 0.0,
+     "top3": 0.0529,
+     "peak": 0.7121
+    },
+    "Muzan Kibutsuji": {
+     "share": 0.024,
+     "top3": 0.1298,
+     "peak": 0.7546
+    },
+    "Sanemi Shinazugawa": {
+     "share": 0.0048,
+     "top3": 0.0625,
+     "peak": 0.7155
+    },
+    "Gyomei Himejima": {
+     "share": 0.0096,
+     "top3": 0.1154,
+     "peak": 0.7473
+    },
+    "Obanai Iguro": {
+     "share": 0.0048,
+     "top3": 0.0337,
+     "peak": 0.7126
+    }
+   },
+   "scanned": "2026-11-16 04:07 UTC"
   }
  },
  "corrections": [
@@ -687,19 +810,26 @@
    "share": 0.0308,
    "best": 0.198,
    "time": "2026-11-15"
+  },
+  {
+   "char": "enmu",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "action": "add",
+   "share": 0.2687,
+   "time": "2026-11-16"
   }
  ],
  "stats": {
-  "episodes_cached": 6,
+  "episodes_cached": 7,
   "episodes_total": 122,
-  "updated": "2026-11-15 20:30 UTC",
+  "updated": "2026-11-16 04:07 UTC",
   "refs": {
-   "jujutsu-kaisen": {
-    "characters": 19,
-    "with_stills": 19,
-    "with_faces": 17,
-    "stills": 150,
-    "faces": 35
+   "demon-slayer-kimetsu-no-yaiba": {
+    "characters": 23,
+    "with_stills": 23,
+    "with_faces": 22,
+    "stills": 171,
+    "faces": 57
    }
   }
  }
