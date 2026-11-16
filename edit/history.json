@@ -5,7 +5,7 @@
   "cotneus_stereo_love_funk": 1,
   "andromeda_montagem_coma": 1,
   "montagem_vozes_profundas": 1,
-  "andromeda_no_fear_phonk": 1,
+  "andromeda_no_fear_phonk": 2,
   "mvsterious_slava_funk": 2,
   "glxxmstrider_dont_stop_slowed": 1,
   "dygo_funk_infernal": 1,
@@ -57,7 +57,8 @@
   "jujutsu-kaisen:S3E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
-  "jujutsu-kaisen:S1E11": 1
+  "jujutsu-kaisen:S1E11": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E07": 1
  },
  "shots": [
   {
@@ -3943,6 +3944,210 @@
   {
    "ep": "jujutsu-kaisen:S1E11",
    "s": 260.209
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 215.783
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 231.366
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 286.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 208.492
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 223.283
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 201.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 202.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 205.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 206.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 210.95
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 212.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 213.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 213.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 214.575
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 221.017
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 235.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 240.033
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 270.742
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 276.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 280.45
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 282.967
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 284.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 293.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 309.684
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 320.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 323.242
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 326.283
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 340.158
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 348.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 350.642
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 222.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 268.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 224.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 207.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 272.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 229.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 232.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 238.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 241.387
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 234.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 236.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 209.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 269.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 183.158
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 189.283
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 177.95
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 194.3
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 174.283
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 197.783
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 171.7
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 287.29
   }
  ],
  "runs": [
@@ -4179,6 +4384,16 @@
    "song": "atlxs_passo_bem_solto_slowed",
    "episodes": [
     "jujutsu-kaisen:S1E11"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-16 04:32 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "andromeda_no_fear_phonk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S3E07"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4526,11 +4741,25 @@
     1316.2,
     1412.3
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E07": [
+   [
+    1.2,
+    102.1
+   ],
+   [
+    121.7,
+    140.4
+   ],
+   [
+    1286.1,
+    1385.1
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 11,
-  "demon-slayer-kimetsu-no-yaiba": 11
+  "demon-slayer-kimetsu-no-yaiba": 12
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -4794,6 +5023,19 @@
    "writer": "template",
    "mode": "rhyme",
    "title": "Mahito quote that hits hard \ud83e\udd76 #shorts"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 246.0,
+   "e": 263.43333333333334,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_andromeda_no_fear_phonk.mp4",
+   "time": "2026-11-16 04:33 UTC",
+   "character": "daki",
+   "song": "andromeda_no_fear_phonk",
+   "voice": "en-US-AndrewNeural",
+   "writer": "groq:openai/gpt-oss-120b",
+   "mode": "rhyme",
+   "title": "Daki hits different \ud83e\udd76 #shorts"
   }
  ],
  "styles": [
@@ -4812,7 +5054,8 @@
  ],
  "narr_chars": {
   "zenitsu": 1,
-  "mahito": 1
+  "mahito": 1,
+  "daki": 1
  },
  "narr_lines": {
   "zenitsu": [
@@ -4823,6 +5066,12 @@
    "They said to kneel, they said to fall.",
    "Mahito rose up and faced it all.",
    "Every scar became a vow, the weak one is the hunter now."
+  ],
+  "daki": [
+   "Behold Daki, whose sashes slash like night\u2019s keen blade",
+   "She weaves the crimson tide, yet ne\u2019er shall she fade.",
+   "Bound to her brother\u2019s doom, she stands till twin heads fall",
+   "Then darkness yields, and silence crowns her fall"
   ]
  },
  "lore_used": {
@@ -4830,6 +5079,47 @@
    "A demon slayer who uses Thunder Breathing but only ever mast": 1,
    "Usually terrified, he becomes lethal when he falls asleep, s": 1
   },
-  "mahito": {}
+  "mahito": {},
+  "daki": {}
+ },
+ "credit_zones": {
+  "demon-slayer-kimetsu-no-yaiba:S3E07": [
+   [
+    44.0,
+    149.0
+   ],
+   [
+    1286.0,
+    1387.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E06": [
+   [
+    49.0,
+    76.0
+   ],
+   [
+    75.0,
+    180.0
+   ],
+   [
+    1286.0,
+    1387.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E05": [
+   [
+    31.0,
+    58.0
+   ],
+   [
+    470.0,
+    497.0
+   ],
+   [
+    1277.0,
+    1364.0
+   ]
+  ]
  }
 }
