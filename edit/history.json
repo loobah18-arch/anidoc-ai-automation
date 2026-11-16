@@ -3,7 +3,7 @@
   "rayelo_ultraslowed": 2,
   "montagem_zora": 2,
   "cotneus_stereo_love_funk": 1,
-  "andromeda_montagem_coma": 1,
+  "andromeda_montagem_coma": 2,
   "montagem_vozes_profundas": 1,
   "andromeda_no_fear_phonk": 2,
   "mvsterious_slava_funk": 2,
@@ -59,7 +59,8 @@
   "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
   "jujutsu-kaisen:S1E11": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 1,
-  "jujutsu-kaisen:S3E05": 1
+  "jujutsu-kaisen:S3E05": 1,
+  "jujutsu-kaisen:S1E04": 1
  },
  "shots": [
   {
@@ -4365,6 +4366,202 @@
   {
    "ep": "jujutsu-kaisen:S3E05",
    "s": 853.091
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 721.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 826.275
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 718.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 727.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 737.958
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 680.441
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 712.816
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 715.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 716.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 791.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 802.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 807.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 841.317
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 843.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 860.233
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 865.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 884.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 719.634
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 722.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 735.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 739.384
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 724.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 725.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 736.879
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 740.879
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 728.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 730.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 882.718
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 678.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 711.879
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 805.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 681.884
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 808.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 885.712
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 863.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 866.884
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 704.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 698.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 693.066
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 689.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 670.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 859.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 864.629
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 664.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 746.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 659.816
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 658.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 751.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 653.566
   }
  ],
  "runs": [
@@ -4621,6 +4818,16 @@
    "song": "rayelo_ultraslowed",
    "episodes": [
     "jujutsu-kaisen:S3E05"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-16 05:56 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "andromeda_montagem_coma",
+   "episodes": [
+    "jujutsu-kaisen:S1E04"
    ],
    "file": "_amv_part.mp4"
   }
@@ -4992,10 +5199,24 @@
     1371.4,
     1423.2
    ]
+  ],
+  "jujutsu-kaisen:S1E04": [
+   [
+    169.2,
+    265.5
+   ],
+   [
+    967.1,
+    982.6
+   ],
+   [
+    1271.2,
+    1370.1
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 12,
+  "jujutsu-kaisen": 13,
   "demon-slayer-kimetsu-no-yaiba": 12
  },
  "known": [
@@ -5286,6 +5507,19 @@
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
    "title": "Kinji quote that hits hard \ud83e\udd76 #shorts"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 764.0,
+   "e": 778.7333333333333,
+   "file": "Jujutsu_Kaisen_narrated_andromeda_montagem_coma.mp4",
+   "time": "2026-11-16 05:57 UTC",
+   "character": "sukuna",
+   "song": "andromeda_montagem_coma",
+   "voice": "en-US-AndrewNeural",
+   "writer": "groq:openai/gpt-oss-120b",
+   "mode": "rhyme",
+   "title": "Ryomen hits different \ud83e\udd76 #shorts"
   }
  ],
  "styles": [
@@ -5306,7 +5540,8 @@
   "zenitsu": 1,
   "mahito": 1,
   "daki": 1,
-  "hakari": 1
+  "hakari": 1,
+  "sukuna": 1
  },
  "narr_lines": {
   "zenitsu": [
@@ -5329,6 +5564,12 @@
    "When jackpot sings, cursed fire doth divine.",
    "Four minutes thou art healed, wounds fade to naught",
    "In idle death's domain, his power is brought."
+  ],
+  "sukuna": [
+   "Behold Ryomen, whose cursed might doth cleave the night",
+   "His wrath doth rend the world, a fearsome sight.",
+   "In shadows deep, his will doth never wane",
+   "A king of curses, ere death, he doth reign."
   ]
  },
  "lore_used": {
@@ -5338,7 +5579,10 @@
   },
   "mahito": {},
   "daki": {},
-  "hakari": {}
+  "hakari": {},
+  "sukuna": {
+   "The King of Curses, whose power was sealed into twenty finge": 1
+  }
  },
  "credit_zones": {
   "demon-slayer-kimetsu-no-yaiba:S3E07": [
@@ -5397,6 +5641,30 @@
    [
     1334.0,
     1426.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E15": [
+   [
+    1324.0,
+    1425.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E17": [
+   [
+    1336.0,
+    1437.0
+   ]
+  ],
+  "jujutsu-kaisen:S1E04": [
+   [
+    170.0,
+    269.0
+   ]
+  ],
+  "jujutsu-kaisen:S1E01": [
+   [
+    50.0,
+    149.0
    ]
   ]
  }
