@@ -2,7 +2,7 @@
  "songs": {
   "rayelo_ultraslowed": 2,
   "montagem_zora": 2,
-  "cotneus_stereo_love_funk": 1,
+  "cotneus_stereo_love_funk": 2,
   "andromeda_montagem_coma": 2,
   "montagem_vozes_profundas": 1,
   "andromeda_no_fear_phonk": 2,
@@ -47,7 +47,7 @@
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
   "jujutsu-kaisen:S1E17": 1,
   "jujutsu-kaisen:S1E23": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E07": 1,
+  "demon-slayer-kimetsu-no-yaiba:S2E07": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E05": 1,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E24": 1,
@@ -64,7 +64,8 @@
   "jujutsu-kaisen:S1E01": 1,
   "jujutsu-kaisen:S1E02": 1,
   "jujutsu-kaisen:S2E16": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E06": 1
+  "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
+  "demon-slayer-kimetsu-no-yaiba:S2E06": 1
  },
  "shots": [
   {
@@ -5002,6 +5003,274 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
    "s": 1103.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 871.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 710.275
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1092.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1182.984
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 999.959
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 155.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 232.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 341.942
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 596.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 879.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 882.692
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 894.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 903.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 904.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 905.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 920.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 923.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 925.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 926.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 938.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 945.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 967.859
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 992.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1041.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1086.025
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1119.192
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1126.025
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1130.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1132.359
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1134.525
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1137.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1141.609
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1144.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1150.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1165.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1175.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1177.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1178.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 118.484
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 223.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 476.941
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 516.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 526.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 555.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 563.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 596.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 611.358
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 680.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 714.483
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 1115.191
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 993.972
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 994.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 995.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 996.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 997.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1000.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 567.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 899.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1145.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1001.972
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 998.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1002.964
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1003.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1004.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1005.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1174.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 937.555
   }
  ],
  "runs": [
@@ -5292,6 +5561,17 @@
     "demon-slayer-kimetsu-no-yaiba:S5E06",
     "demon-slayer-kimetsu-no-yaiba:S5E07",
     "demon-slayer-kimetsu-no-yaiba:S5E08"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-16 10:57 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "cotneus_stereo_love_funk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S2E06",
+    "demon-slayer-kimetsu-no-yaiba:S2E07"
    ],
    "file": "_amv_part.mp4"
   }
@@ -5713,11 +5993,17 @@
     1228.3,
     1258.9
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S2E06": [
+   [
+    1210.3,
+    1244.7
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 14,
-  "demon-slayer-kimetsu-no-yaiba": 13
+  "demon-slayer-kimetsu-no-yaiba": 14
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -6020,6 +6306,19 @@
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
    "title": "Ryomen hits different \ud83e\udd76 #shorts"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 248.0,
+   "e": 265.46666666666664,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_cotneus_stereo_love_funk.mp4",
+   "time": "2026-11-16 10:57 UTC",
+   "character": "akaza",
+   "song": "cotneus_stereo_love_funk",
+   "voice": "en-US-AndrewNeural",
+   "writer": "groq:openai/gpt-oss-120b",
+   "mode": "rhyme",
+   "title": "Akaza quote that hits hard \ud83e\udd76 #shorts"
   }
  ],
  "styles": [
@@ -6041,7 +6340,8 @@
   "mahito": 1,
   "daki": 1,
   "hakari": 1,
-  "sukuna": 1
+  "sukuna": 1,
+  "akaza": 1
  },
  "narr_lines": {
   "zenitsu": [
@@ -6070,6 +6370,12 @@
    "His wrath doth rend the world, a fearsome sight.",
    "In shadows deep, his will doth never wane",
    "A king of curses, ere death, he doth reign."
+  ],
+  "akaza": [
+   "Behold Akaza, whose fury doth blaze like night\u2019s fire",
+   "He strikes with wrath, ere darkness yields to that fire.",
+   "His heart, a tempest, seeks battles as a spear",
+   "Thus he doth rise, forever feared by thy spear."
   ]
  },
  "lore_used": {
@@ -6082,7 +6388,8 @@
   "hakari": {},
   "sukuna": {
    "The King of Curses, whose power was sealed into twenty finge": 1
-  }
+  },
+  "akaza": {}
  },
  "credit_zones": {
   "demon-slayer-kimetsu-no-yaiba:S3E07": [
@@ -6165,6 +6472,18 @@
    [
     50.0,
     149.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S2E06": [
+   [
+    1214.0,
+    1249.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S2E07": [
+   [
+    25.0,
+    60.0
    ]
   ]
  }
