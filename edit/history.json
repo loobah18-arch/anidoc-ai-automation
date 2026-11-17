@@ -12,7 +12,7 @@
   "rubikdice_montagem_pegadora_slowed": 1,
   "zxvren_montagem_delirio_slowed": 2,
   "lonown_avangard_phonk": 1,
-  "ashreveal_manasha_phonk": 1,
+  "ashreveal_manasha_phonk": 2,
   "trashxrl_deus_do_olimpo": 1,
   "atlxs_passo_bem_solto_slowed": 2,
   "poker_face": 2,
@@ -68,7 +68,9 @@
   "demon-slayer-kimetsu-no-yaiba:S2E06": 1,
   "jujutsu-kaisen:S3E08": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E17": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E04": 1
+  "jujutsu-kaisen:S3E01": 1,
+  "jujutsu-kaisen:S3E02": 1,
+  "jujutsu-kaisen:S3E12": 1
  },
  "shots": [
   {
@@ -5748,140 +5750,192 @@
    "s": 1115.5
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 926.583
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1106.783
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 929.108
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1108.283
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 933.25
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1111.267
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 937.65
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1114.95
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 940.333
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1117.457
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 941.983
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1118.04
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 944.233
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1123.158
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 947.125
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1167.725
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 948.917
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1191.183
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 949.79
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1192.457
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 952.775
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1193.158
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 956.417
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1216.707
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 959.233
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1222.841
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 962.208
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1232.533
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 964.442
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1275.267
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 966.958
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1291.308
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 969.192
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1303.325
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 972.25
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1309.658
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 975.816
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1312.408
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 978.733
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1315.492
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 979.957
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1322.258
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 980.707
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1329.242
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 982.108
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1332.491
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 984.417
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1335.017
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 985.542
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1336.558
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 986.457
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1337.491
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 987.858
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1339.2
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 989.373
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1343.075
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 991.441
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1348.466
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 995.0
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1357.725
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 996.457
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1366.475
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 997.875
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1370.033
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 1002.4
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1374.1
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 1005.875
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1377.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1379.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1402.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1405.241
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1407.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1409.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1411.783
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1414.742
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1424.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1437.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1451.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1454.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1507.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 1559.117
   }
  ],
  "runs": [
@@ -6208,12 +6262,14 @@
    "file": "_amv_part.mp4"
   },
   {
-   "time": "2026-11-17 06:28 UTC",
+   "time": "2026-11-17 06:47 UTC",
    "pick": "auto",
-   "series": "demon-slayer-kimetsu-no-yaiba",
-   "song": "poker_face",
+   "series": "jujutsu-kaisen",
+   "song": "ashreveal_manasha_phonk",
    "episodes": [
-    "demon-slayer-kimetsu-no-yaiba:S2E04"
+    "jujutsu-kaisen:S3E01",
+    "jujutsu-kaisen:S3E02",
+    "jujutsu-kaisen:S3E12"
    ],
    "file": "_amv_part.mp4"
   }
@@ -6662,24 +6718,36 @@
     1372.8
    ]
   ],
-  "demon-slayer-kimetsu-no-yaiba:S2E04": [
+  "jujutsu-kaisen:S3E01": [
+   [
+    220.1,
+    318.3
+   ],
+   [
+    1371.4,
+    1423.2
+   ]
+  ],
+  "jujutsu-kaisen:S3E02": [
    [
     -4.0,
-    59.9
+    94.2
    ],
    [
-    114.5,
-    222.2
-   ],
+    1371.4,
+    1425.1
+   ]
+  ],
+  "jujutsu-kaisen:S3E12": [
    [
-    1286.0,
-    1385.0
+    1661.3,
+    1713.2
    ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 15,
-  "demon-slayer-kimetsu-no-yaiba": 16
+  "jujutsu-kaisen": 16,
+  "demon-slayer-kimetsu-no-yaiba": 15
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -7017,11 +7085,17 @@
    "time": "2026-11-16 22:29 UTC"
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "s": 173.83333333333334,
-   "e": 201.26666666666668,
-   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_poker_face.mp4",
-   "time": "2026-11-17 06:28 UTC"
+   "ep": "jujutsu-kaisen:S3E12",
+   "s": 866.0,
+   "e": 886.9666666666667,
+   "file": "Jujutsu_Kaisen_narrated_ashreveal_manasha_phonk.mp4",
+   "time": "2026-11-17 06:48 UTC",
+   "character": "yuta",
+   "song": "ashreveal_manasha_phonk",
+   "voice": "en-US-AndrewNeural",
+   "writer": "groq:openai/gpt-oss-120b",
+   "mode": "rhyme",
+   "title": "Yuta hits different \ud83e\udd76 #shorts"
   }
  ],
  "styles": [
@@ -7044,10 +7118,10 @@
    "time": "2026-11-16 22:29 UTC"
   },
   {
-   "style": "convo",
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
-   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_poker_face.mp4",
-   "time": "2026-11-17 06:28 UTC"
+   "style": "narrated",
+   "ep": "jujutsu-kaisen:S3E12",
+   "file": "Jujutsu_Kaisen_narrated_ashreveal_manasha_phonk.mp4",
+   "time": "2026-11-17 06:48 UTC"
   }
  ],
  "narr_chars": {
@@ -7057,7 +7131,8 @@
   "hakari": 1,
   "sukuna": 1,
   "akaza": 1,
-  "higuruma": 1
+  "higuruma": 1,
+  "yuta": 1
  },
  "narr_lines": {
   "zenitsu": [
@@ -7098,6 +7173,12 @@
    "His judgment swift, a blade of endless fright",
    "In halls of law he forged a cursed domain",
    "Where guilty souls fall, their power wanes again."
+  ],
+  "yuta": [
+   "Behold Yuta, bound to Rika's shade, whose cursed might doth endless flood.",
+   "He doth wield the echoes of all sorcerers, a tempest fierce and good.",
+   "With reserves vast as night\u2019s abyss, he stands where darkness doth rise.",
+   "Thus, ere the world shall break, his spirit rise."
   ]
  },
  "lore_used": {
@@ -7112,7 +7193,10 @@
    "The King of Curses, whose power was sealed into twenty finge": 1
   },
   "akaza": {},
-  "higuruma": {}
+  "higuruma": {},
+  "yuta": {
+   "A special grade sorcerer bound to the cursed spirit Rika.": 1
+  }
  },
  "credit_zones": {
   "demon-slayer-kimetsu-no-yaiba:S3E07": [
@@ -7243,6 +7327,36 @@
    [
     1249.0,
     1325.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E02": [
+   [
+    0.0,
+    96.0
+   ],
+   [
+    680.0,
+    715.0
+   ],
+   [
+    1334.0,
+    1426.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E01": [
+   [
+    218.0,
+    320.0
+   ],
+   [
+    1334.0,
+    1426.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E12": [
+   [
+    1640.0,
+    1716.0
    ]
   ]
  }
