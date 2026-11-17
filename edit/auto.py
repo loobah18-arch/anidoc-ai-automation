@@ -434,8 +434,12 @@ def _drop_char_pool(full_pool):
     print(f'drop style: {len(anchors)} anchor shots clearly {CHAR_NAME}; {how} fight windows:',
           {e: [(round(a), round(b)) for a, b in v] for e, v in win.items()}, flush=True)
     BRIGHT_MIN = float(os.environ.get('DROP_BRIGHT_MIN', 32))
-    pure = [s for s in cands if in_win(s, win) and s['rel'] >= -0.02 and s['act_z'] >= -0.25 and s['bright'] >= BRIGHT_MIN]
-    need = int(os.environ.get('DROP_MIN_SHOTS', 30))
+    if curated:                                                       # hand-checked fights: only drop a clear opponent solo / dark shot
+        pure = [s for s in cands if in_win(s, win) and s['rel'] >= -0.05 and s['bright'] >= BRIGHT_MIN]
+    else:
+        pure = [s for s in cands if in_win(s, win) and s['rel'] >= -0.02 and s['act_z'] >= -0.25 and s['bright'] >= BRIGHT_MIN]
+    print(f'drop style: {len(pure)} {CHAR_NAME} shots inside the fight windows', flush=True)
+    need = int(os.environ.get('DROP_MIN_SHOTS', 60))
     for pct in (IMPACT_PCT, 75.0, 65.0, 50.0):
         gate = float(np.percentile([s['impact'] for s in cands] if curated else imp, pct))
         keep = [s for s in pure if s['impact'] >= gate]
