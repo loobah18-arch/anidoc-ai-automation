@@ -381,6 +381,22 @@ def lore_name(key, series):
     return None
 
 
+def char_slug(nm, series):
+    if not nm:
+        return None
+    d = LORE_ALL.get(series, {}).get(nm, {})
+    for n in d.get('names', []):
+        if n in chars:
+            return n
+    for part in nm.lower().split():
+        if part in chars:
+            return part
+    clean = re.sub(r'\W+', '_', nm.lower()).strip('_')
+    if clean in chars:
+        return clean
+    return clean
+
+
 topic_name = None
 topic_slug = None
 
@@ -410,12 +426,7 @@ if not topic_name:
                 top_char = max(scores, key=scores.get)
                 if scores[top_char] >= 0.20:
                     topic_name = top_char
-                    for s, d in series_lore.items():
-                        if top_char.lower() == s.lower() or top_char in d.get('names', []):
-                            topic_slug = s.lower()
-                            break
-                    if not topic_slug:
-                        topic_slug = re.sub(r'\W+', '_', top_char.lower()).strip('_')
+                    topic_slug = char_slug(topic_name, series_key)
     except Exception as ex:
         print('charvis conversation identification skipped:', ex, flush=True)
 
@@ -428,7 +439,7 @@ if not topic_name:
         if n: heard[nm] = n
     if heard:
         topic_name = max(heard, key=heard.get)
-        topic_slug = re.sub(r'\W+', '_', topic_name.lower()).strip('_')
+        topic_slug = char_slug(topic_name, series_key)
 
 print(f'conversation character identified: {topic_name} ({topic_slug})', flush=True)
 
@@ -442,24 +453,26 @@ except Exception:
 
 # Fetch up to 3 distinct fight episodes for this character from characters.json
 fight_eps = [e for e in chars.get(topic_slug, []) if e in EPISODES] if topic_slug else []
-if fight_eps:
-    for ep_code in fight_eps[:3]:
-        try:
-            fetch(ep_code)
-        except Exception as ex:
-            print(f'fetch failed for fight ep {ep_code}:', ex, flush=True)
+amv_eps = list(dict.fromkeys([conv_ep] + fight_eps[:3])) if fight_eps else [conv_ep]
+for ep_code in amv_eps:
+    try:
+        fetch(ep_code)
+    except Exception as ex:
+        print(f'fetch failed for fight ep {ep_code}:', ex, flush=True)
 
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
 amv_len = max(14.0, TOTAL - HOOK - CONV)
 env = dict(os.environ,
-           FORCE_EPS=(','.join(fight_eps[:3]) if fight_eps else conv_ep),
+           FORCE_EPS=','.join(amv_eps),
            INCLUDE='',
            START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
            CHAR_NAME=topic_name or '',
            CHAR_SERIES=series_title,
            CHAR_ACT_MIN='0.0',
-           CHAR_REL_MIN='0.04')
+           CHAR_REL_MIN='0.04',
+           CHAR_MIN_IDENT='6',
+           CHAR_MIN_SHOTS='20')
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))
