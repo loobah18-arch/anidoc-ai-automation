@@ -350,21 +350,64 @@ def _char_filter(pool):
 
 
 purity_pct = IMPACT_PCT if DROP_STYLE else None
-if CHAR_NAME and DROP_STYLE:                                          # identity is never relaxed; only if the character has too few
-    for pct in (IMPACT_PCT, 75.0, 65.0):                              # p85 hits does the impact gate step down (logged in the plan)
-        gate = float(np.percentile([s['impact'] for s in full_pool], pct))
-        cand = [s for s in full_pool if s['impact'] >= gate]
-        try:
-            pool = _char_filter(cand); purity_pct = pct
+
+
+def _drop_char_pool(full_pool):
+    """Character purity for the drop edit. CLIP identity on single frames is too weak to fill a 1-cut-per-beat edit
+    (a masked / blindfolded / mid-attack face rarely matches a still), so: shots that clearly ARE the character anchor
+    their fight; every high-impact shot within 20 s of an anchor in that episode is kept unless it clearly shows someone
+    else (opponent solo, other characters) or reads as calm (talking, idle, crowd). Impact >= p85 always."""
+    global purity_pct
+    import charvis
+    if not _PROMPTS_ADDED:
+        _PROMPTS_ADDED.append(1)
+        charvis.ACTION += ['an anime character powering up with a glowing aura and crackling energy',
+                           'an anime character awakening with glowing eyes and a burst of cursed energy',
+                           'an anime character dashing through the air mid-attack with speed lines']
+        charvis.CALM += ['a crowd of anime characters watching and reacting in shock',
+                         'an anime close-up of a character talking with a still face',
+                         'anime characters standing around in conversation']
+    cv_ = charvis.get(CHAR_NAME, os.environ.get('CHAR_SERIES', ''))
+    if cv_ is None:
+        raise RuntimeError('charvis unavailable')
+    imp = [s['impact'] for s in full_pool]
+    cands = [s for s in full_pool if s['impact'] >= np.percentile(imp, 55)]
+    res = cv_.score([(SRC(s['ep']), (s['s'] + s['e']) / 2) for s in cands])
+    cands = [dict(s, rel=r['rel'], char=r['char'], action=r['action']) for s, r in zip(cands, res) if r]
+    Az = z([s['action'] for s in cands]); Cz = z([s['char'] for s in cands])
+    for i, s in enumerate(cands):
+        s['act_z'], s['char_z'] = float(Az[i]), float(Cz[i])
+    REL_MIN = float(os.environ.get('CHAR_REL_MIN', 0.04))
+    anchors = [s for s in cands if s['rel'] >= REL_MIN]
+    win = {}
+    for s in anchors:
+        win.setdefault(s['ep'], []).append((s['s'] - 20, s['e'] + 20))
+    print(f'drop style: {len(anchors)} anchor shots clearly {CHAR_NAME}, fight windows per episode:',
+          {e: len(v) for e, v in win.items()}, flush=True)
+    inside = lambda s: any(a <= s['s'] and s['e'] <= b for a, b in win.get(s['ep'], []))
+    pure = [s for s in cands if inside(s) and s['rel'] >= -0.02 and s['act_z'] >= -0.25]   # not someone else, not calm
+    need = int(os.environ.get('DROP_MIN_SHOTS', 30))
+    for pct in (IMPACT_PCT, 75.0, 65.0):
+        gate = float(np.percentile(imp, pct))
+        keep = [s for s in pure if s['impact'] >= gate]
+        print(f'drop style: p{pct:.0f} gate {gate:.3f}: {len(keep)} pure {CHAR_NAME} combat shots', flush=True)
+        if len(keep) >= need:
             break
-        except SystemExit as ex:
-            print(f'drop style: p{pct:.0f} gate too tight for {CHAR_NAME}:', ex, flush=True)
-        except Exception as ex:
-            print('character filter failed, impact-gated motion picks only:', ex, flush=True)
-            pool = cand; purity_pct = pct
-            break
-    else:
-        raise SystemExit(f'drop style: no clean {CHAR_NAME} fight shots even at p65; refusing to fill with other characters')
+    purity_pct = pct
+    if len(keep) < 6:
+        raise SystemExit(f'drop style: only {len(keep)} clean {CHAR_NAME} combat shots; refusing to fill with other characters')
+    for s in keep:
+        s['impact'] += 0.6 * max(0.0, s['char_z']) + 0.6 * s['act_z']
+    return keep
+
+
+if CHAR_NAME and DROP_STYLE:
+    try:
+        pool = _drop_char_pool(full_pool)
+    except SystemExit:
+        raise
+    except Exception as ex:
+        print('character filter failed, impact-gated motion picks only:', ex, flush=True)
     if purity_pct != IMPACT_PCT:
         print(f'WARNING drop style: impact gate relaxed to p{purity_pct:.0f} to find enough {CHAR_NAME} shots', flush=True)
 elif CHAR_NAME:
