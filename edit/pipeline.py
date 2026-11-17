@@ -45,10 +45,14 @@ if style == 'narrated':
 else:
     best = max(lines, key=len) if lines else ''
     quote = best if len(best) <= 60 else ' '.join(best.split()[:8]) + '...'
-    title = rng.choice([f'"{quote}" 🥶', f'{series} battle IQ is unreal 🔥', f'This {series} fight goes hard 😳'])
+    char = info.get('character_name') or info.get('character')
+    first = char.split()[0] if char else series
+    title = rng.choice([f'"{quote}" 🥶', f'{first} battle IQ is unreal 🔥', f'{first} fight goes crazy 😳'])
     desc = '\n'.join(lines[:6])
 title = title[:90] + ' #shorts'
 tags = ['shorts', 'anime', 'animeedit', tag_series, 'phonk', 'amv']
+if info.get('character'):
+    tags.append(re.sub(r'\W+', '', str(info['character']).lower()))
 desc = f"{desc}\n\n#{tag_series} #animeedit #anime #phonk #shorts"
 
 styles.append(dict(style=style, ep=ep, file=os.path.basename(video), time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())))

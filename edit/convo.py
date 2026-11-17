@@ -367,10 +367,99 @@ subprocess.run([sys.executable, '-m', 'demucs', '--two-stems=vocals', '-n', 'htd
 VOICE = 'work/convo/sep/htdemucs/talk/vocals.wav'
 print('voices separated from the anime music', flush=True)
 
+# ------------------------------------------------------------------ 5c. identify the main character speaking in this scene
+series_key = EPISODES[conv_ep]['series']
+series_title = series_key.replace('-', ' ').title()
+LORE_ALL = json.load(open('lore.json')) if os.path.exists('lore.json') else {}
+series_lore = LORE_ALL.get(series_key, {})
+
+
+def lore_name(key, series):
+    for nm, d in LORE_ALL.get(series, {}).items():
+        if key in [a.lower() for a in d.get('names', [])] or key == nm.lower():
+            return nm
+    return None
+
+
+topic_name = None
+topic_slug = None
+
+# 1. If explicit PICK matches a character slug
+if PICK in chars:
+    topic_slug = PICK
+    topic_name = lore_name(topic_slug, series_key) or topic_slug.title()
+
+# 2. Visually detect who is on screen during the conversation using charvis CLIP bank
+if not topic_name:
+    try:
+        import charvis
+        bk = charvis.bank(series_key)
+        times = [c0 + (c1 - c0) * fr for fr in (0.2, 0.4, 0.6, 0.8)]
+        ims = [charvis.frame(src, t) for t in times]
+        ims = [im for im in ims if im is not None]
+        if ims and bk.whole:
+            E = charvis.embed_images(ims)
+            scores = {n: float((bk.whole[n] @ E.T).max()) for n in bk.whole}
+            for im in ims:
+                fc = charvis.faces(im)
+                if fc:
+                    F = charvis.embed_images(fc)
+                    for n in bk.face:
+                        scores[n] = max(scores.get(n, 0), float((bk.face[n] @ F.T).max()))
+            if scores:
+                top_char = max(scores, key=scores.get)
+                if scores[top_char] >= 0.20:
+                    topic_name = top_char
+                    for s, d in series_lore.items():
+                        if top_char.lower() == s.lower() or top_char in d.get('names', []):
+                            topic_slug = s.lower()
+                            break
+                    if not topic_slug:
+                        topic_slug = re.sub(r'\W+', '_', top_char.lower()).strip('_')
+    except Exception as ex:
+        print('charvis conversation identification skipped:', ex, flush=True)
+
+# 3. Fallback: scan dialogue transcript for character names
+if not topic_name:
+    context_txt = ' '.join(w['w'] for w in cw).lower()
+    heard = {}
+    for nm, d in series_lore.items():
+        n = sum(len(re.findall(r'\b' + re.escape(a.lower()) + r'\b', context_txt)) for a in d.get('names', []))
+        if n: heard[nm] = n
+    if heard:
+        topic_name = max(heard, key=heard.get)
+        topic_slug = re.sub(r'\W+', '_', topic_name.lower()).strip('_')
+
+print(f'conversation character identified: {topic_name} ({topic_slug})', flush=True)
+
+# Update convo.json with identified character
+try:
+    cinfo = json.load(open('work/convo/convo.json'))
+    cinfo.update(character=topic_slug, character_name=topic_name)
+    json.dump(cinfo, open('work/convo/convo.json', 'w'), indent=1)
+except Exception:
+    pass
+
+# Fetch up to 3 distinct fight episodes for this character from characters.json
+fight_eps = [e for e in chars.get(topic_slug, []) if e in EPISODES] if topic_slug else []
+if fight_eps:
+    for ep_code in fight_eps[:3]:
+        try:
+            fetch(ep_code)
+        except Exception as ex:
+            print(f'fetch failed for fight ep {ep_code}:', ex, flush=True)
+
 # ------------------------------------------------------------------ 6. the AMV part (auto.py), then join
 amv_len = max(14.0, TOTAL - HOOK - CONV)
-env = dict(os.environ, FORCE_EPS=conv_ep, INCLUDE=f'{conv_ep}|{c0 - 150:.1f}|{c1 + 150:.1f}', START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
-           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK)
+env = dict(os.environ,
+           FORCE_EPS=(','.join(fight_eps[:3]) if fight_eps else conv_ep),
+           INCLUDE='',
+           START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+           EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
+           CHAR_NAME=topic_name or '',
+           CHAR_SERIES=series_title,
+           CHAR_ACT_MIN='0.0',
+           CHAR_REL_MIN='0.04')
 subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))
