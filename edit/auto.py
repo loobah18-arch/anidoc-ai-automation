@@ -33,6 +33,10 @@ FORCE_EPS = [e for e in os.environ.get('FORCE_EPS', '').split(',') if e]
 INCLUDE = os.environ.get('INCLUDE', '')                 # ep|s|e: only shots from this scene (same characters)
 EXCLUDE = [x.rsplit('|', 2) for x in os.environ.get('EXCLUDE', '').split(';') if x]   # ep|s|e already used
 OUT_NAME = os.environ.get('OUT_NAME', '')
+# AMV_STYLE=drop (set by convo.py): the edit starts ON the drop (beat 17), one cut per beat, only the topic
+# character's combat / awakening shots with impact >= the 85th percentile, Gojo v2 FX on every cut.
+DROP_STYLE = os.environ.get('AMV_STYLE', '') == 'drop'
+IMPACT_PCT = float(os.environ.get('IMPACT_PCT', 85))
 SCAN_W, SCAN_H, SCAN_FPS = 64, 36, 12
 rng = random.Random(SEED)
 os.chdir(HERE)
@@ -278,11 +282,27 @@ M, P_, C, S, B = (z([s[k] for s in pool]) for k in ('motion', 'peak', 'contrast'
 for i, s in enumerate(pool):
     s['impact'] = float(0.55 * M[i] + 0.35 * P_[i] + 0.25 * C[i] + 0.2 * S[i] + 0.15 * min(B[i], 1.0))
     s['calm'] = float(-0.6 * abs(M[i] + 0.3) + 0.4 * C[i] + 0.3 * S[i] + 0.3 * min(2.5, s['e'] - s['s']))
+full_pool = list(pool)
+if DROP_STYLE:                                                        # action only: every shot in the top 15% by impact
+    gate = float(np.percentile([s['impact'] for s in pool], IMPACT_PCT))
+    pool = [s for s in pool if s['impact'] >= gate]
+    print(f'drop style: impact gate p{IMPACT_PCT:.0f} = {gate:.3f}, {len(pool)} of {len(full_pool)} shots pass', flush=True)
 
 # ---------------------------------------------------------------- 4b. keep only shots where the topic character is on screen, fighting
 CHAR_NAME = os.environ.get('CHAR_NAME', '')
+_PROMPTS_ADDED = []
+
+
 def _char_filter(pool):
     import charvis
+    if DROP_STYLE and not _PROMPTS_ADDED:
+        _PROMPTS_ADDED.append(1)                                                    # awakening counts as action; crowds / talking heads / idle do not
+        charvis.ACTION += ['an anime character powering up with a glowing aura and crackling energy',
+                           'an anime character awakening with glowing eyes and a burst of cursed energy',
+                           'an anime character dashing through the air mid-attack with speed lines']
+        charvis.CALM += ['a crowd of anime characters watching and reacting in shock',
+                         'an anime close-up of a character talking with a still face',
+                         'anime characters standing around in conversation']
     cv_ = charvis.get(CHAR_NAME, os.environ.get('CHAR_SERIES', ''))
     if cv_ is not None:
         cands = sorted(pool, key=lambda s: -s['impact'])[:int(os.environ.get('CHAR_CANDS', 420))]
@@ -319,6 +339,8 @@ def _char_filter(pool):
                 keep = [s for s in ident if s['char_z'] >= thr and s['act_z'] >= -0.8]
                 if len(keep) >= n_need:
                     break
+            if DROP_STYLE:                                            # purity first: every clearly-them fight shot, nothing else
+                keep, thr = list(ident), 'identity+action'
             for s in keep:                                            # action + character lift the drops and the fast cuts
                 s['impact'] += 0.9 * s['char_z'] + 0.6 * s['act_z']
                 s['calm'] += 0.8 * s['char_z']
@@ -327,11 +349,50 @@ def _char_filter(pool):
     return pool
 
 
-if CHAR_NAME:
+purity_pct = IMPACT_PCT if DROP_STYLE else None
+if CHAR_NAME and DROP_STYLE:                                          # identity is never relaxed; only if the character has too few
+    for pct in (IMPACT_PCT, 75.0, 65.0):                              # p85 hits does the impact gate step down (logged in the plan)
+        gate = float(np.percentile([s['impact'] for s in full_pool], pct))
+        cand = [s for s in full_pool if s['impact'] >= gate]
+        try:
+            pool = _char_filter(cand); purity_pct = pct
+            break
+        except SystemExit as ex:
+            print(f'drop style: p{pct:.0f} gate too tight for {CHAR_NAME}:', ex, flush=True)
+        except Exception as ex:
+            print('character filter failed, impact-gated motion picks only:', ex, flush=True)
+            pool = cand; purity_pct = pct
+            break
+    else:
+        raise SystemExit(f'drop style: no clean {CHAR_NAME} fight shots even at p65; refusing to fill with other characters')
+    if purity_pct != IMPACT_PCT:
+        print(f'WARNING drop style: impact gate relaxed to p{purity_pct:.0f} to find enough {CHAR_NAME} shots', flush=True)
+elif CHAR_NAME:
     try:
         pool = _char_filter(pool)
     except Exception as ex:                                           # fail-safe: motion-only picks
         print('character filter failed, motion-only picks:', ex, flush=True)
+
+if DROP_STYLE:                                                        # talking heads: a big still face is never a combat shot
+    try:
+        import cv2
+        _casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
+        mot_hi = float(np.percentile([s['motion'] for s in pool], 60)) if pool else 0
+        kept = []
+        for s in pool:
+            raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f"{(s['s'] + s['e']) / 2:.2f}", '-i', SRC(s['ep']),
+                            '-frames:v', '1', '-vf', 'scale=480:270,format=gray', '-f', 'rawvideo', '-'])
+            img = np.frombuffer(raw, np.uint8).reshape(270, 480)
+            faces = _casc.detectMultiScale(img, 1.1, 4, minSize=(40, 40))
+            big = max((w * h for x, y, w, h in faces), default=0) / (480 * 270)
+            if big > 0.07 and s['motion'] < mot_hi:
+                continue
+            kept.append(s)
+        print(f'drop style: talking-head check dropped {len(pool) - len(kept)} of {len(pool)}', flush=True)
+        if len(kept) >= 6:
+            pool = kept
+    except Exception as ex:
+        print('talking-head check skipped', ex, flush=True)
 
 # ---------------------------------------------------------------- 5. music
 song_path = f'music/{song}.mp3'
@@ -346,6 +407,8 @@ rms = librosa.feature.rms(y=y, hop_length=512)[0]
 rt = librosa.frames_to_time(np.arange(len(rms)), sr=sr, hop_length=512)
 song_len = len(y) / sr
 need = TEMPLATE_BEATS * P
+if DROP_STYLE:                                                        # only the part after the drop has to fit in the song
+    need = DROP_BEAT * P + MAX_SECONDS
 
 
 def level(t0, t1):
@@ -365,6 +428,9 @@ for b in beats:
         best, drop_t = jump, float(b)
 if drop_t is None:
     drop_t = max(DROP_BEAT * P, MIN_START + (DROP_BEAT - START_BEAT) * P)
+    if DROP_STYLE:                                                    # still land it on a real beat
+        later = [float(b) for b in beats if b >= drop_t]
+        drop_t = later[0] if later else drop_t
 song_start = max(0.0, drop_t - (DROP_BEAT - START_BEAT) * P)
 print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t:.2f}s start {song_start:.2f}s', flush=True)
 
@@ -372,6 +438,8 @@ print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t:.2f}s start {song_start:.2f
 tmpl = [tuple(map(int, l.split()[:2])) for l in open('template.txt')]
 max_beats = START_BEAT + int(MAX_SECONDS / P)                         # keep every edit to its length, whatever the tempo
 tmpl = [(a, min(b, max_beats)) for a, b in tmpl if START_BEAT <= a < max_beats]
+if DROP_STYLE:                                                        # fast section: one cut on every beat from the drop
+    tmpl = [(j, j + 1) for j in range(max(START_BEAT, DROP_BEAT), max_beats)]
 n = len(tmpl)
 second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 pre = [i for i, (a, b) in enumerate(tmpl) if a < DROP_BEAT]
@@ -394,7 +462,7 @@ def take(idx_list, key, min_len):
 try:
     import cv2
     casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
-    for s in sorted(pool, key=lambda s: -s['calm'])[:90]:
+    for s in ([] if DROP_STYLE else sorted(pool, key=lambda s: -s['calm'])[:90]):
         t = (s['s'] + s['e']) / 2
         raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t:.2f}', '-i', SRC(s['ep']), '-frames:v', '1',
                         '-vf', 'scale=480:270,format=gray', '-f', 'rawvideo', '-'])
@@ -452,7 +520,7 @@ if len(assign) < n:                                                   # small po
             got = unused_piece(s, d)
             if got:
                 break
-        if got is None and not CHAR_NAME:                             # 2. the nearest unused shot (never with a topic: it may be someone else)
+        if got is None and not CHAR_NAME and not DROP_STYLE:                             # 2. the nearest unused shot (never with a topic: it may be someone else)
             for s in near:
                 if id(s) not in taken and s['e'] - s['s'] >= min(d * 0.6, 2.0) and free(s['ep'], s['s'], s['e']):
                     got = s; taken.add(id(s))
@@ -485,17 +553,26 @@ kinds = default_transition_pattern(n, drop_i)
 if second_drop:
     kinds[second_drop - 1] = 'flash'
 fxl = pair_transitions(n, kinds)
+if DROP_STYLE:                                                        # the drop: 3-stage flash + punch-in on the very first cut
+    for f_ in ('flash', 'punch'):
+        if f_ not in fxl[drop_i]:
+            fxl[drop_i].append(f_)
+    heavy_cut = float(np.percentile([assign[i].get('peak', 0) for i in range(n)], 65))   # heavy hits: top third by peak motion
 os.makedirs('segfx', exist_ok=True)
 jobs, plan = [], []
 for k_, (a, b) in enumerate(tmpl):
     s = assign[k_]
     nf = fr(b) - fr(a); dur = nf / FPS
     fx = list(fxl[k_])
-    if a < DROP_BEAT or 109 <= a < 113:
+    if DROP_STYLE:                                                    # pulse on every beat, shake + RGB split on the heavy hits
+        fx.append('pulse')
+        if k_ == drop_i or s.get('peak', 0) >= heavy_cut:
+            fx.append('shake')
+    elif a < DROP_BEAT or 109 <= a < 113:
         fx.append('drift')
     elif b - a >= 2:
         fx.append('pulse')
-    if s['impact'] >= impact_cut and a >= DROP_BEAT:
+    if not DROP_STYLE and s['impact'] >= impact_cut and a >= DROP_BEAT:
         fx.append('shake')
     L = s['e'] - s['s']; spd = 1.0
     if L >= dur:
@@ -510,7 +587,8 @@ for k_, (a, b) in enumerate(tmpl):
     jobs.append(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{st:.3f}', '-i', SRC(s['ep']), '-an',
                  '-vf', vf, '-frames:v', str(nf), '-r', str(FPS), '-fps_mode', 'cfr',
                  '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', f'segfx/{k_:03d}.mp4'])
-json.dump(dict(pick=PICK, anime=series, song=song, episodes=eps, tempo=tempo, song_start=song_start, plan=plan),
+json.dump(dict(pick=PICK, anime=series, song=song, episodes=eps, tempo=tempo, song_start=song_start, drop_t=drop_t,
+               style='drop' if DROP_STYLE else 'template', impact_pct=purity_pct, character=CHAR_NAME, plan=plan),
           open('work/edit_plan.json', 'w'), indent=1)
 
 

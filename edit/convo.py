@@ -465,7 +465,9 @@ amv_len = max(14.0, TOTAL - HOOK - CONV)
 env = dict(os.environ,
            FORCE_EPS=','.join(amv_eps),
            INCLUDE='',
-           START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+           START_BEAT='17', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+           AMV_STYLE='drop',                                        # the edit opens ON the drop (beat 17), one cut per beat
+           MIN_SONG_START=f'{CONV + 0.6:.2f}',                      # room before the drop for the song bed under the talk
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
            CHAR_NAME=topic_name or '',
            CHAR_SERIES=series_title,
@@ -477,7 +479,8 @@ subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))
 P = 60.0 / plan['tempo']
-hook_at = (17 - 9) * P                                                # the first drop inside the AMV part
+amv_dur = duration(amv)
+hook_at = min(max(0.0, amv_dur - HOOK - 0.7), 16 * P)                 # cold open from mid-fight, so the drop itself stays fresh
 name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_convo_' + plan['song']
 # the same song plays quietly under the conversation and runs straight into the edit at full volume
 BED_VOL = float(os.environ.get('BED_VOL', '0.22'))
@@ -493,7 +496,11 @@ def _busy_part(path, length):                                        # the stead
         return 0.0
     score = [np.percentile(r[i:i + n], 15) for i in range(0, len(r) - n)]
     return float(np.argmax(score)) / 2
-bed_ss = _busy_part(song_file, CONV + 0.5)                          # a full-energy part of the song, never a silent stretch
+drop_at = float(plan.get('drop_t', plan['song_start']))
+bed_ss = drop_at - CONV                                              # the bed is the lead-in, so the talk ends exactly on the drop
+if bed_ss < 0:
+    bed_ss = _busy_part(song_file, CONV + 0.5)                       # song too short before its drop: old behaviour
+    print('song has no room before the drop, bed from its busiest part', flush=True)
 print(f'song bed from {bed_ss:.1f}s', flush=True)
 fc = (
     f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
