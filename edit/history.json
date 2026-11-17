@@ -9,7 +9,7 @@
   "mvsterious_slava_funk": 2,
   "glxxmstrider_dont_stop_slowed": 2,
   "dygo_funk_infernal": 2,
-  "rubikdice_montagem_pegadora_slowed": 1,
+  "rubikdice_montagem_pegadora_slowed": 2,
   "zxvren_montagem_delirio_slowed": 2,
   "lonown_avangard_phonk": 2,
   "ashreveal_manasha_phonk": 1,
@@ -20,15 +20,15 @@
   "nxxkz_loucura_letal_funk_slowed": 2
  },
  "episodes": {
-  "jujutsu-kaisen:S2E01": 1,
+  "jujutsu-kaisen:S2E01": 2,
   "jujutsu-kaisen:S2E03": 1,
   "jujutsu-kaisen:S2E10": 1,
-  "jujutsu-kaisen:S1E07": 3,
+  "jujutsu-kaisen:S1E07": 4,
   "jujutsu-kaisen:S1E20": 3,
   "jujutsu-kaisen:S2E02": 1,
-  "jujutsu-kaisen:S2E04": 1,
+  "jujutsu-kaisen:S2E04": 2,
   "jujutsu-kaisen:S2E05": 1,
-  "jujutsu-kaisen:S2E09": 1,
+  "jujutsu-kaisen:S2E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S3E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E03": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -6163,6 +6163,118 @@
   {
    "ep": "jujutsu-kaisen:S1E21",
    "s": 884.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 361.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 463.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 464.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1028.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 975.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 996.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1035.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1038.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1056.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1032.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 369.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 510.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 364.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 365.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 368.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1034.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1037.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1055.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 994.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 995.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 997.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 998.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1026.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1027.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1028.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1030.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1031.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 366.733
   }
  ],
  "runs": [
@@ -6511,6 +6623,19 @@
     "jujutsu-kaisen:S1E07",
     "jujutsu-kaisen:S1E20",
     "jujutsu-kaisen:S1E21"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-17 18:20 UTC",
+   "pick": "gojo",
+   "series": "jujutsu-kaisen",
+   "song": "rubikdice_montagem_pegadora_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E07",
+    "jujutsu-kaisen:S2E01",
+    "jujutsu-kaisen:S2E04",
+    "jujutsu-kaisen:S2E09"
    ],
    "file": "_amv_part.mp4"
   }
@@ -6994,10 +7119,20 @@
     1281.0,
     1421.6
    ]
+  ],
+  "jujutsu-kaisen:S2E01": [
+   [
+    654.2,
+    740.6
+   ],
+   [
+    1323.1,
+    1422.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 17,
+  "jujutsu-kaisen": 18,
   "demon-slayer-kimetsu-no-yaiba": 15
  },
  "known": [
@@ -7348,6 +7483,13 @@
    "e": 430.0,
    "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
    "time": "2026-11-17 15:22 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E01",
+   "s": 600.0,
+   "e": 609.3,
+   "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
+   "time": "2026-11-17 18:21 UTC"
   }
  ],
  "styles": [
@@ -7380,6 +7522,12 @@
    "ep": "jujutsu-kaisen:S1E21",
    "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
    "time": "2026-11-17 15:22 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "jujutsu-kaisen:S2E01",
+   "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
+   "time": "2026-11-17 18:21 UTC"
   }
  ],
  "narr_chars": {
