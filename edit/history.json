@@ -15,7 +15,7 @@
   "ashreveal_manasha_phonk": 1,
   "trashxrl_deus_do_olimpo": 1,
   "atlxs_passo_bem_solto_slowed": 2,
-  "poker_face": 1,
+  "poker_face": 2,
   "ncts_next_phonk": 2,
   "nxxkz_loucura_letal_funk_slowed": 2
  },
@@ -67,7 +67,8 @@
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 1,
   "jujutsu-kaisen:S3E08": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E17": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E17": 1,
+  "demon-slayer-kimetsu-no-yaiba:S2E04": 1
  },
  "shots": [
   {
@@ -5745,6 +5746,142 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
    "s": 1115.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 926.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 929.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 933.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 937.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 940.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 941.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 944.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 947.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 948.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 949.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 952.775
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 956.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 959.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 962.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 964.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 966.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 969.192
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 972.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 975.816
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 978.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 979.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 980.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 982.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 984.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 985.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 986.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 987.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 989.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 991.441
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 995.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 996.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 997.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 1002.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 1005.875
   }
  ],
  "runs": [
@@ -6067,6 +6204,16 @@
    "song": "glxxmstrider_dont_stop_slowed",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-17 06:28 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "poker_face",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S2E04"
    ],
    "file": "_amv_part.mp4"
   }
@@ -6514,11 +6661,25 @@
     1306.7,
     1372.8
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S2E04": [
+   [
+    -4.0,
+    59.9
+   ],
+   [
+    114.5,
+    222.2
+   ],
+   [
+    1286.0,
+    1385.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 15,
-  "demon-slayer-kimetsu-no-yaiba": 15
+  "demon-slayer-kimetsu-no-yaiba": 16
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -6854,6 +7015,13 @@
    "e": 969.1666666666666,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
    "time": "2026-11-16 22:29 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 173.83333333333334,
+   "e": 201.26666666666668,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_poker_face.mp4",
+   "time": "2026-11-17 06:28 UTC"
   }
  ],
  "styles": [
@@ -6874,6 +7042,12 @@
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
    "time": "2026-11-16 22:29 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_poker_face.mp4",
+   "time": "2026-11-17 06:28 UTC"
   }
  ],
  "narr_chars": {
