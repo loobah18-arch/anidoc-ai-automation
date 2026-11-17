@@ -1,0 +1,87 @@
+{
+ "_doc": "Hand-checked fight windows (seconds into each episode) per character slug. The drop edit takes its shots ONLY from these when the character has any; characters without an entry get fight windows detected automatically (sustained high-impact stretches the character is in). gojo = the shot list of Gojo_AMV_Funk_Infernal_v2 (gojo-amv-exact/edit/shots.json).",
+ "gojo": {
+  "jujutsu-kaisen:S1E07": [
+   [
+    79.0,
+    101.0
+   ],
+   [
+    304.0,
+    326.0
+   ],
+   [
+    349.2,
+    401.0
+   ],
+   [
+    454.0,
+    476.0
+   ],
+   [
+    834.0,
+    951.0
+   ],
+   [
+    1009.0,
+    1041.0
+   ],
+   [
+    1074.0,
+    1096.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E04": [
+   [
+    79.0,
+    101.0
+   ],
+   [
+    154.0,
+    176.0
+   ],
+   [
+    799.0,
+    851.0
+   ],
+   [
+    964.0,
+    1156.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E09": [
+   [
+    174.0,
+    231.0
+   ],
+   [
+    354.0,
+    381.0
+   ],
+   [
+    499.0,
+    521.0
+   ],
+   [
+    784.0,
+    901.0
+   ],
+   [
+    984.0,
+    1031.0
+   ],
+   [
+    1074.0,
+    1136.0
+   ],
+   [
+    1159.0,
+    1196.0
+   ],
+   [
+    1294.0,
+    1316.0
+   ]
+  ]
+ }
+}

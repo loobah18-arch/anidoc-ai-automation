@@ -453,7 +453,14 @@ except Exception:
 
 # Fetch up to 3 distinct fight episodes for this character from characters.json
 fight_eps = [e for e in chars.get(topic_slug, []) if e in EPISODES] if topic_slug else []
+try:                                                                  # hand-checked fight windows first, when this character has them
+    _fw = json.load(open('fight_windows.json')).get(topic_slug or '', {})
+    _fw = [e if ':' in e else f'jujutsu-kaisen:{e}' for e in _fw]
+    fight_eps = [e for e in _fw if e in EPISODES] + [e for e in fight_eps if e not in _fw]
+except Exception as ex:
+    print('fight_windows.json skipped:', ex, flush=True)
 amv_eps = list(dict.fromkeys([conv_ep] + fight_eps[:3])) if fight_eps else [conv_ep]
+print('fight episodes for the edit:', amv_eps, flush=True)
 for ep_code in amv_eps:
     try:
         fetch(ep_code)
@@ -470,6 +477,7 @@ env = dict(os.environ,
            MIN_SONG_START=f'{CONV + 0.6:.2f}',                      # room before the drop for the song bed under the talk
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
            CHAR_NAME=topic_name or '',
+           CHAR_SLUG=topic_slug or '',
            CHAR_SERIES=series_title,
            CHAR_ACT_MIN='0.0',
            CHAR_REL_MIN='0.04',

@@ -352,11 +352,50 @@ def _char_filter(pool):
 purity_pct = IMPACT_PCT if DROP_STYLE else None
 
 
+def _curated_windows():
+    """Hand-checked fight windows for this character (fight_windows.json), keyed by full episode code."""
+    try:
+        fw = json.load(open('fight_windows.json'))
+    except Exception:
+        return {}
+    slug = os.environ.get('CHAR_SLUG', '').strip().lower()
+    return {_k(e): [tuple(w) for w in v] for e, v in fw.get(slug, {}).items()} if slug else {}
+
+
+def _auto_fight_windows(full_pool, anchors, rel_of):
+    """Any anime, any character: a fight is a sustained stretch of high-impact shots (hot shots no more than 4 s apart,
+    10 s+ long). It is this character's fight when clear-identity shots sit inside it and, on balance, the stretch
+    does not read as someone else."""
+    win = {}
+    for ep in sorted({s['ep'] for s in full_pool}):
+        sh_ = sorted((s for s in full_pool if s['ep'] == ep), key=lambda s: s['s'])
+        if len(sh_) < 8:
+            continue
+        hot_gate = float(np.percentile([s['impact'] for s in sh_], 60))
+        segs, cur = [], None
+        for s in sh_:
+            if s['impact'] < hot_gate:
+                continue
+            if cur and s['s'] - cur[1] <= 4.0:
+                cur[1] = s['e']; cur[2] += 1
+            else:
+                cur = [s['s'], s['e'], 1]; segs.append(cur)
+        for a, b, k in segs:
+            if b - a < 10.0 or k < 4:
+                continue
+            inside = lambda s: s['ep'] == ep and a - 0.5 <= s['s'] and s['e'] <= b + 0.5
+            n_anchor = sum(1 for s in anchors if inside(s))
+            rels = [r for s, r in rel_of if inside(s)]
+            if n_anchor >= 2 or (n_anchor >= 1 and rels and float(np.mean(rels)) >= 0.0):
+                win.setdefault(ep, []).append((a - 1.0, b + 1.0))
+    return win
+
+
 def _drop_char_pool(full_pool):
-    """Character purity for the drop edit. CLIP identity on single frames is too weak to fill a 1-cut-per-beat edit
-    (a masked / blindfolded / mid-attack face rarely matches a still), so: shots that clearly ARE the character anchor
-    their fight; every high-impact shot within 20 s of an anchor in that episode is kept unless it clearly shows someone
-    else (opponent solo, other characters) or reads as calm (talking, idle, crowd). Impact >= p85 always."""
+    """Character purity for the drop edit, for any anime and any character. Shots come ONLY from the character's
+    fights: hand-checked windows (fight_windows.json) when the character has them, else fight stretches detected
+    automatically. Inside a fight a shot still goes if it clearly shows someone else (opponent solo, other characters),
+    reads as calm (talking, idle, crowd) or is too dark to read. Impact >= p85 first."""
     global purity_pct
     import charvis
     if not _PROMPTS_ADDED:
@@ -366,12 +405,17 @@ def _drop_char_pool(full_pool):
                            'an anime character dashing through the air mid-attack with speed lines']
         charvis.CALM += ['a crowd of anime characters watching and reacting in shock',
                          'an anime close-up of a character talking with a still face',
-                         'anime characters standing around in conversation']
+                         'anime characters standing around in conversation',
+                         'anime students playing baseball on a sports field',
+                         'a comedic chibi anime reaction with blushing cheeks']
     cv_ = charvis.get(CHAR_NAME, os.environ.get('CHAR_SERIES', ''))
     if cv_ is None:
         raise RuntimeError('charvis unavailable')
     imp = [s['impact'] for s in full_pool]
-    cands = [s for s in full_pool if s['impact'] >= np.percentile(imp, 55)]
+    curated = {e: w for e, w in _curated_windows().items() if any(s['ep'] == e for s in full_pool)}
+    in_win = lambda s, win: any(a <= s['s'] and s['e'] <= b for a, b in win.get(s['ep'], []))
+    lo_imp = float(np.percentile(imp, 55))
+    cands = [s for s in full_pool if (in_win(s, curated) if curated else s['impact'] >= lo_imp)]
     res = cv_.score([(SRC(s['ep']), (s['s'] + s['e']) / 2) for s in cands])
     cands = [dict(s, rel=r['rel'], char=r['char'], action=r['action']) for s, r in zip(cands, res) if r]
     Az = z([s['action'] for s in cands]); Cz = z([s['char'] for s in cands])
@@ -379,16 +423,21 @@ def _drop_char_pool(full_pool):
         s['act_z'], s['char_z'] = float(Az[i]), float(Cz[i])
     REL_MIN = float(os.environ.get('CHAR_REL_MIN', 0.04))
     anchors = [s for s in cands if s['rel'] >= REL_MIN]
-    win = {}
-    for s in anchors:
-        win.setdefault(s['ep'], []).append((s['s'] - 20, s['e'] + 20))
-    print(f'drop style: {len(anchors)} anchor shots clearly {CHAR_NAME}, fight windows per episode:',
-          {e: len(v) for e, v in win.items()}, flush=True)
-    inside = lambda s: any(a <= s['s'] and s['e'] <= b for a, b in win.get(s['ep'], []))
-    pure = [s for s in cands if inside(s) and s['rel'] >= -0.02 and s['act_z'] >= -0.25]   # not someone else, not calm
+    if curated:
+        win, how = curated, 'hand-checked'
+    else:
+        win, how = _auto_fight_windows(full_pool, anchors, [(s, s['rel']) for s in cands]), 'detected'
+        if not win:                                                   # nothing reads as a fight: stay close to the anchors
+            for s in anchors:
+                win.setdefault(s['ep'], []).append((s['s'] - 12, s['e'] + 12))
+            how = 'anchor +-12 s (no fight stretch detected)'
+    print(f'drop style: {len(anchors)} anchor shots clearly {CHAR_NAME}; {how} fight windows:',
+          {e: [(round(a), round(b)) for a, b in v] for e, v in win.items()}, flush=True)
+    BRIGHT_MIN = float(os.environ.get('DROP_BRIGHT_MIN', 32))
+    pure = [s for s in cands if in_win(s, win) and s['rel'] >= -0.02 and s['act_z'] >= -0.25 and s['bright'] >= BRIGHT_MIN]
     need = int(os.environ.get('DROP_MIN_SHOTS', 30))
-    for pct in (IMPACT_PCT, 75.0, 65.0):
-        gate = float(np.percentile(imp, pct))
+    for pct in (IMPACT_PCT, 75.0, 65.0, 50.0):
+        gate = float(np.percentile([s['impact'] for s in cands] if curated else imp, pct))
         keep = [s for s in pure if s['impact'] >= gate]
         print(f'drop style: p{pct:.0f} gate {gate:.3f}: {len(keep)} pure {CHAR_NAME} combat shots', flush=True)
         if len(keep) >= need:
@@ -574,6 +623,26 @@ if len(assign) < n:                                                   # small po
         if got is not None:
             assign[i] = got; on.setdefault(got['ep'], []).append(shown(got, d))
     miss = [x for x in range(n) if x not in assign]
+    if miss and DROP_STYLE:                                           # 3. drop edit: hold the pace, never a long static cut
+        # 1 cut per beat for as long as the shots allow, then half-time (2 beats per cut) so no cut ever runs past
+        # ~1 s; with very few shots the holds spread evenly over the whole edit instead
+        shots_ = [assign[i] for i in sorted(assign)]
+        m = len(shots_)
+        b0, b1 = tmpl[0][0], tmpl[-1][1]
+        total = b1 - b0
+        if 2 * m >= total:
+            lens = [1] * (2 * m - total) + [2] * (total - m)
+        else:
+            q, r_ = divmod(total, m)
+            lens = [q + (1 if j < r_ else 0) for j in range(m)]
+        new_t, t0 = [], b0
+        for L in lens:
+            new_t.append((t0, t0 + L)); t0 += L
+        print(f'drop style: {m} shots for {total} beats -> {lens.count(1)} single-beat cuts, then holds of '
+              f'{max(lens)} beats (no merge into long cuts)', flush=True)
+        tmpl = new_t; assign = {i: s for i, s in enumerate(shots_)}; n = len(tmpl)
+        second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
+        miss = []
     if miss:                                                          # 3. still short: let the previous cut run longer instead
         print('merging', len(miss), 'beats into the cut before them', flush=True)
         keep = [i for i in range(n) if i in assign]
@@ -587,6 +656,9 @@ if len(assign) < n:                                                   # small po
         second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 if len(assign) < n:
     sys.exit(f'not enough shots ({len(assign)}/{n})')
+if DROP_STYLE and n > 2:                                              # end on the finisher, not on whatever came last
+    fin = max(range(1, n), key=lambda i: assign[i]['impact'])
+    assign[fin], assign[n - 1] = assign[n - 1], assign[fin]
 impact_cut = np.percentile([s['impact'] for s in pool], 85)
 
 # ---------------------------------------------------------------- 7. render
