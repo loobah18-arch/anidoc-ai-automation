@@ -404,27 +404,85 @@ try:
         s['calm'] += 2.5 if big > 0.04 else (1.2 if big > 0 else -0.5)
 except Exception as ex:
     print('face check skipped', ex, flush=True)
-take(pre + build2, 'calm', 0.8)                                      # build-ups: steady, readable shots
-heroes = [next(i for i, (a, b) in enumerate(tmpl) if a == DROP_BEAT)]
-if second_drop is not None:
-    heroes.append(second_drop)
-take(heroes, 'impact', 0.5)                                          # the two drops: hardest hits
-rest = [i for i in range(n) if i not in assign]
-k = len(rest)
-top = sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact'])[:k]
-if os.environ.get('BALANCE_EPS') == '1' and len({s['ep'] for s in pool}) > 1:   # multi-fight edit: spread the cuts over every episode
-    by_ep = {}
-    for s in sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact']):
-        by_ep.setdefault(s['ep'], []).append(s)
-    top, qs = [], list(by_ep.values())
-    while len(top) < k and any(qs):
-        for q in qs:
-            if q and len(top) < k:
-                top.append(q.pop(0))
-    print('balanced cuts per episode:', {e: sum(t['ep'] == e for t in top) for e in by_ep}, flush=True)
-top.sort(key=lambda s: (s['ep'], s['s']))                            # story order through the fights
-for i, s in zip(rest, top):
-    assign[i] = s; taken.add(id(s))
+SELECT = os.environ.get('SELECT', 'story').strip().lower()          # story = cut like the Gojo AMV v2: one fight played in order
+SCENE_GAP = float(os.environ.get('SCENE_GAP', 6.0))
+
+
+def story_assign():
+    """Gojo-v2 scene selection: group the shots into fights (same episode, close in time), take the
+    strongest fight, lead in with the shots just before its hardest hit, land that hit on the drop,
+    then let the fight play out in order and continue into the next strongest fights in story order."""
+    shots = sorted(pool, key=lambda s: (s['ep'], s['s']))
+    scenes, cur = [], []
+    for s in shots:
+        if cur and (s['ep'] != cur[-1]['ep'] or s['s'] - cur[-1]['e'] > SCENE_GAP):
+            scenes.append(cur); cur = []
+        cur.append(s)
+    if cur:
+        scenes.append(cur)
+    scenes = [sc for sc in scenes if len(sc) >= 3]
+    d_i = next(i for i, (a, b) in enumerate(tmpl) if a == DROP_BEAT)
+    pre_i, post_i = list(range(d_i)), list(range(d_i, n))
+    score = lambda sc: sum(sorted((x['impact'] for x in sc), reverse=True)[:5])
+    chosen, cnt = [], 0
+    for sc in sorted(scenes, key=score, reverse=True):
+        chosen.append(sc); cnt += len(sc)
+        if cnt >= n + 4:
+            break
+    if cnt < len(post_i):
+        print(f'story select: only {cnt} fight shots for {len(post_i)} hits, using impact picks', flush=True)
+        return False
+    main = chosen[0]
+    head = main[:max(1, int(len(main) * 0.6))]
+    k0 = main.index(max(head, key=lambda s: s['impact']))
+    lead, after = main[:k0], main[k0:]
+    for sc in sorted(chosen[1:], key=lambda sc: (sc[0]['ep'], sc[0]['s'])):
+        after += sc
+    if len(after) > len(post_i):                                       # too many: drop the weakest, keep the order
+        keep = {id(x) for x in sorted(after[1:], key=lambda s: -s['impact'])[:len(post_i) - 1]}
+        after = [after[0]] + [x for x in after[1:] if id(x) in keep]
+    elif len(after) < len(post_i):                                     # the lead-in shots join the fight instead
+        need = len(post_i) - len(after)
+        after = lead[-need:] + after if need <= len(lead) else lead + after
+        lead = lead[:-need] if need < len(lead) else []
+    used = {id(x) for x in after}
+    build = lead[-len(pre_i):] if pre_i else []
+    if len(build) < len(pre_i):                                        # not enough lead-in: open on the calmest shots
+        extra = sorted((s for s in pool if id(s) not in used and all(id(s) != id(b) for b in build)),
+                       key=lambda s: -s['calm'])[:len(pre_i) - len(build)]
+        build = sorted(extra, key=lambda s: (s['ep'], s['s'])) + build
+    for i, s in zip(pre_i, build):
+        assign[i] = s; taken.add(id(s))
+    for i, s in zip(post_i, after):
+        assign[i] = s; taken.add(id(s))
+    print(f'story select: main fight {main[0]["ep"]} {main[0]["s"]:.0f}-{main[-1]["e"]:.0f}s ({len(main)} shots), '
+          f'{len(chosen)} fights, drop on {after[0]["ep"]} {after[0]["s"]:.1f}s, filled {len(assign)}/{n}', flush=True)
+    return True
+
+
+if not (SELECT == 'story' and story_assign()):
+    assign.clear(); taken.clear()
+    take(pre + build2, 'calm', 0.8)                                  # build-ups: steady, readable shots
+    heroes = [next(i for i, (a, b) in enumerate(tmpl) if a == DROP_BEAT)]
+    if second_drop is not None:
+        heroes.append(second_drop)
+    take(heroes, 'impact', 0.5)                                          # the two drops: hardest hits
+    rest = [i for i in range(n) if i not in assign]
+    k = len(rest)
+    top = sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact'])[:k]
+    if os.environ.get('BALANCE_EPS') == '1' and len({s['ep'] for s in pool}) > 1:   # multi-fight edit: spread the cuts over every episode
+        by_ep = {}
+        for s in sorted((s for s in pool if id(s) not in taken), key=lambda s: -s['impact']):
+            by_ep.setdefault(s['ep'], []).append(s)
+        top, qs = [], list(by_ep.values())
+        while len(top) < k and any(qs):
+            for q in qs:
+                if q and len(top) < k:
+                    top.append(q.pop(0))
+        print('balanced cuts per episode:', {e: sum(t['ep'] == e for t in top) for e in by_ep}, flush=True)
+    top.sort(key=lambda s: (s['ep'], s['s']))                            # story order through the fights
+    for i, s in zip(rest, top):
+        assign[i] = s; taken.add(id(s))
 if len(assign) < n:                                                   # small pool: never show the same footage twice
     print(f'pool short ({len(assign)}/{n}), filling without repeats', flush=True)
     sd = lambda i: (tmpl[i][1] - tmpl[i][0]) * P
