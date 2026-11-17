@@ -660,6 +660,15 @@ if len(assign) < n:                                                   # small po
         second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 if len(assign) < n:
     sys.exit(f'not enough shots ({len(assign)}/{n})')
+if DROP_STYLE and n > 3:                                              # pieces of one long shot never sit side by side (reads as a frozen hold)
+    near_ = lambda x, y: x['ep'] == y['ep'] and x['s'] < y['e'] + 6 and y['s'] < x['e'] + 6
+    for i in range(2, n):
+        if near_(assign[i], assign[i - 1]):
+            for j in list(range(i + 1, n)) + list(range(1, i - 1)):
+                cand_, nb = assign[j], [assign[i - 1]] + ([assign[i + 1]] if i + 1 < n else [])
+                nbj = [assign[x] for x in (j - 1, j + 1) if 0 <= x < n and x != i]
+                if not any(near_(cand_, y) for y in nb) and not any(near_(assign[i], y) for y in nbj):
+                    assign[i], assign[j] = assign[j], assign[i]; break
 if DROP_STYLE and n > 2:                                              # end on the finisher, not on whatever came last
     fin = max(range(1, n), key=lambda i: assign[i]['impact'])
     assign[fin], assign[n - 1] = assign[n - 1], assign[fin]
