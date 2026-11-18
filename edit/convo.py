@@ -86,18 +86,109 @@ def motion(src):
     sat = f.max(axis=3) - f.min(axis=3)                                 # glowing auras / power effects are bright and saturated
     glow = ((sat > 90) & (f.max(axis=3) > 170)).mean(axis=(1, 2)) * 40
     n = len(mot) // SF
+    THUMBS[src] = g[:n * SF:SF].reshape(n, 9, 4, 16, 4).mean(axis=(2, 4)).reshape(n, -1)   # one 16x9 picture per second
     return np.array([mot[i * SF:(i + 1) * SF].mean() + glow[i * SF:(i + 1) * SF].mean() for i in range(n)])
+
+
+# ------------------------------------------------------------------ 1b. opening / ending songs: never talk inside them
+# (Gojo run 44242818226 took S2E03 231-259 s, inside the opening at 186-273 s). Known ranges come from history
+# (auto.py's detection); new episodes are matched picture-by-picture against an episode with the same opening.
+THUMBS = {}
+SONG_PAD = 3.0
+
+
+def op_group(code):                                                   # same rule as auto.py
+    v = EPISODES[code]; se, ep = v['season'], v['ep']
+    if v['series'] == 'jujutsu-kaisen' and se == 2:
+        return (v['series'], se, 0 if ep <= 5 else 1)
+    return (v['series'], se, (ep - 1) // 13)
+
+
+def _norm_ranges(w):
+    if not w:
+        return []
+    if not isinstance(w[0], (list, tuple)):
+        w = [w]
+    return [(float(a), float(b)) for a, b in w]
+
+
+def _shared_runs(a, b):
+    """stretches of episode a whose pictures also appear in episode b (opening, ending, recap)"""
+    A, B = THUMBS.get(SRC(a)), THUMBS.get(SRC(b))
+    if A is None or B is None:
+        return []
+    Bv = B[B.std(axis=1) > 10]                                       # flat / black seconds match anything
+    if not len(Bv):
+        return []
+    hits = [t for t in np.where(A.std(axis=1) > 10)[0] if np.abs(Bv - A[t]).mean(axis=1).min() < 5]
+    runs, grp = [], []
+    for h in hits + [10 ** 9]:
+        if grp and h - grp[-1] > 8:
+            if len(grp) >= 12 and grp[-1] - grp[0] >= 20:
+                runs.append([round(float(grp[0]) - 4.0, 1), round(float(grp[-1]) + 5.0, 1)])
+            grp = []
+        grp.append(h)
+    return runs
+
+
+def song_ranges(ep):
+    """opening / ending ranges of an episode (seconds), from history or detected now and remembered"""
+    known = _norm_ranges(hist.get('openings2', {}).get(ep))
+    if known:
+        return known
+    peers = [o for o in eps if o != ep and SRC(o) in THUMBS and op_group(o) == op_group(ep)]
+    if not peers:
+        sib = sorted((o for o in EPISODES if o != ep and op_group(o) == op_group(ep)),
+                     key=lambda o: abs(EPISODES[o]['ep'] - EPISODES[ep]['ep']))[:1]
+        for o in sib:
+            try:
+                fetch(o); motion(SRC(o)); peers.append(o)
+            except BaseException as ex:                               # a missing sibling must not kill the run
+                print('opening reference failed', o, ex, flush=True)
+    found = []
+    for o in peers:
+        found += _shared_runs(ep, o)
+    found = sorted(found)
+    merged = []
+    for a, b in found:
+        if merged and a <= merged[-1][1] + 5:
+            merged[-1][1] = max(merged[-1][1], b)
+        else:
+            merged.append([a, b])
+    if peers:
+        print(ep, 'opening/ending (matched against', peers[0] + ')', merged, flush=True)
+    if merged:
+        try:                                                          # auto.py reads the same cache
+            h_ = json.load(open('history.json'))
+            h_.setdefault('openings2', {})[ep] = merged
+            json.dump(h_, open('history.json', 'w'), indent=1)
+            hist.setdefault('openings2', {})[ep] = merged
+        except Exception as ex:
+            print('could not cache opening', ex, flush=True)
+    return [tuple(r) for r in merged]
+
+
+def song_mask(ep, dur_):
+    m = np.zeros(int(dur_) + 2, bool)
+    for a, b in song_ranges(ep):
+        m[max(0, int(a - SONG_PAD)):max(0, int(b + SONG_PAD) + 1)] = True
+    return m
 
 # ------------------------------------------------------------------ 2. pick the episode with the biggest fight, find it
 FW = 90
 best_all = None
+motions = {}
 for ep in eps:
     fetch(ep)
-    d_ = duration(SRC(ep)); ps = motion(SRC(ep))
+    motions[ep] = (duration(SRC(ep)), motion(SRC(ep)))
+SONGS = {}
+for ep in eps:
+    d_, ps = motions[ep]
+    SONGS[ep] = song_mask(ep, d_)
     lo_, hi_ = 150, int(d_) - 150                                        # skip openings and the ending/preview
     prev = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == ep]
     for t in range(lo_, hi_ - FW, 5):
-        if any(a_ - FW < t < b_ for a_, b_ in prev):
+        if any(a_ - FW < t < b_ for a_, b_ in prev) or SONGS[ep][t:t + FW].mean() > 0.2:
             continue
         v = ps[t:t + FW].mean()
         if best_all is None or v > best_all[0]:
@@ -115,14 +206,34 @@ sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(lo), '-t', str(hi - lo
 _scan = WhisperModel('small', device='cpu', compute_type='int8')
 _ss, _ = _scan.transcribe(_sf.read('work/convo/full.wav', dtype='float32')[0], beam_size=1, vad_filter=True)
 speech = np.zeros(int(dur) + 1)
+SONG = SONGS[conv_ep]
+_ss = list(_ss)
+_key = lambda t_: re.sub(r'[\W_]+', '', (t_ or '').lower())          # letters only (kana / kanji kept)
+_seen = {}
+for sg in _ss:
+    if len(_key(sg.text)) >= 10:
+        _seen[_key(sg.text)] = _seen.get(_key(sg.text), 0) + 1
+sung = []                                                             # lyrics: music notes, or a long line heard twice (a chorus)
+for sg in _ss:
+    if any(c in (sg.text or '') for c in '♪♫🎵') or _seen.get(_key(sg.text), 0) >= 2:
+        sung.append((lo + sg.start, lo + sg.end))
+for a_, b_ in sung:
+    SONG[max(0, int(a_) - 2):int(b_) + 3] = True
+for k_ in range(len(sung) - 2):                                       # three sung lines within 40 s: a song, block all of it
+    if sung[k_ + 2][1] - sung[k_][0] <= 40:
+        SONG[max(0, int(sung[k_][0]) - 2):int(sung[k_ + 2][1]) + 3] = True
+if sung:
+    print(f'singing / lyric segments in {conv_ep}: {len(sung)}', flush=True)
+print(f'{conv_ep} song seconds excluded from the talk: {int(SONG.sum())}', flush=True)
 for sg in _ss:
     if len((sg.text or '').split()) >= 3 and sg.avg_logprob > -1.0 and sg.no_speech_prob < 0.6:
         speech[int(lo + sg.start):int(lo + sg.end) + 1] = 1
+speech[SONG[:len(speech)]] = 0
 SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
 prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
 bs, bt = -1, fight
 for t in range(lo, hi - 40, 2):
-    if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP):
+    if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP) or SONG[max(0, t - 2):t + 27].any():
         continue
     talk = speech[t:t + 24].mean()
     if talk < 0.45:
@@ -171,6 +282,7 @@ for sg in segs:
         wts = np.cumsum([0] + [len(t) + 2 for t in toks]); wts = wts / wts[-1]
         for k, t in enumerate(toks):
             words.append(dict(w=t, s=win0 + a0 + (a1 - a0) * wts[k], e=win0 + a0 + (a1 - a0) * wts[k + 1], seg=id(sg)))
+words = [w for w in words if not SONG[min(len(SONG) - 1, int(w['s']))] and not SONG[min(len(SONG) - 1, int(w['e']))]]
 if len(words) < 12:
     if len(SKIP) >= 4:
         raise SystemExit('not enough dialogue in the fight')
@@ -190,6 +302,8 @@ for i in starts:
         done = words[j]['w'][-1:] in '.?!' and (j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.7)
         if L < CMIN or not done:
             continue
+        if SONG[max(0, int(words[i]['s'] - 0.35)):int(words[j]['e'] + 0.8) + 1].any():   # never across an opening/ending
+            continue
         talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
         act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref    # action on screen while they talk
         score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3)
@@ -204,6 +318,12 @@ cw = words[pick[0]:pick[1] + 1]
 c0 = max(win0, cw[0]['s'] - 0.35); c1 = min(win1, cw[-1]['e'] + 0.8)
 c0 = round(c0 * FPS) / FPS; c1 = round(c1 * FPS) / FPS
 CONV = c1 - c0
+if SONG[max(0, int(c0)):int(c1) + 1].any():                           # fallback stretch touched an opening/ending: next moment
+    if len(SKIP) >= 4:
+        raise SystemExit('every conversation candidate sits in an opening/ending song')
+    print(f'conversation {c0:.1f}-{c1:.1f}s touches an opening/ending, trying the next fight moment', flush=True)
+    os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 if CONV < CMIN * 0.6:                                                 # too thin to be a conversation: next fight moment
     if len(SKIP) >= 4:
         raise SystemExit('no real conversation found in the fights')
