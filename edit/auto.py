@@ -523,12 +523,13 @@ def _drop_char_pool(full_pool):
     BRIGHT_MIN = float(os.environ.get('DROP_BRIGHT_MIN', 32))
     NC_MAX = float(os.environ.get('DROP_NONCOMBAT_MAX', NONCOMBAT_MAX))
     AUTO_REL = float(os.environ.get('DROP_AUTO_REL_MIN', 0.02))
+    CUR_REL = float(os.environ.get('DROP_CURATED_REL_MIN', -0.035))   # -0.05 let Toji / Jogo close-ups in (rel -0.04..-0.05)
     noncombat = [s for s in cands if in_win(s, win) and s['noncombat'] > NC_MAX]   # crowd / costume / title card / empty sky,
     if noncombat:                                                     # even inside a hand-checked window
         print(f'drop style: {len(noncombat)} non-combat shots out of the fight windows (crowd, title card, scenery):',
               [(s_['ep'].split(':')[-1], round(s_['s'])) for s_ in noncombat[:12]], flush=True)
     if curated:                                                       # hand-checked fights: only drop a clear opponent solo / dark shot
-        pure = [s for s in cands if in_win(s, win) and s['rel'] >= -0.05 and s['bright'] >= BRIGHT_MIN and s['noncombat'] <= NC_MAX]
+        pure = [s for s in cands if in_win(s, win) and s['rel'] >= CUR_REL and s['bright'] >= BRIGHT_MIN and s['noncombat'] <= NC_MAX]
     else:                                                             # detected fights: the character must clearly be the one on screen
         pure = [s for s in cands if in_win(s, win) and s['rel'] >= AUTO_REL and s['act_z'] >= -0.25 and s['bright'] >= BRIGHT_MIN
                 and s['noncombat'] <= NC_MAX]
@@ -704,11 +705,18 @@ if len(assign) < n:                                                   # small po
         return None
     near = sorted((s for s in ep_all if id(s) not in taken and all(id(s) != id(p) for p in pool)),
                   key=lambda s: abs((s['s'] + s['e']) / 2 - (float(INCLUDE.rsplit('|', 2)[1]) if INCLUDE else s['s'])))
+    MAX_USES = int(os.environ.get('DROP_MAX_USES', 2)) if DROP_STYLE else 99   # one shot shows up at most twice (Gojo run
+    uses = {}                                                         # 44315756019: a Toji close-up and one silhouette 5 times each)
+    for s in assign.values():
+        uses[(s['ep'], s['s'])] = uses.get((s['ep'], s['s']), 0) + 1
     for i in [x for x in range(n) if x not in assign]:
         d = sd(i); got = None
         for s in sorted(pool, key=lambda s: -s['impact']):            # 1. same fight, an unseen part of a long shot
+            if uses.get((s['ep'], s['s']), 0) >= MAX_USES:
+                continue
             got = unused_piece(s, d)
             if got:
+                uses[(s['ep'], s['s'])] = uses.get((s['ep'], s['s']), 0) + 1
                 break
         if got is None and not CHAR_NAME and not DROP_STYLE:                             # 2. the nearest unused shot (never with a topic: it may be someone else)
             for s in near:
@@ -754,9 +762,9 @@ if len(assign) < n:                                                   # small po
         second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 if len(assign) < n:
     sys.exit(f'not enough shots ({len(assign)}/{n})')
-if DROP_STYLE and n > 3:                                              # pieces of one long shot never sit within 4 cuts of each other
+if DROP_STYLE and n > 3:                                              # pieces of one long shot never sit within 8 cuts of each other
     near_ = lambda x, y: x['ep'] == y['ep'] and x['s'] < y['e'] + 6 and y['s'] < x['e'] + 6   # (reads as a frozen hold / a repeat)
-    SPACE = int(os.environ.get('DROP_REPEAT_SPACE', 4))
+    SPACE = int(os.environ.get('DROP_REPEAT_SPACE', 8))
     clash = lambda shot, pos, skip: any(near_(shot, assign[x]) for x in range(pos - SPACE, pos + SPACE + 1)
                                         if 0 <= x < n and x != pos and x not in skip)
     for i in range(2, n):
