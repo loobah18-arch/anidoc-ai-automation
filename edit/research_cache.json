@@ -1,0 +1,1907 @@
+{
+ "_doc": "Researched fight episodes per series and character (research.py). Sources: Jikan/MyAnimeList, AniList, the Fandom wiki battles + episode plots. Refreshed only when new episodes appear in the Drive folder.",
+ "jujutsu-kaisen": {
+  "updated": "2026-11-18 05:01 UTC",
+  "sources": [
+   "anilist",
+   "jujutsu-kaisen.fandom.com"
+  ],
+  "wiki": "jujutsu-kaisen.fandom.com",
+  "mal_ids": [],
+  "seasons": {
+   "1": 24,
+   "2": 23,
+   "3": 12
+  },
+  "episodes_seen": [
+   "jujutsu-kaisen:S1E01",
+   "jujutsu-kaisen:S1E02",
+   "jujutsu-kaisen:S1E03",
+   "jujutsu-kaisen:S1E04",
+   "jujutsu-kaisen:S1E05",
+   "jujutsu-kaisen:S1E06",
+   "jujutsu-kaisen:S1E07",
+   "jujutsu-kaisen:S1E08",
+   "jujutsu-kaisen:S1E09",
+   "jujutsu-kaisen:S1E10",
+   "jujutsu-kaisen:S1E11",
+   "jujutsu-kaisen:S1E12",
+   "jujutsu-kaisen:S1E13",
+   "jujutsu-kaisen:S1E14",
+   "jujutsu-kaisen:S1E15",
+   "jujutsu-kaisen:S1E16",
+   "jujutsu-kaisen:S1E17",
+   "jujutsu-kaisen:S1E18",
+   "jujutsu-kaisen:S1E19",
+   "jujutsu-kaisen:S1E20",
+   "jujutsu-kaisen:S1E21",
+   "jujutsu-kaisen:S1E22",
+   "jujutsu-kaisen:S1E23",
+   "jujutsu-kaisen:S1E24",
+   "jujutsu-kaisen:S2E01",
+   "jujutsu-kaisen:S2E02",
+   "jujutsu-kaisen:S2E03",
+   "jujutsu-kaisen:S2E04",
+   "jujutsu-kaisen:S2E05",
+   "jujutsu-kaisen:S2E06",
+   "jujutsu-kaisen:S2E07",
+   "jujutsu-kaisen:S2E08",
+   "jujutsu-kaisen:S2E09",
+   "jujutsu-kaisen:S2E10",
+   "jujutsu-kaisen:S2E11",
+   "jujutsu-kaisen:S2E12",
+   "jujutsu-kaisen:S2E13",
+   "jujutsu-kaisen:S2E14",
+   "jujutsu-kaisen:S2E15",
+   "jujutsu-kaisen:S2E16",
+   "jujutsu-kaisen:S2E17",
+   "jujutsu-kaisen:S2E18",
+   "jujutsu-kaisen:S2E19",
+   "jujutsu-kaisen:S2E20",
+   "jujutsu-kaisen:S2E21",
+   "jujutsu-kaisen:S2E22",
+   "jujutsu-kaisen:S2E23",
+   "jujutsu-kaisen:S3E01",
+   "jujutsu-kaisen:S3E02",
+   "jujutsu-kaisen:S3E03",
+   "jujutsu-kaisen:S3E04",
+   "jujutsu-kaisen:S3E05",
+   "jujutsu-kaisen:S3E06",
+   "jujutsu-kaisen:S3E07",
+   "jujutsu-kaisen:S3E08",
+   "jujutsu-kaisen:S3E09",
+   "jujutsu-kaisen:S3E10",
+   "jujutsu-kaisen:S3E11",
+   "jujutsu-kaisen:S3E12"
+  ],
+  "characters": {
+   "Satoru Gojou": {
+    "aliases": [
+     "gojou",
+     "satoru gojo",
+     "satoru gojou"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E02",
+      "abs": 26,
+      "score": 8.0,
+      "sources": [
+       "wiki battle: Satoru Gojo & Suguru Geto vs. Bayer & Kokun",
+       "wiki battle: Satoru Gojo vs. Cloning Curse User"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E07",
+      "abs": 7,
+      "score": 5.04,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Jogo",
+       "wiki plot: 1 fight lines naming them",
+       "wiki title: Assault"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E04",
+      "abs": 28,
+      "score": 4.58,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Toji Fushiguro: Rematch",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E03",
+      "abs": 27,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Toji Fushiguro",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E02",
+      "abs": 2,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Sukuna: First Fight"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E06",
+      "abs": 6,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Jogo"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E01",
+      "abs": 25,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Satoru Gojo & Suguru Geto vs. Bayer & Kokun"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E08",
+      "abs": 32,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E09",
+      "abs": 33,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group"
+      ]
+     }
+    ]
+   },
+   "Megumi Fushiguro": {
+    "aliases": [
+     "megumi",
+     "megumi fushiguro",
+     "sea urchin head"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E23",
+      "abs": 23,
+      "score": 14.0,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Yasohachi Bridge Curse",
+       "wiki battle: Megumi Fushiguro vs. Finger Bearer",
+       "wiki plot: 12 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E19",
+      "abs": 19,
+      "score": 13.64,
+      "sources": [
+       "wiki battle: Megumi Fushiguro, Toge Inumaki & Noritoshi Kamo vs. Hanami",
+       "wiki battle: Megumi Fushiguro & Maki Zenin vs. Hanami",
+       "wiki plot: 9 fight lines naming them",
+       "wiki title: Black Flash"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E18",
+      "abs": 18,
+      "score": 13.0,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Noritoshi Kamo",
+       "wiki battle: Megumi Fushiguro, Toge Inumaki & Noritoshi Kamo vs. Hanami",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E16",
+      "abs": 40,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Toji Fushiguro",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E10",
+      "abs": 57,
+      "score": 9.12,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Reggie Star's Group",
+       "wiki battle: Megumi Fushiguro vs. Reggie Star",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E11",
+      "abs": 35,
+      "score": 8.84,
+      "sources": [
+       "wiki battle: Yuji Itadori & Megumi Fushiguro vs. Jiro Awasaka",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E01",
+      "abs": 1,
+      "score": 7.96,
+      "sources": [
+       "wiki battle: Yuji Itadori & Megumi Fushiguro vs. Cursed Spirits",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E05",
+      "abs": 5,
+      "score": 7.42,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Sukuna",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E08",
+      "abs": 8,
+      "score": 7.02,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Aoi Todo",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E14",
+      "abs": 38,
+      "score": 7.02,
+      "sources": [
+       "wiki battle: Jujutsu Sorcerers vs. Dagon",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E17",
+      "abs": 41,
+      "score": 4.6,
+      "sources": [
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E06",
+      "abs": 53,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Megumi Fushiguro & Panda vs. Kirara Hoshi",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E11",
+      "abs": 58,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Reggie Star",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E04",
+      "abs": 4,
+      "score": 3.3,
+      "sources": [
+       "wiki plot: 5 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Nobara Kugisaki": {
+    "aliases": [
+     "kugisaki",
+     "nobara",
+     "nobara kugisaki"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E24",
+      "abs": 24,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Eso & Kechizu",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E19",
+      "abs": 43,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki plot: 12 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E12",
+      "abs": 36,
+      "score": 9.92,
+      "sources": [
+       "wiki battle: Nobara Kugisaki & Kento Nanami vs. Haruta Shigemo",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E03",
+      "abs": 3,
+      "score": 7.5,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Cursed Spirits",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E17",
+      "abs": 17,
+      "score": 6.98,
+      "sources": [
+       "wiki battle: Nobara Kugisaki vs. Momo Nishimiya",
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 3"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E23",
+      "abs": 23,
+      "score": 6.18,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Eso & Kechizu",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E08",
+      "abs": 8,
+      "score": 5.98,
+      "sources": [
+       "wiki battle: Nobara Kugisaki vs. Mai Zenin",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E20",
+      "abs": 44,
+      "score": 5.48,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E04",
+      "abs": 4,
+      "score": 4.98,
+      "sources": [
+       "wiki battle: Nobara Kugisaki vs. Cursed Spirits",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E18",
+      "abs": 42,
+      "score": 4.7,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Kento Nanami": {
+    "aliases": [
+     "7:3 sorcerer",
+     "kento",
+     "kento nanami",
+     "nanami",
+     "nanamin"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E14",
+      "abs": 38,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Jujutsu Sorcerers vs. Dagon",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E13",
+      "abs": 13,
+      "score": 8.38,
+      "sources": [
+       "wiki battle: Yuji Itadori & Kento Nanami vs. Mahito",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E12",
+      "abs": 36,
+      "score": 8.18,
+      "sources": [
+       "wiki battle: Nobara Kugisaki & Kento Nanami vs. Haruta Shigemo",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E10",
+      "abs": 10,
+      "score": 8.02,
+      "sources": [
+       "wiki battle: Kento Nanami vs. Mahito",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E09",
+      "abs": 9,
+      "score": 8.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Kento Nanami vs. Transfigured Humans",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E11",
+      "abs": 11,
+      "score": 6.94,
+      "sources": [
+       "wiki battle: Kento Nanami vs. Mahito",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E18",
+      "abs": 42,
+      "score": 3.1,
+      "sources": [
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E15",
+      "abs": 39,
+      "score": 2.48,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Maki Zenin": {
+    "aliases": [
+     "maki",
+     "maki zenin",
+     "miss zenin"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S3E04",
+      "abs": 51,
+      "score": 22.0,
+      "sources": [
+       "wiki battle: Maki Zenin vs. Ogi Zenin",
+       "wiki battle: Maki Zenin vs. The Kukuru Unit",
+       "wiki battle: Maki Zenin vs. The Hei",
+       "wiki battle: Maki Zenin vs. Naoya Zenin"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E17",
+      "abs": 17,
+      "score": 12.8,
+      "sources": [
+       "wiki battle: Maki Zenin vs. Kasumi Miwa",
+       "wiki battle: Maki Zenin vs. Mai Zenin",
+       "wiki plot: 7 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 3"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E14",
+      "abs": 38,
+      "score": 9.46,
+      "sources": [
+       "wiki battle: Jujutsu Sorcerers vs. Dagon",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E19",
+      "abs": 19,
+      "score": 7.44,
+      "sources": [
+       "wiki battle: Megumi Fushiguro & Maki Zenin vs. Hanami",
+       "wiki plot: 5 fight lines naming them",
+       "wiki title: Black Flash"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E16",
+      "abs": 16,
+      "score": 5.04,
+      "sources": [
+       "wiki battle: Maki Zenin vs. Kasumi Miwa",
+       "wiki plot: 1 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 2"
+      ]
+     }
+    ]
+   },
+   "Sukuna": {
+    "aliases": [
+     "disgraced one",
+     "double-faced specter",
+     "king of curses",
+     "ryoumen sukuna (両面宿儺)",
+     "sukuna",
+     "the fallen"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E16",
+      "abs": 40,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Sukuna vs. Jogo",
+       "wiki plot: 18 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E17",
+      "abs": 41,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Sukuna vs. Mahoraga",
+       "wiki plot: 25 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E05",
+      "abs": 5,
+      "score": 8.88,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Sukuna",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E02",
+      "abs": 2,
+      "score": 7.1,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Sukuna: First Fight",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E04",
+      "abs": 4,
+      "score": 6.48,
+      "sources": [
+       "wiki battle: Sukuna vs. Finger Bearer",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E15",
+      "abs": 39,
+      "score": 5.5,
+      "sources": [
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E06",
+      "abs": 6,
+      "score": 2.64,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Toge Inumaki": {
+    "aliases": [
+     "inumaki",
+     "toge",
+     "toge inumaki"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E19",
+      "abs": 19,
+      "score": 6.86,
+      "sources": [
+       "wiki battle: Megumi Fushiguro, Toge Inumaki & Noritoshi Kamo vs. Hanami",
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: Black Flash"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E18",
+      "abs": 18,
+      "score": 4.7,
+      "sources": [
+       "wiki battle: Megumi Fushiguro, Toge Inumaki & Noritoshi Kamo vs. Hanami",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Aoi Toudou": {
+    "aliases": [
+     "aoi todo",
+     "aoi toudou",
+     "toudou"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E15",
+      "abs": 15,
+      "score": 5.08,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Aoi Todo",
+       "wiki plot: 1 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 1"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E19",
+      "abs": 19,
+      "score": 5.08,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Hanami",
+       "wiki plot: 1 fight lines naming them",
+       "wiki title: Black Flash"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E20",
+      "abs": 20,
+      "score": 4.58,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Hanami",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E08",
+      "abs": 8,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Aoi Todo",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E16",
+      "abs": 16,
+      "score": 4.5,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Aoi Todo",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 2"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E20",
+      "abs": 44,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Mahito"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E21",
+      "abs": 45,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Mahito"
+      ]
+     }
+    ]
+   },
+   "Mahito": {
+    "aliases": [
+     "mahito",
+     "patchface"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E20",
+      "abs": 44,
+      "score": 14.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Mahito",
+       "wiki plot: 24 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E13",
+      "abs": 13,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Kento Nanami vs. Mahito",
+       "wiki plot: 13 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E18",
+      "abs": 42,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki plot: 23 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E19",
+      "abs": 43,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki plot: 18 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E21",
+      "abs": 45,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Mahito",
+       "wiki plot: 43 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E07",
+      "abs": 31,
+      "score": 9.92,
+      "sources": [
+       "wiki battle: Kokichi Muta vs. Mahito",
+       "wiki plot: 17 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E12",
+      "abs": 12,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Mahito",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E10",
+      "abs": 10,
+      "score": 7.68,
+      "sources": [
+       "wiki battle: Kento Nanami vs. Mahito",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E11",
+      "abs": 11,
+      "score": 7.44,
+      "sources": [
+       "wiki battle: Kento Nanami vs. Mahito",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E09",
+      "abs": 33,
+      "score": 6.24,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E08",
+      "abs": 32,
+      "score": 5.78,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E06",
+      "abs": 30,
+      "score": 5.2,
+      "sources": [
+       "wiki battle: Kokichi Muta vs. Mahito",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E10",
+      "abs": 34,
+      "score": 2.36,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Kasumi Miwa": {
+    "aliases": [
+     "kasumi",
+     "kasumi miwa",
+     "miwa"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E17",
+      "abs": 17,
+      "score": 7.02,
+      "sources": [
+       "wiki battle: Maki Zenin vs. Kasumi Miwa",
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 3"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E16",
+      "abs": 16,
+      "score": 5.12,
+      "sources": [
+       "wiki battle: Maki Zenin vs. Kasumi Miwa",
+       "wiki plot: 1 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 2"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E15",
+      "abs": 15,
+      "score": 2.24,
+      "sources": [
+       "wiki plot: 3 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 1"
+      ]
+     }
+    ]
+   },
+   "Panda": {
+    "aliases": [
+     "panda"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E16",
+      "abs": 16,
+      "score": 9.5,
+      "sources": [
+       "wiki battle: Panda vs. Ultimate Mechamaru",
+       "wiki plot: 8 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 2"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E05",
+      "abs": 52,
+      "score": 5.24,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Panda",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E06",
+      "abs": 53,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Megumi Fushiguro & Panda vs. Kirara Hoshi",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Mei Mei": {
+    "aliases": [
+     "mei",
+     "mei mei"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E12",
+      "abs": 36,
+      "score": 10.52,
+      "sources": [
+       "wiki battle: Mei Mei vs. Niji Ebina",
+       "wiki battle: Mei Mei & Ui Ui vs. Smallpox Deity",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E14",
+      "abs": 38,
+      "score": 9.68,
+      "sources": [
+       "wiki battle: Mei Mei & Ui Ui vs. Smallpox Deity",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Junpei Yoshino": {
+    "aliases": [
+     "junpei",
+     "junpei yoshino",
+     "yoshino"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E12",
+      "abs": 12,
+      "score": 8.42,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Junpei Yoshino",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E11",
+      "abs": 11,
+      "score": 2.3,
+      "sources": [
+       "wiki plot: 3 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Utahime Iori": {
+    "aliases": [
+     "iori",
+     "utahime",
+     "utahime iori"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S3E10",
+      "abs": 57,
+      "score": 8.0,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Reggie Star's Group",
+       "wiki battle: Fumihiko Takaba vs. Iori Hazenoki"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E11",
+      "abs": 58,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Fumihiko Takaba vs. Iori Hazenoki"
+      ]
+     }
+    ]
+   },
+   "Yuki Tsukumo": {
+    "aliases": [
+     "tsukumo",
+     "yuki",
+     "yuki tsukumo",
+     "つくもゆき"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E23",
+      "abs": 47,
+      "score": 2.02,
+      "sources": [
+       "wiki plot: 3 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Mai Zenin": {
+    "aliases": [
+     "mai",
+     "mai zenin"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E17",
+      "abs": 17,
+      "score": 8.26,
+      "sources": [
+       "wiki battle: Maki Zenin vs. Mai Zenin",
+       "wiki plot: 6 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 3"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E08",
+      "abs": 8,
+      "score": 5.06,
+      "sources": [
+       "wiki battle: Nobara Kugisaki vs. Mai Zenin",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E04",
+      "abs": 51,
+      "score": 3.8,
+      "sources": [
+       "wiki plot: 6 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Koukichi Muta": {
+    "aliases": [
+     "koukichi",
+     "koukichi muta",
+     "muta",
+     "ultimate mechamaru (究極メカ丸)"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E16",
+      "abs": 16,
+      "score": 4.5,
+      "sources": [
+       "wiki battle: Panda vs. Ultimate Mechamaru",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 2"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E06",
+      "abs": 30,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Kokichi Muta vs. Mahito"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E07",
+      "abs": 31,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Kokichi Muta vs. Mahito"
+      ]
+     }
+    ]
+   },
+   "Takuma Ino": {
+    "aliases": [
+     "ino",
+     "takuma",
+     "takuma ino"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E11",
+      "abs": 35,
+      "score": 6.26,
+      "sources": [
+       "wiki battle: Takuma Ino vs. Ogami & Her Grandson",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Noritoshi  Kamo": {
+    "aliases": [
+     "kamo",
+     "noritoshi",
+     "noritoshi  kamo"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E18",
+      "abs": 18,
+      "score": 11.8,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Noritoshi Kamo",
+       "wiki battle: Megumi Fushiguro, Toge Inumaki & Noritoshi Kamo vs. Hanami",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E19",
+      "abs": 19,
+      "score": 5.78,
+      "sources": [
+       "wiki battle: Megumi Fushiguro, Toge Inumaki & Noritoshi Kamo vs. Hanami",
+       "wiki plot: 2 fight lines naming them",
+       "wiki title: Black Flash"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E15",
+      "abs": 15,
+      "score": 3.24,
+      "sources": [
+       "wiki plot: 5 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 1"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E22",
+      "abs": 46,
+      "score": 2.44,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Hanami": {
+    "aliases": [
+     "hanami"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E19",
+      "abs": 19,
+      "score": 18.5,
+      "sources": [
+       "wiki battle: Megumi Fushiguro, Toge Inumaki & Noritoshi Kamo vs. Hanami",
+       "wiki battle: Megumi Fushiguro & Maki Zenin vs. Hanami",
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Hanami",
+       "wiki plot: 22 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E09",
+      "abs": 33,
+      "score": 9.8,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E20",
+      "abs": 20,
+      "score": 9.72,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Hanami",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E08",
+      "abs": 32,
+      "score": 5.7,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E18",
+      "abs": 18,
+      "score": 4.74,
+      "sources": [
+       "wiki battle: Megumi Fushiguro, Toge Inumaki & Noritoshi Kamo vs. Hanami",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Yuji Itadori": {
+    "aliases": [
+     "yuji",
+     "yuji itadori"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E12",
+      "abs": 12,
+      "score": 14.0,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Junpei Yoshino",
+       "wiki battle: Yuji Itadori vs. Mahito",
+       "wiki plot: 12 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E20",
+      "abs": 44,
+      "score": 14.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Mahito",
+       "wiki plot: 17 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E01",
+      "abs": 48,
+      "score": 14.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Choso vs. Cursed Spirits",
+       "wiki battle: Yuji Itadori vs. Yuta Okkotsu",
+       "wiki plot: 31 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E24",
+      "abs": 24,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Eso & Kechizu",
+       "wiki plot: 15 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E11",
+      "abs": 35,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Megumi Fushiguro vs. Jiro Awasaka",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E13",
+      "abs": 37,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Choso",
+       "wiki plot: 35 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E18",
+      "abs": 42,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki plot: 29 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E21",
+      "abs": 45,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Mahito",
+       "wiki plot: 32 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E13",
+      "abs": 13,
+      "score": 9.96,
+      "sources": [
+       "wiki battle: Yuji Itadori & Kento Nanami vs. Mahito",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E19",
+      "abs": 43,
+      "score": 9.64,
+      "sources": [
+       "wiki battle: Yuji Itadori & Nobara Kugisaki vs. Mahito",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E19",
+      "abs": 19,
+      "score": 9.6,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Hanami",
+       "wiki plot: 9 fight lines naming them",
+       "wiki title: Black Flash"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E20",
+      "abs": 20,
+      "score": 9.18,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Hanami",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E05",
+      "abs": 52,
+      "score": 9.08,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Kinji Hakari",
+       "wiki battle: Yuji Itadori vs. Panda",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E04",
+      "abs": 4,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Finger Bearer",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Satoru Gojo": {
+    "aliases": [
+     "gojo",
+     "satoru gojo"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E07",
+      "abs": 7,
+      "score": 10.5,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Jogo",
+       "wiki plot: 16 fight lines naming them",
+       "wiki title: Assault"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E09",
+      "abs": 33,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 15 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E06",
+      "abs": 6,
+      "score": 8.88,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Jogo",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E02",
+      "abs": 26,
+      "score": 8.0,
+      "sources": [
+       "wiki battle: Satoru Gojo & Suguru Geto vs. Bayer & Kokun",
+       "wiki battle: Satoru Gojo vs. Cloning Curse User"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E02",
+      "abs": 2,
+      "score": 7.46,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Sukuna: First Fight",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E04",
+      "abs": 28,
+      "score": 5.12,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Toji Fushiguro: Rematch",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E08",
+      "abs": 32,
+      "score": 4.94,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E03",
+      "abs": 27,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Toji Fushiguro",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E01",
+      "abs": 25,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Satoru Gojo & Suguru Geto vs. Bayer & Kokun"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E20",
+      "abs": 20,
+      "score": 2.7,
+      "sources": [
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E01",
+      "abs": 48,
+      "score": 2.4,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Aoi Todo": {
+    "aliases": [
+     "aoi todo",
+     "todo"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E20",
+      "abs": 44,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Mahito",
+       "wiki plot: 18 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E21",
+      "abs": 45,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Mahito",
+       "wiki plot: 14 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E20",
+      "abs": 20,
+      "score": 7.32,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Hanami",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E19",
+      "abs": 19,
+      "score": 5.16,
+      "sources": [
+       "wiki battle: Yuji Itadori & Aoi Todo vs. Hanami",
+       "wiki plot: 1 fight lines naming them",
+       "wiki title: Black Flash"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E15",
+      "abs": 15,
+      "score": 5.08,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Aoi Todo",
+       "wiki plot: 1 fight lines naming them",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 1"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E08",
+      "abs": 8,
+      "score": 4.62,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Aoi Todo",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E16",
+      "abs": 16,
+      "score": 4.5,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Aoi Todo",
+       "wiki title: Kyoto Sister School Goodwill Event - Team Battle, Part 2"
+      ]
+     }
+    ]
+   },
+   "Jogo": {
+    "aliases": [
+     "jogo"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S1E07",
+      "abs": 7,
+      "score": 10.5,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Jogo",
+       "wiki plot: 11 fight lines naming them",
+       "wiki title: Assault"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E16",
+      "abs": 40,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Sukuna vs. Jogo",
+       "wiki plot: 13 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E09",
+      "abs": 33,
+      "score": 8.22,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E08",
+      "abs": 32,
+      "score": 6.36,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S1E06",
+      "abs": 6,
+      "score": 5.16,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Jogo",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E15",
+      "abs": 39,
+      "score": 4.5,
+      "sources": [
+       "wiki plot: 7 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Choso": {
+    "aliases": [
+     "choso"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S3E01",
+      "abs": 48,
+      "score": 13.96,
+      "sources": [
+       "wiki battle: Choso vs. Naoya Zenin",
+       "wiki battle: Yuji Itadori & Choso vs. Cursed Spirits",
+       "wiki plot: 12 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E02",
+      "abs": 49,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Choso vs. Naoya Zenin",
+       "wiki plot: 12 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E13",
+      "abs": 37,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Choso",
+       "wiki plot: 30 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E22",
+      "abs": 46,
+      "score": 6.0,
+      "sources": [
+       "wiki plot: 14 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E09",
+      "abs": 33,
+      "score": 5.74,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E08",
+      "abs": 32,
+      "score": 4.58,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Mahito's Group",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Toji Fushiguro": {
+    "aliases": [
+     "toji",
+     "toji fushiguro"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E04",
+      "abs": 28,
+      "score": 14.0,
+      "sources": [
+       "wiki battle: Suguru Geto vs. Toji Fushiguro",
+       "wiki battle: Satoru Gojo vs. Toji Fushiguro: Rematch",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E15",
+      "abs": 39,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Toji Fushiguro vs. Dagon",
+       "wiki plot: 14 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E16",
+      "abs": 40,
+      "score": 9.5,
+      "sources": [
+       "wiki battle: Megumi Fushiguro vs. Toji Fushiguro",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E03",
+      "abs": 27,
+      "score": 9.46,
+      "sources": [
+       "wiki battle: Satoru Gojo vs. Toji Fushiguro",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Suguru Geto": {
+    "aliases": [
+     "geto",
+     "suguru geto"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S2E02",
+      "abs": 26,
+      "score": 8.0,
+      "sources": [
+       "wiki battle: Satoru Gojo & Suguru Geto vs. Bayer & Kokun",
+       "wiki battle: Suguru Geto vs. Shikigami Curse User"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E22",
+      "abs": 46,
+      "score": 6.0,
+      "sources": [
+       "wiki plot: 21 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E23",
+      "abs": 47,
+      "score": 5.92,
+      "sources": [
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E01",
+      "abs": 25,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Satoru Gojo & Suguru Geto vs. Bayer & Kokun"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E04",
+      "abs": 28,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Suguru Geto vs. Toji Fushiguro"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E14",
+      "abs": 38,
+      "score": 2.2,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Yuta Okkotsu": {
+    "aliases": [
+     "okkotsu",
+     "yuta",
+     "yuta okkotsu"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S3E01",
+      "abs": 48,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Yuta Okkotsu",
+       "wiki plot: 22 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E12",
+      "abs": 59,
+      "score": 8.54,
+      "sources": [
+       "wiki battle: Yuta Okkotsu vs. Kurourushi",
+       "wiki battle: Yuta Okkotsu vs. Takako Uro vs. Ryu Ishigori",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S2E23",
+      "abs": 47,
+      "score": 5.78,
+      "sources": [
+       "wiki battle: Yuta Okkotsu vs. Cursed Spirit",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E02",
+      "abs": 49,
+      "score": 3.92,
+      "sources": [
+       "wiki plot: 6 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Kinji Hakari": {
+    "aliases": [
+     "hakari",
+     "kinji",
+     "kinji hakari"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S3E05",
+      "abs": 52,
+      "score": 5.08,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Kinji Hakari",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E06",
+      "abs": 53,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Kinji Hakari"
+      ]
+     }
+    ]
+   },
+   "Hiromi Higuruma": {
+    "aliases": [
+     "higuruma",
+     "hiromi",
+     "hiromi higuruma"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S3E08",
+      "abs": 55,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Hiromi Higuruma",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E09",
+      "abs": 56,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Yuji Itadori vs. Hiromi Higuruma",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Naoya Zenin": {
+    "aliases": [
+     "naoya",
+     "naoya zenin"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "jujutsu-kaisen:S3E02",
+      "abs": 49,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Choso vs. Naoya Zenin",
+       "wiki plot: 14 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E01",
+      "abs": 48,
+      "score": 9.96,
+      "sources": [
+       "wiki battle: Choso vs. Naoya Zenin",
+       "wiki plot: 12 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "jujutsu-kaisen:S3E04",
+      "abs": 51,
+      "score": 9.92,
+      "sources": [
+       "wiki battle: Maki Zenin vs. Naoya Zenin",
+       "wiki plot: 12 fight lines naming them"
+      ]
+     }
+    ]
+   }
+  },
+  "seconds": 58
+ }
+}

@@ -430,12 +430,20 @@ if not topic_name:
     except Exception as ex:
         print('charvis conversation identification skipped:', ex, flush=True)
 
-# 3. Fallback: scan dialogue transcript for character names
+# 3. Fallback: scan dialogue transcript for character names (lore.json, else the cast the research step found)
 if not topic_name:
     context_txt = ' '.join(w['w'] for w in cw).lower()
     heard = {}
-    for nm, d in series_lore.items():
-        n = sum(len(re.findall(r'\b' + re.escape(a.lower()) + r'\b', context_txt)) for a in d.get('names', []))
+    _names = {nm: d.get('names', []) for nm, d in series_lore.items()}
+    if not _names:
+        try:
+            import research
+            research.get_series(series_key, EPISODES)
+            _names = research.character_names(series_key)
+        except Exception as ex:
+            print('research names skipped:', ex, flush=True)
+    for nm, al in _names.items():
+        n = sum(len(re.findall(r'\b' + re.escape(a.lower()) + r'\b', context_txt)) for a in al)
         if n: heard[nm] = n
     if heard:
         topic_name = max(heard, key=heard.get)
@@ -456,9 +464,20 @@ fight_eps = [e for e in chars.get(topic_slug, []) if e in EPISODES] if topic_slu
 try:                                                                  # hand-checked fight windows first, when this character has them
     _fw = json.load(open('fight_windows.json')).get(topic_slug or '', {})
     _fw = [e if ':' in e else f'jujutsu-kaisen:{e}' for e in _fw]
-    fight_eps = [e for e in _fw if e in EPISODES] + [e for e in fight_eps if e not in _fw]
 except Exception as ex:
     print('fight_windows.json skipped:', ex, flush=True)
+    _fw = []
+_researched = []
+try:                                                                  # self-research: the episodes where this character fights
+    import research
+    _researched, _rinfo = research.fight_episodes(series_key, topic_name, topic_slug, EPISODES)
+    if _researched:
+        _top = _researched[:6]                                       # strongest researched fights, the ones the character map confirms first
+        _researched = [e for e in _top if e in fight_eps] + [e for e in _top if e not in fight_eps] + _researched[6:]
+        print('research: fight episodes for', topic_name or topic_slug, '->', _researched[:6], flush=True)
+except Exception as ex:
+    print('research skipped:', ex, flush=True)
+fight_eps = list(dict.fromkeys([e for e in _fw if e in EPISODES] + _researched + fight_eps))
 amv_eps = list(dict.fromkeys([conv_ep] + fight_eps[:3])) if fight_eps else [conv_ep]
 print('fight episodes for the edit:', amv_eps, flush=True)
 for ep_code in amv_eps:

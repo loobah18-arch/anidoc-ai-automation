@@ -85,6 +85,6 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "amv-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add edit/history.json metadata/youtube_upload_history.json metadata/candle_gate_state.json 2>/dev/null || true
+          git add edit/history.json edit/research_cache.json edit/fight_windows.json metadata/youtube_upload_history.json metadata/candle_gate_state.json 2>/dev/null || true
           git commit -m "history: anime short ${{ github.run_number }} [skip ci]" || exit 0
           git pull --rebase -X theirs origin ${{ github.ref_name }} && git push origin HEAD:${{ github.ref_name }}

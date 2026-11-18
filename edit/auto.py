@@ -362,6 +362,35 @@ def _curated_windows():
     return {_k(e): [tuple(w) for w in v] for e, v in fw.get(slug, {}).items()} if slug else {}
 
 
+def _cached_auto_windows():
+    """fight windows detected automatically by earlier runs (fight_windows.json -> _auto -> slug -> episode)"""
+    slug = os.environ.get('CHAR_SLUG', '').strip().lower()
+    try:
+        fw = json.load(open('fight_windows.json')).get('_auto', {}).get(slug, {}) if slug else {}
+        return {_k(e): [tuple(w) for w in d['windows']] for e, d in fw.items() if d.get('windows')}
+    except Exception:
+        return {}
+
+
+def _save_auto_windows(det, anchors):
+    """remember detected windows so later runs reuse them; hand-checked entries are never touched"""
+    slug = os.environ.get('CHAR_SLUG', '').strip().lower()
+    if not slug or not det:
+        return
+    try:
+        fw = json.load(open('fight_windows.json'))
+        auto = fw.setdefault('_auto', {}).setdefault(slug, {})
+        for e, w in det.items():
+            auto[e] = dict(windows=[[round(a, 1), round(b, 1)] for a, b in w], source='auto', character=CHAR_NAME,
+                           anchors=sum(1 for s in anchors if s['ep'] == e), detected=time.strftime('%Y-%m-%d', time.gmtime()))
+        fw['_doc_auto'] = ('_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked '
+                           'windows, cached so later runs reuse them. Hand-checked entries stay at the top level.')
+        json.dump(fw, open('fight_windows.json', 'w'), indent=1)
+        print('drop style: cached auto fight windows for', slug, sorted(det), flush=True)
+    except Exception as ex:
+        print('could not cache auto fight windows:', ex, flush=True)
+
+
 def _auto_fight_windows(full_pool, anchors, rel_of):
     """Any anime, any character: a fight is a sustained stretch of high-impact shots (hot shots no more than 4 s apart,
     10 s+ long). It is this character's fight when clear-identity shots sit inside it and, on balance, the stretch
@@ -425,8 +454,15 @@ def _drop_char_pool(full_pool):
     anchors = [s for s in cands if s['rel'] >= REL_MIN]
     if curated:
         win, how = curated, 'hand-checked'
-    else:
-        win, how = _auto_fight_windows(full_pool, anchors, [(s, s['rel']) for s in cands]), 'detected'
+    else:                                                             # auto windows found by an earlier run are reused
+        cached = _cached_auto_windows()
+        pool_eps = sorted({s['ep'] for s in full_pool})
+        win = {e: cached[e] for e in pool_eps if cached.get(e)}
+        todo = [e for e in pool_eps if e not in win]
+        det = _auto_fight_windows([s for s in full_pool if s['ep'] in todo], anchors, [(s, s['rel']) for s in cands]) if todo else {}
+        win.update(det)
+        how = f"detected {sorted(det)}" + (f" + cached {sorted(e for e in win if e not in det)}" if len(win) > len(det) else '')
+        _save_auto_windows(det, anchors)
         if not win:                                                   # nothing reads as a fight: stay close to the anchors
             for s in anchors:
                 win.setdefault(s['ep'], []).append((s['s'] - 12, s['e'] + 12))
