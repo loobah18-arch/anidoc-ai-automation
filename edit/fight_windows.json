@@ -83,5 +83,114 @@
     1316.0
    ]
   ]
- }
+ },
+ "_auto": {
+  "gyokko": {
+   "demon-slayer-kimetsu-no-yaiba:S4E05": {
+    "windows": [
+     [
+      253.8,
+      365.5
+     ],
+     [
+      673.3,
+      796.3
+     ],
+     [
+      819.8,
+      845.7
+     ],
+     [
+      946.8,
+      1020.3
+     ]
+    ],
+    "source": "auto",
+    "character": "Gyokko",
+    "anchors": 31,
+    "detected": "2026-11-18"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S4E07": {
+    "windows": [
+     [
+      321.2,
+      373.5
+     ],
+     [
+      880.1,
+      934.6
+     ],
+     [
+      937.9,
+      1105.0
+     ],
+     [
+      1160.5,
+      1241.2
+     ]
+    ],
+    "source": "auto",
+    "character": "Gyokko",
+    "anchors": 15,
+    "detected": "2026-11-18"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S4E08": {
+    "windows": [
+     [
+      34.5,
+      65.0
+     ],
+     [
+      959.3,
+      977.7
+     ],
+     [
+      1168.0,
+      1236.2
+     ]
+    ],
+    "source": "auto",
+    "character": "Gyokko",
+    "anchors": 8,
+    "detected": "2026-11-18"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S4E09": {
+    "windows": [
+     [
+      129.9,
+      150.7
+     ],
+     [
+      157.0,
+      190.1
+     ],
+     [
+      227.6,
+      322.9
+     ],
+     [
+      391.9,
+      414.0
+     ],
+     [
+      424.3,
+      456.2
+     ],
+     [
+      597.8,
+      676.1
+     ],
+     [
+      730.3,
+      761.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Gyokko",
+    "anchors": 36,
+    "detected": "2026-11-18"
+   }
+  }
+ },
+ "_doc_auto": "_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked windows, cached so later runs reuse them. Hand-checked entries stay at the top level."
 }

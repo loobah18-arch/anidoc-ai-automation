@@ -1903,5 +1903,2211 @@
    }
   },
   "seconds": 58
+ },
+ "demon-slayer-kimetsu-no-yaiba": {
+  "updated": "2026-11-18 06:01 UTC",
+  "sources": [
+   "anilist",
+   "kimetsu-no-yaiba.fandom.com"
+  ],
+  "wiki": "kimetsu-no-yaiba.fandom.com",
+  "mal_ids": [],
+  "seasons": {
+   "1": 26,
+   "2": 7,
+   "3": 11,
+   "4": 11,
+   "5": 8
+  },
+  "episodes_seen": [
+   "demon-slayer-kimetsu-no-yaiba:S1E01",
+   "demon-slayer-kimetsu-no-yaiba:S1E02",
+   "demon-slayer-kimetsu-no-yaiba:S1E03",
+   "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "demon-slayer-kimetsu-no-yaiba:S1E05",
+   "demon-slayer-kimetsu-no-yaiba:S1E06",
+   "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "demon-slayer-kimetsu-no-yaiba:S1E08",
+   "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "demon-slayer-kimetsu-no-yaiba:S1E11",
+   "demon-slayer-kimetsu-no-yaiba:S1E12",
+   "demon-slayer-kimetsu-no-yaiba:S1E13",
+   "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "demon-slayer-kimetsu-no-yaiba:S1E15",
+   "demon-slayer-kimetsu-no-yaiba:S1E16",
+   "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "demon-slayer-kimetsu-no-yaiba:S1E18",
+   "demon-slayer-kimetsu-no-yaiba:S1E19",
+   "demon-slayer-kimetsu-no-yaiba:S1E20",
+   "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "demon-slayer-kimetsu-no-yaiba:S1E24",
+   "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "demon-slayer-kimetsu-no-yaiba:S1E26",
+   "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "demon-slayer-kimetsu-no-yaiba:S2E03",
+   "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "demon-slayer-kimetsu-no-yaiba:S3E01",
+   "demon-slayer-kimetsu-no-yaiba:S3E02",
+   "demon-slayer-kimetsu-no-yaiba:S3E03",
+   "demon-slayer-kimetsu-no-yaiba:S3E04",
+   "demon-slayer-kimetsu-no-yaiba:S3E05",
+   "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "demon-slayer-kimetsu-no-yaiba:S3E11",
+   "demon-slayer-kimetsu-no-yaiba:S4E01",
+   "demon-slayer-kimetsu-no-yaiba:S4E02",
+   "demon-slayer-kimetsu-no-yaiba:S4E03",
+   "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "demon-slayer-kimetsu-no-yaiba:S4E10",
+   "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "demon-slayer-kimetsu-no-yaiba:S5E01",
+   "demon-slayer-kimetsu-no-yaiba:S5E02",
+   "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "demon-slayer-kimetsu-no-yaiba:S5E04",
+   "demon-slayer-kimetsu-no-yaiba:S5E05",
+   "demon-slayer-kimetsu-no-yaiba:S5E06",
+   "demon-slayer-kimetsu-no-yaiba:S5E07",
+   "demon-slayer-kimetsu-no-yaiba:S5E08"
+  ],
+  "characters": {
+   "Inosuke Hashibira": {
+    "aliases": [
+     "hashibira",
+     "inoko",
+     "inosuke",
+     "inosuke hashibira",
+     "svinosuke",
+     "the boar",
+     "하시비라 이노스케"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E16",
+      "abs": 16,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Mother)",
+       "wiki plot: 20 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E18",
+      "abs": 18,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Father)",
+       "wiki plot: 15 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E15",
+      "abs": 15,
+      "score": 9.96,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Mother)",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+      "abs": 31,
+      "score": 9.64,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+      "abs": 42,
+      "score": 9.26,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 14 fight lines naming them",
+       "wiki title: Defeating an Upper Rank Demon"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+      "abs": 17,
+      "score": 7.02,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Father)",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+      "abs": 32,
+      "score": 6.4,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+      "abs": 14,
+      "score": 6.14,
+      "sources": [
+       "wiki battle: Tanjiro Kamado vs Inosuke Hashibira",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E12",
+      "abs": 12,
+      "score": 5.0,
+      "sources": [
+       "wiki battle: Inosuke Hashibira vs Horned Demon",
+       "wiki title: The Boar Bares Its Fangs, Zenitsu Sleeps"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+      "abs": 43,
+      "score": 4.78,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E05",
+      "abs": 38,
+      "score": 4.7,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E04",
+      "abs": 37,
+      "score": 4.52,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+      "abs": 41,
+      "score": 3.78,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+      "abs": 39,
+      "score": 3.66,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Nezuko Kamado": {
+    "aliases": [
+     "nezuko",
+     "nezuko kamado",
+     "竈門禰?豆子",
+     "카마도 네즈코"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+      "abs": 1,
+      "score": 9.88,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Giyu Tomioka",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+      "abs": 40,
+      "score": 8.96,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E02",
+      "abs": 2,
+      "score": 8.76,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Temple Demon",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+      "abs": 9,
+      "score": 8.56,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+      "abs": 55,
+      "score": 8.5,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+      "abs": 19,
+      "score": 8.14,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+      "abs": 10,
+      "score": 7.84,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+      "abs": 7,
+      "score": 7.48,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Swamp Demon",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+      "abs": 39,
+      "score": 7.06,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+      "abs": 54,
+      "score": 6.98,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+      "abs": 49,
+      "score": 6.74,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 6 fight lines naming them",
+       "wiki title: Bright Red Blade"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+      "abs": 48,
+      "score": 6.52,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E06",
+      "abs": 6,
+      "score": 6.32,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Swamp Demon",
+       "wiki plot: 3 fight lines naming them",
+       "wiki title: Swordsman Accompanying a Demon"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+      "abs": 31,
+      "score": 5.62,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Zenitsu Agatsuma": {
+    "aliases": [
+     "agatsuma",
+     "zenitsu",
+     "zenitsu agatsuma"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+      "abs": 17,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Zenitsu Agatsuma vs Spider Demon (Son)",
+       "wiki plot: 12 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E12",
+      "abs": 12,
+      "score": 7.56,
+      "sources": [
+       "wiki battle: Zenitsu Agatsuma vs Tongue Demon",
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: The Boar Bares Its Fangs, Zenitsu Sleeps"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+      "abs": 42,
+      "score": 6.98,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 6 fight lines naming them",
+       "wiki title: Defeating an Upper Rank Demon"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+      "abs": 43,
+      "score": 6.32,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+      "abs": 31,
+      "score": 6.16,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E04",
+      "abs": 37,
+      "score": 4.86,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+      "abs": 41,
+      "score": 4.36,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E05",
+      "abs": 38,
+      "score": 4.16,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E13",
+      "abs": 13,
+      "score": 4.14,
+      "sources": [
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+      "abs": 32,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+      "abs": 14,
+      "score": 4.0,
+      "sources": [
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+      "abs": 40,
+      "score": 3.66,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+      "abs": 44,
+      "score": 3.4,
+      "sources": [
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E05",
+      "abs": 60,
+      "score": 3.1,
+      "sources": [
+       "wiki plot: 5 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Tengen Uzui": {
+    "aliases": [
+     "sound hashira",
+     "sound pillar",
+     "tengen",
+     "tengen uzui",
+     "uzui"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+      "abs": 42,
+      "score": 9.5,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 12 fight lines naming them",
+       "wiki title: Defeating an Upper Rank Demon"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+      "abs": 41,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 19 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+      "abs": 40,
+      "score": 8.42,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+      "abs": 43,
+      "score": 7.06,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+      "abs": 58,
+      "score": 6.0,
+      "sources": [
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+      "abs": 44,
+      "score": 5.72,
+      "sources": [
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E04",
+      "abs": 37,
+      "score": 5.52,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+      "abs": 39,
+      "score": 4.36,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E05",
+      "abs": 38,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E02",
+      "abs": 35,
+      "score": 3.0,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Mitsuri Kanroji": {
+    "aliases": [
+     "kanroji",
+     "love hashira",
+     "love pillar",
+     "mitsuri",
+     "mitsuri kanroji",
+     "the eightfold girl"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+      "abs": 54,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 15 fight lines naming them",
+       "wiki title: Love Hashira Mitsuri Kanroji"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+      "abs": 49,
+      "score": 5.74,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: Bright Red Blade"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+      "abs": 55,
+      "score": 5.32,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 5.16,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+      "abs": 53,
+      "score": 4.16,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+      "abs": 48,
+      "score": 3.54,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E03",
+      "abs": 47,
+      "score": 3.5,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki title: A Sword from Over 300 Years Ago"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+      "abs": 50,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+      "abs": 51,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E05",
+      "abs": 60,
+      "score": 2.4,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Kanao Tsuyuri": {
+    "aliases": [
+     "kanao",
+     "kanao tsuyuri",
+     "tsuyuri"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+      "abs": 25,
+      "score": 2.64,
+      "sources": [
+       "wiki plot: 2 fight lines naming them",
+       "wiki title: Tsuguko, Kanao Tsuyuri"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E24",
+      "abs": 24,
+      "score": 2.32,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Obanai Iguro": {
+    "aliases": [
+     "iguro",
+     "obanai",
+     "obanai iguro",
+     "snake hashira",
+     "snake pillar"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E05",
+      "abs": 60,
+      "score": 5.76,
+      "sources": [
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E01",
+      "abs": 56,
+      "score": 5.22,
+      "sources": [
+       "wiki plot: 8 fight lines naming them",
+       "wiki title: To Defeat Muzan Kibutsuji"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 5.16,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E04",
+      "abs": 59,
+      "score": 2.36,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+      "abs": 44,
+      "score": 2.16,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Sanemi Shinazugawa": {
+    "aliases": [
+     "sanemi",
+     "sanemi shinazugawa",
+     "wind hashira",
+     "wind pillar"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E05",
+      "abs": 60,
+      "score": 6.0,
+      "sources": [
+       "wiki plot: 12 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 5.74,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E01",
+      "abs": 56,
+      "score": 5.5,
+      "sources": [
+       "wiki plot: 8 fight lines naming them",
+       "wiki title: To Defeat Muzan Kibutsuji"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+      "abs": 62,
+      "score": 4.6,
+      "sources": [
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E04",
+      "abs": 59,
+      "score": 3.94,
+      "sources": [
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+      "abs": 22,
+      "score": 3.3,
+      "sources": [
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+      "abs": 50,
+      "score": 2.4,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Muzan Kibutsuji": {
+    "aliases": [
+     "kibutsuji",
+     "muzan",
+     "muzan kibutsuji",
+     "toshikuni",
+     "tsukihiko"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1",
+       "wiki plot: 20 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E26",
+      "abs": 26,
+      "score": 4.5,
+      "sources": [
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+      "abs": 55,
+      "score": 4.18,
+      "sources": [
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E01",
+      "abs": 45,
+      "score": 3.56,
+      "sources": [
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E01",
+      "abs": 56,
+      "score": 3.2,
+      "sources": [
+       "wiki plot: 3 fight lines naming them",
+       "wiki title: To Defeat Muzan Kibutsuji"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E08",
+      "abs": 8,
+      "score": 2.76,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+      "abs": 7,
+      "score": 2.4,
+      "sources": [
+       "wiki plot: 2 fight lines naming them",
+       "wiki title: Muzan Kibutsuji"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+      "abs": 10,
+      "score": 2.36,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E06",
+      "abs": 61,
+      "score": 2.2,
+      "sources": [
+       "wiki plot: 3 fight lines naming them",
+       "wiki title: The Strongest of the Demon Slayer Corps"
+      ]
+     }
+    ]
+   },
+   "Sabito": {
+    "aliases": [
+     "sabito"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E03",
+      "abs": 3,
+      "score": 4.32,
+      "sources": [
+       "wiki plot: 6 fight lines naming them",
+       "wiki title: Sabito and Makomo"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+      "abs": 4,
+      "score": 2.9,
+      "sources": [
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E02",
+      "abs": 57,
+      "score": 2.52,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Genya Shinazugawa": {
+    "aliases": [
+     "genya",
+     "genya shinazugawa"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+      "abs": 50,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+      "abs": 54,
+      "score": 6.52,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+      "abs": 48,
+      "score": 6.06,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E03",
+      "abs": 47,
+      "score": 5.32,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 3 fight lines naming them",
+       "wiki title: A Sword from Over 300 Years Ago"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E05",
+      "abs": 60,
+      "score": 5.18,
+      "sources": [
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+      "abs": 53,
+      "score": 4.66,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+      "abs": 55,
+      "score": 3.82,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+      "abs": 51,
+      "score": 3.66,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+      "abs": 49,
+      "score": 3.5,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki title: Bright Red Blade"
+      ]
+     }
+    ]
+   },
+   "Tamayo": {
+    "aliases": [
+     "tamayo"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+      "abs": 9,
+      "score": 9.3,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+      "abs": 10,
+      "score": 7.5,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 5.74,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E08",
+      "abs": 8,
+      "score": 5.48,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Hotaru Haganezuka": {
+    "aliases": [
+     "haganezuka",
+     "hotaru",
+     "hotaru haganezuka"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E03",
+      "abs": 47,
+      "score": 4.9,
+      "sources": [
+       "wiki plot: 8 fight lines naming them",
+       "wiki title: A Sword from Over 300 Years Ago"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+      "abs": 55,
+      "score": 4.4,
+      "sources": [
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E01",
+      "abs": 56,
+      "score": 3.32,
+      "sources": [
+       "wiki plot: 5 fight lines naming them",
+       "wiki title: To Defeat Muzan Kibutsuji"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E05",
+      "abs": 5,
+      "score": 2.78,
+      "sources": [
+       "wiki plot: 5 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E01",
+      "abs": 45,
+      "score": 2.24,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+      "abs": 51,
+      "score": 2.2,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Sakonji Urokodaki": {
+    "aliases": [
+     "sakonji",
+     "sakonji urokodaki",
+     "urokodaki"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E03",
+      "abs": 3,
+      "score": 5.38,
+      "sources": [
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E02",
+      "abs": 2,
+      "score": 4.1,
+      "sources": [
+       "wiki plot: 5 fight lines naming them",
+       "wiki title: Trainer Sakonji Urokodaki"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E05",
+      "abs": 5,
+      "score": 3.48,
+      "sources": [
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+      "abs": 4,
+      "score": 2.6,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Rui": {
+    "aliases": [
+     "rui"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+      "abs": 19,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 13 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E20",
+      "abs": 20,
+      "score": 9.96,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E18",
+      "abs": 18,
+      "score": 7.64,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+      "abs": 21,
+      "score": 2.68,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Yushirou": {
+    "aliases": [
+     "yushiro",
+     "yushirou"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+      "abs": 9,
+      "score": 9.34,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+      "abs": 10,
+      "score": 6.26,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E08",
+      "abs": 8,
+      "score": 4.86,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Kagaya Ubuyashiki": {
+    "aliases": [
+     "kagaya",
+     "kagaya ubuyashiki",
+     "oyakata-sama",
+     "ubuyashiki"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 6.0,
+      "sources": [
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E01",
+      "abs": 56,
+      "score": 2.44,
+      "sources": [
+       "wiki plot: 3 fight lines naming them",
+       "wiki title: To Defeat Muzan Kibutsuji"
+      ]
+     }
+    ]
+   },
+   "Enmu": {
+    "aliases": [
+     "enmu",
+     "tamio enmu"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+      "abs": 31,
+      "score": 9.68,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu",
+       "wiki plot: 15 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+      "abs": 32,
+      "score": 5.2,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+      "abs": 30,
+      "score": 4.52,
+      "sources": [
+       "wiki plot: 8 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Makomo": {
+    "aliases": [
+     "makomo"
+    ],
+    "role": "Supporting",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E03",
+      "abs": 3,
+      "score": 3.82,
+      "sources": [
+       "wiki plot: 5 fight lines naming them",
+       "wiki title: Sabito and Makomo"
+      ]
+     }
+    ]
+   },
+   "Tanjiro Kamado": {
+    "aliases": [
+     "tanjiro",
+     "tanjiro kamado"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E18",
+      "abs": 18,
+      "score": 14.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Father)",
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+      "abs": 9,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+      "abs": 10,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, Tamayo, and Yushiro vs Susamaru and Yahaba",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+      "abs": 7,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Swamp Demon",
+       "wiki plot: 15 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+      "abs": 4,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado vs Hand Demon",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E11",
+      "abs": 11,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado vs Kyogai",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E13",
+      "abs": 13,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado vs Kyogai",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E15",
+      "abs": 15,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Mother)",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E16",
+      "abs": 16,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Mother)",
+       "wiki plot: 24 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+      "abs": 19,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 20 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+      "abs": 1,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Giyu Tomioka",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E02",
+      "abs": 2,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Temple Demon",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+      "abs": 14,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado vs Inosuke Hashibira",
+       "wiki plot: 10 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E01",
+      "abs": 34,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Mantis Demon",
+       "wiki plot: 14 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Kyojuro Rengoku": {
+    "aliases": [
+     "kyojuro",
+     "kyojuro rengoku"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+      "abs": 32,
+      "score": 14.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu",
+       "wiki battle: Kyojuro Rengoku vs Akaza",
+       "wiki plot: 20 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+      "abs": 27,
+      "score": 11.0,
+      "sources": [
+       "wiki battle: Kyojuro Rengoku vs Slasher",
+       "wiki plot: 17 fight lines naming them",
+       "wiki title: Flame Hashira Kyojuro Rengoku"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+      "abs": 33,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Kyojuro Rengoku vs Akaza",
+       "wiki plot: 20 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+      "abs": 31,
+      "score": 6.24,
+      "sources": [
+       "wiki battle: Demon Slayers vs Enmu",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+      "abs": 28,
+      "score": 4.76,
+      "sources": [
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E01",
+      "abs": 34,
+      "score": 2.6,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Akaza": {
+    "aliases": [
+     "akaza"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+      "abs": 32,
+      "score": 10.76,
+      "sources": [
+       "wiki battle: Kyojuro Rengoku vs Akaza",
+       "wiki plot: 16 fight lines naming them",
+       "wiki title: Akaza"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+      "abs": 33,
+      "score": 9.88,
+      "sources": [
+       "wiki battle: Kyojuro Rengoku vs Akaza",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E01",
+      "abs": 34,
+      "score": 3.36,
+      "sources": [
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E01",
+      "abs": 45,
+      "score": 3.18,
+      "sources": [
+       "wiki plot: 5 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Daki": {
+    "aliases": [
+     "daki"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+      "abs": 39,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 18 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+      "abs": 40,
+      "score": 8.92,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+      "abs": 41,
+      "score": 8.46,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+      "abs": 43,
+      "score": 8.14,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+      "abs": 42,
+      "score": 7.48,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 7 fight lines naming them",
+       "wiki title: Defeating an Upper Rank Demon"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E04",
+      "abs": 37,
+      "score": 6.36,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E05",
+      "abs": 38,
+      "score": 5.44,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+      "abs": 44,
+      "score": 2.36,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Gyutaro": {
+    "aliases": [
+     "gyutaro"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+      "abs": 42,
+      "score": 9.38,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 12 fight lines naming them",
+       "wiki title: Defeating an Upper Rank Demon"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+      "abs": 41,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 16 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+      "abs": 43,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 15 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E11",
+      "abs": 44,
+      "score": 6.0,
+      "sources": [
+       "wiki plot: 11 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+      "abs": 40,
+      "score": 5.28,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E04",
+      "abs": 37,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E05",
+      "abs": 38,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+      "abs": 39,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Daki and Gyutaro"
+      ]
+     }
+    ]
+   },
+   "Giyu Tomioka": {
+    "aliases": [
+     "giyu",
+     "giyu tomioka"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E18",
+      "abs": 18,
+      "score": 9.66,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Father)",
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E19",
+      "abs": 19,
+      "score": 5.74,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E20",
+      "abs": 20,
+      "score": 5.7,
+      "sources": [
+       "wiki battle: Tanjiro Kamado, Nezuko Kamado, and Giyu Tomioka vs Rui",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 5.16,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E01",
+      "abs": 1,
+      "score": 4.58,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Nezuko Kamado vs Giyu Tomioka",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E02",
+      "abs": 57,
+      "score": 4.5,
+      "sources": [
+       "wiki plot: 5 fight lines naming them",
+       "wiki title: Water Hashira Giyu Tomioka's Pain"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+      "abs": 21,
+      "score": 4.18,
+      "sources": [
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+      "abs": 17,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Tanjiro Kamado and Inosuke Hashibira vs Spider Demon (Father)"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+      "abs": 62,
+      "score": 3.94,
+      "sources": [
+       "wiki plot: 7 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Shinobu Kocho": {
+    "aliases": [
+     "kocho",
+     "shinobu kocho"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S1E20",
+      "abs": 20,
+      "score": 4.54,
+      "sources": [
+       "wiki battle: Shinobu Kocho vs Spider Demon (Daughter)",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 4.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1"
+      ]
+     }
+    ]
+   },
+   "Muichiro Tokito": {
+    "aliases": [
+     "muichiro",
+     "muichiro tokito",
+     "tokito"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+      "abs": 53,
+      "score": 13.0,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 22 fight lines naming them",
+       "wiki title: Mist Hashira Muichiro Tokito"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+      "abs": 49,
+      "score": 11.68,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 9 fight lines naming them",
+       "wiki title: Bright Red Blade"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+      "abs": 52,
+      "score": 10.0,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki plot: 15 fight lines naming them",
+       "wiki title: The Mu in Muichiro"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+      "abs": 48,
+      "score": 9.28,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: Thank You, Tokito"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+      "abs": 51,
+      "score": 8.48,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+      "abs": 50,
+      "score": 6.62,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E03",
+      "abs": 47,
+      "score": 6.44,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 5 fight lines naming them",
+       "wiki title: A Sword from Over 300 Years Ago"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+      "abs": 55,
+      "score": 6.36,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 6 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E04",
+      "abs": 59,
+      "score": 6.0,
+      "sources": [
+       "wiki plot: 15 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E02",
+      "abs": 46,
+      "score": 5.92,
+      "sources": [
+       "wiki plot: 13 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 5.16,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+      "abs": 54,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu"
+      ]
+     }
+    ]
+   },
+   "Hantengu": {
+    "aliases": [
+     "hantengu"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+      "abs": 55,
+      "score": 8.14,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 9 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E10",
+      "abs": 54,
+      "score": 7.48,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E03",
+      "abs": 47,
+      "score": 5.7,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: A Sword from Over 300 Years Ago"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+      "abs": 51,
+      "score": 4.74,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 3 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+      "abs": 49,
+      "score": 4.62,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 2 fight lines naming them",
+       "wiki title: Bright Red Blade"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+      "abs": 50,
+      "score": 4.2,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu",
+       "wiki plot: 2 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+      "abs": 48,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+      "abs": 53,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Demon Slayers vs Hantengu"
+      ]
+     }
+    ]
+   },
+   "Gyokko": {
+    "aliases": [
+     "gyokko"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+      "abs": 53,
+      "score": 9.0,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki plot: 15 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+      "abs": 49,
+      "score": 7.56,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki plot: 7 fight lines naming them",
+       "wiki title: Bright Red Blade"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+      "abs": 52,
+      "score": 7.4,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki plot: 8 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+      "abs": 51,
+      "score": 5.32,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki plot: 4 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+      "abs": 50,
+      "score": 3.58,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko",
+       "wiki plot: 1 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+      "abs": 48,
+      "score": 3.0,
+      "sources": [
+       "wiki battle: Muichiro Tokito vs Gyokko"
+      ]
+     }
+    ]
+   },
+   "Doma": {
+    "aliases": [
+     "doma"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S4E01",
+      "abs": 45,
+      "score": 2.52,
+      "sources": [
+       "wiki plot: 4 fight lines naming them"
+      ]
+     }
+    ]
+   },
+   "Gyomei Himejima": {
+    "aliases": [
+     "gyomei",
+     "gyomei himejima"
+    ],
+    "role": "Main",
+    "ranked": [
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E08",
+      "abs": 63,
+      "score": 8.14,
+      "sources": [
+       "wiki battle: Demon Slayers vs Muzan Kibutsuji: Part 1",
+       "wiki plot: 7 fight lines naming them"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E07",
+      "abs": 62,
+      "score": 4.46,
+      "sources": [
+       "wiki plot: 5 fight lines naming them",
+       "wiki title: Stone Hashira, Gyomei Himejima"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E06",
+      "abs": 61,
+      "score": 3.14,
+      "sources": [
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: The Strongest of the Demon Slayer Corps"
+      ]
+     },
+     {
+      "ep": "demon-slayer-kimetsu-no-yaiba:S5E01",
+      "abs": 56,
+      "score": 2.94,
+      "sources": [
+       "wiki plot: 4 fight lines naming them",
+       "wiki title: To Defeat Muzan Kibutsuji"
+      ]
+     }
+    ]
+   }
+  },
+  "seconds": 49
  }
 }
