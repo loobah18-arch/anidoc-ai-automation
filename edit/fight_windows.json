@@ -1,5 +1,5 @@
 {
- "_doc": "Hand-checked fight windows (seconds into each episode) per character slug. The drop edit takes its shots ONLY from these when the character has any; characters without an entry get fight windows detected automatically (sustained high-impact stretches the character is in). gojo = the shot list of Gojo_AMV_Funk_Infernal_v2 (gojo-amv-exact/edit/shots.json).",
+ "_doc": "Hand-checked fight windows (seconds into each episode) per character slug. The drop edit takes its shots ONLY from these when the character has any; characters without an entry get fight windows detected automatically (sustained high-impact stretches the character is in). gojo = the shot list of Gojo_AMV_Funk_Infernal_v2 (gojo-amv-exact/edit/shots.json). 2026-11-18 trims (checked frame by frame): S2E04 79-101 and 154-176 dropped (cold open, episode title card, opening song, dark corridor); S2E09 174-231 -> 174-224 (train-station crowd at 224-227) and 784-901 -> 784-892.5 (Shibuya Halloween crowd / Joker cosplayer at 893-901).",
  "gojo": {
   "jujutsu-kaisen:S1E07": [
    [
@@ -33,14 +33,6 @@
   ],
   "jujutsu-kaisen:S2E04": [
    [
-    79.0,
-    101.0
-   ],
-   [
-    154.0,
-    176.0
-   ],
-   [
     799.0,
     851.0
    ],
@@ -52,7 +44,7 @@
   "jujutsu-kaisen:S2E09": [
    [
     174.0,
-    231.0
+    224.0
    ],
    [
     354.0,
@@ -64,7 +56,7 @@
    ],
    [
     784.0,
-    901.0
+    892.5
    ],
    [
     984.0,

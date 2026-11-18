@@ -87,8 +87,20 @@ def _fandom(name, series):
     return [(info[t].get('thumburl') or info[t]['url']) for t in still if t in info]
 
 
+_JIKAN_FAILS = [0]
+
+
 def _jikan(name):
-    js = json.loads(_get('https://api.jikan.moe/v4/characters?' + urllib.parse.urlencode(dict(q=name, limit=3, order_by='favorites', sort='desc'))))
+    if _JIKAN_FAILS[0] >= 2:                                          # unreachable from this runner (Errno 101 on GitHub): stop asking
+        return []
+    try:
+        js = json.loads(_get('https://api.jikan.moe/v4/characters?' + urllib.parse.urlencode(dict(q=name, limit=3, order_by='favorites', sort='desc')), timeout=12))
+        _JIKAN_FAILS[0] = 0
+    except Exception:
+        _JIKAN_FAILS[0] += 1
+        if _JIKAN_FAILS[0] == 2:
+            print('jikan unreachable twice, skipping it for the other characters', flush=True)
+        raise
     out = []
     for c in js.get('data', [])[:1]:
         out.append(c['images']['jpg']['image_url'])
@@ -346,6 +358,15 @@ ACTION = ['an anime fight scene with a sword slash', 'an anime character unleash
 CALM = ['two anime characters calmly talking', 'an anime character standing still in a quiet room',
         'an anime landscape with no people', 'an anime close-up of a character eating or smiling',
         'a dark blank frame or title card']
+# shots that are never combat even inside a fight window: crowds, costumes, title cards, empty scenery, dark frames.
+# noncombat = best match here minus best ACTION match (> 0: reads more like these than like any fight)
+NONCOMBAT = ['a crowd of people in halloween costumes on a city street at night',
+             'a person in clown or joker face paint in a crowd',
+             'a crowd of ordinary people standing in a train station',
+             'an anime episode title card with white text on a black screen',
+             'an anime title logo with japanese text',
+             'an empty sky over dark mountains with no people',
+             'a nearly black frame with a small light in the darkness']
 
 
 def _best(M, x):
@@ -375,6 +396,7 @@ class Scorer:
                    f'{name}, {look}' if look else f'{name} fighting']
         t = embed_text(names_t + ACTION + CALM)
         nn = len(names_t); self.t_name, self.t_act, self.t_calm = t[:nn], t[nn:nn + len(ACTION)], t[nn + len(ACTION):]
+        self.t_non = embed_text(NONCOMBAT)
         self.image_mode = self.ref is not None and len(self.others_w) >= 2
         print(f'charvis ready for {name}: {0 if self.ref is None else len(self.ref)} stills, '
               f'{0 if self.ref_face is None else len(self.ref_face)} face refs, {len(self.others_w)} other characters with refs, '
@@ -423,6 +445,7 @@ class Scorer:
             face = (_best(self.ref_face, f) or 0.0) if f is not None else 0.0
             named = float((self.t_name @ e).max())
             act = float((self.t_act @ e).max() - (self.t_calm @ e).max())
+            noncombat = float((self.t_non @ e).max() - (self.t_act @ e).max())
             if self.image_mode:                                      # image refs: how much more like them than anyone else
                 if f is not None and self.ref_face is not None and self.others_f:
                     mine, theirs = face, max(_best(v, f) for v in self.others_f.values())
@@ -434,7 +457,8 @@ class Scorer:
                 look_self = float(self.t_name[1] @ e)
                 rel = look_self - float((self.t_others @ e).max()) if self.t_others is not None else 0.0
                 char = max(whole, face) + 1.0 * named + 2.0 * rel
-            out.append(dict(char=char, rel=rel, face=face, whole=whole, named=named, action=act, has_face=f is not None))
+            out.append(dict(char=char, rel=rel, face=face, whole=whole, named=named, action=act, noncombat=noncombat,
+                            has_face=f is not None))
         return out
 
     def present(self, items, margin=-0.02):

@@ -149,6 +149,12 @@ def duration(p):
     return float(sh(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', p]))
 
 
+BLACK_MEAN, BLACK_P90 = 14.0, 30.0                                    # per frame, 0-255 luma at scan size
+DARK_MEAN = float(os.environ.get('DARK_MEAN', 24)); DARK_P90 = float(os.environ.get('DARK_P90', 36))   # night fights sit at
+                                                                     # ~19-34 / 40-60 and stay; corridor 10-21 / 18-33, title card 4 / 0 go
+DARK_SHARE = float(os.environ.get('DARK_SHARE', 0.4))
+
+
 def scan(code):
     p = SRC(code)
     raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-i', p, '-vf',
@@ -163,12 +169,34 @@ def scan(code):
     cuts = [0] + [i for i in range(1, len(diff)) if diff[i] > max(18, 4 * med[i])] + [len(diff)]
     dur = len(diff) / SCAN_FPS
     lo, hi = 25.0, dur - 140.0                                        # skip cold-open title + ED/preview
+    flat = gray.reshape(len(gray), -1)
+    f_mean, f_p90 = flat.mean(axis=1), np.percentile(flat, 90, axis=1)
+    black = (f_mean < BLACK_MEAN) & (f_p90 < BLACK_P90)               # truly black (fade to / from black)
+    dark = (f_mean < DARK_MEAN) & (f_p90 < DARK_P90)                 # too dark to read (corridor, glint on black, title card)
     shots, sigs = [], []
+    n_dark = 0
     for a, b in zip(cuts[:-1], cuts[1:]):
         s, e = a / SCAN_FPS, b / SCAN_FPS
         if b - a >= 3:
             sigs.append((s, gray[(a + b) // 2].reshape(9, 4, 16, 4).mean(axis=(1, 3)).ravel()))
+        while a < b and black[a]:                                     # a fade: drop only the truly black frames, keep the shot
+            a += 1
+        while b > a and black[b - 1]:
+            b -= 1
+        a0, b0 = a, b                                                 # dark head / tail (title card, corridor) cut off too
+        while a < b and dark[a]:
+            a += 1
+        while b > a and dark[b - 1]:
+            b -= 1
+        if b - a < 6:                                                 # nothing readable left
+            a, b = a0, b0
+        if b - a < 3:
+            continue
+        s, e = a / SCAN_FPS, b / SCAN_FPS
         if e - s < 0.45 or s < lo or e > hi:
+            continue
+        if dark[a:b].mean() > DARK_SHARE:                             # mostly dark: mean AND bright end both low
+            n_dark += 1
             continue
         seg = slice(a + 1, b)
         inner = diff[seg] if b - a > 2 else diff[a:b]
@@ -182,7 +210,7 @@ def scan(code):
                           motion=float(np.mean(inner)), peak=float(np.percentile(inner, 90)),
                           contrast=contrast, sat=float(sat[a:b].mean()), bright=bright,
                           thumb=thumb.round(1).tolist()))
-    print(code, 'shots', len(shots), flush=True)
+    print(code, 'shots', len(shots), f'({n_dark} mostly-dark shots dropped)', flush=True)
     return code, shots, sigs
 
 
@@ -436,6 +464,11 @@ def _auto_fight_windows(full_pool, anchors, rel_of, act_of=None):
     return win
 
 
+NONCOMBAT_MAX = -0.003                                                # charvis noncombat score above this: never a fight shot
+                                                                      # (Gojo windows: title logo .13, Halloween crowd .05, mahjong .03,
+                                                                      #  Joker cosplayer .007, opening shots .01; fight shots <= -0.02)
+
+
 def _drop_char_pool(full_pool):
     """Character purity for the drop edit, for any anime and any character. Shots come ONLY from the character's
     fights: hand-checked windows (fight_windows.json) when the character has them, else fight stretches detected
@@ -462,7 +495,8 @@ def _drop_char_pool(full_pool):
     lo_imp = float(np.percentile(imp, 55))
     cands = [s for s in full_pool if (in_win(s, curated) if curated else s['impact'] >= lo_imp)]
     res = cv_.score([(SRC(s['ep']), (s['s'] + s['e']) / 2) for s in cands])
-    cands = [dict(s, rel=r['rel'], char=r['char'], action=r['action']) for s, r in zip(cands, res) if r]
+    cands = [dict(s, rel=r['rel'], char=r['char'], action=r['action'], noncombat=r.get('noncombat', -1.0))
+             for s, r in zip(cands, res) if r]
     Az = z([s['action'] for s in cands]); Cz = z([s['char'] for s in cands])
     for i, s in enumerate(cands):
         s['act_z'], s['char_z'] = float(Az[i]), float(Cz[i])
@@ -487,10 +521,17 @@ def _drop_char_pool(full_pool):
     print(f'drop style: {len(anchors)} anchor shots clearly {CHAR_NAME}; {how} fight windows:',
           {e: [(round(a), round(b)) for a, b in v] for e, v in win.items()}, flush=True)
     BRIGHT_MIN = float(os.environ.get('DROP_BRIGHT_MIN', 32))
+    NC_MAX = float(os.environ.get('DROP_NONCOMBAT_MAX', NONCOMBAT_MAX))
+    AUTO_REL = float(os.environ.get('DROP_AUTO_REL_MIN', 0.02))
+    noncombat = [s for s in cands if in_win(s, win) and s['noncombat'] > NC_MAX]   # crowd / costume / title card / empty sky,
+    if noncombat:                                                     # even inside a hand-checked window
+        print(f'drop style: {len(noncombat)} non-combat shots out of the fight windows (crowd, title card, scenery):',
+              [(s_['ep'].split(':')[-1], round(s_['s'])) for s_ in noncombat[:12]], flush=True)
     if curated:                                                       # hand-checked fights: only drop a clear opponent solo / dark shot
-        pure = [s for s in cands if in_win(s, win) and s['rel'] >= -0.05 and s['bright'] >= BRIGHT_MIN]
-    else:
-        pure = [s for s in cands if in_win(s, win) and s['rel'] >= -0.02 and s['act_z'] >= -0.25 and s['bright'] >= BRIGHT_MIN]
+        pure = [s for s in cands if in_win(s, win) and s['rel'] >= -0.05 and s['bright'] >= BRIGHT_MIN and s['noncombat'] <= NC_MAX]
+    else:                                                             # detected fights: the character must clearly be the one on screen
+        pure = [s for s in cands if in_win(s, win) and s['rel'] >= AUTO_REL and s['act_z'] >= -0.25 and s['bright'] >= BRIGHT_MIN
+                and s['noncombat'] <= NC_MAX]
     print(f'drop style: {len(pure)} {CHAR_NAME} shots inside the fight windows', flush=True)
     need = int(os.environ.get('DROP_MIN_SHOTS', 60))
     for pct in (IMPACT_PCT, 75.0, 65.0, 50.0):
@@ -658,7 +699,7 @@ if len(assign) < n:                                                   # small po
         t = s['s']
         while t + d <= s['e'] + 1e-6:
             if free(s['ep'], t, t + d):
-                return dict(s, s=round(t, 3), e=round(t + d, 3))
+                return dict(s, s=round(t, 3), e=round(t + d, 3), orig=s.get('orig', s['s']))
             t += 0.25
         return None
     near = sorted((s for s in ep_all if id(s) not in taken and all(id(s) != id(p) for p in pool)),
@@ -713,15 +754,19 @@ if len(assign) < n:                                                   # small po
         second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 if len(assign) < n:
     sys.exit(f'not enough shots ({len(assign)}/{n})')
-if DROP_STYLE and n > 3:                                              # pieces of one long shot never sit side by side (reads as a frozen hold)
-    near_ = lambda x, y: x['ep'] == y['ep'] and x['s'] < y['e'] + 6 and y['s'] < x['e'] + 6
+if DROP_STYLE and n > 3:                                              # pieces of one long shot never sit within 4 cuts of each other
+    near_ = lambda x, y: x['ep'] == y['ep'] and x['s'] < y['e'] + 6 and y['s'] < x['e'] + 6   # (reads as a frozen hold / a repeat)
+    SPACE = int(os.environ.get('DROP_REPEAT_SPACE', 4))
+    clash = lambda shot, pos, skip: any(near_(shot, assign[x]) for x in range(pos - SPACE, pos + SPACE + 1)
+                                        if 0 <= x < n and x != pos and x not in skip)
     for i in range(2, n):
-        if near_(assign[i], assign[i - 1]):
+        if any(near_(assign[i], assign[x]) for x in range(max(0, i - SPACE), i)):
             for j in list(range(i + 1, n)) + list(range(1, i - 1)):
-                cand_, nb = assign[j], [assign[i - 1]] + ([assign[i + 1]] if i + 1 < n else [])
-                nbj = [assign[x] for x in (j - 1, j + 1) if 0 <= x < n and x != i]
-                if not any(near_(cand_, y) for y in nb) and not any(near_(assign[i], y) for y in nbj):
+                if not clash(assign[j], i, {i, j}) and not clash(assign[i], j, {i, j}):
                     assign[i], assign[j] = assign[j], assign[i]; break
+    rep = sum(1 for i in range(1, n) if any(near_(assign[i], assign[x]) for x in range(max(0, i - SPACE), i)))
+    print(f'drop style: {len({(s_["ep"], s_.get("orig", s_["s"])) for s_ in assign.values()})} distinct shots for {n} cuts, '
+          f'{rep} cuts still within {SPACE} of a piece of the same shot', flush=True)
 if DROP_STYLE and n > 2:                                              # end on the finisher, not on whatever came last
     fin = max(range(1, n), key=lambda i: assign[i]['impact'])
     assign[fin], assign[n - 1] = assign[n - 1], assign[fin]
