@@ -11,7 +11,7 @@
   "dygo_funk_infernal": 2,
   "rubikdice_montagem_pegadora_slowed": 1,
   "zxvren_montagem_delirio_slowed": 2,
-  "lonown_avangard_phonk": 1,
+  "lonown_avangard_phonk": 2,
   "ashreveal_manasha_phonk": 1,
   "trashxrl_deus_do_olimpo": 1,
   "atlxs_passo_bem_solto_slowed": 2,
@@ -67,7 +67,10 @@
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 1,
   "jujutsu-kaisen:S3E08": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E17": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E17": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E07": 1
  },
  "shots": [
   {
@@ -5745,6 +5748,198 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
    "s": 1115.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 887.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 905.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1051.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 988.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 163.334
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 337.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 513.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 679.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 690.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 837.358
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 839.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 922.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 951.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 1010.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 1037.358
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 139.416
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 181.9
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 187.666
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 216.191
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 229.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 238.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 262.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 404.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 455.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 469.084
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 613.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 743.566
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 924.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 1245.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 1258.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 128.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 132.416
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 138.483
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 167.166
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 171.316
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 223.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 323.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 323.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 329.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 423.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 601.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 767.025
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 859.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 954.566
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 968.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1122.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1222.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1263.667
   }
  ],
  "runs": [
@@ -6067,6 +6262,18 @@
    "song": "glxxmstrider_dont_stop_slowed",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-18 00:59 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "lonown_avangard_phonk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E09",
+    "demon-slayer-kimetsu-no-yaiba:S1E10",
+    "demon-slayer-kimetsu-no-yaiba:S4E07"
    ],
    "file": "_amv_part.mp4"
   }
@@ -6514,11 +6721,41 @@
     1306.7,
     1372.8
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E09": [
+   [
+    49.8,
+    146.9
+   ],
+   [
+    1288.3,
+    1371.3
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E10": [
+   [
+    -4.0,
+    136.0
+   ],
+   [
+    1309.3,
+    1391.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E07": [
+   [
+    27.8,
+    125.0
+   ],
+   [
+    1289.4,
+    1385.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 15,
-  "demon-slayer-kimetsu-no-yaiba": 15
+  "demon-slayer-kimetsu-no-yaiba": 16
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -6854,6 +7091,19 @@
    "e": 969.1666666666666,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
    "time": "2026-11-16 22:29 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 422.0,
+   "e": 437.8333333333333,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
+   "time": "2026-11-18 01:00 UTC",
+   "character": "nezuko",
+   "song": "lonown_avangard_phonk",
+   "voice": "en-US-AndrewNeural",
+   "writer": "groq:openai/gpt-oss-120b",
+   "mode": "rhyme",
+   "title": "Nezuko quote that hits hard \ud83e\udd76 #shorts"
   }
  ],
  "styles": [
@@ -6874,6 +7124,12 @@
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
    "time": "2026-11-16 22:29 UTC"
+  },
+  {
+   "style": "narrated",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
+   "time": "2026-11-18 01:00 UTC"
   }
  ],
  "narr_chars": {
@@ -6883,7 +7139,8 @@
   "hakari": 1,
   "sukuna": 1,
   "akaza": 1,
-  "higuruma": 1
+  "higuruma": 1,
+  "nezuko": 1
  },
  "narr_lines": {
   "zenitsu": [
@@ -6924,6 +7181,12 @@
    "His judgment swift, a blade of endless fright",
    "In halls of law he forged a cursed domain",
    "Where guilty souls fall, their power wanes again."
+  ],
+  "nezuko": [
+   "Behold Nezuko, pure heart within demon\u2019s frame",
+   "She shuns mortal flesh, yet wields fierce flame.",
+   "When shadows rise, her blood ignites the gloom",
+   "A gentle bane, she shields the world from doom."
   ]
  },
  "lore_used": {
@@ -6938,7 +7201,8 @@
    "The King of Curses, whose power was sealed into twenty finge": 1
   },
   "akaza": {},
-  "higuruma": {}
+  "higuruma": {},
+  "nezuko": {}
  },
  "credit_zones": {
   "demon-slayer-kimetsu-no-yaiba:S3E07": [
@@ -7069,6 +7333,46 @@
    [
     1249.0,
     1325.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E07": [
+   [
+    25.0,
+    86.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E01": [
+   [
+    2653.0,
+    2714.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E10": [
+   [
+    5.0,
+    49.0
+   ],
+   [
+    49.0,
+    103.0
+   ],
+   [
+    1277.0,
+    1374.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E09": [
+   [
+    60.0,
+    114.0
+   ],
+   [
+    1214.0,
+    1258.0
+   ],
+   [
+    1256.0,
+    1353.0
    ]
   ]
  }
