@@ -391,21 +391,28 @@ def _save_auto_windows(det, anchors):
         print('could not cache auto fight windows:', ex, flush=True)
 
 
-def _auto_fight_windows(full_pool, anchors, rel_of):
-    """Any anime, any character: a fight is a sustained stretch of high-impact shots (hot shots no more than 4 s apart,
-    10 s+ long). It is this character's fight when clear-identity shots sit inside it and, on balance, the stretch
-    does not read as someone else."""
+def _auto_fight_windows(full_pool, anchors, rel_of, act_of=None):
+    """Any anime, any character: a fight is a sustained stretch of hot shots (heat = impact + 0.6 * CLIP action z for
+    the shots charvis scored; hot = top 65% of the episode; hot shots no more than 6 s apart, 10 s+ long, 4+ shots).
+    It is this character's fight when clear-identity shots sit inside it and, on balance, the stretch does not read as
+    someone else. Tuned offline against the hand-checked Gojo windows (S1E07, S2E04, S2E09): recall 75.5% of curated
+    seconds at 41.3% precision (the old 60th-percentile / 4 s rule: recall 11.5%, precision 21.7%)."""
+    HOT_PCT = float(os.environ.get('FIGHT_HOT_PCT', 35))
+    GAP = float(os.environ.get('FIGHT_GAP', 6.0))
+    ACT_W = float(os.environ.get('FIGHT_ACT_W', 0.6))
+    act_of = act_of or {}
+    heat = lambda s: s['impact'] + ACT_W * act_of.get((s['ep'], s['s']), 0.0)
     win = {}
     for ep in sorted({s['ep'] for s in full_pool}):
         sh_ = sorted((s for s in full_pool if s['ep'] == ep), key=lambda s: s['s'])
         if len(sh_) < 8:
             continue
-        hot_gate = float(np.percentile([s['impact'] for s in sh_], 60))
+        hot_gate = float(np.percentile([heat(s) for s in sh_], HOT_PCT))
         segs, cur = [], None
         for s in sh_:
-            if s['impact'] < hot_gate:
+            if heat(s) < hot_gate:
                 continue
-            if cur and s['s'] - cur[1] <= 4.0:
+            if cur and s['s'] - cur[1] <= GAP:
                 cur[1] = s['e']; cur[2] += 1
             else:
                 cur = [s['s'], s['e'], 1]; segs.append(cur)
@@ -416,7 +423,7 @@ def _auto_fight_windows(full_pool, anchors, rel_of):
             n_anchor = sum(1 for s in anchors if inside(s))
             rels = [r for s, r in rel_of if inside(s)]
             if n_anchor >= 2 or (n_anchor >= 1 and rels and float(np.mean(rels)) >= 0.0):
-                win.setdefault(ep, []).append((a - 1.0, b + 1.0))
+                win.setdefault(ep, []).append((a - 2.0, b + 2.0))
     return win
 
 
@@ -459,7 +466,8 @@ def _drop_char_pool(full_pool):
         pool_eps = sorted({s['ep'] for s in full_pool})
         win = {e: cached[e] for e in pool_eps if cached.get(e)}
         todo = [e for e in pool_eps if e not in win]
-        det = _auto_fight_windows([s for s in full_pool if s['ep'] in todo], anchors, [(s, s['rel']) for s in cands]) if todo else {}
+        det = _auto_fight_windows([s for s in full_pool if s['ep'] in todo], anchors, [(s, s['rel']) for s in cands],
+                                  {(s['ep'], s['s']): s['act_z'] for s in cands}) if todo else {}
         win.update(det)
         how = f"detected {sorted(det)}" + (f" + cached {sorted(e for e in win if e not in det)}" if len(win) > len(det) else '')
         _save_auto_windows(det, anchors)
