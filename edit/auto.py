@@ -271,6 +271,12 @@ pool = [s for k, s in enumerate(allshots)
         if not dup[k] and not any((s['ep'], round(s['s']) + o) in used for o in (-2, -1, 0, 1, 2))]
 if len(pool) < 90 or INCLUDE:                                                    # history too tight: allow reuse
     pool = [s for k, s in enumerate(allshots) if not dup[k]]
+elif DROP_STYLE and os.environ.get('CHAR_SLUG'):                     # a character's fights are finite: earlier runs must not
+    fresh_ids = {id(s) for s in pool}                                # eat them up (the pool shrank to 10 Gojo shots), so used
+    pool = [s for k, s in enumerate(allshots) if not dup[k]]         # shots come back, ranked a little below fresh ones
+    for s in pool:
+        s['reused'] = id(s) not in fresh_ids
+    print(f'drop style: {sum(s["reused"] for s in pool)} shots used by earlier runs allowed back (ranked below fresh ones)', flush=True)
 print('pool', len(pool), 'of', len(allshots), flush=True)
 
 
@@ -282,6 +288,9 @@ M, P_, C, S, B = (z([s[k] for s in pool]) for k in ('motion', 'peak', 'contrast'
 for i, s in enumerate(pool):
     s['impact'] = float(0.55 * M[i] + 0.35 * P_[i] + 0.25 * C[i] + 0.2 * S[i] + 0.15 * min(B[i], 1.0))
     s['calm'] = float(-0.6 * abs(M[i] + 0.3) + 0.4 * C[i] + 0.3 * S[i] + 0.3 * min(2.5, s['e'] - s['s']))
+for s in pool:
+    if s.get('reused'):
+        s['impact'] -= 0.25
 full_pool = list(pool)
 if DROP_STYLE:                                                        # action only: every shot in the top 15% by impact
     gate = float(np.percentile([s['impact'] for s in pool], IMPACT_PCT))
