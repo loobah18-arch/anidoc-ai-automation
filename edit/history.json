@@ -17,7 +17,7 @@
   "atlxs_passo_bem_solto_slowed": 2,
   "poker_face": 3,
   "ncts_next_phonk": 2,
-  "nxxkz_loucura_letal_funk_slowed": 2
+  "nxxkz_loucura_letal_funk_slowed": 3
  },
  "episodes": {
   "jujutsu-kaisen:S2E01": 2,
@@ -48,7 +48,7 @@
   "jujutsu-kaisen:S1E17": 1,
   "jujutsu-kaisen:S1E23": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E07": 2,
-  "demon-slayer-kimetsu-no-yaiba:S2E05": 2,
+  "demon-slayer-kimetsu-no-yaiba:S2E05": 3,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E24": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
@@ -56,7 +56,7 @@
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S3E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E01": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E10": 2,
   "jujutsu-kaisen:S1E11": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
   "jujutsu-kaisen:S3E05": 1,
@@ -67,7 +67,7 @@
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 2,
   "jujutsu-kaisen:S3E08": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E17": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E17": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E07": 1,
@@ -79,7 +79,8 @@
   "demon-slayer-kimetsu-no-yaiba:S4E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E06": 1
+  "demon-slayer-kimetsu-no-yaiba:S4E06": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E02": 1
  },
  "shots": [
   {
@@ -7921,6 +7922,210 @@
   {
    "ep": "jujutsu-kaisen:S2E09",
    "s": 818.334
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1160.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 784.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1111.791
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 684.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 735.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 767.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 806.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 972.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 986.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1021.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 455.317
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 790.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 471.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 826.525
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 240.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 481.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 942.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 510.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 778.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1182.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 427.666
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 457.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 838.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 886.066
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 484.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 805.545
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1089.817
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1101.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 509.296
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 659.275
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 780.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E02",
+   "s": 72.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 821.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 469.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1043.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 1019.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1106.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 482.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 657.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 781.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E02",
+   "s": 73.291
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 971.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 237.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 421.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 733.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1104.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 456.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
+   "s": 761.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 777.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1180.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1045.316
   }
  ],
  "runs": [
@@ -8395,6 +8600,19 @@
     "jujutsu-kaisen:S2E04",
     "jujutsu-kaisen:S2E05",
     "jujutsu-kaisen:S2E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-19 18:31 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "nxxkz_loucura_letal_funk_slowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E17",
+    "demon-slayer-kimetsu-no-yaiba:S2E05",
+    "demon-slayer-kimetsu-no-yaiba:S3E10",
+    "demon-slayer-kimetsu-no-yaiba:S4E02"
    ],
    "file": "_amv_part.mp4"
   }
@@ -9044,11 +9262,37 @@
     1280.0,
     1371.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E01": [
+   [
+    2666.0,
+    2706.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E03": [
+   [
+    66.0,
+    136.0
+   ],
+   [
+    193.0,
+    227.0
+   ],
+   [
+    1170.0,
+    1248.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E02": [
+   [
+    78.0,
+    118.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 25,
-  "demon-slayer-kimetsu-no-yaiba": 17
+  "demon-slayer-kimetsu-no-yaiba": 18
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -9298,7 +9542,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "pollinations",
    "mode": "character",
-   "title": "Zenitsu's power is unreal 😳 #shorts"
+   "title": "Zenitsu's power is unreal \ud83d\ude33 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
@@ -9311,7 +9555,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "template",
    "mode": "rhyme",
-   "title": "Mahito quote that hits hard 🥶 #shorts"
+   "title": "Mahito quote that hits hard \ud83e\udd76 #shorts"
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
@@ -9324,7 +9568,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Daki hits different 🥶 #shorts"
+   "title": "Daki hits different \ud83e\udd76 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S3E05",
@@ -9337,7 +9581,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Kinji quote that hits hard 🥶 #shorts"
+   "title": "Kinji quote that hits hard \ud83e\udd76 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S1E04",
@@ -9350,7 +9594,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Ryomen hits different 🥶 #shorts"
+   "title": "Ryomen hits different \ud83e\udd76 #shorts"
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
@@ -9363,7 +9607,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Akaza quote that hits hard 🥶 #shorts"
+   "title": "Akaza quote that hits hard \ud83e\udd76 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S3E09",
@@ -9376,7 +9620,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Hiromi hits different 🥶 #shorts"
+   "title": "Hiromi hits different \ud83e\udd76 #shorts"
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
@@ -9396,7 +9640,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Nezuko quote that hits hard 🥶 #shorts"
+   "title": "Nezuko quote that hits hard \ud83e\udd76 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S3E01",
@@ -9474,6 +9718,13 @@
    "e": 1103.7,
    "file": "Jujutsu_Kaisen_convo_mvsterious_slava_funk.mp4",
    "time": "2026-11-19 14:55 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E02",
+   "s": 1178.5,
+   "e": 1200.0666666666666,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_nxxkz_loucura_letal_funk_slowed.mp4",
+   "time": "2026-11-19 18:31 UTC"
   }
  ],
  "styles": [
@@ -9553,9 +9804,9 @@
    "Every scar became a vow, the weak one is the hunter now."
   ],
   "daki": [
-   "Behold Daki, whose sashes slash like night’s keen blade",
-   "She weaves the crimson tide, yet ne’er shall she fade.",
-   "Bound to her brother’s doom, she stands till twin heads fall",
+   "Behold Daki, whose sashes slash like night\u2019s keen blade",
+   "She weaves the crimson tide, yet ne\u2019er shall she fade.",
+   "Bound to her brother\u2019s doom, she stands till twin heads fall",
    "Then darkness yields, and silence crowns her fall"
   ],
   "hakari": [
@@ -9571,7 +9822,7 @@
    "A king of curses, ere death, he doth reign."
   ],
   "akaza": [
-   "Behold Akaza, whose fury doth blaze like night’s fire",
+   "Behold Akaza, whose fury doth blaze like night\u2019s fire",
    "He strikes with wrath, ere darkness yields to that fire.",
    "His heart, a tempest, seeks battles as a spear",
    "Thus he doth rise, forever feared by thy spear."
@@ -9583,7 +9834,7 @@
    "Where guilty souls fall, their power wanes again."
   ],
   "nezuko": [
-   "Behold Nezuko, pure heart within demon’s frame",
+   "Behold Nezuko, pure heart within demon\u2019s frame",
    "She shuns mortal flesh, yet wields fierce flame.",
    "When shadows rise, her blood ignites the gloom",
    "A gentle bane, she shields the world from doom."
