@@ -497,7 +497,8 @@ def _drop_char_pool(full_pool):
     cands = [s for s in full_pool if (in_win(s, curated) if curated else s['impact'] >= lo_imp)]
     res = cv_.score([(SRC(s['ep']), (s['s'] + s['e']) / 2) for s in cands])
     cands = [dict(s, rel=r['rel'], char=r['char'], action=r['action'], noncombat=r.get('noncombat', -1.0),
-                  mine=r.get('mine'), vs={k: v for k, v in (r.get('vs') or {}).items() if v is not None})
+                  mine=r.get('mine'), vs={k: v for k, v in (r.get('vs') or {}).items() if v is not None},
+                  look_me=r.get('look_me'), look_vs=r.get('look_vs') or {})
              for s, r in zip(cands, res) if r]
     Az = z([s['action'] for s in cands]); Cz = z([s['char'] for s in cands])
     for i, s in enumerate(cands):
@@ -547,6 +548,23 @@ def _drop_char_pool(full_pool):
         return s['mine'] - max(their) if their else s['rel']
     for s in cands:
         s['riv'] = riv_margin(s)
+    # look veto: CLIP's reading of the look descriptions ("spiky pink hair ...", "volcano-shaped head ..."), each centred on
+    # the pool's mean; a shot that reads as a rival's look clearly more than the target's goes (Yuji close-ups at S1E07
+    # 941/1079 passed every reference check). Offline on 209 Gojo-window shots: wrong picks 3 -> 1, Gojo shots 51 -> 46.
+    LOOK_MIN = float(os.environ.get('DROP_LOOK_MIN', -0.04))
+    lk = [s for s in cands if s.get('look_me') is not None and s['look_vs']]
+    lk_ids = {id(s) for s in lk}
+    if len(lk) >= 20:
+        mu_me = float(np.mean([s['look_me'] for s in lk]))
+        mu = {r: float(np.mean([s['look_vs'][r] for s in lk if r in s['look_vs']])) for r in rivals if any(r in s['look_vs'] for s in lk)}
+        for s in cands:
+            if id(s) in lk_ids and mu:
+                s['look'] = (s['look_me'] - mu_me) - max(s['look_vs'][r] - mu[r] for r in mu if r in s['look_vs'])
+            else:
+                s['look'] = 0.0
+    else:
+        for s in cands:
+            s['look'] = 0.0
     base = lambda s: in_win(s, win) and s['bright'] >= BRIGHT_MIN and s['noncombat'] <= NC_MAX
     gate_of = lambda pct: float(np.percentile([s['impact'] for s in cands] if curated else imp, pct))
     target = int(os.environ.get('DROP_PURE_TARGET', 40))
@@ -560,7 +578,8 @@ def _drop_char_pool(full_pool):
     g50 = gate_of(50.0)
     levels = []
     for rmin, mmin in ladder:
-        pure = [s for s in cands if base(s) and s['rel'] >= rmin and s['riv'] >= mmin and (curated or s['act_z'] >= -0.25)]
+        pure = [s for s in cands if base(s) and s['rel'] >= rmin and s['riv'] >= mmin and s['look'] >= LOOK_MIN
+                and (curated or s['act_z'] >= -0.25)]
         at50 = sum(s['impact'] >= g50 for s in pure)
         levels.append((rmin, mmin, pure, at50))
         print(f'drop style: identity rel>={rmin} & {mmin:+.2f} over rivals: {len(pure)} shots in the windows, {at50} at p50', flush=True)
@@ -571,13 +590,15 @@ def _drop_char_pool(full_pool):
     print(f'drop style: identity step rel>={rmin} & {mmin:+.2f} over rivals chosen ({at50} shots at p50)', flush=True)
     print(f'drop style: rivals {rivals}; {len(pure)} {CHAR_NAME} shots inside the fight windows', flush=True)
     need = int(os.environ.get('DROP_MIN_SHOTS', 60))
-    for pct in (IMPACT_PCT, 75.0, 65.0, 50.0, 40.0):
-        if pct == 40.0 and len(keep) >= 30:                           # p40 only when the stricter identity left p50 thin
-            pct = 50.0
+    last = None
+    for pct in (IMPACT_PCT, 75.0, 65.0, 50.0, 40.0, 30.0):
+        if pct < 50.0 and (len(keep) >= target or not curated):                        # below p50 only while the stricter identity leaves it thin
+            pct = last                                                # (hand-checked windows are all fight: lower impact is still them fighting)
             break
         gate = gate_of(pct)
         keep = [s for s in pure if s['impact'] >= gate]
         print(f'drop style: p{pct:.0f} gate {gate:.3f}: {len(keep)} pure {CHAR_NAME} combat shots', flush=True)
+        last = pct
         if len(keep) >= need:
             break
     purity_pct = pct
