@@ -448,17 +448,18 @@ class Scorer:
             noncombat = float((self.t_non @ e).max() - (self.t_act @ e).max())
             if self.image_mode:                                      # image refs: how much more like them than anyone else
                 if f is not None and self.ref_face is not None and self.others_f:
-                    mine, theirs = face, max(_best(v, f) for v in self.others_f.values())
+                    mine, vs = face, {n: _best(v, f) for n, v in self.others_f.items()}
                 else:
-                    mine, theirs = whole, max(_best(v, e) for v in self.others_w.values())
-                rel = mine - theirs
+                    mine, vs = whole, {n: _best(v, e) for n, v in self.others_w.items()}
+                rel = mine - max(vs.values())
                 char = max(whole, face) + 0.5 * named + 2.0 * rel
             else:                                                    # no refs: the old text look description
                 look_self = float(self.t_name[1] @ e)
                 rel = look_self - float((self.t_others @ e).max()) if self.t_others is not None else 0.0
                 char = max(whole, face) + 1.0 * named + 2.0 * rel
+                mine, vs = None, {}
             out.append(dict(char=char, rel=rel, face=face, whole=whole, named=named, action=act, noncombat=noncombat,
-                            has_face=f is not None))
+                            has_face=f is not None, mine=mine, vs=vs))   # vs: every other character's score (for rival margins)
         return out
 
     def present(self, items, margin=-0.02):

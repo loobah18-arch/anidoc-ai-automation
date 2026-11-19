@@ -464,6 +464,7 @@ def _auto_fight_windows(full_pool, anchors, rel_of, act_of=None):
     return win
 
 
+RIVALS = {'Satoru Gojo': ['Toji Fushiguro', 'Yuji Itadori', 'Jogo', 'Suguru Geto', 'Mahito', 'Ryomen Sukuna']}
 NONCOMBAT_MAX = -0.003                                                # charvis noncombat score above this: never a fight shot
                                                                       # (Gojo windows: title logo .13, Halloween crowd .05, mahjong .03,
                                                                       #  Joker cosplayer .007, opening shots .01; fight shots <= -0.02)
@@ -495,7 +496,8 @@ def _drop_char_pool(full_pool):
     lo_imp = float(np.percentile(imp, 55))
     cands = [s for s in full_pool if (in_win(s, curated) if curated else s['impact'] >= lo_imp)]
     res = cv_.score([(SRC(s['ep']), (s['s'] + s['e']) / 2) for s in cands])
-    cands = [dict(s, rel=r['rel'], char=r['char'], action=r['action'], noncombat=r.get('noncombat', -1.0))
+    cands = [dict(s, rel=r['rel'], char=r['char'], action=r['action'], noncombat=r.get('noncombat', -1.0),
+                  mine=r.get('mine'), vs={k: v for k, v in (r.get('vs') or {}).items() if v is not None})
              for s, r in zip(cands, res) if r]
     Az = z([s['action'] for s in cands]); Cz = z([s['char'] for s in cands])
     for i, s in enumerate(cands):
@@ -528,15 +530,52 @@ def _drop_char_pool(full_pool):
     if noncombat:                                                     # even inside a hand-checked window
         print(f'drop style: {len(noncombat)} non-combat shots out of the fight windows (crowd, title card, scenery):',
               [(s_['ep'].split(':')[-1], round(s_['s'])) for s_ in noncombat[:12]], flush=True)
-    if curated:                                                       # hand-checked fights: only drop a clear opponent solo / dark shot
-        pure = [s for s in cands if in_win(s, win) and s['rel'] >= CUR_REL and s['bright'] >= BRIGHT_MIN and s['noncombat'] <= NC_MAX]
-    else:                                                             # detected fights: the character must clearly be the one on screen
-        pure = [s for s in cands if in_win(s, win) and s['rel'] >= AUTO_REL and s['act_z'] >= -0.25 and s['bright'] >= BRIGHT_MIN
-                and s['noncombat'] <= NC_MAX]
-    print(f'drop style: {len(pure)} {CHAR_NAME} shots inside the fight windows', flush=True)
+    # rivals: the characters this one fights / stands next to. The shot must look more like the target than like each
+    # of them by a margin (Gojo run 44315756019: Toji close-ups at rel -0.03, Yuji and Jogo shots got in)
+    rivals = [r for r in RIVALS.get(CHAR_NAME, []) + [r for r in os.environ.get('CHAR_RIVALS', '').split(',') if r.strip()]]
+    tally = {}
+    for s in cands:
+        if s['vs']:
+            b = max(s['vs'], key=s['vs'].get); tally[b] = tally.get(b, 0) + 1
+    rivals = list(dict.fromkeys([r.strip() for r in rivals] + sorted(tally, key=lambda k: -tally[k])[:6]))
+    rivals = [r for r in rivals if r != CHAR_NAME]
+
+    def riv_margin(s):
+        if s.get('mine') is None or not s['vs']:
+            return s['rel']
+        their = [s['vs'][r] for r in rivals if r in s['vs']]
+        return s['mine'] - max(their) if their else s['rel']
+    for s in cands:
+        s['riv'] = riv_margin(s)
+    base = lambda s: in_win(s, win) and s['bright'] >= BRIGHT_MIN and s['noncombat'] <= NC_MAX
+    gate_of = lambda pct: float(np.percentile([s['impact'] for s in cands] if curated else imp, pct))
+    target = int(os.environ.get('DROP_PURE_TARGET', 40))
+    # identity ladder, strictest first: (rel vs everyone, margin vs the rivals). Relaxed one step at a time only while
+    # fewer than `target` shots pass at the p50 impact gate; the last step is the old rule.
+    if curated:
+        ladder = [(0.01, 0.03), (0.0, 0.02), (0.0, 0.0), (-0.01, 0.01), (-0.01, 0.0), (-0.02, 0.0), (CUR_REL, -9.0)]
+    else:
+        ladder = [(max(AUTO_REL, 0.02), 0.03), (AUTO_REL, 0.02), (AUTO_REL, 0.0), (AUTO_REL, -9.0)]
+    floor = int(os.environ.get('DROP_PURE_FLOOR', 24))               # below this even the loosest checked step is too thin
+    g50 = gate_of(50.0)
+    levels = []
+    for rmin, mmin in ladder:
+        pure = [s for s in cands if base(s) and s['rel'] >= rmin and s['riv'] >= mmin and (curated or s['act_z'] >= -0.25)]
+        at50 = sum(s['impact'] >= g50 for s in pure)
+        levels.append((rmin, mmin, pure, at50))
+        print(f'drop style: identity rel>={rmin} & {mmin:+.2f} over rivals: {len(pure)} shots in the windows, {at50} at p50', flush=True)
+        if at50 >= target:
+            break
+    else:                                                             # nobody reached the target: the loosest checked step if it
+        rmin, mmin, pure, at50 = levels[-2] if len(levels) >= 2 and levels[-2][3] >= floor else levels[-1]   # is not starved, else the old rule
+    print(f'drop style: identity step rel>={rmin} & {mmin:+.2f} over rivals chosen ({at50} shots at p50)', flush=True)
+    print(f'drop style: rivals {rivals}; {len(pure)} {CHAR_NAME} shots inside the fight windows', flush=True)
     need = int(os.environ.get('DROP_MIN_SHOTS', 60))
-    for pct in (IMPACT_PCT, 75.0, 65.0, 50.0):
-        gate = float(np.percentile([s['impact'] for s in cands] if curated else imp, pct))
+    for pct in (IMPACT_PCT, 75.0, 65.0, 50.0, 40.0):
+        if pct == 40.0 and len(keep) >= 30:                           # p40 only when the stricter identity left p50 thin
+            pct = 50.0
+            break
+        gate = gate_of(pct)
         keep = [s for s in pure if s['impact'] >= gate]
         print(f'drop style: p{pct:.0f} gate {gate:.3f}: {len(keep)} pure {CHAR_NAME} combat shots', flush=True)
         if len(keep) >= need:
