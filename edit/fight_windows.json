@@ -368,6 +368,128 @@
     "anchors": 39,
     "detected": "2026-11-18"
    }
+  },
+  "nezuko": {
+   "demon-slayer-kimetsu-no-yaiba:S1E09": {
+    "windows": [
+     [
+      299.4,
+      320.6
+     ],
+     [
+      781.0,
+      852.7
+     ],
+     [
+      858.5,
+      886.3
+     ],
+     [
+      902.0,
+      1016.5
+     ],
+     [
+      1034.5,
+      1070.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Nezuko Kamado",
+    "anchors": 15,
+    "detected": "2026-11-19"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S3E07": {
+    "windows": [
+     [
+      204.0,
+      236.0
+     ],
+     [
+      571.4,
+      692.5
+     ],
+     [
+      696.4,
+      747.9
+     ],
+     [
+      808.8,
+      912.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Nezuko Kamado",
+    "anchors": 20,
+    "detected": "2026-11-19"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S4E06": {
+    "windows": [
+     [
+      120.1,
+      201.3
+     ],
+     [
+      277.0,
+      322.0
+     ],
+     [
+      336.4,
+      467.5
+     ],
+     [
+      502.1,
+      539.0
+     ],
+     [
+      1051.2,
+      1094.8
+     ]
+    ],
+    "source": "auto",
+    "character": "Nezuko Kamado",
+    "anchors": 15,
+    "detected": "2026-11-19"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S4E11": {
+    "windows": [
+     [
+      184.0,
+      276.1
+     ],
+     [
+      898.4,
+      1119.4
+     ],
+     [
+      1121.8,
+      1169.7
+     ],
+     [
+      1178.6,
+      1347.6
+     ],
+     [
+      1413.6,
+      1596.3
+     ],
+     [
+      1604.3,
+      1641.4
+     ],
+     [
+      1676.8,
+      1702.4
+     ],
+     [
+      1704.5,
+      1746.7
+     ]
+    ],
+    "source": "auto",
+    "character": "Nezuko Kamado",
+    "anchors": 55,
+    "detected": "2026-11-19"
+   }
   }
  },
  "_doc_auto": "_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked windows, cached so later runs reuse them. Hand-checked entries stay at the top level."
