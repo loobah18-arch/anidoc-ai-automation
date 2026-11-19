@@ -40,11 +40,9 @@ if style == 'narrated':
         title = rng.choice([f'{first} hits different 🥶', f'This {series} edit goes hard 🔥', f'{first} quote that hits hard 🥶'])
         desc = ' '.join(lines)
 else:
-    best = max(lines, key=len) if lines else ''
-    quote = best if len(best) <= 60 else ' '.join(best.split()[:8]) + '...'
     char = info.get('character_name') or info.get('character')
     first = char.split()[0] if char else series
-    title = rng.choice([f'"{quote}" 🥶', f'{first} battle IQ is unreal 🔥', f'{first} fight goes crazy 😳'])
+    title = rng.choice([f'{first} battle IQ is unreal 🔥', f'{first} fight goes crazy 😳', f'{first} goes all out 🥶'])
     desc = '\n'.join(lines[:6])
 title = title[:90] + ' #shorts'
 tags = ['shorts', 'anime', 'animeedit', tag_series, 'phonk', 'amv']
