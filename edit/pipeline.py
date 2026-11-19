@@ -1,5 +1,5 @@
-"""One Short per run, alternating styles: conversation Short, then narrated Short, then conversation ...
-   STYLE=auto (default) flips from the last style in history.json; STYLE=convo / narrated forces one.
+"""One Short per run: conversation Shorts only (drop-locked AMV edit from edit/convo.py, same as convo_short.yml).
+   STYLE=convo (default, also 'auto'); STYLE=narrated must be asked for explicitly (old quote/rhyme style, off by default).
    Writes out/meta.json (file, style, title, description, tags) for the upload step."""
 import json, os, random, re, subprocess, sys, glob, time
 
@@ -8,11 +8,8 @@ ROOT = os.path.dirname(HERE)
 hist_path = os.path.join(HERE, 'history.json')
 hist = json.load(open(hist_path)) if os.path.exists(hist_path) else {}
 styles = hist.get('styles', [])
-want = (os.environ.get('STYLE') or 'auto').strip().lower()
-if want in ('convo', 'narrated'):
-    style = want
-else:
-    style = 'narrated' if (styles and styles[-1]['style'] == 'convo') else 'convo'
+want = (os.environ.get('STYLE') or 'convo').strip().lower()
+style = 'narrated' if want == 'narrated' else 'convo'      # convo only unless narrated is explicitly forced
 print('style this run:', style, '| last:', styles[-1]['style'] if styles else None, flush=True)
 
 os.makedirs(os.path.join(ROOT, 'out'), exist_ok=True)

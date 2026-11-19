@@ -1,4 +1,4 @@
-name: Anime Shorts Pipeline (alternating convo / narrated, protected uploads)
+name: Anime Shorts Pipeline (conversation Shorts only, protected uploads)
 
 on:
   push:
@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       style:
-        description: 'auto (alternate 50/50 convo & narrated), convo, or narrated'
+        description: 'convo (default; auto = convo) or narrated (old style, only when forced)'
         required: false
-        default: 'auto'
+        default: 'convo'
       pick:
         description: 'auto, an anime name, or a character'
         required: false
@@ -57,9 +57,9 @@ jobs:
           pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 torchaudio==2.7.1 torchvision==0.22.1
           pip3 install --break-system-packages demucs open_clip_torch pillow
       - uses: actions/checkout@v4
-      - name: Make the Short (alternating 50/50 convo / narrated)
+      - name: Make the Short (conversation AMV edit only)
         env:
-          STYLE: ${{ github.event.inputs.style || 'auto' }}
+          STYLE: ${{ github.event.inputs.style || 'convo' }}
           PICK: ${{ github.event.inputs.pick || 'auto' }}
           DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
