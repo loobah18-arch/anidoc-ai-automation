@@ -232,6 +232,7 @@ speech[SONG[:len(speech)]] = 0
 SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
 prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
 bs, bt = -1, fight
+_cands = []
 for t in range(lo, hi - 40, 2):
     if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP) or SONG[max(0, t - 2):t + 27].any():
         continue
@@ -240,8 +241,40 @@ for t in range(lo, hi - 40, 2):
         continue
     act = per_s[t:t + 24].mean() / mref
     sc = 0.6 * talk + 1.5 * min(act, 1.3)
+    _cands.append((sc, t))
     if sc > bs:
         bs, bt = sc, t
+LORE_ALL = json.load(open('lore.json')) if os.path.exists('lore.json') else {}
+_SKIP_SONG = lambda t_: bool(SONG[min(len(SONG) - 1, max(0, int(t_)))])
+PICK_NAME = None                                                      # a character pick: their full name in lore.json
+if PICK in chars:
+    PICK_NAME = next((nm for nm, d in LORE_ALL.get(EPISODES[conv_ep]['series'], {}).items()
+                      if PICK in [a.lower() for a in d.get('names', [])] or PICK == nm.lower()), None)
+if PICK_NAME and _cands and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
+    # a character pick talks in a scene that is visibly about them: of the 5 best talk moments (30+ s apart) the best
+    # one where identify() puts the character on top wins; none of them -> the best-scoring moment as before
+    try:
+        import charvis
+        _top = []
+        for sc_, t_ in sorted(_cands, reverse=True):
+            if all(abs(t_ - u) >= 30 for _, u in _top):
+                _top.append((sc_, t_))
+            if len(_top) >= 5:
+                break
+        for sc_, t_ in _top:
+            r_ = charvis.identify(src, t_, t_ + 24, EPISODES[conv_ep]['series'], lo, hi, skip=_SKIP_SONG,
+                                  expected=(PICK_NAME,), target=PICK_NAME, log=lambda m: print('identify:', m, flush=True))
+            print(f'talk candidate {t_}s (score {sc_:.2f}): {PICK_NAME} votes {r_.get("target_share", 0):.0%}, '
+                  f'top {"yes" if r_.get("target_top") else "no"}', flush=True)
+            if r_.get('target_top'):
+                if t_ != bt:
+                    print(f'talk moment {bt}s -> {t_}s: {PICK_NAME} is on screen there', flush=True)
+                bs, bt = sc_, t_
+                break
+        else:
+            print(f'no talk candidate shows {PICK_NAME} on top; keeping the best-scoring moment {bt}s', flush=True)
+    except Exception as ex:
+        print('talk candidate identification skipped:', ex, flush=True)
 fight = bt
 win0, win1 = max(lo, bt - 12), min(hi, bt + 52)
 print('conversation from', conv_ep, f'| talking fight at {bt}s (score {bs:.2f}), transcribing {win0}-{win1}s', flush=True)
@@ -490,7 +523,6 @@ print('voices separated from the anime music', flush=True)
 # ------------------------------------------------------------------ 5c. identify the main character speaking in this scene
 series_key = EPISODES[conv_ep]['series']
 series_title = series_key.replace('-', ' ').title()
-LORE_ALL = json.load(open('lore.json')) if os.path.exists('lore.json') else {}
 series_lore = LORE_ALL.get(series_key, {})
 
 
@@ -525,7 +557,65 @@ if PICK in chars:
     topic_slug = PICK
     topic_name = lore_name(topic_slug, series_key) or topic_slug.title()
 
-# 2. Visually detect who is on screen during the conversation using charvis CLIP bank
+# 2. who the scene is about: charvis.identify() - a frame every 0.75 s, each votes for its best character
+#    (name / look / stills, z-scored against frames every 25 s of the same episode). Always run and logged, so a
+#    character pick shows whether the talk really features them.
+IDENT = {}
+try:
+    import charvis
+    IDENT = charvis.identify(src, c0, c1, series_key, lo, hi, skip=_SKIP_SONG, expected=(PICK_NAME,) if PICK_NAME else (),
+                             target=PICK_NAME, series_title=series_title, log=lambda m: print('identify:', m, flush=True))
+    print(f'identify votes for the talk {c0:.1f}-{c1:.1f}s: {IDENT.get("votes")} of {IDENT.get("frames")} frames '
+          f'-> {IDENT.get("name") or "unsure"}' + (f' ({PICK_NAME} share {IDENT.get("target_share")})' if PICK_NAME else ''), flush=True)
+    if not topic_name and IDENT.get('name'):
+        topic_name = IDENT['name']
+        topic_slug = char_slug(topic_name, series_key)
+        print('conversation character from identify():', topic_name, flush=True)
+except Exception as ex:
+    print('identify() skipped:', ex, flush=True)
+
+# 3. names said in the subtitles / transcript (lore.json, else the cast the research step found)
+if not topic_name:
+    context_txt = ' '.join(w['w'] for w in cw).lower()
+    heard = {}
+    _names = {nm: d.get('names', []) for nm, d in series_lore.items()}
+    if not _names:
+        try:
+            import research
+            research.get_series(series_key, EPISODES)
+            _names = research.character_names(series_key)
+        except Exception as ex:
+            print('research names skipped:', ex, flush=True)
+    for nm, al in _names.items():
+        n = sum(len(re.findall(r'\b' + re.escape(a.lower()) + r'\b', context_txt)) for a in al)
+        if n: heard[nm] = n
+    if heard:
+        topic_name = max(heard, key=heard.get)
+        topic_slug = char_slug(topic_name, series_key)
+        print('conversation character from the transcript:', heard, flush=True)
+
+# 4. a main character of the series (research_cache.json): the one identify() voted for most, else the main whose
+#    researched fights include this episode
+if not topic_name:
+    try:
+        _rc = json.load(open('research_cache.json')).get(series_key, {}).get('characters', {})
+        mains = [nm for nm, d in _rc.items() if (d.get('role') or '').lower() == 'main']
+        _v = IDENT.get('votes') or {}
+        voted = [nm for nm in mains if _v.get(nm)]
+        if voted:
+            topic_name = max(voted, key=lambda nm: _v[nm])
+        else:
+            here = [(max([r.get('score', 0) for r in _rc[nm].get('ranked', []) if r.get('ep') == conv_ep] or [0]), nm) for nm in mains]
+            here = [x for x in here if x[0] > 0]
+            if here:
+                topic_name = max(here)[1]
+        if topic_name:
+            topic_slug = char_slug(topic_name, series_key)
+            print('conversation character from the researched main cast:', topic_name, flush=True)
+    except Exception as ex:
+        print('research main characters skipped:', ex, flush=True)
+
+# 5. last resort: the old 4-frame best reference match
 if not topic_name:
     try:
         import charvis
@@ -547,27 +637,9 @@ if not topic_name:
                 if scores[top_char] >= 0.20:
                     topic_name = top_char
                     topic_slug = char_slug(topic_name, series_key)
+                    print('conversation character from the 4-frame reference match:', topic_name, flush=True)
     except Exception as ex:
         print('charvis conversation identification skipped:', ex, flush=True)
-
-# 3. Fallback: scan dialogue transcript for character names (lore.json, else the cast the research step found)
-if not topic_name:
-    context_txt = ' '.join(w['w'] for w in cw).lower()
-    heard = {}
-    _names = {nm: d.get('names', []) for nm, d in series_lore.items()}
-    if not _names:
-        try:
-            import research
-            research.get_series(series_key, EPISODES)
-            _names = research.character_names(series_key)
-        except Exception as ex:
-            print('research names skipped:', ex, flush=True)
-    for nm, al in _names.items():
-        n = sum(len(re.findall(r'\b' + re.escape(a.lower()) + r'\b', context_txt)) for a in al)
-        if n: heard[nm] = n
-    if heard:
-        topic_name = max(heard, key=heard.get)
-        topic_slug = char_slug(topic_name, series_key)
 
 print(f'conversation character identified: {topic_name} ({topic_slug})', flush=True)
 
