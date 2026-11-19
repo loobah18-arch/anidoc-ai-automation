@@ -26,6 +26,7 @@ CMIN, CMAX = float(os.environ.get('CONV_MIN', 14)), float(os.environ.get('CONV_M
 HOOK = 1.5
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
+os.environ['SEED'] = str(SEED)                                       # a re-run (next talk moment / episode) sees the same episodes
 COLORS = ['#FF3B5C', '#3DFF7A', '#B266FF', '#33D6FF', '#FFC533']      # pink-red, green, purple, cyan, gold
 FONT = os.environ.get('CAPTION_FONT', 'Montserrat ExtraBold')
 os.makedirs('src', exist_ok=True); os.makedirs('work/convo', exist_ok=True); os.makedirs('../out', exist_ok=True)
@@ -86,18 +87,113 @@ def motion(src):
     sat = f.max(axis=3) - f.min(axis=3)                                 # glowing auras / power effects are bright and saturated
     glow = ((sat > 90) & (f.max(axis=3) > 170)).mean(axis=(1, 2)) * 40
     n = len(mot) // SF
+    THUMBS[src] = g[:n * SF:SF].reshape(n, 9, 4, 16, 4).mean(axis=(2, 4)).reshape(n, -1)   # one 16x9 picture per second
     return np.array([mot[i * SF:(i + 1) * SF].mean() + glow[i * SF:(i + 1) * SF].mean() for i in range(n)])
+
+
+# ------------------------------------------------------------------ 1b. opening / ending songs: never talk inside them
+# (Gojo run 44242818226 took S2E03 231-259 s, inside the opening at 186-273 s). Known ranges come from history
+# (auto.py's detection); new episodes are matched picture-by-picture against an episode with the same opening.
+THUMBS = {}
+SONG_PAD = 3.0
+
+
+def op_group(code):                                                   # same rule as auto.py
+    v = EPISODES[code]; se, ep = v['season'], v['ep']
+    if v['series'] == 'jujutsu-kaisen' and se == 2:
+        return (v['series'], se, 0 if ep <= 5 else 1)
+    return (v['series'], se, (ep - 1) // 13)
+
+
+def _norm_ranges(w):
+    if not w:
+        return []
+    if not isinstance(w[0], (list, tuple)):
+        w = [w]
+    return [(float(a), float(b)) for a, b in w]
+
+
+def _shared_runs(a, b):
+    """stretches of episode a whose pictures also appear in episode b (opening, ending, recap)"""
+    A, B = THUMBS.get(SRC(a)), THUMBS.get(SRC(b))
+    if A is None or B is None:
+        return []
+    Bv = B[B.std(axis=1) > 10]                                       # flat / black seconds match anything
+    if not len(Bv):
+        return []
+    hits = [t for t in np.where(A.std(axis=1) > 10)[0] if np.abs(Bv - A[t]).mean(axis=1).min() < 5]
+    runs, grp = [], []
+    for h in hits + [10 ** 9]:
+        if grp and h - grp[-1] > 8:
+            if len(grp) >= 12 and grp[-1] - grp[0] >= 20:
+                runs.append([round(float(grp[0]) - 4.0, 1), round(float(grp[-1]) + 5.0, 1)])
+            grp = []
+        grp.append(h)
+    return runs
+
+
+def song_ranges(ep):
+    """opening / ending ranges of an episode (seconds), from history or detected now and remembered"""
+    known = _norm_ranges(hist.get('openings2', {}).get(ep))
+    if known:
+        return known
+    peers = [o for o in eps if o != ep and SRC(o) in THUMBS and op_group(o) == op_group(ep)]
+    if not peers:
+        sib = sorted((o for o in EPISODES if o != ep and op_group(o) == op_group(ep)),
+                     key=lambda o: abs(EPISODES[o]['ep'] - EPISODES[ep]['ep']))[:1]
+        for o in sib:
+            try:
+                fetch(o); motion(SRC(o)); peers.append(o)
+            except BaseException as ex:                               # a missing sibling must not kill the run
+                print('opening reference failed', o, ex, flush=True)
+    found = []
+    for o in peers:
+        found += _shared_runs(ep, o)
+    found = sorted(found)
+    merged = []
+    for a, b in found:
+        if merged and a <= merged[-1][1] + 5:
+            merged[-1][1] = max(merged[-1][1], b)
+        else:
+            merged.append([a, b])
+    if peers:
+        print(ep, 'opening/ending (matched against', peers[0] + ')', merged, flush=True)
+    if merged:
+        try:                                                          # auto.py reads the same cache
+            h_ = json.load(open('history.json'))
+            h_.setdefault('openings2', {})[ep] = merged
+            json.dump(h_, open('history.json', 'w'), indent=1)
+            hist.setdefault('openings2', {})[ep] = merged
+        except Exception as ex:
+            print('could not cache opening', ex, flush=True)
+    return [tuple(r) for r in merged]
+
+
+def song_mask(ep, dur_):
+    m = np.zeros(int(dur_) + 2, bool)
+    for a, b in song_ranges(ep):
+        m[max(0, int(a - SONG_PAD)):max(0, int(b + SONG_PAD) + 1)] = True
+    return m
 
 # ------------------------------------------------------------------ 2. pick the episode with the biggest fight, find it
 FW = 90
 best_all = None
+motions = {}
 for ep in eps:
     fetch(ep)
-    d_ = duration(SRC(ep)); ps = motion(SRC(ep))
+    motions[ep] = (duration(SRC(ep)), motion(SRC(ep)))
+SONGS = {}
+EP_EXCLUDE = [e for e in os.environ.get('CONVO_EP_EXCLUDE', '').split(',') if e]   # talk episodes that did not show the pick
+for ep in eps:
+    d_, ps = motions[ep]
+    if ep in EP_EXCLUDE and any(e not in EP_EXCLUDE for e in eps):
+        SONGS[ep] = song_mask(ep, d_)
+        continue
+    SONGS[ep] = song_mask(ep, d_)
     lo_, hi_ = 150, int(d_) - 150                                        # skip openings and the ending/preview
     prev = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == ep]
     for t in range(lo_, hi_ - FW, 5):
-        if any(a_ - FW < t < b_ for a_, b_ in prev):
+        if any(a_ - FW < t < b_ for a_, b_ in prev) or SONGS[ep][t:t + FW].mean() > 0.2:
             continue
         v = ps[t:t + FW].mean()
         if best_all is None or v > best_all[0]:
@@ -115,22 +211,80 @@ sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(lo), '-t', str(hi - lo
 _scan = WhisperModel('small', device='cpu', compute_type='int8')
 _ss, _ = _scan.transcribe(_sf.read('work/convo/full.wav', dtype='float32')[0], beam_size=1, vad_filter=True)
 speech = np.zeros(int(dur) + 1)
+SONG = SONGS[conv_ep]
+_ss = list(_ss)
+_key = lambda t_: re.sub(r'[\W_]+', '', (t_ or '').lower())          # letters only (kana / kanji kept)
+_seen = {}
+for sg in _ss:
+    if len(_key(sg.text)) >= 10:
+        _seen[_key(sg.text)] = _seen.get(_key(sg.text), 0) + 1
+sung = []                                                             # lyrics: music notes, or a long line heard twice (a chorus)
+for sg in _ss:
+    if any(c in (sg.text or '') for c in '♪♫🎵') or _seen.get(_key(sg.text), 0) >= 2:
+        sung.append((lo + sg.start, lo + sg.end))
+for a_, b_ in sung:
+    SONG[max(0, int(a_) - 2):int(b_) + 3] = True
+for k_ in range(len(sung) - 2):                                       # three sung lines within 40 s: a song, block all of it
+    if sung[k_ + 2][1] - sung[k_][0] <= 40:
+        SONG[max(0, int(sung[k_][0]) - 2):int(sung[k_ + 2][1]) + 3] = True
+if sung:
+    print(f'singing / lyric segments in {conv_ep}: {len(sung)}', flush=True)
+print(f'{conv_ep} song seconds excluded from the talk: {int(SONG.sum())}', flush=True)
 for sg in _ss:
     if len((sg.text or '').split()) >= 3 and sg.avg_logprob > -1.0 and sg.no_speech_prob < 0.6:
         speech[int(lo + sg.start):int(lo + sg.end) + 1] = 1
+speech[SONG[:len(speech)]] = 0
 SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
 prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
 bs, bt = -1, fight
+_cands = []
 for t in range(lo, hi - 40, 2):
-    if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP):
+    if any(a_ - 40 < t < b_ for a_, b_ in prevc) or any(abs(t - k) < 40 for k in SKIP) or SONG[max(0, t - 2):t + 27].any():
         continue
     talk = speech[t:t + 24].mean()
     if talk < 0.45:
         continue
     act = per_s[t:t + 24].mean() / mref
     sc = 0.6 * talk + 1.5 * min(act, 1.3)
+    _cands.append((sc, t))
     if sc > bs:
         bs, bt = sc, t
+LORE_ALL = json.load(open('lore.json')) if os.path.exists('lore.json') else {}
+_SKIP_SONG = lambda t_: bool(SONG[min(len(SONG) - 1, max(0, int(t_)))])
+PICK_NAME = None                                                      # a character pick: their full name in lore.json
+if PICK in chars:
+    PICK_NAME = next((nm for nm, d in LORE_ALL.get(EPISODES[conv_ep]['series'], {}).items()
+                      if PICK in [a.lower() for a in d.get('names', [])] or PICK == nm.lower()), None)
+if PICK_NAME and _cands and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
+    # a character pick talks in a scene that is visibly about them: of the 5 best talk moments (30+ s apart) the best
+    # one where identify() puts the character on top wins; none of them -> the best-scoring moment as before
+    try:
+        import charvis
+        _top = []
+        for sc_, t_ in sorted(_cands, reverse=True):
+            if all(abs(t_ - u) >= 30 for _, u in _top):
+                _top.append((sc_, t_))
+            if len(_top) >= 5:
+                break
+        for sc_, t_ in _top:
+            r_ = charvis.identify(src, t_, t_ + 24, EPISODES[conv_ep]['series'], lo, hi, skip=_SKIP_SONG,
+                                  expected=(PICK_NAME,), target=PICK_NAME, log=lambda m: print('identify:', m, flush=True))
+            print(f'talk candidate {t_}s (score {sc_:.2f}): {PICK_NAME} votes {r_.get("target_share", 0):.0%}, '
+                  f'clearly them {"yes" if r_.get("target_clear") else "no"}', flush=True)
+            if r_.get('target_clear'):
+                if t_ != bt:
+                    print(f'talk moment {bt}s -> {t_}s: {PICK_NAME} is on screen there', flush=True)
+                bs, bt = sc_, t_
+                break
+        else:
+            left = [e for e in eps if e != conv_ep and e not in EP_EXCLUDE]
+            if left and len(EP_EXCLUDE) < 2:                          # try the talk in another of the picked episodes
+                print(f'no talk candidate in {conv_ep} is clearly {PICK_NAME}; trying the next episode {left}', flush=True)
+                os.environ['CONVO_EP_EXCLUDE'] = ','.join(EP_EXCLUDE + [conv_ep]); os.environ.pop('CONVO_SKIP', None)
+                os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
+            print(f'no talk candidate is clearly {PICK_NAME}; keeping the best-scoring moment {bt}s', flush=True)
+    except Exception as ex:
+        print('talk candidate identification skipped:', ex, flush=True)
 fight = bt
 win0, win1 = max(lo, bt - 12), min(hi, bt + 52)
 print('conversation from', conv_ep, f'| talking fight at {bt}s (score {bs:.2f}), transcribing {win0}-{win1}s', flush=True)
@@ -171,6 +325,7 @@ for sg in segs:
         wts = np.cumsum([0] + [len(t) + 2 for t in toks]); wts = wts / wts[-1]
         for k, t in enumerate(toks):
             words.append(dict(w=t, s=win0 + a0 + (a1 - a0) * wts[k], e=win0 + a0 + (a1 - a0) * wts[k + 1], seg=id(sg)))
+words = [w for w in words if not SONG[min(len(SONG) - 1, int(w['s']))] and not SONG[min(len(SONG) - 1, int(w['e']))]]
 if len(words) < 12:
     if len(SKIP) >= 4:
         raise SystemExit('not enough dialogue in the fight')
@@ -179,6 +334,25 @@ if len(words) < 12:
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 
 # ------------------------------------------------------------------ 3. densest stretch of dialogue
+PICK_T = []                                                           # a character pick: times of frames that vote for them
+if PICK_NAME and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
+    try:
+        import charvis
+        _rw = charvis.identify(src, win0, win1, EPISODES[conv_ep]['series'], lo, hi, skip=_SKIP_SONG, expected=(PICK_NAME,),
+                               target=PICK_NAME, log=lambda m: print('identify:', m, flush=True))
+        PICK_T = [t_ for t_, n_ in _rw.get('per_frame', []) if n_ == PICK_NAME]
+        _all_t = [t_ for t_, _ in _rw.get('per_frame', [])]
+    except Exception as ex:
+        print('pick frames skipped:', ex, flush=True)
+
+
+def pick_frac(a, b):                                                  # share of the stretch's sampled frames that are the pick
+    if not PICK_T:
+        return 0.0
+    n_all = sum(a <= t_ <= b for t_ in _all_t)
+    return sum(a <= t_ <= b for t_ in PICK_T) / max(1, n_all)
+
+
 starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
 best, pick = -1, None
 for i in starts:
@@ -190,9 +364,11 @@ for i in starts:
         done = words[j]['w'][-1:] in '.?!' and (j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.7)
         if L < CMIN or not done:
             continue
+        if SONG[max(0, int(words[i]['s'] - 0.35)):int(words[j]['e'] + 0.8) + 1].any():   # never across an opening/ending
+            continue
         talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
         act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref    # action on screen while they talk
-        score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3)
+        score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3) + 1.5 * pick_frac(words[i]['s'], words[j]['e'])
         if score > best:
             best, pick = score, (i, j)
 if pick is None:
@@ -204,6 +380,12 @@ cw = words[pick[0]:pick[1] + 1]
 c0 = max(win0, cw[0]['s'] - 0.35); c1 = min(win1, cw[-1]['e'] + 0.8)
 c0 = round(c0 * FPS) / FPS; c1 = round(c1 * FPS) / FPS
 CONV = c1 - c0
+if SONG[max(0, int(c0)):int(c1) + 1].any():                           # fallback stretch touched an opening/ending: next moment
+    if len(SKIP) >= 4:
+        raise SystemExit('every conversation candidate sits in an opening/ending song')
+    print(f'conversation {c0:.1f}-{c1:.1f}s touches an opening/ending, trying the next fight moment', flush=True)
+    os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 if CONV < CMIN * 0.6:                                                 # too thin to be a conversation: next fight moment
     if len(SKIP) >= 4:
         raise SystemExit('no real conversation found in the fights')
@@ -370,7 +552,6 @@ print('voices separated from the anime music', flush=True)
 # ------------------------------------------------------------------ 5c. identify the main character speaking in this scene
 series_key = EPISODES[conv_ep]['series']
 series_title = series_key.replace('-', ' ').title()
-LORE_ALL = json.load(open('lore.json')) if os.path.exists('lore.json') else {}
 series_lore = LORE_ALL.get(series_key, {})
 
 
@@ -405,7 +586,65 @@ if PICK in chars:
     topic_slug = PICK
     topic_name = lore_name(topic_slug, series_key) or topic_slug.title()
 
-# 2. Visually detect who is on screen during the conversation using charvis CLIP bank
+# 2. who the scene is about: charvis.identify() - a frame every 0.75 s, each votes for its best character
+#    (name / look / stills, z-scored against frames every 25 s of the same episode). Always run and logged, so a
+#    character pick shows whether the talk really features them.
+IDENT = {}
+try:
+    import charvis
+    IDENT = charvis.identify(src, c0, c1, series_key, lo, hi, skip=_SKIP_SONG, expected=(PICK_NAME,) if PICK_NAME else (),
+                             target=PICK_NAME, series_title=series_title, log=lambda m: print('identify:', m, flush=True))
+    print(f'identify votes for the talk {c0:.1f}-{c1:.1f}s: {IDENT.get("votes")} of {IDENT.get("frames")} frames '
+          f'-> {IDENT.get("name") or "unsure"}' + (f' ({PICK_NAME} share {IDENT.get("target_share")})' if PICK_NAME else ''), flush=True)
+    if not topic_name and IDENT.get('name'):
+        topic_name = IDENT['name']
+        topic_slug = char_slug(topic_name, series_key)
+        print('conversation character from identify():', topic_name, flush=True)
+except Exception as ex:
+    print('identify() skipped:', ex, flush=True)
+
+# 3. names said in the subtitles / transcript (lore.json, else the cast the research step found)
+if not topic_name:
+    context_txt = ' '.join(w['w'] for w in cw).lower()
+    heard = {}
+    _names = {nm: d.get('names', []) for nm, d in series_lore.items()}
+    if not _names:
+        try:
+            import research
+            research.get_series(series_key, EPISODES)
+            _names = research.character_names(series_key)
+        except Exception as ex:
+            print('research names skipped:', ex, flush=True)
+    for nm, al in _names.items():
+        n = sum(len(re.findall(r'\b' + re.escape(a.lower()) + r'\b', context_txt)) for a in al)
+        if n: heard[nm] = n
+    if heard:
+        topic_name = max(heard, key=heard.get)
+        topic_slug = char_slug(topic_name, series_key)
+        print('conversation character from the transcript:', heard, flush=True)
+
+# 4. a main character of the series (research_cache.json): the one identify() voted for most, else the main whose
+#    researched fights include this episode
+if not topic_name:
+    try:
+        _rc = json.load(open('research_cache.json')).get(series_key, {}).get('characters', {})
+        mains = [nm for nm, d in _rc.items() if (d.get('role') or '').lower() == 'main']
+        _v = IDENT.get('votes') or {}
+        voted = [nm for nm in mains if _v.get(nm)]
+        if voted:
+            topic_name = max(voted, key=lambda nm: _v[nm])
+        else:
+            here = [(max([r.get('score', 0) for r in _rc[nm].get('ranked', []) if r.get('ep') == conv_ep] or [0]), nm) for nm in mains]
+            here = [x for x in here if x[0] > 0]
+            if here:
+                topic_name = max(here)[1]
+        if topic_name:
+            topic_slug = char_slug(topic_name, series_key)
+            print('conversation character from the researched main cast:', topic_name, flush=True)
+    except Exception as ex:
+        print('research main characters skipped:', ex, flush=True)
+
+# 5. last resort: the old 4-frame best reference match
 if not topic_name:
     try:
         import charvis
@@ -427,19 +666,9 @@ if not topic_name:
                 if scores[top_char] >= 0.20:
                     topic_name = top_char
                     topic_slug = char_slug(topic_name, series_key)
+                    print('conversation character from the 4-frame reference match:', topic_name, flush=True)
     except Exception as ex:
         print('charvis conversation identification skipped:', ex, flush=True)
-
-# 3. Fallback: scan dialogue transcript for character names
-if not topic_name:
-    context_txt = ' '.join(w['w'] for w in cw).lower()
-    heard = {}
-    for nm, d in series_lore.items():
-        n = sum(len(re.findall(r'\b' + re.escape(a.lower()) + r'\b', context_txt)) for a in d.get('names', []))
-        if n: heard[nm] = n
-    if heard:
-        topic_name = max(heard, key=heard.get)
-        topic_slug = char_slug(topic_name, series_key)
 
 print(f'conversation character identified: {topic_name} ({topic_slug})', flush=True)
 
@@ -453,7 +682,25 @@ except Exception:
 
 # Fetch up to 3 distinct fight episodes for this character from characters.json
 fight_eps = [e for e in chars.get(topic_slug, []) if e in EPISODES] if topic_slug else []
+try:                                                                  # hand-checked fight windows first, when this character has them
+    _fw = json.load(open('fight_windows.json')).get(topic_slug or '', {})
+    _fw = [e if ':' in e else f'jujutsu-kaisen:{e}' for e in _fw]
+except Exception as ex:
+    print('fight_windows.json skipped:', ex, flush=True)
+    _fw = []
+_researched = []
+try:                                                                  # self-research: the episodes where this character fights
+    import research
+    _researched, _rinfo = research.fight_episodes(series_key, topic_name, topic_slug, EPISODES)
+    if _researched:
+        _top = _researched[:6]                                       # strongest researched fights, the ones the character map confirms first
+        _researched = [e for e in _top if e in fight_eps] + [e for e in _top if e not in fight_eps] + _researched[6:]
+        print('research: fight episodes for', topic_name or topic_slug, '->', _researched[:6], flush=True)
+except Exception as ex:
+    print('research skipped:', ex, flush=True)
+fight_eps = list(dict.fromkeys([e for e in _fw if e in EPISODES] + _researched + fight_eps))
 amv_eps = list(dict.fromkeys([conv_ep] + fight_eps[:3])) if fight_eps else [conv_ep]
+print('fight episodes for the edit:', amv_eps, flush=True)
 for ep_code in amv_eps:
     try:
         fetch(ep_code)
@@ -465,9 +712,12 @@ amv_len = max(14.0, TOTAL - HOOK - CONV)
 env = dict(os.environ,
            FORCE_EPS=','.join(amv_eps),
            INCLUDE='',
-           START_BEAT='9', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+           START_BEAT='17', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
+           AMV_STYLE='drop',                                        # the edit opens ON the drop (beat 17), one cut per beat
+           MIN_SONG_START=f'{CONV + 0.6:.2f}',                      # room before the drop for the song bed under the talk
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
            CHAR_NAME=topic_name or '',
+           CHAR_SLUG=topic_slug or '',
            CHAR_SERIES=series_title,
            CHAR_ACT_MIN='0.0',
            CHAR_REL_MIN='0.04',
@@ -477,7 +727,8 @@ subprocess.run([sys.executable, 'auto.py'], env=env, check=True)
 amv = '../out/_amv_part.mp4'
 plan = json.load(open('work/edit_plan.json'))
 P = 60.0 / plan['tempo']
-hook_at = (17 - 9) * P                                                # the first drop inside the AMV part
+amv_dur = duration(amv)
+hook_at = min(max(0.0, amv_dur - HOOK - 0.7), 16 * P)                 # cold open from mid-fight, so the drop itself stays fresh
 name = re.sub(r'[^A-Za-z0-9]+', '_', EPISODES[conv_ep]['series'].title()) + '_convo_' + plan['song']
 # the same song plays quietly under the conversation and runs straight into the edit at full volume
 BED_VOL = float(os.environ.get('BED_VOL', '0.22'))
@@ -493,7 +744,11 @@ def _busy_part(path, length):                                        # the stead
         return 0.0
     score = [np.percentile(r[i:i + n], 15) for i in range(0, len(r) - n)]
     return float(np.argmax(score)) / 2
-bed_ss = _busy_part(song_file, CONV + 0.5)                          # a full-energy part of the song, never a silent stretch
+drop_at = float(plan.get('drop_t', plan['song_start']))
+bed_ss = drop_at - CONV                                              # the bed is the lead-in, so the talk ends exactly on the drop
+if bed_ss < 0:
+    bed_ss = _busy_part(song_file, CONV + 0.5)                       # song too short before its drop: old behaviour
+    print('song has no room before the drop, bed from its busiest part', flush=True)
 print(f'song bed from {bed_ss:.1f}s', flush=True)
 fc = (
     f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"

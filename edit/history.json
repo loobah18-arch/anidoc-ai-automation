@@ -1,34 +1,34 @@
 {
  "songs": {
   "rayelo_ultraslowed": 2,
-  "montagem_zora": 2,
+  "montagem_zora": 3,
   "cotneus_stereo_love_funk": 2,
   "andromeda_montagem_coma": 2,
-  "montagem_vozes_profundas": 1,
+  "montagem_vozes_profundas": 3,
   "andromeda_no_fear_phonk": 2,
-  "mvsterious_slava_funk": 2,
+  "mvsterious_slava_funk": 3,
   "glxxmstrider_dont_stop_slowed": 2,
-  "dygo_funk_infernal": 2,
-  "rubikdice_montagem_pegadora_slowed": 1,
-  "zxvren_montagem_delirio_slowed": 2,
-  "lonown_avangard_phonk": 2,
-  "ashreveal_manasha_phonk": 1,
-  "trashxrl_deus_do_olimpo": 1,
+  "dygo_funk_infernal": 3,
+  "rubikdice_montagem_pegadora_slowed": 2,
+  "zxvren_montagem_delirio_slowed": 3,
+  "lonown_avangard_phonk": 3,
+  "ashreveal_manasha_phonk": 2,
+  "trashxrl_deus_do_olimpo": 3,
   "atlxs_passo_bem_solto_slowed": 2,
-  "poker_face": 2,
+  "poker_face": 3,
   "ncts_next_phonk": 2,
   "nxxkz_loucura_letal_funk_slowed": 2
  },
  "episodes": {
-  "jujutsu-kaisen:S2E01": 1,
-  "jujutsu-kaisen:S2E03": 1,
+  "jujutsu-kaisen:S2E01": 2,
+  "jujutsu-kaisen:S2E03": 2,
   "jujutsu-kaisen:S2E10": 1,
-  "jujutsu-kaisen:S1E07": 1,
-  "jujutsu-kaisen:S1E20": 1,
-  "jujutsu-kaisen:S2E02": 1,
-  "jujutsu-kaisen:S2E04": 1,
-  "jujutsu-kaisen:S2E05": 1,
-  "jujutsu-kaisen:S2E09": 1,
+  "jujutsu-kaisen:S1E07": 10,
+  "jujutsu-kaisen:S1E20": 4,
+  "jujutsu-kaisen:S2E02": 2,
+  "jujutsu-kaisen:S2E04": 8,
+  "jujutsu-kaisen:S2E05": 2,
+  "jujutsu-kaisen:S2E09": 8,
   "demon-slayer-kimetsu-no-yaiba:S3E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E03": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -39,7 +39,7 @@
   "demon-slayer-kimetsu-no-yaiba:S1E24": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E23": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E11": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E11": 2,
   "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
   "jujutsu-kaisen:S1E10": 1,
   "jujutsu-kaisen:S1E13": 1,
@@ -48,7 +48,7 @@
   "jujutsu-kaisen:S1E17": 1,
   "jujutsu-kaisen:S1E23": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E07": 2,
-  "demon-slayer-kimetsu-no-yaiba:S2E05": 1,
+  "demon-slayer-kimetsu-no-yaiba:S2E05": 2,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E24": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
@@ -58,20 +58,28 @@
   "demon-slayer-kimetsu-no-yaiba:S5E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E10": 1,
   "jujutsu-kaisen:S1E11": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E07": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
   "jujutsu-kaisen:S3E05": 1,
   "jujutsu-kaisen:S1E04": 1,
   "jujutsu-kaisen:S1E01": 1,
-  "jujutsu-kaisen:S1E02": 1,
+  "jujutsu-kaisen:S1E02": 3,
   "jujutsu-kaisen:S2E16": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E06": 1,
+  "demon-slayer-kimetsu-no-yaiba:S2E06": 2,
   "jujutsu-kaisen:S3E08": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E17": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E07": 1,
-  "jujutsu-kaisen:S3E01": 1
+  "jujutsu-kaisen:S3E01": 1,
+  "jujutsu-kaisen:S2E07": 2,
+  "jujutsu-kaisen:S1E21": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E05": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E08": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
+  "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E06": 1
  },
  "shots": [
   {
@@ -2280,22 +2288,6 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
-   "s": 287.04
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
-   "s": 282.366
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
-   "s": 288.04
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
-   "s": 295.408
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
    "s": 302.033
   },
   {
@@ -3664,15 +3656,7 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1045.3
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
    "s": 1104.207
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1159.967
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
@@ -3680,15 +3664,7 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1163.65
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
    "s": 1089.817
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1101.509
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
@@ -3700,47 +3676,7 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1118.05
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 889.457
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1156.425
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1045.3
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1104.207
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
    "s": 1159.95
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 960.842
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1163.65
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1089.817
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1101.509
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 957.442
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
@@ -3812,14 +3748,6 @@
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
-   "s": 260.209
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 231.108
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
    "s": 262.4
   },
   {
@@ -3840,23 +3768,11 @@
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
-   "s": 265.083
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
    "s": 240.691
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
-   "s": 119.207
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
    "s": 127.834
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 120.025
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
@@ -3880,10 +3796,6 @@
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
-   "s": 257.275
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
    "s": 134.25
   },
   {
@@ -3892,19 +3804,7 @@
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
-   "s": 240.708
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 119.207
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
    "s": 127.817
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 120.041
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
@@ -3913,50 +3813,6 @@
   {
    "ep": "jujutsu-kaisen:S1E11",
    "s": 231.375
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 262.4
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 250.583
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 266.692
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 257.275
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 134.25
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 264.817
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 240.691
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 119.207
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 127.817
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 120.025
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E11",
-   "s": 260.209
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
@@ -6129,6 +5985,1942 @@
   {
    "ep": "jujutsu-kaisen:S3E01",
    "s": 1275.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 418.084
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 201.567
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 645.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 243.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 387.942
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1051.209
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1182.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E07",
+   "s": 430.316
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E07",
+   "s": 729.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E07",
+   "s": 793.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 411.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 412.296
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 413.296
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 414.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 415.296
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 416.296
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 419.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 420.046
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 421.046
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 422.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 423.046
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 424.046
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E07",
+   "s": 728.129
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E07",
+   "s": 730.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 199.462
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 200.462
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 202.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 203.462
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 241.046
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 242.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 244.546
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 245.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 250.041
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 143.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 188.541
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 251.666
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 252.816
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 811.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1143.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 56.816
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 251.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 311.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 685.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 689.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 732.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 779.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 921.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1062.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1080.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1083.041
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 969.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 970.858
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 980.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1129.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1159.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 873.317
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 885.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 897.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 922.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 1031.417
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 1243.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1126.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1127.379
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1130.129
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1131.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 1241.045
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 1242.045
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 1244.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 1245.545
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 686.379
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 687.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 688.379
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 690.629
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 691.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 692.629
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 730.295
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 731.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 733.295
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 248.546
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 249.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 250.546
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 252.796
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 253.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 254.796
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 310.629
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 979.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 981.712
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 774.962
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 775.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 776.962
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 777.962
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 780.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 781.212
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 782.212
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 783.212
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1156.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1157.213
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1158.213
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1160.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1161.463
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 1162.463
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 896.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 898.212
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 884.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 361.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 463.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 464.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1028.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 975.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 996.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1035.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1038.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1056.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1032.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 369.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 510.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 364.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 365.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 368.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1034.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1037.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1055.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 994.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 995.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 997.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 998.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1026.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1027.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1028.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1030.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1031.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 366.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 869.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 89.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 863.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 865.683
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 937.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 941.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 945.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1018.866
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1086.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1087.309
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 833.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 984.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1051.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1143.184
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1146.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 214.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 506.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 507.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 800.433
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 801.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 808.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 885.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 888.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1117.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1119.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1127.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1173.184
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1120.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 868.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 870.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 871.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 87.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 89.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1049.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1051.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1170.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1171.972
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1173.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1174.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1141.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1143.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 832.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 833.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 834.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 887.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1144.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1147.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 981.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 982.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 985.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 986.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 940.638
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 942.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1126.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1127.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 943.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 944.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 946.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 947.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 934.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 935.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 938.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 939.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 864.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 884.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 886.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1118.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 867.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 855.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 918.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 882.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 86.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 929.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 878.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 920.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1185.867
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1167.434
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 897.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 896.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 858.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 851.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 860.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 853.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 925.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 856.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 927.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 850.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 859.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 852.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 861.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 854.805
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 926.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 857.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 930.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 82.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 932.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 81.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 931.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 83.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 91.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 85.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1186.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 88.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1165.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 90.638
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 84.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1184.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 87.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1164.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 89.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1166.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 874.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1169.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 880.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 873.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1168.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 875.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 917.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 879.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1170.222
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 881.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 503.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 916.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 876.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 919.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 849.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 718.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 668.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 319.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 355.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 342.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 361.642
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 327.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 349.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 362.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 662.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 697.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 720.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 747.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 768.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 954.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 782.933
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 966.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 772.017
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 786.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 982.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 1008.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 993.683
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 345.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 987.808
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 997.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 352.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1016.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 968.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 353.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1178.642
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 36.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1188.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 47.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1199.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1184.334
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 37.808
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1192.209
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1213.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 135.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1232.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1214.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 145.017
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 166.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 249.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 229.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 258.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 169.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 239.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 310.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 605.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 631.834
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 616.433
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 648.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 607.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 621.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 656.017
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 742.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 665.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 260.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 741.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 677.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1211.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1194.433
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 127.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E13",
+   "s": 547.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E13",
+   "s": 558.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E13",
+   "s": 1231.808
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E13",
+   "s": 532.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 360.266
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 933.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 621.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 898.584
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 918.641
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 364.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 942.183
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 959.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 969.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 295.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 1002.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 1076.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 285.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 762.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 1063.891
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
+   "s": 972.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 546.933
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 812.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 608.183
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 287.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 769.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 556.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 826.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 1024.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 288.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 1083.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 1109.641
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
+   "s": 1124.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 61.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 88.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 863.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 195.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 938.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 695.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1147.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 903.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 197.516
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1012.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 962.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1041.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1157.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 987.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1122.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 952.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1020.584
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 967.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1126.058
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1145.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E13",
+   "s": 519.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 969.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1172.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1186.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1057.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 367.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 852.805
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 312.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 368.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 940.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 311.366
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 862.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 514.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 463.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 980.308
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1080.184
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 818.684
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 310.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 464.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1036.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 509.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1056.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1083.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 361.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 832.138
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 369.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 510.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1146.158
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 817.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1085.867
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1109.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1117.3
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 512.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 979.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1087.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 387.742
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 366.866
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1155.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1687.183
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 828.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 871.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 982.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 994.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 1010.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 1037.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 206.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "s": 368.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 593.266
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "s": 380.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 606.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 621.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "s": 137.183
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "s": 279.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "s": 290.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "s": 306.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 208.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 596.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "s": 407.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 955.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 205.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 966.834
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 272.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 904.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1035.141
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1440.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 922.933
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1077.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1505.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E06",
+   "s": 409.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 209.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1007.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1312.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1020.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 906.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E11",
+   "s": 1048.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 818.384
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 817.467
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 509.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 387.925
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1082.991
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 463.883
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 980.258
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 869.45
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 929.342
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 361.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 945.55
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1018.783
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 510.175
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 393.967
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1086.034
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 800.383
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E04",
+   "s": 1146.342
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 937.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1024.342
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 514.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 311.55
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 507.675
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1087.259
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 801.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 1023.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 843.708
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 885.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1117.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1126.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 1185.5
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 820.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 943.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 837.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E07",
+   "s": 392.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E09",
+   "s": 818.334
   }
  ],
  "runs": [
@@ -6473,6 +8265,136 @@
    "song": "poker_face",
    "episodes": [
     "jujutsu-kaisen:S3E01"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-17 14:49 UTC",
+   "pick": "gojo",
+   "series": "jujutsu-kaisen",
+   "song": "lonown_avangard_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E07",
+    "jujutsu-kaisen:S1E20",
+    "jujutsu-kaisen:S2E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-17 15:21 UTC",
+   "pick": "gojo",
+   "series": "jujutsu-kaisen",
+   "song": "poker_face",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E07",
+    "jujutsu-kaisen:S1E20",
+    "jujutsu-kaisen:S1E21"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-17 18:20 UTC",
+   "pick": "gojo",
+   "series": "jujutsu-kaisen",
+   "song": "rubikdice_montagem_pegadora_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E07",
+    "jujutsu-kaisen:S2E01",
+    "jujutsu-kaisen:S2E04",
+    "jujutsu-kaisen:S2E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-17 18:47 UTC",
+   "pick": "gojo",
+   "series": "jujutsu-kaisen",
+   "song": "trashxrl_deus_do_olimpo",
+   "episodes": [
+    "jujutsu-kaisen:S1E07",
+    "jujutsu-kaisen:S2E02",
+    "jujutsu-kaisen:S2E04",
+    "jujutsu-kaisen:S2E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-18 05:41 UTC",
+   "pick": "gojo",
+   "series": "jujutsu-kaisen",
+   "song": "ashreveal_manasha_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S1E07",
+    "jujutsu-kaisen:S2E03",
+    "jujutsu-kaisen:S2E04",
+    "jujutsu-kaisen:S2E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-18 06:05 UTC",
+   "pick": "demon slayer",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "montagem_vozes_profundas",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S4E05",
+    "demon-slayer-kimetsu-no-yaiba:S4E07",
+    "demon-slayer-kimetsu-no-yaiba:S4E08",
+    "demon-slayer-kimetsu-no-yaiba:S4E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-18 14:10 UTC",
+   "pick": "demon slayer",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "zxvren_montagem_delirio_slowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E13",
+    "demon-slayer-kimetsu-no-yaiba:S2E04",
+    "demon-slayer-kimetsu-no-yaiba:S2E05",
+    "demon-slayer-kimetsu-no-yaiba:S2E06"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-18 14:26 UTC",
+   "pick": "gojo",
+   "series": "jujutsu-kaisen",
+   "song": "trashxrl_deus_do_olimpo",
+   "episodes": [
+    "jujutsu-kaisen:S1E07",
+    "jujutsu-kaisen:S1E20",
+    "jujutsu-kaisen:S2E04",
+    "jujutsu-kaisen:S2E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-19 14:34 UTC",
+   "pick": "demon slayer",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "montagem_vozes_profundas",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E09",
+    "demon-slayer-kimetsu-no-yaiba:S3E07",
+    "demon-slayer-kimetsu-no-yaiba:S4E06",
+    "demon-slayer-kimetsu-no-yaiba:S4E11"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-19 14:55 UTC",
+   "pick": "gojo",
+   "series": "jujutsu-kaisen",
+   "song": "mvsterious_slava_funk",
+   "episodes": [
+    "jujutsu-kaisen:S1E07",
+    "jujutsu-kaisen:S2E04",
+    "jujutsu-kaisen:S2E05",
+    "jujutsu-kaisen:S2E09"
    ],
    "file": "_amv_part.mp4"
   }
@@ -6929,6 +8851,14 @@
    [
     1288.3,
     1371.3
+   ],
+   [
+    -4.0,
+    146.9
+   ],
+   [
+    1288.3,
+    1367.8
    ]
   ],
   "demon-slayer-kimetsu-no-yaiba:S1E10": [
@@ -6949,6 +8879,10 @@
    [
     1289.4,
     1385.0
+   ],
+   [
+    1286.1,
+    1385.0
    ]
   ],
   "jujutsu-kaisen:S3E01": [
@@ -6960,11 +8894,161 @@
     1371.4,
     1423.2
    ]
+  ],
+  "jujutsu-kaisen:S2E07": [
+   [
+    -4.0,
+    26.8
+   ],
+   [
+    66.6,
+    103.5
+   ],
+   [
+    128.1,
+    173.0
+   ],
+   [
+    190.9,
+    223.0
+   ],
+   [
+    1376.1,
+    1424.3
+   ]
+  ],
+  "jujutsu-kaisen:S1E21": [
+   [
+    309.8,
+    394.1
+   ],
+   [
+    721.1,
+    738.8
+   ],
+   [
+    1281.0,
+    1421.6
+   ]
+  ],
+  "jujutsu-kaisen:S2E01": [
+   [
+    654.2,
+    740.6
+   ],
+   [
+    1323.1,
+    1422.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E03": [
+   [
+    186.1,
+    272.6
+   ],
+   [
+    1338.5,
+    1429.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E05": [
+   [
+    100.2,
+    198.0
+   ],
+   [
+    1286.1,
+    1385.1
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E08": [
+   [
+    62.5,
+    124.8
+   ],
+   [
+    1306.0,
+    1405.1
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E09": [
+   [
+    20.2,
+    118.0
+   ],
+   [
+    1288.1,
+    1387.1
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E06": [
+   [
+    -4.0,
+    118.0
+   ],
+   [
+    1287.0,
+    1385.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E13": [
+   [
+    32.0,
+    126.0
+   ],
+   [
+    1277.0,
+    1369.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E05": [
+   [
+    45.0,
+    139.0
+   ],
+   [
+    1279.0,
+    1371.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S2E04": [
+   [
+    128.4,
+    222.2
+   ],
+   [
+    1104.6,
+    1141.3
+   ],
+   [
+    1201.8,
+    1385.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E08": [
+   [
+    20.0,
+    119.0
+   ],
+   [
+    1280.0,
+    1371.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E04": [
+   [
+    57.0,
+    156.0
+   ],
+   [
+    1280.0,
+    1371.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 16,
-  "demon-slayer-kimetsu-no-yaiba": 16
+  "jujutsu-kaisen": 25,
+  "demon-slayer-kimetsu-no-yaiba": 17
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -7214,7 +9298,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "pollinations",
    "mode": "character",
-   "title": "Zenitsu's power is unreal \ud83d\ude33 #shorts"
+   "title": "Zenitsu's power is unreal 😳 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S1E11",
@@ -7227,7 +9311,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "template",
    "mode": "rhyme",
-   "title": "Mahito quote that hits hard \ud83e\udd76 #shorts"
+   "title": "Mahito quote that hits hard 🥶 #shorts"
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
@@ -7240,7 +9324,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Daki hits different \ud83e\udd76 #shorts"
+   "title": "Daki hits different 🥶 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S3E05",
@@ -7253,7 +9337,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Kinji quote that hits hard \ud83e\udd76 #shorts"
+   "title": "Kinji quote that hits hard 🥶 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S1E04",
@@ -7266,7 +9350,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Ryomen hits different \ud83e\udd76 #shorts"
+   "title": "Ryomen hits different 🥶 #shorts"
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
@@ -7279,7 +9363,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Akaza quote that hits hard \ud83e\udd76 #shorts"
+   "title": "Akaza quote that hits hard 🥶 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S3E09",
@@ -7292,7 +9376,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Hiromi hits different \ud83e\udd76 #shorts"
+   "title": "Hiromi hits different 🥶 #shorts"
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
@@ -7312,7 +9396,7 @@
    "voice": "en-US-AndrewNeural",
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
-   "title": "Nezuko quote that hits hard \ud83e\udd76 #shorts"
+   "title": "Nezuko quote that hits hard 🥶 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S3E01",
@@ -7320,6 +9404,76 @@
    "e": 1249.3666666666666,
    "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
    "time": "2026-11-19 02:00 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E07",
+   "s": 293.46666666666664,
+   "e": 314.0,
+   "file": "Jujutsu_Kaisen_convo_lonown_avangard_phonk.mp4",
+   "time": "2026-11-17 14:50 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E21",
+   "s": 414.03333333333336,
+   "e": 430.0,
+   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
+   "time": "2026-11-17 15:22 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E01",
+   "s": 600.0,
+   "e": 609.3,
+   "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
+   "time": "2026-11-17 18:21 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E02",
+   "s": 999.8,
+   "e": 1019.0666666666667,
+   "file": "Jujutsu_Kaisen_convo_trashxrl_deus_do_olimpo.mp4",
+   "time": "2026-11-17 18:47 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E03",
+   "s": 231.23333333333332,
+   "e": 259.26666666666665,
+   "file": "Jujutsu_Kaisen_convo_ashreveal_manasha_phonk.mp4",
+   "time": "2026-11-18 05:43 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 579.6666666666666,
+   "e": 596.9,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_montagem_vozes_profundas.mp4",
+   "time": "2026-11-18 06:06 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E08",
+   "s": 807.4666666666667,
+   "e": 822.7666666666667,
+   "file": "Jujutsu_Kaisen_convo_dygo_funk_infernal.mp4",
+   "time": "2026-11-18 13:57 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E20",
+   "s": 842.0,
+   "e": 869.6666666666666,
+   "file": "Jujutsu_Kaisen_convo_trashxrl_deus_do_olimpo.mp4",
+   "time": "2026-11-18 14:27 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E07",
+   "s": 331.4,
+   "e": 348.3333333333333,
+   "file": "Jujutsu_Kaisen_convo_montagem_zora.mp4",
+   "time": "2026-11-19 14:19 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E05",
+   "s": 1086.4666666666667,
+   "e": 1103.7,
+   "file": "Jujutsu_Kaisen_convo_mvsterious_slava_funk.mp4",
+   "time": "2026-11-19 14:55 UTC"
   }
  ],
  "styles": [
@@ -7352,6 +9506,30 @@
    "ep": "jujutsu-kaisen:S3E01",
    "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
    "time": "2026-11-19 02:00 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "jujutsu-kaisen:S2E07",
+   "file": "Jujutsu_Kaisen_convo_lonown_avangard_phonk.mp4",
+   "time": "2026-11-17 14:50 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "jujutsu-kaisen:S1E21",
+   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
+   "time": "2026-11-17 15:22 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "jujutsu-kaisen:S2E01",
+   "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
+   "time": "2026-11-17 18:21 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "jujutsu-kaisen:S2E02",
+   "file": "Jujutsu_Kaisen_convo_trashxrl_deus_do_olimpo.mp4",
+   "time": "2026-11-17 18:47 UTC"
   }
  ],
  "narr_chars": {
@@ -7375,9 +9553,9 @@
    "Every scar became a vow, the weak one is the hunter now."
   ],
   "daki": [
-   "Behold Daki, whose sashes slash like night\u2019s keen blade",
-   "She weaves the crimson tide, yet ne\u2019er shall she fade.",
-   "Bound to her brother\u2019s doom, she stands till twin heads fall",
+   "Behold Daki, whose sashes slash like night’s keen blade",
+   "She weaves the crimson tide, yet ne’er shall she fade.",
+   "Bound to her brother’s doom, she stands till twin heads fall",
    "Then darkness yields, and silence crowns her fall"
   ],
   "hakari": [
@@ -7393,7 +9571,7 @@
    "A king of curses, ere death, he doth reign."
   ],
   "akaza": [
-   "Behold Akaza, whose fury doth blaze like night\u2019s fire",
+   "Behold Akaza, whose fury doth blaze like night’s fire",
    "He strikes with wrath, ere darkness yields to that fire.",
    "His heart, a tempest, seeks battles as a spear",
    "Thus he doth rise, forever feared by thy spear."
@@ -7405,7 +9583,7 @@
    "Where guilty souls fall, their power wanes again."
   ],
   "nezuko": [
-   "Behold Nezuko, pure heart within demon\u2019s frame",
+   "Behold Nezuko, pure heart within demon’s frame",
    "She shuns mortal flesh, yet wields fierce flame.",
    "When shadows rise, her blood ignites the gloom",
    "A gentle bane, she shields the world from doom."

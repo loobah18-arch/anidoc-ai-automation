@@ -33,6 +33,10 @@ FORCE_EPS = [e for e in os.environ.get('FORCE_EPS', '').split(',') if e]
 INCLUDE = os.environ.get('INCLUDE', '')                 # ep|s|e: only shots from this scene (same characters)
 EXCLUDE = [x.rsplit('|', 2) for x in os.environ.get('EXCLUDE', '').split(';') if x]   # ep|s|e already used
 OUT_NAME = os.environ.get('OUT_NAME', '')
+# AMV_STYLE=drop (set by convo.py): the edit starts ON the drop (beat 17), one cut per beat, only the topic
+# character's combat / awakening shots with impact >= the 85th percentile, Gojo v2 FX on every cut.
+DROP_STYLE = os.environ.get('AMV_STYLE', '') == 'drop'
+IMPACT_PCT = float(os.environ.get('IMPACT_PCT', 85))
 SCAN_W, SCAN_H, SCAN_FPS = 64, 36, 12
 rng = random.Random(SEED)
 os.chdir(HERE)
@@ -145,6 +149,12 @@ def duration(p):
     return float(sh(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', p]))
 
 
+BLACK_MEAN, BLACK_P90 = 14.0, 30.0                                    # per frame, 0-255 luma at scan size
+DARK_MEAN = float(os.environ.get('DARK_MEAN', 24)); DARK_P90 = float(os.environ.get('DARK_P90', 36))   # night fights sit at
+                                                                     # ~19-34 / 40-60 and stay; corridor 10-21 / 18-33, title card 4 / 0 go
+DARK_SHARE = float(os.environ.get('DARK_SHARE', 0.4))
+
+
 def scan(code):
     p = SRC(code)
     raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-i', p, '-vf',
@@ -159,12 +169,34 @@ def scan(code):
     cuts = [0] + [i for i in range(1, len(diff)) if diff[i] > max(18, 4 * med[i])] + [len(diff)]
     dur = len(diff) / SCAN_FPS
     lo, hi = 25.0, dur - 140.0                                        # skip cold-open title + ED/preview
+    flat = gray.reshape(len(gray), -1)
+    f_mean, f_p90 = flat.mean(axis=1), np.percentile(flat, 90, axis=1)
+    black = (f_mean < BLACK_MEAN) & (f_p90 < BLACK_P90)               # truly black (fade to / from black)
+    dark = (f_mean < DARK_MEAN) & (f_p90 < DARK_P90)                 # too dark to read (corridor, glint on black, title card)
     shots, sigs = [], []
+    n_dark = 0
     for a, b in zip(cuts[:-1], cuts[1:]):
         s, e = a / SCAN_FPS, b / SCAN_FPS
         if b - a >= 3:
             sigs.append((s, gray[(a + b) // 2].reshape(9, 4, 16, 4).mean(axis=(1, 3)).ravel()))
+        while a < b and black[a]:                                     # a fade: drop only the truly black frames, keep the shot
+            a += 1
+        while b > a and black[b - 1]:
+            b -= 1
+        a0, b0 = a, b                                                 # dark head / tail (title card, corridor) cut off too
+        while a < b and dark[a]:
+            a += 1
+        while b > a and dark[b - 1]:
+            b -= 1
+        if b - a < 6:                                                 # nothing readable left
+            a, b = a0, b0
+        if b - a < 3:
+            continue
+        s, e = a / SCAN_FPS, b / SCAN_FPS
         if e - s < 0.45 or s < lo or e > hi:
+            continue
+        if dark[a:b].mean() > DARK_SHARE:                             # mostly dark: mean AND bright end both low
+            n_dark += 1
             continue
         seg = slice(a + 1, b)
         inner = diff[seg] if b - a > 2 else diff[a:b]
@@ -178,7 +210,7 @@ def scan(code):
                           motion=float(np.mean(inner)), peak=float(np.percentile(inner, 90)),
                           contrast=contrast, sat=float(sat[a:b].mean()), bright=bright,
                           thumb=thumb.round(1).tolist()))
-    print(code, 'shots', len(shots), flush=True)
+    print(code, 'shots', len(shots), f'({n_dark} mostly-dark shots dropped)', flush=True)
     return code, shots, sigs
 
 
@@ -267,6 +299,12 @@ pool = [s for k, s in enumerate(allshots)
         if not dup[k] and not any((s['ep'], round(s['s']) + o) in used for o in (-2, -1, 0, 1, 2))]
 if len(pool) < 90 or INCLUDE:                                                    # history too tight: allow reuse
     pool = [s for k, s in enumerate(allshots) if not dup[k]]
+elif DROP_STYLE and os.environ.get('CHAR_SLUG'):                     # a character's fights are finite: earlier runs must not
+    fresh_ids = {id(s) for s in pool}                                # eat them up (the pool shrank to 10 Gojo shots), so used
+    pool = [s for k, s in enumerate(allshots) if not dup[k]]         # shots come back, ranked a little below fresh ones
+    for s in pool:
+        s['reused'] = id(s) not in fresh_ids
+    print(f'drop style: {sum(s["reused"] for s in pool)} shots used by earlier runs allowed back (ranked below fresh ones)', flush=True)
 print('pool', len(pool), 'of', len(allshots), flush=True)
 
 
@@ -278,11 +316,30 @@ M, P_, C, S, B = (z([s[k] for s in pool]) for k in ('motion', 'peak', 'contrast'
 for i, s in enumerate(pool):
     s['impact'] = float(0.55 * M[i] + 0.35 * P_[i] + 0.25 * C[i] + 0.2 * S[i] + 0.15 * min(B[i], 1.0))
     s['calm'] = float(-0.6 * abs(M[i] + 0.3) + 0.4 * C[i] + 0.3 * S[i] + 0.3 * min(2.5, s['e'] - s['s']))
+for s in pool:
+    if s.get('reused'):
+        s['impact'] -= 0.25
+full_pool = list(pool)
+if DROP_STYLE:                                                        # action only: every shot in the top 15% by impact
+    gate = float(np.percentile([s['impact'] for s in pool], IMPACT_PCT))
+    pool = [s for s in pool if s['impact'] >= gate]
+    print(f'drop style: impact gate p{IMPACT_PCT:.0f} = {gate:.3f}, {len(pool)} of {len(full_pool)} shots pass', flush=True)
 
 # ---------------------------------------------------------------- 4b. keep only shots where the topic character is on screen, fighting
 CHAR_NAME = os.environ.get('CHAR_NAME', '')
+_PROMPTS_ADDED = []
+
+
 def _char_filter(pool):
     import charvis
+    if DROP_STYLE and not _PROMPTS_ADDED:
+        _PROMPTS_ADDED.append(1)                                                    # awakening counts as action; crowds / talking heads / idle do not
+        charvis.ACTION += ['an anime character powering up with a glowing aura and crackling energy',
+                           'an anime character awakening with glowing eyes and a burst of cursed energy',
+                           'an anime character dashing through the air mid-attack with speed lines']
+        charvis.CALM += ['a crowd of anime characters watching and reacting in shock',
+                         'an anime close-up of a character talking with a still face',
+                         'anime characters standing around in conversation']
     cv_ = charvis.get(CHAR_NAME, os.environ.get('CHAR_SERIES', ''))
     if cv_ is not None:
         cands = sorted(pool, key=lambda s: -s['impact'])[:int(os.environ.get('CHAR_CANDS', 420))]
@@ -319,6 +376,8 @@ def _char_filter(pool):
                 keep = [s for s in ident if s['char_z'] >= thr and s['act_z'] >= -0.8]
                 if len(keep) >= n_need:
                     break
+            if DROP_STYLE:                                            # purity first: every clearly-them fight shot, nothing else
+                keep, thr = list(ident), 'identity+action'
             for s in keep:                                            # action + character lift the drops and the fast cuts
                 s['impact'] += 0.9 * s['char_z'] + 0.6 * s['act_z']
                 s['calm'] += 0.8 * s['char_z']
@@ -327,11 +386,264 @@ def _char_filter(pool):
     return pool
 
 
-if CHAR_NAME:
+purity_pct = IMPACT_PCT if DROP_STYLE else None
+
+
+def _curated_windows():
+    """Hand-checked fight windows for this character (fight_windows.json), keyed by full episode code."""
+    try:
+        fw = json.load(open('fight_windows.json'))
+    except Exception:
+        return {}
+    slug = os.environ.get('CHAR_SLUG', '').strip().lower()
+    return {_k(e): [tuple(w) for w in v] for e, v in fw.get(slug, {}).items()} if slug else {}
+
+
+def _cached_auto_windows():
+    """fight windows detected automatically by earlier runs (fight_windows.json -> _auto -> slug -> episode)"""
+    slug = os.environ.get('CHAR_SLUG', '').strip().lower()
+    try:
+        fw = json.load(open('fight_windows.json')).get('_auto', {}).get(slug, {}) if slug else {}
+        return {_k(e): [tuple(w) for w in d['windows']] for e, d in fw.items() if d.get('windows')}
+    except Exception:
+        return {}
+
+
+def _save_auto_windows(det, anchors):
+    """remember detected windows so later runs reuse them; hand-checked entries are never touched"""
+    slug = os.environ.get('CHAR_SLUG', '').strip().lower()
+    if not slug or not det:
+        return
+    try:
+        fw = json.load(open('fight_windows.json'))
+        auto = fw.setdefault('_auto', {}).setdefault(slug, {})
+        for e, w in det.items():
+            auto[e] = dict(windows=[[round(a, 1), round(b, 1)] for a, b in w], source='auto', character=CHAR_NAME,
+                           anchors=sum(1 for s in anchors if s['ep'] == e), detected=time.strftime('%Y-%m-%d', time.gmtime()))
+        fw['_doc_auto'] = ('_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked '
+                           'windows, cached so later runs reuse them. Hand-checked entries stay at the top level.')
+        json.dump(fw, open('fight_windows.json', 'w'), indent=1)
+        print('drop style: cached auto fight windows for', slug, sorted(det), flush=True)
+    except Exception as ex:
+        print('could not cache auto fight windows:', ex, flush=True)
+
+
+def _auto_fight_windows(full_pool, anchors, rel_of, act_of=None):
+    """Any anime, any character: a fight is a sustained stretch of hot shots (heat = impact + 0.6 * CLIP action z for
+    the shots charvis scored; hot = top 65% of the episode; hot shots no more than 6 s apart, 10 s+ long, 4+ shots).
+    It is this character's fight when clear-identity shots sit inside it and, on balance, the stretch does not read as
+    someone else. Tuned offline against the hand-checked Gojo windows (S1E07, S2E04, S2E09): recall 75.5% of curated
+    seconds at 41.3% precision (the old 60th-percentile / 4 s rule: recall 11.5%, precision 21.7%)."""
+    HOT_PCT = float(os.environ.get('FIGHT_HOT_PCT', 35))
+    GAP = float(os.environ.get('FIGHT_GAP', 6.0))
+    ACT_W = float(os.environ.get('FIGHT_ACT_W', 0.6))
+    act_of = act_of or {}
+    heat = lambda s: s['impact'] + ACT_W * act_of.get((s['ep'], s['s']), 0.0)
+    win = {}
+    for ep in sorted({s['ep'] for s in full_pool}):
+        sh_ = sorted((s for s in full_pool if s['ep'] == ep), key=lambda s: s['s'])
+        if len(sh_) < 8:
+            continue
+        hot_gate = float(np.percentile([heat(s) for s in sh_], HOT_PCT))
+        segs, cur = [], None
+        for s in sh_:
+            if heat(s) < hot_gate:
+                continue
+            if cur and s['s'] - cur[1] <= GAP:
+                cur[1] = s['e']; cur[2] += 1
+            else:
+                cur = [s['s'], s['e'], 1]; segs.append(cur)
+        for a, b, k in segs:
+            if b - a < 10.0 or k < 4:
+                continue
+            inside = lambda s: s['ep'] == ep and a - 0.5 <= s['s'] and s['e'] <= b + 0.5
+            n_anchor = sum(1 for s in anchors if inside(s))
+            rels = [r for s, r in rel_of if inside(s)]
+            if n_anchor >= 2 or (n_anchor >= 1 and rels and float(np.mean(rels)) >= 0.0):
+                win.setdefault(ep, []).append((a - 2.0, b + 2.0))
+    return win
+
+
+RIVALS = {'Satoru Gojo': ['Toji Fushiguro', 'Yuji Itadori', 'Jogo', 'Suguru Geto', 'Mahito', 'Ryomen Sukuna']}
+NONCOMBAT_MAX = -0.003                                                # charvis noncombat score above this: never a fight shot
+                                                                      # (Gojo windows: title logo .13, Halloween crowd .05, mahjong .03,
+                                                                      #  Joker cosplayer .007, opening shots .01; fight shots <= -0.02)
+
+
+def _drop_char_pool(full_pool):
+    """Character purity for the drop edit, for any anime and any character. Shots come ONLY from the character's
+    fights: hand-checked windows (fight_windows.json) when the character has them, else fight stretches detected
+    automatically. Inside a fight a shot still goes if it clearly shows someone else (opponent solo, other characters),
+    reads as calm (talking, idle, crowd) or is too dark to read. Impact >= p85 first."""
+    global purity_pct
+    import charvis
+    if not _PROMPTS_ADDED:
+        _PROMPTS_ADDED.append(1)
+        charvis.ACTION += ['an anime character powering up with a glowing aura and crackling energy',
+                           'an anime character awakening with glowing eyes and a burst of cursed energy',
+                           'an anime character dashing through the air mid-attack with speed lines']
+        charvis.CALM += ['a crowd of anime characters watching and reacting in shock',
+                         'an anime close-up of a character talking with a still face',
+                         'anime characters standing around in conversation',
+                         'anime students playing baseball on a sports field',
+                         'a comedic chibi anime reaction with blushing cheeks']
+    cv_ = charvis.get(CHAR_NAME, os.environ.get('CHAR_SERIES', ''))
+    if cv_ is None:
+        raise RuntimeError('charvis unavailable')
+    imp = [s['impact'] for s in full_pool]
+    curated = {e: w for e, w in _curated_windows().items() if any(s['ep'] == e for s in full_pool)}
+    in_win = lambda s, win: any(a <= s['s'] and s['e'] <= b for a, b in win.get(s['ep'], []))
+    lo_imp = float(np.percentile(imp, 55))
+    cands = [s for s in full_pool if (in_win(s, curated) if curated else s['impact'] >= lo_imp)]
+    res = cv_.score([(SRC(s['ep']), (s['s'] + s['e']) / 2) for s in cands])
+    cands = [dict(s, rel=r['rel'], char=r['char'], action=r['action'], noncombat=r.get('noncombat', -1.0),
+                  mine=r.get('mine'), vs={k: v for k, v in (r.get('vs') or {}).items() if v is not None},
+                  look_me=r.get('look_me'), look_vs=r.get('look_vs') or {})
+             for s, r in zip(cands, res) if r]
+    Az = z([s['action'] for s in cands]); Cz = z([s['char'] for s in cands])
+    for i, s in enumerate(cands):
+        s['act_z'], s['char_z'] = float(Az[i]), float(Cz[i])
+    REL_MIN = float(os.environ.get('CHAR_REL_MIN', 0.04))
+    anchors = [s for s in cands if s['rel'] >= REL_MIN]
+    if curated:
+        win, how = curated, 'hand-checked'
+    else:                                                             # auto windows found by an earlier run are reused
+        cached = _cached_auto_windows()
+        pool_eps = sorted({s['ep'] for s in full_pool})
+        win = {e: cached[e] for e in pool_eps if cached.get(e)}
+        todo = [e for e in pool_eps if e not in win]
+        det = _auto_fight_windows([s for s in full_pool if s['ep'] in todo], anchors, [(s, s['rel']) for s in cands],
+                                  {(s['ep'], s['s']): s['act_z'] for s in cands}) if todo else {}
+        win.update(det)
+        how = f"detected {sorted(det)}" + (f" + cached {sorted(e for e in win if e not in det)}" if len(win) > len(det) else '')
+        _save_auto_windows(det, anchors)
+        if not win:                                                   # nothing reads as a fight: stay close to the anchors
+            for s in anchors:
+                win.setdefault(s['ep'], []).append((s['s'] - 12, s['e'] + 12))
+            how = 'anchor +-12 s (no fight stretch detected)'
+    print(f'drop style: {len(anchors)} anchor shots clearly {CHAR_NAME}; {how} fight windows:',
+          {e: [(round(a), round(b)) for a, b in v] for e, v in win.items()}, flush=True)
+    BRIGHT_MIN = float(os.environ.get('DROP_BRIGHT_MIN', 32))
+    NC_MAX = float(os.environ.get('DROP_NONCOMBAT_MAX', NONCOMBAT_MAX))
+    AUTO_REL = float(os.environ.get('DROP_AUTO_REL_MIN', 0.02))
+    CUR_REL = float(os.environ.get('DROP_CURATED_REL_MIN', -0.035))   # -0.05 let Toji / Jogo close-ups in (rel -0.04..-0.05)
+    noncombat = [s for s in cands if in_win(s, win) and s['noncombat'] > NC_MAX]   # crowd / costume / title card / empty sky,
+    if noncombat:                                                     # even inside a hand-checked window
+        print(f'drop style: {len(noncombat)} non-combat shots out of the fight windows (crowd, title card, scenery):',
+              [(s_['ep'].split(':')[-1], round(s_['s'])) for s_ in noncombat[:12]], flush=True)
+    # rivals: the characters this one fights / stands next to. The shot must look more like the target than like each
+    # of them by a margin (Gojo run 44315756019: Toji close-ups at rel -0.03, Yuji and Jogo shots got in)
+    rivals = [r for r in RIVALS.get(CHAR_NAME, []) + [r for r in os.environ.get('CHAR_RIVALS', '').split(',') if r.strip()]]
+    tally = {}
+    for s in cands:
+        if s['vs']:
+            b = max(s['vs'], key=s['vs'].get); tally[b] = tally.get(b, 0) + 1
+    rivals = list(dict.fromkeys([r.strip() for r in rivals] + sorted(tally, key=lambda k: -tally[k])[:6]))
+    rivals = [r for r in rivals if r != CHAR_NAME]
+
+    def riv_margin(s):
+        if s.get('mine') is None or not s['vs']:
+            return s['rel']
+        their = [s['vs'][r] for r in rivals if r in s['vs']]
+        return s['mine'] - max(their) if their else s['rel']
+    for s in cands:
+        s['riv'] = riv_margin(s)
+    # look veto: CLIP's reading of the look descriptions ("spiky pink hair ...", "volcano-shaped head ..."), each centred on
+    # the pool's mean; a shot that reads as a rival's look clearly more than the target's goes (Yuji close-ups at S1E07
+    # 941/1079 passed every reference check). Offline on 209 Gojo-window shots: wrong picks 3 -> 1, Gojo shots 51 -> 46.
+    LOOK_MIN = float(os.environ.get('DROP_LOOK_MIN', -0.04))
+    lk = [s for s in cands if s.get('look_me') is not None and s['look_vs']]
+    lk_ids = {id(s) for s in lk}
+    if len(lk) >= 20:
+        mu_me = float(np.mean([s['look_me'] for s in lk]))
+        mu = {r: float(np.mean([s['look_vs'][r] for s in lk if r in s['look_vs']])) for r in rivals if any(r in s['look_vs'] for s in lk)}
+        for s in cands:
+            if id(s) in lk_ids and mu:
+                s['look'] = (s['look_me'] - mu_me) - max(s['look_vs'][r] - mu[r] for r in mu if r in s['look_vs'])
+            else:
+                s['look'] = 0.0
+    else:
+        for s in cands:
+            s['look'] = 0.0
+    base = lambda s: in_win(s, win) and s['bright'] >= BRIGHT_MIN and s['noncombat'] <= NC_MAX
+    gate_of = lambda pct: float(np.percentile([s['impact'] for s in cands] if curated else imp, pct))
+    target = int(os.environ.get('DROP_PURE_TARGET', 40))
+    # identity ladder, strictest first: (rel vs everyone, margin vs the rivals). Relaxed one step at a time only while
+    # fewer than `target` shots pass at the p50 impact gate; the last step is the old rule.
+    if curated:
+        ladder = [(0.01, 0.03), (0.0, 0.02), (0.0, 0.0), (-0.01, 0.01), (-0.01, 0.0), (-0.02, 0.0), (CUR_REL, -9.0)]
+    else:
+        ladder = [(max(AUTO_REL, 0.02), 0.03), (AUTO_REL, 0.02), (AUTO_REL, 0.0), (AUTO_REL, -9.0)]
+    floor = int(os.environ.get('DROP_PURE_FLOOR', 24))               # below this even the loosest checked step is too thin
+    g50 = gate_of(50.0)
+    levels = []
+    for rmin, mmin in ladder:
+        pure = [s for s in cands if base(s) and s['rel'] >= rmin and s['riv'] >= mmin and s['look'] >= LOOK_MIN
+                and (curated or s['act_z'] >= -0.25)]
+        at50 = sum(s['impact'] >= g50 for s in pure)
+        levels.append((rmin, mmin, pure, at50))
+        print(f'drop style: identity rel>={rmin} & {mmin:+.2f} over rivals: {len(pure)} shots in the windows, {at50} at p50', flush=True)
+        if at50 >= target:
+            break
+    else:                                                             # nobody reached the target: the loosest checked step if it
+        rmin, mmin, pure, at50 = levels[-2] if len(levels) >= 2 and levels[-2][3] >= floor else levels[-1]   # is not starved, else the old rule
+    print(f'drop style: identity step rel>={rmin} & {mmin:+.2f} over rivals chosen ({at50} shots at p50)', flush=True)
+    print(f'drop style: rivals {rivals}; {len(pure)} {CHAR_NAME} shots inside the fight windows', flush=True)
+    need = int(os.environ.get('DROP_MIN_SHOTS', 60))
+    last = None
+    for pct in (IMPACT_PCT, 75.0, 65.0, 50.0, 40.0, 30.0):
+        if pct < 50.0 and (len(keep) >= target or not curated):                        # below p50 only while the stricter identity leaves it thin
+            pct = last                                                # (hand-checked windows are all fight: lower impact is still them fighting)
+            break
+        gate = gate_of(pct)
+        keep = [s for s in pure if s['impact'] >= gate]
+        print(f'drop style: p{pct:.0f} gate {gate:.3f}: {len(keep)} pure {CHAR_NAME} combat shots', flush=True)
+        last = pct
+        if len(keep) >= need:
+            break
+    purity_pct = pct
+    if len(keep) < 6:
+        raise SystemExit(f'drop style: only {len(keep)} clean {CHAR_NAME} combat shots; refusing to fill with other characters')
+    for s in keep:
+        s['impact'] += 0.6 * max(0.0, s['char_z']) + 0.6 * s['act_z']
+    return keep
+
+
+if CHAR_NAME and DROP_STYLE:
+    try:
+        pool = _drop_char_pool(full_pool)
+    except SystemExit:
+        raise
+    except Exception as ex:
+        print('character filter failed, impact-gated motion picks only:', ex, flush=True)
+    if purity_pct != IMPACT_PCT:
+        print(f'WARNING drop style: impact gate relaxed to p{purity_pct:.0f} to find enough {CHAR_NAME} shots', flush=True)
+elif CHAR_NAME:
     try:
         pool = _char_filter(pool)
     except Exception as ex:                                           # fail-safe: motion-only picks
         print('character filter failed, motion-only picks:', ex, flush=True)
+
+if DROP_STYLE:                                                        # talking heads: a big still face is never a combat shot
+    try:
+        import cv2
+        _casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
+        mot_hi = float(np.percentile([s['motion'] for s in pool], 60)) if pool else 0
+        kept = []
+        for s in pool:
+            raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f"{(s['s'] + s['e']) / 2:.2f}", '-i', SRC(s['ep']),
+                            '-frames:v', '1', '-vf', 'scale=480:270,format=gray', '-f', 'rawvideo', '-'])
+            img = np.frombuffer(raw, np.uint8).reshape(270, 480)
+            faces = _casc.detectMultiScale(img, 1.1, 4, minSize=(40, 40))
+            big = max((w * h for x, y, w, h in faces), default=0) / (480 * 270)
+            if big > 0.07 and s['motion'] < mot_hi:
+                continue
+            kept.append(s)
+        print(f'drop style: talking-head check dropped {len(pool) - len(kept)} of {len(pool)}', flush=True)
+        if len(kept) >= 6:
+            pool = kept
+    except Exception as ex:
+        print('talking-head check skipped', ex, flush=True)
 
 # ---------------------------------------------------------------- 5. music
 song_path = f'music/{song}.mp3'
@@ -346,6 +658,8 @@ rms = librosa.feature.rms(y=y, hop_length=512)[0]
 rt = librosa.frames_to_time(np.arange(len(rms)), sr=sr, hop_length=512)
 song_len = len(y) / sr
 need = TEMPLATE_BEATS * P
+if DROP_STYLE:                                                        # only the part after the drop has to fit in the song
+    need = DROP_BEAT * P + MAX_SECONDS
 
 
 def level(t0, t1):
@@ -365,6 +679,9 @@ for b in beats:
         best, drop_t = jump, float(b)
 if drop_t is None:
     drop_t = max(DROP_BEAT * P, MIN_START + (DROP_BEAT - START_BEAT) * P)
+    if DROP_STYLE:                                                    # still land it on a real beat
+        later = [float(b) for b in beats if b >= drop_t]
+        drop_t = later[0] if later else drop_t
 song_start = max(0.0, drop_t - (DROP_BEAT - START_BEAT) * P)
 print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t:.2f}s start {song_start:.2f}s', flush=True)
 
@@ -372,6 +689,8 @@ print(f'tempo {tempo:.1f} beat {P:.4f}s drop {drop_t:.2f}s start {song_start:.2f
 tmpl = [tuple(map(int, l.split()[:2])) for l in open('template.txt')]
 max_beats = START_BEAT + int(MAX_SECONDS / P)                         # keep every edit to its length, whatever the tempo
 tmpl = [(a, min(b, max_beats)) for a, b in tmpl if START_BEAT <= a < max_beats]
+if DROP_STYLE:                                                        # fast section: one cut on every beat from the drop
+    tmpl = [(j, j + 1) for j in range(max(START_BEAT, DROP_BEAT), max_beats)]
 n = len(tmpl)
 second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 pre = [i for i, (a, b) in enumerate(tmpl) if a < DROP_BEAT]
@@ -394,7 +713,7 @@ def take(idx_list, key, min_len):
 try:
     import cv2
     casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
-    for s in sorted(pool, key=lambda s: -s['calm'])[:90]:
+    for s in ([] if DROP_STYLE else sorted(pool, key=lambda s: -s['calm'])[:90]):
         t = (s['s'] + s['e']) / 2
         raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t:.2f}', '-i', SRC(s['ep']), '-frames:v', '1',
                         '-vf', 'scale=480:270,format=gray', '-f', 'rawvideo', '-'])
@@ -441,18 +760,25 @@ if len(assign) < n:                                                   # small po
         t = s['s']
         while t + d <= s['e'] + 1e-6:
             if free(s['ep'], t, t + d):
-                return dict(s, s=round(t, 3), e=round(t + d, 3))
+                return dict(s, s=round(t, 3), e=round(t + d, 3), orig=s.get('orig', s['s']))
             t += 0.25
         return None
     near = sorted((s for s in ep_all if id(s) not in taken and all(id(s) != id(p) for p in pool)),
                   key=lambda s: abs((s['s'] + s['e']) / 2 - (float(INCLUDE.rsplit('|', 2)[1]) if INCLUDE else s['s'])))
+    MAX_USES = int(os.environ.get('DROP_MAX_USES', 2)) if DROP_STYLE else 99   # one shot shows up at most twice (Gojo run
+    uses = {}                                                         # 44315756019: a Toji close-up and one silhouette 5 times each)
+    for s in assign.values():
+        uses[(s['ep'], s['s'])] = uses.get((s['ep'], s['s']), 0) + 1
     for i in [x for x in range(n) if x not in assign]:
         d = sd(i); got = None
         for s in sorted(pool, key=lambda s: -s['impact']):            # 1. same fight, an unseen part of a long shot
+            if uses.get((s['ep'], s['s']), 0) >= MAX_USES:
+                continue
             got = unused_piece(s, d)
             if got:
+                uses[(s['ep'], s['s'])] = uses.get((s['ep'], s['s']), 0) + 1
                 break
-        if got is None and not CHAR_NAME:                             # 2. the nearest unused shot (never with a topic: it may be someone else)
+        if got is None and not CHAR_NAME and not DROP_STYLE:                             # 2. the nearest unused shot (never with a topic: it may be someone else)
             for s in near:
                 if id(s) not in taken and s['e'] - s['s'] >= min(d * 0.6, 2.0) and free(s['ep'], s['s'], s['e']):
                     got = s; taken.add(id(s))
@@ -463,6 +789,26 @@ if len(assign) < n:                                                   # small po
         if got is not None:
             assign[i] = got; on.setdefault(got['ep'], []).append(shown(got, d))
     miss = [x for x in range(n) if x not in assign]
+    if miss and DROP_STYLE:                                           # 3. drop edit: hold the pace, never a long static cut
+        # 1 cut per beat for as long as the shots allow, then half-time (2 beats per cut) so no cut ever runs past
+        # ~1 s; with very few shots the holds spread evenly over the whole edit instead
+        shots_ = [assign[i] for i in sorted(assign)]
+        m = len(shots_)
+        b0, b1 = tmpl[0][0], tmpl[-1][1]
+        total = b1 - b0
+        if 2 * m >= total:
+            lens = [1] * (2 * m - total) + [2] * (total - m)
+        else:
+            q, r_ = divmod(total, m)
+            lens = [q + (1 if j < r_ else 0) for j in range(m)]
+        new_t, t0 = [], b0
+        for L in lens:
+            new_t.append((t0, t0 + L)); t0 += L
+        print(f'drop style: {m} shots for {total} beats -> {lens.count(1)} single-beat cuts, then holds of '
+              f'{max(lens)} beats (no merge into long cuts)', flush=True)
+        tmpl = new_t; assign = {i: s for i, s in enumerate(shots_)}; n = len(tmpl)
+        second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
+        miss = []
     if miss:                                                          # 3. still short: let the previous cut run longer instead
         print('merging', len(miss), 'beats into the cut before them', flush=True)
         keep = [i for i in range(n) if i in assign]
@@ -476,6 +822,22 @@ if len(assign) < n:                                                   # small po
         second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 if len(assign) < n:
     sys.exit(f'not enough shots ({len(assign)}/{n})')
+if DROP_STYLE and n > 3:                                              # pieces of one long shot never sit within 8 cuts of each other
+    near_ = lambda x, y: x['ep'] == y['ep'] and x['s'] < y['e'] + 6 and y['s'] < x['e'] + 6   # (reads as a frozen hold / a repeat)
+    SPACE = int(os.environ.get('DROP_REPEAT_SPACE', 8))
+    clash = lambda shot, pos, skip: any(near_(shot, assign[x]) for x in range(pos - SPACE, pos + SPACE + 1)
+                                        if 0 <= x < n and x != pos and x not in skip)
+    for i in range(2, n):
+        if any(near_(assign[i], assign[x]) for x in range(max(0, i - SPACE), i)):
+            for j in list(range(i + 1, n)) + list(range(1, i - 1)):
+                if not clash(assign[j], i, {i, j}) and not clash(assign[i], j, {i, j}):
+                    assign[i], assign[j] = assign[j], assign[i]; break
+    rep = sum(1 for i in range(1, n) if any(near_(assign[i], assign[x]) for x in range(max(0, i - SPACE), i)))
+    print(f'drop style: {len({(s_["ep"], s_.get("orig", s_["s"])) for s_ in assign.values()})} distinct shots for {n} cuts, '
+          f'{rep} cuts still within {SPACE} of a piece of the same shot', flush=True)
+if DROP_STYLE and n > 2:                                              # end on the finisher, not on whatever came last
+    fin = max(range(1, n), key=lambda i: assign[i]['impact'])
+    assign[fin], assign[n - 1] = assign[n - 1], assign[fin]
 impact_cut = np.percentile([s['impact'] for s in pool], 85)
 
 # ---------------------------------------------------------------- 7. render
@@ -485,17 +847,26 @@ kinds = default_transition_pattern(n, drop_i)
 if second_drop:
     kinds[second_drop - 1] = 'flash'
 fxl = pair_transitions(n, kinds)
+if DROP_STYLE:                                                        # the drop: 3-stage flash + punch-in on the very first cut
+    for f_ in ('flash', 'punch'):
+        if f_ not in fxl[drop_i]:
+            fxl[drop_i].append(f_)
+    heavy_cut = float(np.percentile([assign[i].get('peak', 0) for i in range(n)], 65))   # heavy hits: top third by peak motion
 os.makedirs('segfx', exist_ok=True)
 jobs, plan = [], []
 for k_, (a, b) in enumerate(tmpl):
     s = assign[k_]
     nf = fr(b) - fr(a); dur = nf / FPS
     fx = list(fxl[k_])
-    if a < DROP_BEAT or 109 <= a < 113:
+    if DROP_STYLE:                                                    # pulse on every beat, shake + RGB split on the heavy hits
+        fx.append('pulse')
+        if k_ == drop_i or s.get('peak', 0) >= heavy_cut:
+            fx.append('shake')
+    elif a < DROP_BEAT or 109 <= a < 113:
         fx.append('drift')
     elif b - a >= 2:
         fx.append('pulse')
-    if s['impact'] >= impact_cut and a >= DROP_BEAT:
+    if not DROP_STYLE and s['impact'] >= impact_cut and a >= DROP_BEAT:
         fx.append('shake')
     L = s['e'] - s['s']; spd = 1.0
     if L >= dur:
@@ -510,7 +881,8 @@ for k_, (a, b) in enumerate(tmpl):
     jobs.append(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{st:.3f}', '-i', SRC(s['ep']), '-an',
                  '-vf', vf, '-frames:v', str(nf), '-r', str(FPS), '-fps_mode', 'cfr',
                  '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', f'segfx/{k_:03d}.mp4'])
-json.dump(dict(pick=PICK, anime=series, song=song, episodes=eps, tempo=tempo, song_start=song_start, plan=plan),
+json.dump(dict(pick=PICK, anime=series, song=song, episodes=eps, tempo=tempo, song_start=song_start, drop_t=drop_t,
+               style='drop' if DROP_STYLE else 'template', impact_pct=purity_pct, character=CHAR_NAME, plan=plan),
           open('work/edit_plan.json', 'w'), indent=1)
 
 

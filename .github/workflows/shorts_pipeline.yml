@@ -54,8 +54,8 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends ffmpeg python3 python3-pip git ca-certificates libsndfile1 libglib2.0-0t64 fonts-montserrat fontconfig
           pip3 install --break-system-packages gdown numpy librosa soundfile scikit-learn faster-whisper "opencv-python-headless<5" edge-tts requests google-api-python-client google-auth
-          pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 torchaudio==2.7.1
-          pip3 install --break-system-packages demucs
+          pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 torchaudio==2.7.1 torchvision==0.22.1
+          pip3 install --break-system-packages demucs open_clip_torch pillow
       - uses: actions/checkout@v4
       - name: Make the Short (alternating 50/50 convo / narrated)
         env:
@@ -85,6 +85,6 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "amv-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add edit/history.json metadata/youtube_upload_history.json metadata/candle_gate_state.json 2>/dev/null || true
+          git add edit/history.json edit/research_cache.json edit/fight_windows.json metadata/youtube_upload_history.json metadata/candle_gate_state.json 2>/dev/null || true
           git commit -m "history: anime short ${{ github.run_number }} [skip ci]" || exit 0
           git pull --rebase -X theirs origin ${{ github.ref_name }} && git push origin HEAD:${{ github.ref_name }}

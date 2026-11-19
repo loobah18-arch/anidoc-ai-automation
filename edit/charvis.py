@@ -87,8 +87,20 @@ def _fandom(name, series):
     return [(info[t].get('thumburl') or info[t]['url']) for t in still if t in info]
 
 
+_JIKAN_FAILS = [0]
+
+
 def _jikan(name):
-    js = json.loads(_get('https://api.jikan.moe/v4/characters?' + urllib.parse.urlencode(dict(q=name, limit=3, order_by='favorites', sort='desc'))))
+    if _JIKAN_FAILS[0] >= 2:                                          # unreachable from this runner (Errno 101 on GitHub): stop asking
+        return []
+    try:
+        js = json.loads(_get('https://api.jikan.moe/v4/characters?' + urllib.parse.urlencode(dict(q=name, limit=3, order_by='favorites', sort='desc')), timeout=12))
+        _JIKAN_FAILS[0] = 0
+    except Exception:
+        _JIKAN_FAILS[0] += 1
+        if _JIKAN_FAILS[0] == 2:
+            print('jikan unreachable twice, skipping it for the other characters', flush=True)
+        raise
     out = []
     for c in js.get('data', [])[:1]:
         out.append(c['images']['jpg']['image_url'])
@@ -346,6 +358,15 @@ ACTION = ['an anime fight scene with a sword slash', 'an anime character unleash
 CALM = ['two anime characters calmly talking', 'an anime character standing still in a quiet room',
         'an anime landscape with no people', 'an anime close-up of a character eating or smiling',
         'a dark blank frame or title card']
+# shots that are never combat even inside a fight window: crowds, costumes, title cards, empty scenery, dark frames.
+# noncombat = best match here minus best ACTION match (> 0: reads more like these than like any fight)
+NONCOMBAT = ['a crowd of people in halloween costumes on a city street at night',
+             'a person in clown or joker face paint in a crowd',
+             'a crowd of ordinary people standing in a train station',
+             'an anime episode title card with white text on a black screen',
+             'an anime title logo with japanese text',
+             'an empty sky over dark mountains with no people',
+             'a nearly black frame with a small light in the darkness']
 
 
 def _best(M, x):
@@ -369,12 +390,15 @@ class Scorer:
         self.others_w = {n: v for n, v in self.bank.whole.items() if n != name}
         self.others_f = {n: v for n, v in self.bank.face.items() if n != name}
         look = self.bank.look.get(name, '')
-        others = [f'anime screenshot of {v}' for k, v in self.bank.look.items() if k != name and v]
+        self.look_names = [k for k, v in self.bank.look.items() if k != name and v]
+        others = [f'anime screenshot of {self.bank.look[k]}' for k in self.look_names]
+        self.has_look = bool(look)
         self.t_others = embed_text(others) if others else None
         names_t = [f'{name} from {series}, anime screenshot', f'anime screenshot of {look}' if look else f'{name}, anime character',
                    f'{name}, {look}' if look else f'{name} fighting']
         t = embed_text(names_t + ACTION + CALM)
         nn = len(names_t); self.t_name, self.t_act, self.t_calm = t[:nn], t[nn:nn + len(ACTION)], t[nn + len(ACTION):]
+        self.t_non = embed_text(NONCOMBAT)
         self.image_mode = self.ref is not None and len(self.others_w) >= 2
         print(f'charvis ready for {name}: {0 if self.ref is None else len(self.ref)} stills, '
               f'{0 if self.ref_face is None else len(self.ref_face)} face refs, {len(self.others_w)} other characters with refs, '
@@ -423,18 +447,24 @@ class Scorer:
             face = (_best(self.ref_face, f) or 0.0) if f is not None else 0.0
             named = float((self.t_name @ e).max())
             act = float((self.t_act @ e).max() - (self.t_calm @ e).max())
+            noncombat = float((self.t_non @ e).max() - (self.t_act @ e).max())
             if self.image_mode:                                      # image refs: how much more like them than anyone else
                 if f is not None and self.ref_face is not None and self.others_f:
-                    mine, theirs = face, max(_best(v, f) for v in self.others_f.values())
+                    mine, vs = face, {n: _best(v, f) for n, v in self.others_f.items()}
                 else:
-                    mine, theirs = whole, max(_best(v, e) for v in self.others_w.values())
-                rel = mine - theirs
+                    mine, vs = whole, {n: _best(v, e) for n, v in self.others_w.items()}
+                rel = mine - max(vs.values())
                 char = max(whole, face) + 0.5 * named + 2.0 * rel
             else:                                                    # no refs: the old text look description
                 look_self = float(self.t_name[1] @ e)
                 rel = look_self - float((self.t_others @ e).max()) if self.t_others is not None else 0.0
                 char = max(whole, face) + 1.0 * named + 2.0 * rel
-            out.append(dict(char=char, rel=rel, face=face, whole=whole, named=named, action=act, has_face=f is not None))
+                mine, vs = None, {}
+            look_me = float(self.t_name[1] @ e) if self.has_look else None
+            look_vs = dict(zip(self.look_names, (self.t_others @ e).tolist())) if self.t_others is not None else {}
+            out.append(dict(char=char, rel=rel, face=face, whole=whole, named=named, action=act, noncombat=noncombat,
+                            has_face=f is not None, mine=mine, vs=vs,   # vs: every other character's score (rival margins)
+                            look_me=look_me, look_vs=look_vs))          # CLIP look-description scores (rival look veto)
         return out
 
     def present(self, items, margin=-0.02):
@@ -487,3 +517,128 @@ def get(name, series=''):
     except Exception as ex:
         print('charvis unavailable, motion-only picks:', ex, flush=True)
         return None
+
+
+# ------------------------------------------------------------------ who is this scene about (conversation character)
+# The rules below are the offline prototype that got the S1E13 459-476 s Tanjiro scene right (Tanjiro 11-13 of 23
+# votes, where the earlier draft said Zenitsu 5 / Mitsuri 3 / Tanjiro 2): short title in the name prompt (the long
+# "Demon Slayer Kimetsu No Yaiba, anime screenshot" title washed the names out), background = plain frames every 25 s
+# of the episode, no face-crop blending, one vote per frame.
+SHORT_TITLE = {'demon-slayer-kimetsu-no-yaiba': 'Demon Slayer', 'jujutsu-kaisen': 'Jujutsu Kaisen'}
+_BG = {}
+
+
+def short_title(series, title=''):
+    k = series_key(series)
+    if k in SHORT_TITLE:
+        return SHORT_TITLE[k]
+    t = title or k.replace('-', ' ').title()
+    t = re.split(r'\s*[:(\u2013\u2014]\s*|\s+-\s+|\s+season\s+', t, flags=re.I)[0].strip()
+    return ' '.join(t.split()[:3]) or t
+
+
+def _embed_frames(src, ts, w=448, dark=18):
+    """(times kept, whole-frame embeddings). Pure black / fade frames (mean < dark) say nothing about who it is."""
+    kept, ims = [], []
+    for t in ts:
+        im = frame(src, t, w)
+        if im is not None and (dark is None or np.asarray(im.convert('L')).mean() > dark):
+            kept.append(t); ims.append(im)
+    if not ims:
+        return [], np.zeros((0, 512), np.float32)
+    return kept, embed_images(ims)
+
+
+def background(src, lo, hi, skip=None, step=25.0, min_n=24):
+    """frames every `step` s of the same episode (outside `skip(t)`): the baseline every character score is measured
+    against. A short range gets a finer step so there are still min_n frames."""
+    key = (src, int(lo), int(hi), step)
+    if key not in _BG:
+        ts = [t for t in np.arange(lo, hi, step) if not (skip and skip(t))]
+        if len(ts) < min_n and hi - lo > 0:
+            ts = [t for t in np.linspace(lo, hi, min_n * 2) if not (skip and skip(t))]
+        _BG[key] = _embed_frames(src, ts, dark=None)
+    return _BG[key]
+
+
+def validate_refs(bk, EB, expected=(), log=print):
+    """reference pictures that match too broadly. A still that is the best match of 10%+ of an episode's frames is a
+    composition match (a dark room, a screaming close-up, Enmu#4's big blue close-up), not the character: dropped.
+    A character whose refs win 20%+ of the episode's frames (and 3x the typical share) without being expected in it is
+    dropped entirely (Enmu's refs - flesh blobs, game art, a blue close-up - were the 'clear' match of 223 Demon Slayer
+    shots)."""
+    names = [n for n in bk.whole]
+    R = np.vstack([bk.whole[n] for n in names])
+    win = np.bincount((EB @ R.T).argmax(1), minlength=len(R)) / max(1, len(EB))
+    keep = {n: np.ones(len(bk.whole[n]), bool) for n in names}
+    i, hubs = 0, []
+    for n in names:
+        for j in range(len(bk.whole[n])):
+            if win[i] >= 0.10 and len(bk.whole[n]) >= 3:
+                keep[n][j] = False; hubs.append(f'{n}#{j}')
+            i += 1
+    S = np.stack([(EB @ bk.whole[n].T).max(1) for n in names], 1)
+    o = np.sort(S, 1); top = S.argmax(1); mar = o[:, -1] - o[:, -2]
+    share = np.bincount(top[mar >= 0.02], minlength=len(names)) / max(1, len(EB))
+    med = float(np.median(share))
+    exp = {e.lower() for e in expected}
+    broad = [names[k] for k in range(len(names)) if share[k] >= 0.20 and share[k] >= 3 * med and names[k].lower() not in exp]
+    log(f'reference check: {len(hubs)} over-broad stills dropped {hubs[:8]}; characters matching too broadly: '
+        f'{[(n, round(float(share[names.index(n)]), 2)) for n in broad]}')
+    return {n: bk.whole[n][keep[n]] for n in names if n not in broad and keep[n].any()}, broad
+
+
+def identify(src, t0, t1, series, lo, hi, skip=None, expected=(), target=None, log=print, series_title='',
+             weights=(0.7, 0.15, 0.15)):
+    """who a scene (t0..t1 s of src) is about. A frame every 0.75 s is scored for every character of the anime by
+    CLIP's knowledge of the name ("{name} from {short title}"), of the look description and of the reference stills,
+    each as a z-score against background frames every 25 s of the same episode (so a reference that matches every dark
+    close-up, or the hero who is in every frame, does not win by default). One vote per frame for its best character;
+    the scene's character needs 30%+ of the votes and 1.6x the runner-up.
+    returns dict(name or None, votes, share, runner, margin, target_share, target_top)."""
+    bk = bank(series)
+    if len(bk.whole) < 2:
+        return dict(name=None, reason='no reference bank')
+    ts = list(np.arange(t0 + 0.25, t1, 0.75))
+    if len(ts) > 40:
+        ts = list(np.linspace(t0 + 0.25, t1 - 0.25, 40))
+    if len(ts) < 8:
+        ts = list(np.linspace(t0 + 0.1, t1 - 0.1, 8))
+    tk, ET = _embed_frames(src, ts)
+    _, EB = background(src, lo, hi, skip=skip)
+    if len(ET) < 4 or len(EB) < 12:
+        return dict(name=None, reason='too few readable frames')
+    whole, broad = validate_refs(bk, EB, expected, log)
+    names = list(whole)
+    z = lambda St, Sb: (St - Sb.mean(0)) / (Sb.std(0) + 1e-6)
+    st = short_title(series, series_title)
+    tn = embed_text([f'{n} from {st}' for n in names])
+    C = weights[0] * z(ET @ tn.T, EB @ tn.T)
+    if weights[1]:
+        tl = embed_text([f'anime screenshot of {bk.look.get(n) or n}' for n in names])
+        C = C + weights[1] * z(ET @ tl.T, EB @ tl.T)
+    if weights[2]:
+        C = C + weights[2] * np.stack([z(ET @ whole[n].T, EB @ whole[n].T).max(1) for n in names], 1)
+    if os.environ.get('CHARVIS_DEBUG'):
+        for k in range(len(C)):
+            oo = np.argsort(-C[k])[:3]; print(' frame', k, [(names[j].split()[0], round(float(C[k, j]), 2)) for j in oo])
+    votes = np.bincount(C.argmax(1), minlength=len(names))
+    order = np.argsort(-votes)
+    top, run = names[order[0]], names[order[1]]
+    share = float(votes[order[0]]) / len(C)
+    margin = float(votes[order[0]]) / max(1.0, float(votes[order[1]]))
+    mean = C.mean(0)
+    res = dict(votes={names[k]: int(votes[k]) for k in order[:5] if votes[k]}, frames=len(C), share=round(share, 3),
+               runner=run, margin=round(margin, 2), mean={names[k]: round(float(mean[k]), 2) for k in np.argsort(-mean)[:4]},
+               broad=broad, prompt=f'{{name}} from {st}', name=top if share >= 0.30 and margin >= 1.6 else None)
+    res['per_frame'] = [(float(t), names[k]) for t, k in zip(tk, C.argmax(1))]     # (time, its vote)
+    if target:
+        ti = next((k for k, n in enumerate(names) if n.lower() == target.lower() or n.split()[0].lower() == target.lower()), None)
+        res['target_share'] = round(float(votes[ti]) / len(C), 3) if ti is not None else 0.0
+        res['target_top'] = ti is not None and int(votes[ti]) == int(votes.max()) and votes[ti] > 0
+        # clearly about the target: strictly the most votes and a quarter of the frames (a 6-6 tie with Hanami is not)
+        res['target_clear'] = bool(ti is not None and votes[ti] > max([votes[k] for k in range(len(names)) if k != ti] or [0])
+                                   and res['target_share'] >= 0.25)
+    log(f'scene {t0:.0f}-{t1:.0f}s: votes {res["votes"]} of {len(C)} frames (bg {len(EB)}, prompt "{res["prompt"]}"); '
+        f'top {top} {share:.0%}, {margin:.1f}x {run} -> {res["name"] or "unsure"}')
+    return res
