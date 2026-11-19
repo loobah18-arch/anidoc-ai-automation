@@ -23,7 +23,7 @@ from drive_index import library
 W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by default (1080x1440)
 TOTAL = float(os.environ.get('TOTAL_SECONDS', 59))
 CMIN, CMAX = float(os.environ.get('CONV_MIN', 14)), float(os.environ.get('CONV_MAX', 27))   # short talk, long edit
-HOOK = 1.5
+HOOK = float(os.environ.get('CONVO_HOOK', 0))                      # no cold open: the talk starts the Short at 0 s (set 1.5 for the old phonk hook)
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
 os.environ['SEED'] = str(SEED)                                       # a re-run (next talk moment / episode) sees the same episodes
@@ -377,7 +377,7 @@ if pick is None:
     j = max(ends) if ends else max(k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX)
     pick = (i, j)
 cw = words[pick[0]:pick[1] + 1]
-c0 = max(win0, cw[0]['s'] - 0.35); c1 = min(win1, cw[-1]['e'] + 0.8)
+c0 = max(win0, cw[0]['s'] - 0.12); c1 = min(win1, cw[-1]['e'] + 0.8)
 c0 = round(c0 * FPS) / FPS; c1 = round(c1 * FPS) / FPS
 CONV = c1 - c0
 if SONG[max(0, int(c0)):int(c1) + 1].any():                           # fallback stretch touched an opening/ending: next moment
@@ -750,15 +750,18 @@ if bed_ss < 0:
     bed_ss = _busy_part(song_file, CONV + 0.5)                       # song too short before its drop: old behaviour
     print('song has no room before the drop, bed from its busiest part', flush=True)
 print(f'song bed from {bed_ss:.1f}s', flush=True)
-fc = (
+_hook = (
     f"[0:v]trim={hook_at:.3f}:{hook_at + HOOK:.3f},setpts=PTS-STARTPTS,fps={FPS}[hv];"
     f"[0:a]atrim={hook_at:.3f}:{hook_at + HOOK:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={HOOK - 0.25}:d=0.25,volume=0.8[ha];"
+) if HOOK > 0 else ''
+fc = (
+    _hook +
     f"[1:v]setpts=PTS-STARTPTS,fps={FPS},ass=work/convo/captions_shift.ass[cv];"
     f"[2:a]asetpts=PTS-STARTPTS,loudnorm=I=-15:TP=-1.5:LRA=11,aresample=48000,aformat=channel_layouts=stereo[dl];"
-    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,volume={BED_VOL},afade=t=in:d=0.4[bd];"
+    f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,volume={BED_VOL},afade=t=in:d=1.0[bd];"
     f"[dl][bd]amix=inputs=2:duration=first:normalize=0[ca];"
     f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
-    f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]"
+    (f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]" if HOOK > 0 else f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a]")
 )
 # captions were timed from the start of the short (hook included); the conversation clip starts at 0
 txt = open('work/convo/captions.ass').read()
