@@ -761,7 +761,7 @@ fc = (
     f"[3:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo,volume={BED_VOL},afade=t=in:d=1.0[bd];"
     f"[dl][bd]amix=inputs=2:duration=first:normalize=0[ca];"
     f"[0:v]setpts=PTS-STARTPTS,fps={FPS}[av];[0:a]asetpts=PTS-STARTPTS,aresample=48000,aformat=channel_layouts=stereo[aa];"
-    (f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]" if HOOK > 0 else f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a]")
+    + (f"[hv][ha][cv][ca][av][aa]concat=n=3:v=1:a=1[v][a]" if HOOK > 0 else f"[cv][ca][av][aa]concat=n=2:v=1:a=1[v][a]")
 )
 # captions were timed from the start of the short (hook included); the conversation clip starts at 0
 txt = open('work/convo/captions.ass').read()
