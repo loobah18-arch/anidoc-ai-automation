@@ -26,6 +26,7 @@ CMIN, CMAX = float(os.environ.get('CONV_MIN', 14)), float(os.environ.get('CONV_M
 HOOK = 1.5
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
+os.environ['SEED'] = str(SEED)                                       # a re-run (next talk moment / episode) sees the same episodes
 COLORS = ['#FF3B5C', '#3DFF7A', '#B266FF', '#33D6FF', '#FFC533']      # pink-red, green, purple, cyan, gold
 FONT = os.environ.get('CAPTION_FONT', 'Montserrat ExtraBold')
 os.makedirs('src', exist_ok=True); os.makedirs('work/convo', exist_ok=True); os.makedirs('../out', exist_ok=True)
@@ -182,8 +183,12 @@ for ep in eps:
     fetch(ep)
     motions[ep] = (duration(SRC(ep)), motion(SRC(ep)))
 SONGS = {}
+EP_EXCLUDE = [e for e in os.environ.get('CONVO_EP_EXCLUDE', '').split(',') if e]   # talk episodes that did not show the pick
 for ep in eps:
     d_, ps = motions[ep]
+    if ep in EP_EXCLUDE and any(e not in EP_EXCLUDE for e in eps):
+        SONGS[ep] = song_mask(ep, d_)
+        continue
     SONGS[ep] = song_mask(ep, d_)
     lo_, hi_ = 150, int(d_) - 150                                        # skip openings and the ending/preview
     prev = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == ep]
@@ -265,14 +270,19 @@ if PICK_NAME and _cands and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
             r_ = charvis.identify(src, t_, t_ + 24, EPISODES[conv_ep]['series'], lo, hi, skip=_SKIP_SONG,
                                   expected=(PICK_NAME,), target=PICK_NAME, log=lambda m: print('identify:', m, flush=True))
             print(f'talk candidate {t_}s (score {sc_:.2f}): {PICK_NAME} votes {r_.get("target_share", 0):.0%}, '
-                  f'top {"yes" if r_.get("target_top") else "no"}', flush=True)
-            if r_.get('target_top'):
+                  f'clearly them {"yes" if r_.get("target_clear") else "no"}', flush=True)
+            if r_.get('target_clear'):
                 if t_ != bt:
                     print(f'talk moment {bt}s -> {t_}s: {PICK_NAME} is on screen there', flush=True)
                 bs, bt = sc_, t_
                 break
         else:
-            print(f'no talk candidate shows {PICK_NAME} on top; keeping the best-scoring moment {bt}s', flush=True)
+            left = [e for e in eps if e != conv_ep and e not in EP_EXCLUDE]
+            if left and len(EP_EXCLUDE) < 2:                          # try the talk in another of the picked episodes
+                print(f'no talk candidate in {conv_ep} is clearly {PICK_NAME}; trying the next episode {left}', flush=True)
+                os.environ['CONVO_EP_EXCLUDE'] = ','.join(EP_EXCLUDE + [conv_ep]); os.environ.pop('CONVO_SKIP', None)
+                os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
+            print(f'no talk candidate is clearly {PICK_NAME}; keeping the best-scoring moment {bt}s', flush=True)
     except Exception as ex:
         print('talk candidate identification skipped:', ex, flush=True)
 fight = bt
@@ -324,6 +334,25 @@ if len(words) < 12:
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 
 # ------------------------------------------------------------------ 3. densest stretch of dialogue
+PICK_T = []                                                           # a character pick: times of frames that vote for them
+if PICK_NAME and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
+    try:
+        import charvis
+        _rw = charvis.identify(src, win0, win1, EPISODES[conv_ep]['series'], lo, hi, skip=_SKIP_SONG, expected=(PICK_NAME,),
+                               target=PICK_NAME, log=lambda m: print('identify:', m, flush=True))
+        PICK_T = [t_ for t_, n_ in _rw.get('per_frame', []) if n_ == PICK_NAME]
+        _all_t = [t_ for t_, _ in _rw.get('per_frame', [])]
+    except Exception as ex:
+        print('pick frames skipped:', ex, flush=True)
+
+
+def pick_frac(a, b):                                                  # share of the stretch's sampled frames that are the pick
+    if not PICK_T:
+        return 0.0
+    n_all = sum(a <= t_ <= b for t_ in _all_t)
+    return sum(a <= t_ <= b for t_ in PICK_T) / max(1, n_all)
+
+
 starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
 best, pick = -1, None
 for i in starts:
@@ -339,7 +368,7 @@ for i in starts:
             continue
         talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
         act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref    # action on screen while they talk
-        score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3)
+        score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3) + 1.5 * pick_frac(words[i]['s'], words[j]['e'])
         if score > best:
             best, pick = score, (i, j)
 if pick is None:

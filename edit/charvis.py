@@ -390,7 +390,9 @@ class Scorer:
         self.others_w = {n: v for n, v in self.bank.whole.items() if n != name}
         self.others_f = {n: v for n, v in self.bank.face.items() if n != name}
         look = self.bank.look.get(name, '')
-        others = [f'anime screenshot of {v}' for k, v in self.bank.look.items() if k != name and v]
+        self.look_names = [k for k, v in self.bank.look.items() if k != name and v]
+        others = [f'anime screenshot of {self.bank.look[k]}' for k in self.look_names]
+        self.has_look = bool(look)
         self.t_others = embed_text(others) if others else None
         names_t = [f'{name} from {series}, anime screenshot', f'anime screenshot of {look}' if look else f'{name}, anime character',
                    f'{name}, {look}' if look else f'{name} fighting']
@@ -458,8 +460,11 @@ class Scorer:
                 rel = look_self - float((self.t_others @ e).max()) if self.t_others is not None else 0.0
                 char = max(whole, face) + 1.0 * named + 2.0 * rel
                 mine, vs = None, {}
+            look_me = float(self.t_name[1] @ e) if self.has_look else None
+            look_vs = dict(zip(self.look_names, (self.t_others @ e).tolist())) if self.t_others is not None else {}
             out.append(dict(char=char, rel=rel, face=face, whole=whole, named=named, action=act, noncombat=noncombat,
-                            has_face=f is not None, mine=mine, vs=vs))   # vs: every other character's score (for rival margins)
+                            has_face=f is not None, mine=mine, vs=vs,   # vs: every other character's score (rival margins)
+                            look_me=look_me, look_vs=look_vs))          # CLIP look-description scores (rival look veto)
         return out
 
     def present(self, items, margin=-0.02):
@@ -599,7 +604,7 @@ def identify(src, t0, t1, series, lo, hi, skip=None, expected=(), target=None, l
         ts = list(np.linspace(t0 + 0.25, t1 - 0.25, 40))
     if len(ts) < 8:
         ts = list(np.linspace(t0 + 0.1, t1 - 0.1, 8))
-    _, ET = _embed_frames(src, ts)
+    tk, ET = _embed_frames(src, ts)
     _, EB = background(src, lo, hi, skip=skip)
     if len(ET) < 4 or len(EB) < 12:
         return dict(name=None, reason='too few readable frames')
@@ -626,10 +631,14 @@ def identify(src, t0, t1, series, lo, hi, skip=None, expected=(), target=None, l
     res = dict(votes={names[k]: int(votes[k]) for k in order[:5] if votes[k]}, frames=len(C), share=round(share, 3),
                runner=run, margin=round(margin, 2), mean={names[k]: round(float(mean[k]), 2) for k in np.argsort(-mean)[:4]},
                broad=broad, prompt=f'{{name}} from {st}', name=top if share >= 0.30 and margin >= 1.6 else None)
+    res['per_frame'] = [(float(t), names[k]) for t, k in zip(tk, C.argmax(1))]     # (time, its vote)
     if target:
-        tk = next((k for k, n in enumerate(names) if n.lower() == target.lower() or n.split()[0].lower() == target.lower()), None)
-        res['target_share'] = round(float(votes[tk]) / len(C), 3) if tk is not None else 0.0
-        res['target_top'] = tk is not None and int(votes[tk]) == int(votes.max()) and votes[tk] > 0
+        ti = next((k for k, n in enumerate(names) if n.lower() == target.lower() or n.split()[0].lower() == target.lower()), None)
+        res['target_share'] = round(float(votes[ti]) / len(C), 3) if ti is not None else 0.0
+        res['target_top'] = ti is not None and int(votes[ti]) == int(votes.max()) and votes[ti] > 0
+        # clearly about the target: strictly the most votes and a quarter of the frames (a 6-6 tie with Hanami is not)
+        res['target_clear'] = bool(ti is not None and votes[ti] > max([votes[k] for k in range(len(names)) if k != ti] or [0])
+                                   and res['target_share'] >= 0.25)
     log(f'scene {t0:.0f}-{t1:.0f}s: votes {res["votes"]} of {len(C)} frames (bg {len(EB)}, prompt "{res["prompt"]}"); '
         f'top {top} {share:.0%}, {margin:.1f}x {run} -> {res["name"] or "unsure"}')
     return res
