@@ -15,7 +15,7 @@
   "ashreveal_manasha_phonk": 1,
   "trashxrl_deus_do_olimpo": 1,
   "atlxs_passo_bem_solto_slowed": 2,
-  "poker_face": 1,
+  "poker_face": 2,
   "ncts_next_phonk": 2,
   "nxxkz_loucura_letal_funk_slowed": 2
  },
@@ -70,7 +70,8 @@
   "demon-slayer-kimetsu-no-yaiba:S1E17": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E07": 1
+  "demon-slayer-kimetsu-no-yaiba:S4E07": 1,
+  "jujutsu-kaisen:S3E01": 1
  },
  "shots": [
   {
@@ -5940,6 +5941,194 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
    "s": 1263.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 936.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1223.066
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1152.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 29.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1105.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 31.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 51.442
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 118.542
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 188.041
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 389.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 444.65
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 563.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 564.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 670.917
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 678.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 711.875
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 719.317
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 737.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 739.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 757.192
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 768.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 789.483
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 792.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 897.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 901.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 909.858
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 943.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1051.292
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1054.275
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1058.041
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1089.566
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1104.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1107.816
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1115.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1124.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1146.209
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1186.567
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1207.875
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1217.4
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1219.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1226.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1255.317
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1256.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1258.692
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1260.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1262.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1275.25
   }
  ],
  "runs": [
@@ -6274,6 +6463,16 @@
     "demon-slayer-kimetsu-no-yaiba:S1E09",
     "demon-slayer-kimetsu-no-yaiba:S1E10",
     "demon-slayer-kimetsu-no-yaiba:S4E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-19 01:59 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "poker_face",
+   "episodes": [
+    "jujutsu-kaisen:S3E01"
    ],
    "file": "_amv_part.mp4"
   }
@@ -6751,10 +6950,20 @@
     1289.4,
     1385.0
    ]
+  ],
+  "jujutsu-kaisen:S3E01": [
+   [
+    220.1,
+    318.3
+   ],
+   [
+    1371.4,
+    1423.2
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 15,
+  "jujutsu-kaisen": 16,
   "demon-slayer-kimetsu-no-yaiba": 16
  },
  "known": [
@@ -7104,6 +7313,13 @@
    "writer": "groq:openai/gpt-oss-120b",
    "mode": "rhyme",
    "title": "Nezuko quote that hits hard \ud83e\udd76 #shorts"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1233.7333333333333,
+   "e": 1249.3666666666666,
+   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
+   "time": "2026-11-19 02:00 UTC"
   }
  ],
  "styles": [
@@ -7130,6 +7346,12 @@
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
    "time": "2026-11-18 01:00 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "jujutsu-kaisen:S3E01",
+   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
+   "time": "2026-11-19 02:00 UTC"
   }
  ],
  "narr_chars": {
