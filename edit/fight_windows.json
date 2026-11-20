@@ -628,6 +628,156 @@
     "anchors": 16,
     "detected": "2026-11-19"
    }
+  },
+  "rengoku": {
+   "demon-slayer-kimetsu-no-yaiba:S2E01": {
+    "windows": [
+     [
+      29.0,
+      97.2
+     ],
+     [
+      188.7,
+      217.9
+     ],
+     [
+      318.5,
+      361.1
+     ],
+     [
+      364.2,
+      395.0
+     ],
+     [
+      397.7,
+      429.8
+     ],
+     [
+      490.8,
+      522.1
+     ],
+     [
+      532.1,
+      594.2
+     ],
+     [
+      601.3,
+      640.5
+     ],
+     [
+      656.9,
+      705.8
+     ],
+     [
+      806.3,
+      872.5
+     ],
+     [
+      1029.6,
+      1116.0
+     ],
+     [
+      1374.7,
+      1405.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Kyojuro Rengoku",
+    "anchors": 42,
+    "detected": "2026-11-20"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S2E02": {
+    "windows": [
+     [
+      28.9,
+      57.6
+     ],
+     [
+      61.5,
+      81.7
+     ],
+     [
+      191.4,
+      215.1
+     ],
+     [
+      223.2,
+      279.5
+     ],
+     [
+      329.0,
+      381.5
+     ],
+     [
+      401.8,
+      492.1
+     ],
+     [
+      603.0,
+      645.8
+     ],
+     [
+      661.0,
+      689.3
+     ],
+     [
+      691.8,
+      773.6
+     ],
+     [
+      780.0,
+      820.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Kyojuro Rengoku",
+    "anchors": 42,
+    "detected": "2026-11-20"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S2E06": {
+    "windows": [
+     [
+      414.0,
+      447.6
+     ],
+     [
+      648.5,
+      702.3
+     ],
+     [
+      892.9,
+      1045.4
+     ],
+     [
+      1076.9,
+      1216.3
+     ]
+    ],
+    "source": "auto",
+    "character": "Kyojuro Rengoku",
+    "anchors": 26,
+    "detected": "2026-11-20"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S2E07": {
+    "windows": [
+     [
+      210.8,
+      294.8
+     ],
+     [
+      825.5,
+      901.0
+     ],
+     [
+      932.4,
+      1078.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Kyojuro Rengoku",
+    "anchors": 16,
+    "detected": "2026-11-20"
+   }
   }
  },
  "_doc_auto": "_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked windows, cached so later runs reuse them. Hand-checked entries stay at the top level."
