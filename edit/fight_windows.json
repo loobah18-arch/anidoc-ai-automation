@@ -628,6 +628,148 @@
     "anchors": 16,
     "detected": "2026-11-19"
    }
+  },
+  "rengoku": {
+   "demon-slayer-kimetsu-no-yaiba:S2E01": {
+    "windows": [
+     [
+      57.5,
+      86.2
+     ],
+     [
+      188.7,
+      217.9
+     ],
+     [
+      318.5,
+      361.1
+     ],
+     [
+      364.2,
+      429.8
+     ],
+     [
+      490.8,
+      522.1
+     ],
+     [
+      532.1,
+      594.2
+     ],
+     [
+      601.3,
+      640.5
+     ],
+     [
+      656.9,
+      705.8
+     ],
+     [
+      806.3,
+      872.5
+     ],
+     [
+      1029.6,
+      1116.0
+     ],
+     [
+      1155.7,
+      1183.4
+     ],
+     [
+      1225.5,
+      1241.0
+     ],
+     [
+      1255.3,
+      1270.0
+     ],
+     [
+      1374.7,
+      1405.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Kyojuro Rengoku",
+    "anchors": 46,
+    "detected": "2026-11-20"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S2E05": {
+    "windows": [
+     [
+      312.0,
+      339.3
+     ],
+     [
+      390.6,
+      490.7
+     ],
+     [
+      516.0,
+      531.8
+     ],
+     [
+      535.2,
+      572.7
+     ],
+     [
+      596.4,
+      611.3
+     ],
+     [
+      712.9,
+      849.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Kyojuro Rengoku",
+    "anchors": 16,
+    "detected": "2026-11-20"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S2E06": {
+    "windows": [
+     [
+      414.0,
+      447.6
+     ],
+     [
+      648.5,
+      702.3
+     ],
+     [
+      892.9,
+      1045.4
+     ],
+     [
+      1076.9,
+      1216.3
+     ]
+    ],
+    "source": "auto",
+    "character": "Kyojuro Rengoku",
+    "anchors": 24,
+    "detected": "2026-11-20"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S2E07": {
+    "windows": [
+     [
+      210.8,
+      294.8
+     ],
+     [
+      839.0,
+      901.0
+     ],
+     [
+      932.4,
+      970.6
+     ]
+    ],
+    "source": "auto",
+    "character": "Kyojuro Rengoku",
+    "anchors": 15,
+    "detected": "2026-11-20"
+   }
   }
  },
  "_doc_auto": "_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked windows, cached so later runs reuse them. Hand-checked entries stay at the top level."
