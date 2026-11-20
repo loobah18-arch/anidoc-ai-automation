@@ -440,15 +440,30 @@ def groq_pick():
               "Rules: line numbers in increasing order; the chosen lines form at most 4 separate stretches of consecutive "
               f"numbers; the summed durations of the chosen lines are {CMIN:.0f}-{CMAX:.0f} s.\n"
               'Answer with JSON only: {"hook": <number>, "build": [<numbers>], "payoff": <number>, "reason": "<short>"}')
-    try:
-        out, mdl = _load_groq()(prompt, temperature=0.2, system='You are a precise video editor of anime Shorts. You answer with JSON only.')
-        js = json.loads(re.search(r'\{.*\}', out, re.S).group(0))
-        sel = [int(js['hook'])] + [int(x) for x in (js.get('build') or [])] + [int(js['payoff'])]
-        sel = list(dict.fromkeys(sel))
-        print(f'groq ({mdl}) pick: {js}', flush=True)
-        return sel, check(sel)
-    except Exception as ex:
-        return None, f'groq failed: {ex}'
+    prompt += ("\nAdd up the durations in brackets before answering; most picks need about "
+               f"{max(2, int(len(SEGS) * (CMIN + CMAX) / 2 / max(1.0, sum(g['e'] - g['s'] + 0.4 for g in SEGS))))} lines.")
+    sel, why, groq = None, 'groq not asked', _load_groq()
+    for attempt in range(2):
+        try:
+            out, mdl = groq(prompt, temperature=0.2, system='You are a precise video editor of anime Shorts. You answer with JSON only.')
+            js = json.loads(re.search(r'\{.*\}', out, re.S).group(0))
+            sel = [int(js['hook'])] + [int(x) for x in (js.get('build') or [])] + [int(js['payoff'])]
+            sel = list(dict.fromkeys(sel))
+            print(f'groq ({mdl}) pick {attempt + 1}: {js}', flush=True)
+        except Exception as ex:
+            sel, why = None, f'groq failed: {ex}'
+            continue
+        why = check(sel)
+        if why is None:
+            return sel, None
+        fix = list(sel)                                               # too long: drop build lines after the hook, keep hook + payoff
+        while len(fix) > 2 and check(fix) and sum(L for _, L in pieces_of(fix)) > CMAX:
+            fix.pop(1)
+        if check(fix) is None:
+            print(f'groq pick trimmed to fit ({why}): {fix}', flush=True)
+            return fix, None
+        prompt += f"\n\nYour previous answer {json.dumps(js)} was rejected: {why}. Answer again, following every rule."
+    return sel, why
 
 
 HOOKY = re.compile(r"\?|!|\byou\b|\byour\b|\bi'll\b|\bi will\b|\bcan't\b|\bcannot\b", re.I)

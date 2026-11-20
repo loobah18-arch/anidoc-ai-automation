@@ -575,18 +575,25 @@ def _drop_char_pool(full_pool):
     else:
         ladder = [(max(AUTO_REL, 0.02), 0.03), (AUTO_REL, 0.02), (AUTO_REL, 0.0), (AUTO_REL, -9.0)]
     floor = int(os.environ.get('DROP_PURE_FLOOR', 24))               # below this even the loosest checked step is too thin
-    g50 = gate_of(50.0)
+    g50, g75 = gate_of(50.0), gate_of(75.0)
+    need_ = int(os.environ.get('DROP_MIN_SHOTS', 60))
     levels = []
     for rmin, mmin in ladder:
         pure = [s for s in cands if base(s) and s['rel'] >= rmin and s['riv'] >= mmin and s['look'] >= LOOK_MIN
                 and (curated or s['act_z'] >= -0.25)]
-        at50 = sum(s['impact'] >= g50 for s in pure)
-        levels.append((rmin, mmin, pure, at50))
-        print(f'drop style: identity rel>={rmin} & {mmin:+.2f} over rivals: {len(pure)} shots in the windows, {at50} at p50', flush=True)
-        if at50 >= target:
+        at50, at75 = sum(s['impact'] >= g50 for s in pure), sum(s['impact'] >= g75 for s in pure)
+        levels.append((rmin, mmin, pure, at50, at75))
+        print(f'drop style: identity rel>={rmin} & {mmin:+.2f} over rivals: {len(pure)} shots in the windows, {at50} at p50, {at75} at p75', flush=True)
+        if at75 >= need_ and mmin >= 0.0:
             break
-    else:                                                             # nobody reached the target: the loosest checked step if it
-        rmin, mmin, pure, at50 = levels[-2] if len(levels) >= 2 and levels[-2][3] >= floor else levels[-1]   # is not starved, else the old rule
+    # a looser identity step (still ahead of every rival) beats an impact gate below p75: the first step with enough
+    # shots at p75 wins; none -> the old rule (first step with `target` shots at p50)
+    pick_ = next((L_ for L_ in levels if L_[4] >= need_ and L_[1] >= 0.0), None)
+    if pick_ is None:
+        pick_ = next((L_ for L_ in levels if L_[3] >= target), None)
+    if pick_ is None:                                                 # nobody reached the target: the loosest checked step if it
+        pick_ = levels[-2] if len(levels) >= 2 and levels[-2][3] >= floor else levels[-1]   # is not starved, else the old rule
+    rmin, mmin, pure, at50, _ = pick_
     print(f'drop style: identity step rel>={rmin} & {mmin:+.2f} over rivals chosen ({at50} shots at p50)', flush=True)
     print(f'drop style: rivals {rivals}; {len(pure)} {CHAR_NAME} shots inside the fight windows', flush=True)
     need = int(os.environ.get('DROP_MIN_SHOTS', 60))
