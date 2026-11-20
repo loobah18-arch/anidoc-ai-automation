@@ -497,7 +497,7 @@ def fight_episodes(series, name, slug, lib):
             '| sources', res.get('sources'))
         for r in ranked[:4]:
             log('  ', r['ep'], '<-', '; '.join(r['sources']))
-        return [r['ep'] for r in ranked], dict(character=nm, ranked=ranked[:8], sources=res.get('sources'), wiki=res.get('wiki'))
+        return [r['ep'] for r in ranked], dict(character=nm, ranked=ranked[:8], scores={r['ep']: r['score'] for r in ranked}, sources=res.get('sources'), wiki=res.get('wiki'))
     except Exception as ex:
         log('failed, old behaviour:', ex)
         return [], None

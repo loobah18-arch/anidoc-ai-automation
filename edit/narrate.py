@@ -326,7 +326,7 @@ prompt = (f"Anime: {series_name}, episode {conv_ep.split(':')[-1]}.\n"
 WRITER = 'none'
 
 
-def _groq(prompt):
+def _groq(prompt, temperature=0.8, system='You write short narration and rhyming quotes about anime for YouTube Shorts.'):
     key = os.environ.get('GROQ_API_KEY', '').strip()
     if not key:
         raise LookupError('no GROQ_API_KEY')
@@ -344,8 +344,8 @@ def _groq(prompt):
     for mdl in dict.fromkeys([os.environ.get('GROQ_MODEL') or 'llama-3.3-70b-versatile'] + ranked[:3] + ['llama-3.1-8b-instant']):
         try:
             req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST',
-                data=json.dumps(dict(model=mdl, temperature=0.8, max_tokens=2000, **({'reasoning_effort': 'low'} if 'gpt-oss' in mdl or 'qwen3' in mdl else {}),
-                                     messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'),
+                data=json.dumps(dict(model=mdl, temperature=temperature, max_tokens=2000, **({'reasoning_effort': 'low'} if 'gpt-oss' in mdl or 'qwen3' in mdl else {}),
+                                     messages=[dict(role='system', content=system),
                                                dict(role='user', content=prompt)])).encode(),
                 headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'User-Agent': 'narrate/1.0'})
             out = (json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message'].get('content') or '').strip()
@@ -362,7 +362,7 @@ def _groq(prompt):
 def _pollinations(prompt):
     req = urllib.request.Request('https://text.pollinations.ai/openai', method='POST',     # free fallback, no key
         data=json.dumps(dict(model='openai', max_tokens=3000, reasoning_effort='low', seed=random.randint(1, 10**6),
-                             messages=[dict(role='system', content='You write short narration and rhyming quotes about anime for YouTube Shorts.'), dict(role='user', content=prompt)])).encode(),
+                             messages=[dict(role='system', content=system), dict(role='user', content=prompt)])).encode(),
         headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'})
     return json.load(urllib.request.urlopen(req, timeout=90))['choices'][0]['message']['content'], 'pollinations'
 

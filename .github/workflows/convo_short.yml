@@ -36,6 +36,7 @@ jobs:
       - name: Make the Short
         env:
           PICK: ${{ github.event.inputs.pick || 'auto' }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
         run: python3 edit/convo.py
       - uses: actions/upload-artifact@v4

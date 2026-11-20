@@ -286,7 +286,7 @@ if PICK_NAME and _cands and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
     except Exception as ex:
         print('talk candidate identification skipped:', ex, flush=True)
 fight = bt
-win0, win1 = max(lo, bt - 12), min(hi, bt + 52)
+win0, win1 = max(lo, bt - 12), min(hi, bt + int(os.environ.get('CONVO_WIN_AFTER', 72)))   # wide enough for the payoff to finish
 print('conversation from', conv_ep, f'| talking fight at {bt}s (score {bs:.2f}), transcribing {win0}-{win1}s', flush=True)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(win0), '-t', str(win1 - win0), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/win.wav'])
 
@@ -306,12 +306,13 @@ if len(segs) < 3:                                                     # misdetec
     segs = list(model.transcribe(audio16, task='translate', language='ja', beam_size=3, word_timestamps=True, vad_filter=False)[0])
     segs = [sg for sg in segs if getattr(sg, 'no_speech_prob', 0) < 0.6 and len((sg.text or '').split()) >= 2]
 print('language', info.language, task, len(segs), 'segments', flush=True)
-words = []
+words, SEGS = [], []
 for sg in segs:
     text = (sg.text or '').strip()
     if not text:
         continue
     ws = [w for w in (sg.words or []) if w.word.strip()]
+    SEGS.append(dict(s=win0 + (ws[0].start if ws else sg.start), e=win0 + (ws[-1].end if ws else sg.end), t=text, id=id(sg)))
     if task == 'transcribe' and ws:                                   # real word timings; glue split tokens back together
         for w in ws:
             if words and not w.word.startswith(' ') and words[-1]['seg'] == id(sg):
@@ -353,34 +354,206 @@ def pick_frac(a, b):                                                  # share of
     return sum(a <= t_ <= b for t_ in PICK_T) / max(1, n_all)
 
 
-starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
-best, pick = -1, None
-for i in starts:
-    for j in range(i + 6, len(words)):
-        L = words[j]['e'] - words[i]['s']
-        if L > CMAX:
-            break
-        # only end where the character has finished: sentence end AND a real pause (or nothing after)
-        done = words[j]['w'][-1:] in '.?!' and (j == len(words) - 1 or words[j + 1]['s'] - words[j]['e'] > 0.7)
-        if L < CMIN or not done:
+# ------------------------------------------------------------------ 3. hook -> build -> payoff (cut only at whisper-segment edges)
+# translated word times are spread evenly inside a segment, so the only honest cut points are segment edges. The talk is
+# 1-4 stretches of whole segments: a HOOK line that grabs, BUILD lines, and a PAYOFF line that finishes the thought.
+SEGS = [g for g in SEGS if not SONG[max(0, int(g['s'] - 0.35)):int(g['e'] + 0.8) + 1].any()]
+for k_, g in enumerate(SEGS):
+    g['k'] = k_
+SEND = lambda t_: re.sub(r'["\'\u201d\u2019)\]\s]+$', '', t_ or '')[-1:] in '.!?'
+EDGE = 1.0                                                            # the window edge is not a pause: the line may go on
+
+
+def pause_after(k):
+    return (SEGS[k + 1]['s'] - SEGS[k]['e']) if k + 1 < len(SEGS) else (win1 - EDGE - SEGS[k]['e'])
+
+
+def runs_of(sel):
+    sel = sorted(set(sel)); out = []
+    for k in sel:
+        if out and k == out[-1][1] + 1:
+            out[-1][1] = k
+        else:
+            out.append([k, k])
+    return out
+
+
+def pieces_of(sel):
+    """[(src_start, length)] for the runs of selected segments, frame-rounded; the last one keeps up to 0.8 s of pause"""
+    rs = runs_of(sel); out = []
+    for n_, (f, l) in enumerate(rs):
+        a = SEGS[f]['s'] - 0.12
+        if f > 0:
+            a = max(a, SEGS[f - 1]['e'] + 0.03)
+        a = max(a, win0)
+        pz = pause_after(l)
+        tail = min(0.8, max(0.15, pz - 0.1)) if n_ == len(rs) - 1 else min(0.3, max(0.05, pz - 0.08))
+        b = SEGS[l]['e'] + tail
+        if l + 1 < len(SEGS):
+            b = min(b, SEGS[l + 1]['s'] - 0.03)
+        b = min(b, win1)
+        a = round(a * FPS) / FPS; L = max(1, round((b - a) * FPS)) / FPS
+        out.append((a, L))
+    return out
+
+
+def check(sel):
+    """None when the pick is usable, else why not"""
+    if not sel or any(not isinstance(k, int) or k < 0 or k >= len(SEGS) for k in sel):
+        return 'line numbers out of range'
+    if any(b <= a for a, b in zip(sel, sel[1:])):
+        return 'lines not in order'
+    rs = runs_of(sel)
+    if not 1 <= len(rs) <= 4:
+        return f'{len(rs)} stretches (1-4 allowed)'
+    ps = pieces_of(sel); tot = sum(L for _, L in ps)
+    if not CMIN <= tot <= CMAX:
+        return f'{tot:.1f}s long ({CMIN:.0f}-{CMAX:.0f}s allowed)'
+    if any(SONG[max(0, int(a)):int(a + L) + 1].any() for a, L in ps):
+        return 'touches an opening/ending song'
+    if not SEND(SEGS[sel[-1]]['t']):
+        return 'payoff does not end a sentence'
+    if pause_after(sel[-1]) < 0.5:
+        return f'only {pause_after(sel[-1]):.2f}s pause after the payoff'
+    return None
+
+
+def _load_groq():                                                     # narrate.py::_groq, without running narrate.py
+    import ast, urllib.request
+    tree = ast.parse(open('narrate.py').read())
+    fn = next(n_ for n_ in tree.body if isinstance(n_, ast.FunctionDef) and n_.name == '_groq')
+    ns = dict(json=json, os=os, re=re, urllib=urllib)
+    exec(compile(ast.Module([fn], []), 'narrate.py', 'exec'), ns)
+    return ns['_groq']
+
+
+def groq_pick():
+    if not SEGS or not os.environ.get('GROQ_API_KEY', '').strip():
+        return None, 'no GROQ_API_KEY' if SEGS else 'no segments'
+    lines_ = '\n'.join(f"{g['k']}. [{g['s'] - win0:.1f}-{g['e'] - win0:.1f}s, {g['e'] - g['s']:.1f}s] {g['t']}" for g in SEGS)
+    prompt = (f"Numbered subtitle lines (English translation) from an anime scene of {EPISODES[conv_ep]['series'].replace('-', ' ')}"
+              + (f", focused on {PICK_NAME}" if PICK_NAME else '') + ":\n" + lines_ + "\n\n"
+              f"Cut a {CMIN:.0f}-{CMAX:.0f} second talk clip for a YouTube Short as HOOK -> BUILD -> PAYOFF:\n"
+              "- hook: the first line, it must grab attention at once (a question, a threat, a bold claim, an emotional cry)\n"
+              "- build: the lines in between that develop it (prefer consecutive lines so the scene flows)\n"
+              "- payoff: the last line, a complete, strong closing statement that ends with . ! or ? and is followed by a pause\n"
+              "Rules: line numbers in increasing order; the chosen lines form at most 4 separate stretches of consecutive "
+              f"numbers; the summed durations of the chosen lines are {CMIN:.0f}-{CMAX:.0f} s.\n"
+              'Answer with JSON only: {"hook": <number>, "build": [<numbers>], "payoff": <number>, "reason": "<short>"}')
+    try:
+        out, mdl = _load_groq()(prompt, temperature=0.2, system='You are a precise video editor of anime Shorts. You answer with JSON only.')
+        js = json.loads(re.search(r'\{.*\}', out, re.S).group(0))
+        sel = [int(js['hook'])] + [int(x) for x in (js.get('build') or [])] + [int(js['payoff'])]
+        sel = list(dict.fromkeys(sel))
+        print(f'groq ({mdl}) pick: {js}', flush=True)
+        return sel, check(sel)
+    except Exception as ex:
+        return None, f'groq failed: {ex}'
+
+
+HOOKY = re.compile(r"\?|!|\byou\b|\byour\b|\bi'll\b|\bi will\b|\bcan't\b|\bcannot\b", re.I)
+
+
+def heuristic_pick():
+    best_ = None
+    for h in range(len(SEGS)):
+        if not HOOKY.search(SEGS[h]['t']):
             continue
-        if SONG[max(0, int(words[i]['s'] - 0.35)):int(words[j]['e'] + 0.8) + 1].any():   # never across an opening/ending
-            continue
-        talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
-        act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref    # action on screen while they talk
-        score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3) + 1.5 * pick_frac(words[i]['s'], words[j]['e'])
-        if score > best:
-            best, pick = score, (i, j)
-if pick is None:
-    i = starts[0]
-    ends = [k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX and words[k]['w'][-1:] in '.?!']
-    j = max(ends) if ends else max(k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX)
-    pick = (i, j)
-cw = words[pick[0]:pick[1] + 1]
-c0 = max(win0, cw[0]['s'] - 0.12); c1 = min(win1, cw[-1]['e'] + 0.8)
-c0 = round(c0 * FPS) / FPS; c1 = round(c1 * FPS) / FPS
-CONV = c1 - c0
-if SONG[max(0, int(c0)):int(c1) + 1].any():                           # fallback stretch touched an opening/ending: next moment
+        for p in range(h, len(SEGS)):
+            t_ = SEGS[p]['t'].rstrip()
+            if not SEND(t_) or t_.endswith('?') or pause_after(p) < 0.5:
+                continue
+            sel = list(range(h, p + 1))
+            while len(sel) > 2 and sum(L for _, L in pieces_of(sel)) > CMAX:   # too long: drop build lines from the front
+                sel.pop(1)
+            if check(sel):
+                continue
+            a_, b_ = SEGS[h]['s'], SEGS[p]['e']
+            act = per_s[int(a_):int(b_) + 1].mean() / mref
+            dens = sum(SEGS[k]['e'] - SEGS[k]['s'] for k in sel) / sum(L for _, L in pieces_of(sel))
+            sc = 1.0 * dens + 1.0 * min(act, 1.3) + 1.5 * pick_frac(a_, b_) + 0.3 * len(HOOKY.findall(SEGS[h]['t'])) - 0.15 * (len(runs_of(sel)) - 1)
+            if best_ is None or sc > best_[0]:
+                best_ = (sc, sel)
+    return best_[1] if best_ else None
+
+
+def stretch_pick():
+    """the old single stretch of words, snapped to segment edges and ended on a sentence end + pause, never the window edge"""
+    starts = [i for i, w in enumerate(words) if i == 0 or words[i - 1]['w'][-1:] in '.?!' or w['s'] - words[i - 1]['e'] > 0.8]
+    best, pick = -1, None
+    for i in starts:
+        for j in range(i + 6, len(words)):
+            L = words[j]['e'] - words[i]['s']
+            if L > CMAX:
+                break
+            done = words[j]['w'][-1:] in '.?!' and (j == len(words) - 1 and win1 - words[j]['e'] > EDGE + 0.5 or
+                                                    j < len(words) - 1 and words[j + 1]['s'] - words[j]['e'] > 0.7)
+            if L < CMIN or not done:
+                continue
+            if SONG[max(0, int(words[i]['s'] - 0.35)):int(words[j]['e'] + 0.8) + 1].any():
+                continue
+            talk = sum(w['e'] - w['s'] for w in words[i:j + 1]) / L
+            act = per_s[int(words[i]['s']):int(words[j]['e']) + 1].mean() / mref
+            score = 1.0 * talk + 0.08 * (j - i) / L + 1.0 * min(act, 1.3) + 1.5 * pick_frac(words[i]['s'], words[j]['e'])
+            if score > best:
+                best, pick = score, (i, j)
+    if pick is None:
+        i = starts[0]
+        ends = [k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX and words[k]['w'][-1:] in '.?!']
+        j = max(ends) if ends else max(k for k in range(len(words)) if words[k]['e'] - words[i]['s'] <= CMAX)
+        pick = (i, j)
+    k0 = next((g['k'] for g in SEGS if g['id'] == words[pick[0]]['seg']), 0)
+    k1 = next((g['k'] for g in SEGS if g['id'] == words[pick[1]]['seg']), len(SEGS) - 1)
+    k1 = max(k1, k0)
+    while k1 < len(SEGS) - 1 and not (SEND(SEGS[k1]['t']) and pause_after(k1) >= 0.5) and \
+            SEGS[k1 + 1]['e'] - SEGS[k0]['s'] <= CMAX + 6:                  # extend to the next sentence end + pause
+        k1 += 1
+    return list(range(k0, k1 + 1))
+
+
+SEL, how = None, None
+if SEGS:
+    sel_, why = groq_pick()
+    if sel_ and why is None:
+        SEL, how = sel_, 'groq'
+    else:
+        print('groq hook/build/payoff rejected:', why, flush=True)
+        sel_ = heuristic_pick()
+        if sel_:
+            SEL, how = sel_, 'heuristic'
+        else:
+            print('heuristic hook/payoff found nothing valid; single stretch fallback', flush=True)
+            SEL, how = stretch_pick(), 'stretch'
+if not SEL:
+    raise SystemExit('no talk segments')
+PIECES = pieces_of(SEL)
+OFFS = list(np.cumsum([0.0] + [L for _, L in PIECES])[:-1])
+_sel_ids = {SEGS[k]['id'] for k in SEL}
+cw = [w for w in words if w['seg'] in _sel_ids]
+c0 = PIECES[0][0]; c1 = PIECES[-1][0] + PIECES[-1][1]               # the overall span (history, the edit's EXCLUDE)
+CONV = round(sum(L for _, L in PIECES) * FPS) / FPS
+
+
+def _piece(t):                                                         # the piece holding source time t (nearest one)
+    return min(range(len(PIECES)), key=lambda n_: max(PIECES[n_][0] - t, t - PIECES[n_][0] - PIECES[n_][1], 0.0))
+
+
+def to_out(t):
+    """source time -> time inside the stitched talk"""
+    n_ = _piece(t); a, L = PIECES[n_]
+    return OFFS[n_] + min(max(t - a, 0.0), L)
+
+
+def piece_end_out(t):                                                 # end of the stitched piece holding source time t
+    n_ = _piece(t)
+    return OFFS[n_] + PIECES[n_][1]
+
+
+_lbl = {SEL[0]: 'HOOK', SEL[-1]: 'PAYOFF'}
+for k in SEL:
+    g = SEGS[k]
+    print(f"talk {_lbl.get(k, 'BUILD')}: {g['s']:.2f}-{g['e']:.2f}s -> {to_out(g['s']):.2f}s in the Short | {g['t']}", flush=True)
+if SONG[max(0, int(c0)):int(c1) + 1].any() and any(SONG[max(0, int(a)):int(a + L) + 1].any() for a, L in PIECES):
     if len(SKIP) >= 4:
         raise SystemExit('every conversation candidate sits in an opening/ending song')
     print(f'conversation {c0:.1f}-{c1:.1f}s touches an opening/ending, trying the next fight moment', flush=True)
@@ -392,7 +565,8 @@ if CONV < CMIN * 0.6:                                                 # too thin
     print(f'conversation only {CONV:.1f}s, trying the next fight moment', flush=True)
     os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
-print(f'conversation {c0:.2f}-{c1:.2f}s ({CONV:.1f}s, {len(cw)} words)', flush=True)
+print(f'conversation ({how}) {len(PIECES)} piece(s) ' + ', '.join(f'{a:.2f}-{a + L:.2f}s' for a, L in PIECES) +
+      f' = {CONV:.2f}s, {len(cw)} words; span {c0:.2f}-{c1:.2f}s', flush=True)
 
 # ------------------------------------------------------------------ 4. caption lines + speakers
 lines, cur = [], []
@@ -467,15 +641,16 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"
 DIM = '&H00A0A0A0&'
 for li, ln in enumerate(lines):
     col = colour_of[spk[li]]
-    t_end = min(ln[-1]['e'] + 0.35, lines[li + 1][0]['s'] if li + 1 < len(lines) else c1) - c0 + HOOK
+    t_end = min(to_out(ln[-1]['e']) + 0.35, to_out(lines[li + 1][0]['s']) if li + 1 < len(lines) else CONV,
+                piece_end_out(ln[0]['s'])) + HOOK
     toks = [clean(w['w']) for w in ln]
     toks = [t for t in toks if t]
     if not toks:
         continue
     split = len(toks) if len(toks) <= 3 or sum(map(len, toks)) <= 14 else (len(toks) + 1) // 2
     for k in range(len(toks)):                                        # word-by-word: spoken white, the rest dim
-        a = ln[min(k, len(ln) - 1)]['s'] - c0 + HOOK
-        b = (ln[k + 1]['s'] - c0 + HOOK) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
+        a = to_out(ln[min(k, len(ln) - 1)]['s']) + HOOK
+        b = (to_out(ln[k + 1]['s']) + HOOK) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
         if b <= a:
             continue
         parts = []
@@ -492,18 +667,25 @@ for li, ln in enumerate(lines):
         ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
         ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
 open('work/convo/captions.ass', 'w').write('\n'.join(ass) + '\n')
-json.dump(dict(ep=conv_ep, s=c0, e=c1, lines=[dict(t=' '.join(w['w'] for w in ln), speaker=int(spk[i]), colour=colour_of[spk[i]])
+json.dump(dict(ep=conv_ep, s=c0, e=c1, pieces=[[round(a_, 3), round(L_, 3)] for a_, L_ in PIECES], pick=how,
+               hook=dict(t=SEGS[SEL[0]]['t'], s=round(SEGS[SEL[0]]['s'], 2), e=round(SEGS[SEL[0]]['e'], 2)),
+               build=[dict(t=SEGS[k]['t'], s=round(SEGS[k]['s'], 2), e=round(SEGS[k]['e'], 2)) for k in SEL[1:-1]],
+               payoff=dict(t=SEGS[SEL[-1]]['t'], s=round(SEGS[SEL[-1]]['s'], 2), e=round(SEGS[SEL[-1]]['e'], 2)), lines=[dict(t=' '.join(w['w'] for w in ln), speaker=int(spk[i]), colour=colour_of[spk[i]])
                                                for i, ln in enumerate(lines)]), open('work/convo/convo.json', 'w'), indent=1)
 print('captions', len(lines), 'lines,', len(set(spk)), 'speaker colours', flush=True)
 
-# ------------------------------------------------------------------ 5. face-following 9:16 crop, shot by shot
-raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src, '-vf',
-          'fps=12,scale=64:36,format=gray', '-f', 'rawvideo', '-'], binary=True)
-gg = np.frombuffer(raw, np.uint8).reshape(-1, 36, 64).astype(np.float32)
-d = np.abs(np.diff(gg, axis=0)).mean(axis=(1, 2))
-cuts = [0.0] + [(i + 1) / 12 for i in range(len(d)) if d[i] > max(18, 4 * np.median(d[max(0, i - 12):i + 12]))] + [CONV]
-cuts = sorted(set(round(c * FPS) / FPS for c in cuts))
-cuts = [c for k, c in enumerate(cuts) if k == 0 or c - cuts[k - 1] >= 0.3 or c == CONV]
+# ------------------------------------------------------------------ 5. face-following 9:16 crop, shot by shot, piece by piece
+def scene_cuts(a, L):
+    """shot changes (seconds from a) inside src a..a+L"""
+    raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{a:.3f}', '-t', f'{L:.3f}', '-i', src, '-vf',
+              'fps=12,scale=64:36,format=gray', '-f', 'rawvideo', '-'], binary=True)
+    gg = np.frombuffer(raw, np.uint8).reshape(-1, 36, 64).astype(np.float32)
+    d = np.abs(np.diff(gg, axis=0)).mean(axis=(1, 2)) if len(gg) > 1 else np.zeros(0)
+    cuts = [0.0] + [(i + 1) / 12 for i in range(len(d)) if d[i] > max(18, 4 * np.median(d[max(0, i - 12):i + 12]))] + [L]
+    cuts = sorted(set(min(L, round(c * FPS) / FPS) for c in cuts))
+    return [c for k, c in enumerate(cuts) if k == 0 or c - cuts[k - 1] >= 0.3 or c == L]
+
+
 iw, ih = map(int, sh(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', src]).strip().split(','))
 try:
     import cv2
@@ -511,40 +693,110 @@ try:
 except Exception:
     casc = None
 crop_w = ih * W / H                                                    # 9:16 window in source pixels
-prev_x = 0.5
-xs = []
-for a, b in zip(cuts[:-1], cuts[1:]):
+
+
+def face_x(t0_, t1_):
+    """crop centre (0..1) from the biggest anime face in the shot, None when no face"""
     cx = []
     for f in (0.3, 0.7):
         if casc is None:
             break
-        t = c0 + a + (b - a) * f
+        t = t0_ + (t1_ - t0_) * f
         fr = np.frombuffer(sh(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t:.2f}', '-i', src, '-frames:v', '1', '-vf',
                                'scale=640:360,format=gray', '-f', 'rawvideo', '-'], binary=True), np.uint8).reshape(360, 640)
         faces = casc.detectMultiScale(fr, 1.1, 3, minSize=(28, 28))
         if len(faces):
             x, y_, w, h = max(faces, key=lambda f_: f_[2] * f_[3])
             cx.append((x + w / 2) / 640)
-    x = float(np.mean(cx)) if cx else 0.5
-    xs.append(x)
+    return float(np.mean(cx)) if cx else None
+
+
+# no talk picture holds longer than ~6 s: long shots get a cutaway (a reaction / other shot of the same scene, outside the
+# talk itself) every ~4 s; with no such shot, a punch-in on the same footage reads as the cut
+MAXHOLD = float(os.environ.get('TALK_MAX_SHOT', 6.0))
+_busy = [(a - 0.3, a + L + 0.3) for a, L in PIECES]
+_wc = scene_cuts(win0, win1 - win0)
+BROLL = []
+for x_, y_ in zip(_wc[:-1], _wc[1:]):
+    a_, b_ = win0 + x_, win0 + y_
+    if b_ - a_ >= 1.2 and not any(a_ < u1 and b_ > u0 for u0, u1 in _busy) and not SONG[max(0, int(a_)):int(b_) + 1].any():
+        BROLL.append([a_, b_, None])
+for br in BROLL:
+    br[2] = face_x(br[0], br[1])
+
+
+def cutaway(t_src, dur):
+    """the nearest unused scene shot that fits dur (faces first); removed from BROLL"""
+    fit = [br for br in BROLL if br[1] - br[0] >= dur]
+    if not fit:
+        return None
+    br = min(fit, key=lambda b: (b[2] is None, abs((b[0] + b[1]) / 2 - t_src)))
+    BROLL.remove(br)
+    return dict(ss=(br[0] + br[1]) / 2 - dur / 2, x=br[2] if br[2] is not None else 0.5, zoom=1.0, kind='cutaway')
+
+
+SHOTS = []                                                            # dict(f0, f1 (frames of the Short), ss (src), x, zoom, kind)
+n_cut, n_punch = 0, 0
+for (a, L), o in zip(PIECES, OFFS):
+    cuts = scene_cuts(a, L)
+    for x0, x1 in zip(cuts[:-1], cuts[1:]):
+        f0, f1 = round((o + x0) * FPS), round((o + x1) * FPS)
+        if f1 <= f0:
+            continue
+        fx_ = face_x(a + x0, a + x1)
+        xm = fx_ if fx_ is not None else 0.5
+        t = f0
+        while (f1 - t) / FPS > MAXHOLD:                              # hold 4 s, cut away for up to 2 s, come back
+            k1 = t + round(4.0 * FPS)
+            cl = round(min(2.0, (f1 - k1) / FPS - 1.0) * FPS)
+            SHOTS.append(dict(f0=t, f1=k1, ss=a + x0 + (t - f0) / FPS, x=xm, zoom=1.0, kind='talk'))
+            ca = cutaway(a + x0 + (k1 - f0) / FPS, cl / FPS)
+            if ca is None:                                            # same footage (lips stay in sync), punched in
+                ca = dict(ss=a + x0 + (k1 - f0) / FPS, x=min(0.8, max(0.2, xm + (0.12 if xm < 0.5 else -0.12))), zoom=1.3, kind='punch')
+                n_punch += 1
+            else:
+                n_cut += 1
+            SHOTS.append(dict(ca, f0=k1, f1=k1 + cl))
+            t = k1 + cl
+        SHOTS.append(dict(f0=t, f1=f1, ss=a + x0 + (t - f0) / FPS, x=xm, zoom=1.0, kind='talk'))
+_holds = [(s_['f1'] - s_['f0']) / FPS for s_ in SHOTS]
+print(f'talk picture: {len(SHOTS)} shots, longest {max(_holds):.1f}s, {n_cut} cutaways, {n_punch} punch-ins '
+      f'(max hold {MAXHOLD:.0f}s)', flush=True)
 os.makedirs('work/convo/seg', exist_ok=True)
 lst = []
-for k, ((a, b), x) in enumerate(zip(zip(cuts[:-1], cuts[1:]), xs)):
-    nf = round(b * FPS) - round(a * FPS)
-    if nf <= 0:
-        continue
-    left = min(max(x * iw - crop_w / 2, 0), iw - crop_w)
-    vf = (f'crop={int(crop_w) // 2 * 2}:{ih}:{int(left)}:0,scale={W}:{H}:flags=lanczos,setsar=1,'
+for k, s_ in enumerate(SHOTS):
+    nf = s_['f1'] - s_['f0']
+    cw_, ch_ = crop_w / s_['zoom'], ih / s_['zoom']
+    left = min(max(s_['x'] * iw - cw_ / 2, 0), iw - cw_)
+    top = (ih - ch_) * 0.35
+    vf = (f'crop={int(cw_) // 2 * 2}:{int(ch_) // 2 * 2}:{int(left)}:{int(top)},scale={W}:{H}:flags=lanczos,setsar=1,'
           f'eq=contrast=1.06:saturation=1.12,fps={FPS}')
     out = f'work/convo/seg/{k:03d}.mp4'
-    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{c0 + a:.3f}', '-i', src, '-an', '-vf', vf, '-frames:v', str(nf),
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f"{s_['ss']:.3f}", '-i', src, '-an', '-vf', vf, '-frames:v', str(nf),
         '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '17', out])
     lst.append(out)
 open('work/convo/seg/list.txt', 'w').write(''.join(f"file '{os.path.basename(p)}'\n" for p in lst))
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', 'work/convo/seg/list.txt', '-c', 'copy', 'work/convo/video.mp4'])
 
 # ------------------------------------------------------------------ 5b. voices only: strip the anime's own music (copyright)
-sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{c0:.3f}', '-t', f'{CONV:.3f}', '-i', src, '-vn', '-ac', '2', '-ar', '44100', 'work/convo/talk.wav'])
+# each piece is cut with ~60 ms of extra tail (all but the last) and the pieces are joined with that much acrossfade, so the
+# stitched talk is exactly CONV long and lines up with the picture; no hard joins, no clicks
+XF = 0.06
+for n_, (a, L) in enumerate(PIECES):
+    ext = L + (XF if n_ < len(PIECES) - 1 else 0.0)
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{a:.3f}', '-t', f'{ext:.3f}', '-i', src, '-vn', '-ac', '2', '-ar', '44100',
+        f'work/convo/talk_{n_}.wav'])
+if len(PIECES) == 1:
+    os.replace('work/convo/talk_0.wav', 'work/convo/talk.wav')
+else:
+    ins = sum([['-i', f'work/convo/talk_{n_}.wav'] for n_ in range(len(PIECES))], [])
+    g_, prev_ = [], '[0:a]'
+    for n_ in range(1, len(PIECES)):
+        lab = f'[x{n_}]' if n_ < len(PIECES) - 1 else '[out]'
+        g_.append(f'{prev_}[{n_}:a]acrossfade=d={XF}:c1=qsin:c2=qsin{lab}'); prev_ = lab
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', *ins, '-filter_complex', ';'.join(g_), '-map', '[out]', '-t', f'{CONV:.3f}',
+        'work/convo/talk.wav'])
+print(f'talk audio: {len(PIECES)} piece(s) stitched, {duration("work/convo/talk.wav"):.3f}s (picture {CONV:.3f}s)', flush=True)
 subprocess.run([sys.executable, '-m', 'demucs', '--two-stems=vocals', '-n', 'htdemucs', '-o', 'work/convo/sep', 'work/convo/talk.wav'], check=True)
 VOICE = 'work/convo/sep/htdemucs/talk/vocals.wav'
 print('voices separated from the anime music', flush=True)
@@ -592,8 +844,27 @@ if PICK in chars:
 IDENT = {}
 try:
     import charvis
-    IDENT = charvis.identify(src, c0, c1, series_key, lo, hi, skip=_SKIP_SONG, expected=(PICK_NAME,) if PICK_NAME else (),
-                             target=PICK_NAME, series_title=series_title, log=lambda m: print('identify:', m, flush=True))
+    _parts = [charvis.identify(src, a_, a_ + L_, series_key, lo, hi, skip=_SKIP_SONG, expected=(PICK_NAME,) if PICK_NAME else (),
+                               target=PICK_NAME, series_title=series_title, log=lambda m: print('identify:', m, flush=True))
+              for a_, L_ in PIECES]
+    _parts = [r_ for r_ in _parts if r_.get('votes')]
+    if len(_parts) == 1:
+        IDENT = _parts[0]
+    elif _parts:                                                      # votes of every piece together, same 30% / 1.6x rule
+        _v = {}
+        for r_ in _parts:
+            for nm_, c_ in r_['votes'].items():
+                _v[nm_] = _v.get(nm_, 0) + c_
+        _fr = sum(r_.get('frames', 0) for r_ in _parts)
+        _o = sorted(_v, key=lambda nm_: -_v[nm_])
+        _top_v, _run_v = _v[_o[0]], (_v[_o[1]] if len(_o) > 1 else 0)
+        IDENT = dict(votes=dict(sorted(_v.items(), key=lambda kv: -kv[1])), frames=_fr, share=round(_top_v / max(1, _fr), 3),
+                     margin=round(_top_v / max(1.0, _run_v), 2), runner=_o[1] if len(_o) > 1 else None,
+                     name=_o[0] if _top_v / max(1, _fr) >= 0.30 and _top_v / max(1.0, _run_v) >= 1.6 else None,
+                     per_frame=sum([r_.get('per_frame', []) for r_ in _parts], []))
+        if PICK_NAME:
+            _tv = sum(c_ for nm_, c_ in _v.items() if nm_.lower() == PICK_NAME.lower())
+            IDENT['target_share'] = round(_tv / max(1, _fr), 3)
     print(f'identify votes for the talk {c0:.1f}-{c1:.1f}s: {IDENT.get("votes")} of {IDENT.get("frames")} frames '
           f'-> {IDENT.get("name") or "unsure"}' + (f' ({PICK_NAME} share {IDENT.get("target_share")})' if PICK_NAME else ''), flush=True)
     if not topic_name and IDENT.get('name'):
@@ -649,7 +920,7 @@ if not topic_name:
     try:
         import charvis
         bk = charvis.bank(series_key)
-        times = [c0 + (c1 - c0) * fr for fr in (0.2, 0.4, 0.6, 0.8)]
+        times = [a_ + L_ * fr for a_, L_ in PIECES for fr in ((0.2, 0.4, 0.6, 0.8) if len(PIECES) == 1 else (0.3, 0.7))][:6]
         ims = [charvis.frame(src, t) for t in times]
         ims = [im for im in ims if im is not None]
         if ims and bk.whole:
@@ -699,7 +970,24 @@ try:                                                                  # self-res
 except Exception as ex:
     print('research skipped:', ex, flush=True)
 fight_eps = list(dict.fromkeys([e for e in _fw if e in EPISODES] + _researched + fight_eps))
-amv_eps = list(dict.fromkeys([conv_ep] + fight_eps[:3])) if fight_eps else [conv_ep]
+# rank by the researched fight score; an episode under ~40% of the best score (or under 5) is not a fight source while
+# enough stronger ones exist - not even the talk episode. More episodes so the impact gate is met before it relaxes.
+MAX_FIGHT = int(os.environ.get('CONVO_FIGHT_EPS', 5))
+_sc = {e: float(v) for e, v in ((_rinfo or {}).get('scores') or {}).items() if e in EPISODES} if _researched else {}
+if _sc:
+    _floor = max(5.0, 0.4 * max(_sc.values()))
+    _strong = sorted((e for e in _sc if _sc[e] >= _floor), key=lambda e: -_sc[e])
+    _hand = [e for e in _fw if e in EPISODES]
+    _extra = [e for e in fight_eps if e not in _sc and e not in _hand]          # character map only, never scored low
+    if len(set(_hand + _strong)) >= 3:
+        amv_eps = list(dict.fromkeys(_hand + _strong + _extra))[:MAX_FIGHT]
+        _weak = [e for e in list(dict.fromkeys([conv_ep] + fight_eps)) if e not in amv_eps and e in _sc and _sc[e] < _floor]
+        print(f'fight episodes by research score (floor {_floor:.2f}): ' + ', '.join(f'{e.split(":")[-1]} {_sc[e]}' for e in _strong)
+              + (f' | dropped weak: ' + ', '.join(f'{e.split(":")[-1]} {_sc[e]}' for e in _weak) if _weak else ''), flush=True)
+    else:
+        amv_eps = list(dict.fromkeys([conv_ep] + fight_eps))[:MAX_FIGHT]
+else:
+    amv_eps = list(dict.fromkeys([conv_ep] + fight_eps))[:MAX_FIGHT] if fight_eps else [conv_ep]
 print('fight episodes for the edit:', amv_eps, flush=True)
 for ep_code in amv_eps:
     try:

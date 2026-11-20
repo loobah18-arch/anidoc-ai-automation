@@ -724,6 +724,11 @@ try:
 except Exception as ex:
     print('face check skipped', ex, flush=True)
 take(pre + build2, 'calm', 0.8)                                      # build-ups: steady, readable shots
+FIN = None
+if DROP_STYLE and n > 2 and pool:                                     # the finisher: the character's single highest-impact shot,
+    FIN = max((s for s in pool if id(s) not in taken), key=lambda s: s['impact'], default=None)   # kept for the last cut only
+    if FIN is not None:
+        assign[n - 1] = FIN; taken.add(id(FIN))
 heroes = [next(i for i, (a, b) in enumerate(tmpl) if a == DROP_BEAT)]
 if second_drop is not None:
     heroes.append(second_drop)
@@ -769,8 +774,18 @@ if len(assign) < n:                                                   # small po
     uses = {}                                                         # 44315756019: a Toji close-up and one silhouette 5 times each)
     for s in assign.values():
         uses[(s['ep'], s['s'])] = uses.get((s['ep'], s['s']), 0) + 1
+    if FIN is not None:                                               # the finisher is never shown before the end
+        uses[(FIN['ep'], FIN['s'])] = 10 ** 6
+    budget = 10 ** 9
+    if DROP_STYLE:                                                    # fewer repeats: 2-beat holds (3 at fast tempos) come before
+        m_, total_ = len(assign), tmpl[-1][1] - tmpl[0][0]            # reusing a shot; reuse only what the holds cannot cover
+        hold = 3 if 3 * P <= 1.2 and m_ * 2 < total_ and m_ / max(1, -(-total_ // 2)) < 0.85 else 2
+        budget = max(0, -(-total_ // hold) - m_)
+        print(f'drop style: {m_} distinct shots for {total_} beats -> holds up to {hold} beats, {budget} reused pieces allowed', flush=True)
     for i in [x for x in range(n) if x not in assign]:
         d = sd(i); got = None
+        if budget <= 0:
+            break
         for s in sorted(pool, key=lambda s: -s['impact']):            # 1. same fight, an unseen part of a long shot
             if uses.get((s['ep'], s['s']), 0) >= MAX_USES:
                 continue
@@ -787,7 +802,7 @@ if len(assign) < n:                                                   # small po
                         got.setdefault(k_, v_)
                     break
         if got is not None:
-            assign[i] = got; on.setdefault(got['ep'], []).append(shown(got, d))
+            assign[i] = got; on.setdefault(got['ep'], []).append(shown(got, d)); budget -= 1
     miss = [x for x in range(n) if x not in assign]
     if miss and DROP_STYLE:                                           # 3. drop edit: hold the pace, never a long static cut
         # 1 cut per beat for as long as the shots allow, then half-time (2 beats per cut) so no cut ever runs past
@@ -796,7 +811,9 @@ if len(assign) < n:                                                   # small po
         m = len(shots_)
         b0, b1 = tmpl[0][0], tmpl[-1][1]
         total = b1 - b0
-        if 2 * m >= total:
+        if m >= total:
+            lens = [1] * total
+        elif 2 * m >= total:
             lens = [1] * (2 * m - total) + [2] * (total - m)
         else:
             q, r_ = divmod(total, m)
@@ -836,8 +853,17 @@ if DROP_STYLE and n > 3:                                              # pieces o
     print(f'drop style: {len({(s_["ep"], s_.get("orig", s_["s"])) for s_ in assign.values()})} distinct shots for {n} cuts, '
           f'{rep} cuts still within {SPACE} of a piece of the same shot', flush=True)
 if DROP_STYLE and n > 2:                                              # end on the finisher, not on whatever came last
-    fin = max(range(1, n), key=lambda i: assign[i]['impact'])
+    fin = next((i for i in range(n) if FIN is not None and assign[i] is FIN), None)
+    if fin is None:
+        fin = max(range(1, n), key=lambda i: assign[i]['impact'])
     assign[fin], assign[n - 1] = assign[n - 1], assign[fin]
+    _f = assign[n - 1]
+    _seen = sum(1 for i in range(n - 1) if (assign[i]['ep'], assign[i].get('orig', assign[i]['s'])) == (_f['ep'], _f.get('orig', _f['s'])))
+    print(f"drop style: finisher {_f['ep']} {_f['s']:.1f}s impact {_f['impact']:.3f} (top of pool "
+          f"{max(s['impact'] for s in pool):.3f}), shown earlier {_seen}x", flush=True)
+if DROP_STYLE:
+    _d = len({(s_['ep'], s_.get('orig', s_['s'])) for s_ in assign.values()})
+    print(f'drop style: distinct shots per cut {_d}/{n} = {_d / max(1, n):.0%} (target >= 85%), impact gate p{purity_pct:.0f}', flush=True)
 impact_cut = np.percentile([s['impact'] for s in pool], 85)
 
 # ---------------------------------------------------------------- 7. render
