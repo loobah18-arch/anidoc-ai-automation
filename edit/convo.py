@@ -76,6 +76,27 @@ if PICK in chars:
 else:
     series = match[0] if match else (EPISODES[new_eps[0]]['series'] if new_eps else least_used(series_all, hist.get('series', {}), 1)[0])
     cand = [k for k, v in EPISODES.items() if v['series'] == series]
+# characters of the last 4 Shorts rest: their episodes count as heavily used, and episodes a re-run rejected are skipped
+RECENT_TOPICS = [c.get('topic') for c in hist.get('convos', [])[-4:] if c.get('topic')]
+AVOID = [e for e in os.environ.get('CONVO_AVOID_EPS', '').split(',') if e]
+if PICK == 'auto':
+    try:
+        _rc0 = json.load(open('research_cache.json'))
+    except Exception:
+        _rc0 = {}
+    for _t in set(RECENT_TOPICS):
+        _eps_t = set(chars.get(_t, []))
+        for _sv in _rc0.values():
+            for _nm, _d in (_sv.get('characters') or {}).items():
+                if _nm.lower().split()[-1] == _t or _nm.lower().split()[0] == _t:
+                    _eps_t |= {r.get('ep') for r in _d.get('ranked', []) if r.get('score', 0) >= 2}
+        for _e in _eps_t:
+            if _e:
+                used_eps[_e] = used_eps.get(_e, 0) + 4
+    if RECENT_TOPICS:
+        print('resting characters of the last Shorts:', RECENT_TOPICS, flush=True)
+    if len([e for e in cand if e not in AVOID]) >= 3:
+        cand = [e for e in cand if e not in AVOID]
 fresh = [e for e in new_eps if e in cand][:3]
 eps = fresh + least_used([e for e in cand if e not in fresh], used_eps, 3 - len(fresh))
 SF, SW, SH_ = 4, 64, 36
@@ -970,6 +991,12 @@ if not topic_name:
         print('charvis conversation identification skipped:', ex, flush=True)
 
 print(f'conversation character identified: {topic_name} ({topic_slug})', flush=True)
+if PICK == 'auto' and topic_slug and topic_slug in RECENT_TOPICS and len(AVOID) < 3 \
+        and os.environ.get('REPEAT_GUARD', '1') != '0':                # same character as a recent Short: another episode
+    print(f'{topic_slug} was in one of the last {len(RECENT_TOPICS)} Shorts, re-picking without {conv_ep}', flush=True)
+    os.environ['CONVO_AVOID_EPS'] = ','.join(AVOID + [conv_ep])
+    os.environ.pop('CONVO_SKIP', None)
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 
 # ------------------------------------------------------------------ 5b. the question shown at the top during the talk only
 QUESTION_ON = os.environ.get('QUESTION', '1') != '0'
@@ -997,9 +1024,11 @@ def make_question():
             f"Anime: {EPISODES[conv_ep]['series'].replace('-', ' ')}. Main character of this Short: {topic_name or 'unknown'}.\n"
             f"What they say in the clip (auto-translated): {talk}\n\n"
             "Write ONE short question (4 to 8 words) shown as big text at the top of the video while they talk. "
-            "It must make a viewer stop scrolling and want to answer in the comments: a debate, a 'who wins', "
-            "a 'why did he', or a 'would you'. Use the character's first name when you know it. Do not spoil the ending, "
-            "no emojis, no hashtags, no quotes. Reply with the question only.",
+            "It must make a viewer stop scrolling and want to argue in the comments. Best kinds: power debates "
+            "('Is Rengoku stronger than Giyu?', 'Who wins: Gojo or Sukuna?'), a hard 'why' ('Why didn't Akaza finish him?'), "
+            "or a bold opinion to defend ('Was Tanjiro wrong here?'). Avoid soft feelings questions. Use the names fans "
+            "use (surname for Hashira like Rengoku, Giyu, Tengen). Do not spoil the ending, no emojis, no hashtags, "
+            "no quotes. Reply with the question only.",
             temperature=0.9, system='You write scroll-stopping on-screen questions for anime YouTube Shorts.')
         q = _clean_q(out.strip().splitlines()[0] if out.strip() else '')
         if q:
