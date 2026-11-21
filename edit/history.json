@@ -1,6 +1,6 @@
 {
  "songs": {
-  "andromeda_no_fear_phonk": 2,
+  "andromeda_no_fear_phonk": 3,
   "glxxmstrider_dont_stop_slowed": 3,
   "andromeda_montagem_coma": 3,
   "mvsterious_slava_funk": 3,
@@ -56,7 +56,7 @@
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 6,
-  "jujutsu-kaisen:S3E01": 1,
+  "jujutsu-kaisen:S3E01": 2,
   "jujutsu-kaisen:S2E16": 1,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
@@ -65,7 +65,7 @@
   "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E05": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E26": 1,
-  "jujutsu-kaisen:S1E24": 1,
+  "jujutsu-kaisen:S1E24": 2,
   "jujutsu-kaisen:S1E07": 11,
   "demon-slayer-kimetsu-no-yaiba:S4E02": 1,
   "jujutsu-kaisen:S2E10": 1,
@@ -83,7 +83,10 @@
   "demon-slayer-kimetsu-no-yaiba:S5E07": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E02": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
-  "jujutsu-kaisen:S2E03": 2
+  "jujutsu-kaisen:S2E03": 2,
+  "jujutsu-kaisen:S1E12": 1,
+  "jujutsu-kaisen:S2E11": 1,
+  "jujutsu-kaisen:S2E20": 1
  },
  "shots": [
   {
@@ -9389,6 +9392,266 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
    "s": 272.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 821.934
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 215.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1213.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1233.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 647.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 367.934
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 1110.309
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 778.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 554.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 572.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 1166.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 637.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 327.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 1005.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 1029.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 646.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 372.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 1135.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 572.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 87.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 496.184
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 511.309
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 537.741
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 1030.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 656.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 377.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E24",
+   "s": 799.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 205.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 215.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 1150.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 249.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 517.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 543.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 134.559
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 528.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 1035.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 1124.867
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 222.309
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 1165.809
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 1272.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 1089.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 512.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 1186.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 521.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 647.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 794.433
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 837.683
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1146.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 1278.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 1095.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 518.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 1244.325
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 522.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 175.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1104.517
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E20",
+   "s": 844.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1186.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1208.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 238.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1227.934
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 322.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1246.623
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1256.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1285.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E12",
+   "s": 217.033
   }
  ],
  "runs": [
@@ -9967,6 +10230,20 @@
     "demon-slayer-kimetsu-no-yaiba:S2E05",
     "demon-slayer-kimetsu-no-yaiba:S2E06",
     "demon-slayer-kimetsu-no-yaiba:S2E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-21 20:40 UTC",
+   "pick": "jujutsu kaisen",
+   "series": "jujutsu-kaisen",
+   "song": "andromeda_no_fear_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S1E12",
+    "jujutsu-kaisen:S1E24",
+    "jujutsu-kaisen:S2E11",
+    "jujutsu-kaisen:S2E20",
+    "jujutsu-kaisen:S3E01"
    ],
    "file": "_amv_part.mp4"
   }
@@ -10731,10 +11008,60 @@
     1389.0,
     1471.0
    ]
+  ],
+  "jujutsu-kaisen:S2E23": [
+   [
+    -4.0,
+    101.0
+   ],
+   [
+    1349.0,
+    1431.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E03": [
+   [
+    -4.0,
+    94.0
+   ],
+   [
+    1334.0,
+    1424.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E11": [
+   [
+    285.0,
+    386.0
+   ],
+   [
+    1349.0,
+    1431.0
+   ]
+  ],
+  "jujutsu-kaisen:S1E12": [
+   [
+    84.3,
+    207.5
+   ],
+   [
+    859.1,
+    876.8
+   ],
+   [
+    1271.1,
+    1367.3
+   ]
+  ],
+  "jujutsu-kaisen:S2E20": [
+   [
+    306.0,
+    403.9
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 26,
+  "jujutsu-kaisen": 27,
   "demon-slayer-kimetsu-no-yaiba": 22
  },
  "known": [
@@ -11219,6 +11546,15 @@
    "question": "Would Kyojuro accept his own father?",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_rayelo_ultraslowed.mp4",
    "time": "2026-11-21 19:35 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E11",
+   "s": 549.9333333333333,
+   "e": 561.0333333333333,
+   "topic": "yuji",
+   "question": "Who\u2019s stronger: Yuji or Gojo?",
+   "file": "Jujutsu_Kaisen_convo_andromeda_no_fear_phonk.mp4",
+   "time": "2026-11-21 20:40 UTC"
   }
  ],
  "styles": [
