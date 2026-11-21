@@ -433,10 +433,16 @@ def groq_pick():
     lines_ = '\n'.join(f"{g['k']}. [{g['s'] - win0:.1f}-{g['e'] - win0:.1f}s, {g['e'] - g['s']:.1f}s] {g['t']}" for g in SEGS)
     prompt = (f"Numbered subtitle lines (English translation) from an anime scene of {EPISODES[conv_ep]['series'].replace('-', ' ')}"
               + (f", focused on {PICK_NAME}" if PICK_NAME else '') + ":\n" + lines_ + "\n\n"
-              f"Cut a {CMIN:.0f}-{CMAX:.0f} second talk clip for a YouTube Short as HOOK -> BUILD -> PAYOFF:\n"
-              "- hook: the first line, it must grab attention at once (a question, a threat, a bold claim, an emotional cry)\n"
-              "- build: the lines in between that develop it (prefer consecutive lines so the scene flows)\n"
-              "- payoff: the last line, a complete, strong closing statement that ends with . ! or ? and is followed by a pause\n"
+              f"Cut a {CMIN:.0f}-{CMAX:.0f} second talk clip for a YouTube Short using the TRIPLE HOOK "
+              "(context -> lean -> contrarian snapback):\n"
+              "- hook (CONTEXT): the first line makes it instantly clear who is talking and what is at stake, AND grabs "
+              "at once (a threat, a bold claim, a challenge, a question, an emotional cry). Never open on filler, a name call "
+              "alone, or a line that needs earlier context\n"
+              "- build (LEAN): lines that make the viewer lean in: tension rises, one side looks sure to win, a shocking "
+              "claim, proof of power, or a pain point. Prefer consecutive lines so the scene flows\n"
+              "- payoff (SNAPBACK): the last line flips the direction the build leaned toward: a counter, a reveal, a "
+              "defiant answer, an unexpected twist (but / no / you're wrong / I won't). It is a complete, strong statement "
+              "that ends with . ! or ? and is followed by a pause. If no line truly flips it, take the strongest closing line\n"
               "Rules: line numbers in increasing order; the chosen lines form at most 4 separate stretches of consecutive "
               f"numbers; the summed durations of the chosen lines are {CMIN:.0f}-{CMAX:.0f} s.\n"
               'Answer with JSON only: {"hook": <number>, "build": [<numbers>], "payoff": <number>, "reason": "<short>"}')
@@ -467,6 +473,7 @@ def groq_pick():
 
 
 HOOKY = re.compile(r"\?|!|\byou\b|\byour\b|\bi'll\b|\bi will\b|\bcan't\b|\bcannot\b", re.I)
+SNAP = re.compile(r"\bbut\b|\bno\b|\bnot\b|\bnever\b|\bwrong\b|\bactually\b|\binstead\b|\bwon't\b|\bstill\b|\byet\b", re.I)   # contrarian snapback words
 
 
 def heuristic_pick():
@@ -486,7 +493,7 @@ def heuristic_pick():
             a_, b_ = SEGS[h]['s'], SEGS[p]['e']
             act = per_s[int(a_):int(b_) + 1].mean() / mref
             dens = sum(SEGS[k]['e'] - SEGS[k]['s'] for k in sel) / sum(L for _, L in pieces_of(sel))
-            sc = 1.0 * dens + 1.0 * min(act, 1.3) + 1.5 * pick_frac(a_, b_) + 0.3 * len(HOOKY.findall(SEGS[h]['t'])) - 0.15 * (len(runs_of(sel)) - 1)
+            sc = 1.0 * dens + 1.0 * min(act, 1.3) + 1.5 * pick_frac(a_, b_) + 0.3 * len(HOOKY.findall(SEGS[h]['t'])) + 0.4 * min(2, len(SNAP.findall(SEGS[p]['t']))) - 0.15 * (len(runs_of(sel)) - 1)
             if best_ is None or sc > best_[0]:
                 best_ = (sc, sel)
     return best_[1] if best_ else None
@@ -916,11 +923,17 @@ if not topic_name:
         _rc = json.load(open('research_cache.json')).get(series_key, {}).get('characters', {})
         mains = [nm for nm, d in _rc.items() if (d.get('role') or '').lower() == 'main']
         _v = IDENT.get('votes') or {}
-        voted = [nm for nm in mains if _v.get(nm)]
+        _fr = max(1, IDENT.get('frames') or sum(_v.values()) or 1)
+        _recent = [c.get('topic') for c in hist.get('convos', [])[-4:] if c.get('topic')]   # last 4 Shorts' characters rest
+        _ep_score = lambda nm: max([r.get('score', 0) for r in _rc[nm].get('ranked', []) if r.get('ep') == conv_ep] or [0])
+        # a weak identify() vote only counts when it is a real share of the frames AND research says the character is in
+        # this episode (fixes "Rengoku wins with 9/22 frames in S1E11", an episode he is not in)
+        voted = [nm for nm in mains if _v.get(nm, 0) / _fr >= 0.20 and _ep_score(nm) >= 2.0
+                 and char_slug(nm, series_key) not in _recent]
         if voted:
             topic_name = max(voted, key=lambda nm: _v[nm])
         else:
-            here = [(max([r.get('score', 0) for r in _rc[nm].get('ranked', []) if r.get('ep') == conv_ep] or [0]), nm) for nm in mains]
+            here = [(_ep_score(nm), nm) for nm in mains if char_slug(nm, series_key) not in _recent]
             here = [x for x in here if x[0] > 0]
             if here:
                 topic_name = max(here)[1]
@@ -958,10 +971,56 @@ if not topic_name:
 
 print(f'conversation character identified: {topic_name} ({topic_slug})', flush=True)
 
+# ------------------------------------------------------------------ 5b. the question shown at the top during the talk only
+QUESTION_ON = os.environ.get('QUESTION', '1') != '0'
+
+
+def _clean_q(q):
+    q = re.sub(r'[\r\n"\u201c\u201d*#{}\\]+', ' ', q or '').strip()
+    q = re.sub(r'\s+', ' ', q)
+    q = re.sub(r'^(question|q)\s*[:\-]\s*', '', q, flags=re.I)
+    if not q or len(q.split()) > 9 or len(q) > 60:
+        return None
+    return q if q.endswith('?') else q.rstrip('.!') + '?'
+
+
+def make_question():
+    if not QUESTION_ON:
+        return None
+    if os.environ.get('QUESTION_TEXT', '').strip():
+        return _clean_q(os.environ['QUESTION_TEXT'])
+    first = (topic_name or '').split()[0] if topic_name else ''
+    talk = ' '.join(SEGS[k]['t'] for k in SEL)
+    try:
+        groq = _load_groq()
+        out, mdl = groq(
+            f"Anime: {EPISODES[conv_ep]['series'].replace('-', ' ')}. Main character of this Short: {topic_name or 'unknown'}.\n"
+            f"What they say in the clip (auto-translated): {talk}\n\n"
+            "Write ONE short question (4 to 8 words) shown as big text at the top of the video while they talk. "
+            "It must make a viewer stop scrolling and want to answer in the comments: a debate, a 'who wins', "
+            "a 'why did he', or a 'would you'. Use the character's first name when you know it. Do not spoil the ending, "
+            "no emojis, no hashtags, no quotes. Reply with the question only.",
+            temperature=0.9, system='You write scroll-stopping on-screen questions for anime YouTube Shorts.')
+        q = _clean_q(out.strip().splitlines()[0] if out.strip() else '')
+        if q:
+            print(f'question ({mdl}): {q}', flush=True)
+            return q
+        print('question from groq unusable:', out[:120], flush=True)
+    except Exception as ex:
+        print('question groq skipped:', ex, flush=True)
+    who = first or 'he'
+    pool = [f'Can anyone beat {who} here?', f'Did {who} just go too far?', f'Is {who} the strongest here?',
+            f'Would you survive {who}?', f'Who wins this fight?', f'Was {who} right here?']
+    return rng.choice(pool)
+
+
+QUESTION_TXT = make_question()
+print('top question:', QUESTION_TXT, flush=True)
+
 # Update convo.json with identified character
 try:
     cinfo = json.load(open('work/convo/convo.json'))
-    cinfo.update(character=topic_slug, character_name=topic_name)
+    cinfo.update(character=topic_slug, character_name=topic_name, question=QUESTION_TXT)
     json.dump(cinfo, open('work/convo/convo.json', 'w'), indent=1)
 except Exception:
     pass
@@ -1069,6 +1128,20 @@ fc = (
 # captions were timed from the start of the short (hook included); the conversation clip starts at 0
 txt = open('work/convo/captions.ass').read()
 txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for x, f in zip(m.group(1).split(':'), (3600, 60, 1))) - HOOK)), txt)
+if QUESTION_TXT:                                                     # top question: talk part only, never on the edit
+    _qw = QUESTION_TXT.upper().split(); _qrows, _cur = [], ''
+    for w_ in _qw:
+        if _cur and len(_cur) + 1 + len(w_) > int(os.environ.get('QUESTION_WRAP', 18)):
+            _qrows.append(_cur); _cur = w_
+        else:
+            _cur = (_cur + ' ' + w_).strip()
+    _qrows.append(_cur)
+    _qfs = int(os.environ.get('QUESTION_SIZE', 72))
+    _qy = int(H * float(os.environ.get('QUESTION_Y', 0.06)))
+    _q = '\\N'.join(_qrows)
+    txt = txt.rstrip('\n') + '\n' + (
+        f"Dialogue: 2,{ts(0)},{ts(CONV)},Cap,,0,0,0,,{{\\an8\\pos({W // 2},{_qy})\\fs{_qfs}\\bord7\\3c&H00000000&\\shad4"
+        f"\\4a&H60&\\1c&H00FFFFFF&\\fad(150,0)}}{_q}\n")
 open('work/convo/captions_shift.ass', 'w').write(txt)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-i', VOICE,
@@ -1079,5 +1152,5 @@ os.remove(amv)
 print('wrote', f'out/{name}.mp4', flush=True)
 
 hist = json.load(open('history.json'))
-hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())))
+hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, topic=topic_slug, question=QUESTION_TXT, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())))
 json.dump(hist, open('history.json', 'w'), indent=1)
