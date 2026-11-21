@@ -1,87 +1,89 @@
 {
  "songs": {
-  "rayelo_ultraslowed": 2,
-  "montagem_zora": 3,
-  "cotneus_stereo_love_funk": 3,
-  "andromeda_montagem_coma": 3,
-  "montagem_vozes_profundas": 3,
   "andromeda_no_fear_phonk": 2,
+  "glxxmstrider_dont_stop_slowed": 3,
+  "andromeda_montagem_coma": 3,
   "mvsterious_slava_funk": 3,
-  "glxxmstrider_dont_stop_slowed": 2,
-  "dygo_funk_infernal": 3,
-  "rubikdice_montagem_pegadora_slowed": 2,
-  "zxvren_montagem_delirio_slowed": 3,
   "lonown_avangard_phonk": 3,
-  "ashreveal_manasha_phonk": 3,
   "trashxrl_deus_do_olimpo": 3,
-  "atlxs_passo_bem_solto_slowed": 2,
-  "poker_face": 3,
+  "montagem_zora": 3,
+  "rayelo_ultraslowed": 2,
+  "rubikdice_montagem_pegadora_slowed": 2,
   "ncts_next_phonk": 2,
-  "nxxkz_loucura_letal_funk_slowed": 3
+  "nxxkz_loucura_letal_funk_slowed": 3,
+  "montagem_vozes_profundas": 3,
+  "cotneus_stereo_love_funk": 3,
+  "zxvren_montagem_delirio_slowed": 3,
+  "poker_face": 3,
+  "atlxs_passo_bem_solto_slowed": 2,
+  "ashreveal_manasha_phonk": 3,
+  "dygo_funk_infernal": 3
  },
  "episodes": {
-  "jujutsu-kaisen:S2E01": 2,
-  "jujutsu-kaisen:S2E03": 2,
-  "jujutsu-kaisen:S2E10": 1,
-  "jujutsu-kaisen:S1E07": 11,
-  "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S2E02": 2,
-  "jujutsu-kaisen:S2E04": 9,
-  "jujutsu-kaisen:S2E05": 2,
-  "jujutsu-kaisen:S2E09": 9,
-  "demon-slayer-kimetsu-no-yaiba:S3E04": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E03": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
-  "demon-slayer-kimetsu-no-yaiba:S1E15": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E26": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E07": 2,
-  "demon-slayer-kimetsu-no-yaiba:S1E16": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E24": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E23": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E11": 2,
-  "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
-  "jujutsu-kaisen:S1E10": 1,
-  "jujutsu-kaisen:S1E13": 1,
-  "jujutsu-kaisen:S3E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E08": 1,
   "jujutsu-kaisen:S1E17": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E17": 2,
+  "jujutsu-kaisen:S2E02": 2,
+  "demon-slayer-kimetsu-no-yaiba:S2E01": 2,
   "jujutsu-kaisen:S1E23": 1,
+  "jujutsu-kaisen:S3E08": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E07": 4,
-  "demon-slayer-kimetsu-no-yaiba:S2E05": 5,
-  "jujutsu-kaisen:S1E16": 1,
-  "jujutsu-kaisen:S1E24": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E07": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E09": 1,
   "jujutsu-kaisen:S1E14": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
-  "jujutsu-kaisen:S3E10": 1,
+  "jujutsu-kaisen:S2E01": 2,
+  "demon-slayer-kimetsu-no-yaiba:S1E24": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E01": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E10": 2,
+  "jujutsu-kaisen:S2E07": 2,
+  "demon-slayer-kimetsu-no-yaiba:S2E05": 5,
   "jujutsu-kaisen:S1E11": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
-  "jujutsu-kaisen:S3E05": 1,
-  "jujutsu-kaisen:S1E04": 1,
-  "jujutsu-kaisen:S1E01": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E11": 1,
+  "jujutsu-kaisen:S2E05": 2,
+  "demon-slayer-kimetsu-no-yaiba:S4E11": 2,
+  "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E23": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
   "jujutsu-kaisen:S1E02": 3,
-  "jujutsu-kaisen:S2E16": 1,
+  "jujutsu-kaisen:S1E16": 1,
+  "jujutsu-kaisen:S1E20": 4,
+  "jujutsu-kaisen:S1E04": 1,
+  "jujutsu-kaisen:S1E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
+  "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 4,
-  "jujutsu-kaisen:S3E08": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E17": 2,
-  "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E07": 1,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E07": 2,
-  "jujutsu-kaisen:S1E21": 2,
+  "jujutsu-kaisen:S2E16": 1,
+  "jujutsu-kaisen:S1E13": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
+  "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
+  "demon-slayer-kimetsu-no-yaiba:S3E10": 2,
+  "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E05": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E08": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E09": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E06": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E26": 1,
+  "jujutsu-kaisen:S1E24": 1,
+  "jujutsu-kaisen:S1E07": 11,
   "demon-slayer-kimetsu-no-yaiba:S4E02": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E01": 2
+  "jujutsu-kaisen:S2E10": 1,
+  "jujutsu-kaisen:S3E09": 2,
+  "jujutsu-kaisen:S3E05": 1,
+  "jujutsu-kaisen:S3E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E03": 1,
+  "jujutsu-kaisen:S2E04": 9,
+  "demon-slayer-kimetsu-no-yaiba:S1E15": 1,
+  "jujutsu-kaisen:S1E21": 2,
+  "demon-slayer-kimetsu-no-yaiba:S3E04": 1,
+  "jujutsu-kaisen:S2E09": 9,
+  "demon-slayer-kimetsu-no-yaiba:S1E16": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E06": 1,
+  "demon-slayer-kimetsu-no-yaiba:S5E07": 2,
+  "demon-slayer-kimetsu-no-yaiba:S2E02": 1,
+  "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
+  "jujutsu-kaisen:S2E03": 2
  },
  "shots": [
   {
@@ -8018,19 +8020,11 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 886.066
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
    "s": 484.792
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
    "s": 805.545
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1089.817
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
@@ -8105,10 +8099,6 @@
    "s": 733.54
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
-   "s": 1104.207
-  },
-  {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
    "s": 456.207
   },
@@ -8134,23 +8124,7 @@
   },
   {
    "ep": "jujutsu-kaisen:S2E09",
-   "s": 510.225
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E09",
    "s": 888.017
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 463.933
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E04",
-   "s": 980.308
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 800.433
   },
   {
    "ep": "jujutsu-kaisen:S1E07",
@@ -8161,10 +8135,6 @@
    "s": 929.158
   },
   {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 369.873
-  },
-  {
    "ep": "jujutsu-kaisen:S1E07",
    "s": 945.366
   },
@@ -8173,32 +8143,8 @@
    "s": 513.908
   },
   {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 884.04
-  },
-  {
    "ep": "jujutsu-kaisen:S1E07",
    "s": 1082.825
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E04",
-   "s": 979.54
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 464.79
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E04",
-   "s": 1038.29
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E04",
-   "s": 1146.158
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 361.873
   },
   {
    "ep": "jujutsu-kaisen:S1E07",
@@ -8207,10 +8153,6 @@
   {
    "ep": "jujutsu-kaisen:S2E09",
    "s": 507.491
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 1184.207
   },
   {
    "ep": "jujutsu-kaisen:S1E07",
@@ -8229,10 +8171,6 @@
    "s": 801.367
   },
   {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 1085.867
-  },
-  {
    "ep": "jujutsu-kaisen:S2E09",
    "s": 820.491
   },
@@ -8243,10 +8181,6 @@
   {
    "ep": "jujutsu-kaisen:S1E07",
    "s": 387.758
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 1109.957
   },
   {
    "ep": "jujutsu-kaisen:S2E09",
@@ -8261,52 +8195,12 @@
    "s": 1185.617
   },
   {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 867.29
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 925.707
-  },
-  {
    "ep": "jujutsu-kaisen:S2E09",
    "s": 819.873
   },
   {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 512.457
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 1087.075
-  },
-  {
    "ep": "jujutsu-kaisen:S1E07",
    "s": 470.373
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 310.623
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E04",
-   "s": 1144.957
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 887.207
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 943.123
-  },
-  {
-   "ep": "jujutsu-kaisen:S1E07",
-   "s": 934.623
-  },
-  {
-   "ep": "jujutsu-kaisen:S2E09",
-   "s": 1126.04
   },
   {
    "ep": "jujutsu-kaisen:S2E09",
@@ -8390,10 +8284,6 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 945.29
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 971.108
   },
   {
@@ -8431,10 +8321,6 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 1168.942
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 1177.29
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
@@ -8494,19 +8380,11 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
-   "s": 696.04
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
    "s": 825.4
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 925.167
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 1141.442
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
@@ -8515,10 +8393,6 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
    "s": 1057.833
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
-   "s": 1266.525
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E05",
@@ -8530,39 +8404,11 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 1089.733
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 693.875
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 922.817
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
-   "s": 827.692
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 945.29
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 971.108
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 1012.692
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 1177.29
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 1026.04
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
@@ -8571,14 +8417,6 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 1097.292
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 1125.873
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
-   "s": 831.358
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
@@ -8598,10 +8436,6 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
-   "s": 1020.4
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 1194.233
   },
   {
@@ -8610,15 +8444,655 @@
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
-   "s": 232.873
-  },
-  {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
    "s": 874.792
   },
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
    "s": 272.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 754.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 830.709
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 331.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 383.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 403.15
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 419.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 519.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 563.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 611.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 685.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 696.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 828.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 335.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1058.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 407.942
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1077.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1092.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 71.916
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 245.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 261.416
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 831.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 348.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1062.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 608.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 680.442
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 728.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 746.833
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 923.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 786.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 971.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1169.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 804.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 416.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 694.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1090.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 749.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 925.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 945.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1141.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 792.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1013.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1194.583
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1026.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 698.166
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1097.609
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1126.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 953.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1153.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 796.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1177.458
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 403.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1020.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 214.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 233.041
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 865.942
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1089.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 82.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 269.709
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1179.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 344.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 948.209
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1188.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 605.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 875.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 781.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1056.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 70.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1011.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 802.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1168.209
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 416.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 610.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1140.292
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 921.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1093.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 331.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1016.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 970.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 696.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 417.959
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 824.875
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 83.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 402.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 244.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 678.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 357.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 872.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1178.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 864.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 684.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 212.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 417.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 422.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 360.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 416.459
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 273.042
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 329.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1060.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1091.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 381.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 259.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 827.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1077.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 415.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 793.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 752.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 273.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 827.045
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 331.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 383.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 419.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 535.525
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 685.167
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 83.067
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 825.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 945.333
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1126.108
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1031.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1058.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 971.358
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 416.709
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 694.125
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1089.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 923.083
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1141.708
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 827.958
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 953.025
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1062.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 986.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1012.942
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1177.375
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 698.066
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1097.542
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 831.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 925.4
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1147.792
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 1004.917
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1165.65
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 77.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1020.667
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1178.983
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1194.5
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 214.0
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 232.941
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1153.25
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 999.962
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 948.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 1056.545
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1093.713
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1011.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1188.463
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 921.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 534.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1168.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 970.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 696.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1140.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1016.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E01",
+   "s": 830.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
+   "s": 1163.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
+   "s": 269.707
   }
  ],
  "runs": [
@@ -8945,28 +9419,6 @@
    "file": "_amv_part.mp4"
   },
   {
-   "time": "2026-11-18 00:59 UTC",
-   "pick": "auto",
-   "series": "demon-slayer-kimetsu-no-yaiba",
-   "song": "lonown_avangard_phonk",
-   "episodes": [
-    "demon-slayer-kimetsu-no-yaiba:S1E09",
-    "demon-slayer-kimetsu-no-yaiba:S1E10",
-    "demon-slayer-kimetsu-no-yaiba:S4E07"
-   ],
-   "file": "_amv_part.mp4"
-  },
-  {
-   "time": "2026-11-19 01:59 UTC",
-   "pick": "auto",
-   "series": "jujutsu-kaisen",
-   "song": "poker_face",
-   "episodes": [
-    "jujutsu-kaisen:S3E01"
-   ],
-   "file": "_amv_part.mp4"
-  },
-  {
    "time": "2026-11-17 14:49 UTC",
    "pick": "gojo",
    "series": "jujutsu-kaisen",
@@ -9015,6 +9467,18 @@
     "jujutsu-kaisen:S2E02",
     "jujutsu-kaisen:S2E04",
     "jujutsu-kaisen:S2E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-18 00:59 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "lonown_avangard_phonk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E09",
+    "demon-slayer-kimetsu-no-yaiba:S1E10",
+    "demon-slayer-kimetsu-no-yaiba:S4E07"
    ],
    "file": "_amv_part.mp4"
   },
@@ -9071,6 +9535,16 @@
    "file": "_amv_part.mp4"
   },
   {
+   "time": "2026-11-19 01:59 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "poker_face",
+   "episodes": [
+    "jujutsu-kaisen:S3E01"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
    "time": "2026-11-19 14:34 UTC",
    "pick": "demon slayer",
    "series": "demon-slayer-kimetsu-no-yaiba",
@@ -9123,6 +9597,19 @@
    "file": "_amv_part.mp4"
   },
   {
+   "time": "2026-11-20 03:04 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "glxxmstrider_dont_stop_slowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S2E01",
+    "demon-slayer-kimetsu-no-yaiba:S2E02",
+    "demon-slayer-kimetsu-no-yaiba:S2E06",
+    "demon-slayer-kimetsu-no-yaiba:S2E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
    "time": "2026-11-20 19:09 UTC",
    "pick": "rengoku",
    "series": "demon-slayer-kimetsu-no-yaiba",
@@ -9143,6 +9630,19 @@
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S2E01",
     "demon-slayer-kimetsu-no-yaiba:S2E05",
+    "demon-slayer-kimetsu-no-yaiba:S2E06",
+    "demon-slayer-kimetsu-no-yaiba:S2E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-21 03:13 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "andromeda_montagem_coma",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E11",
+    "demon-slayer-kimetsu-no-yaiba:S2E01",
     "demon-slayer-kimetsu-no-yaiba:S2E06",
     "demon-slayer-kimetsu-no-yaiba:S2E07"
    ],
@@ -9831,7 +10331,49 @@
     1430.0
    ]
   ],
-  "demon-slayer-kimetsu-no-yaiba:S2E01": []
+  "demon-slayer-kimetsu-no-yaiba:S2E01": [],
+  "demon-slayer-kimetsu-no-yaiba:S1E14": [
+   [
+    30.0,
+    96.0
+   ],
+   [
+    1280.0,
+    1377.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E06": [
+   [
+    -4.0,
+    90.0
+   ],
+   [
+    1289.0,
+    1323.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S2E02": [
+   [
+    76.7,
+    165.1
+   ],
+   [
+    1254.0,
+    1338.1
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E11": [
+   [
+    1276.0,
+    1355.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E02": [
+   [
+    1296.0,
+    1375.0
+   ]
+  ]
  },
  "series": {
   "jujutsu-kaisen": 26,
@@ -10173,26 +10715,6 @@
    "time": "2026-11-16 22:29 UTC"
   },
   {
-   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
-   "s": 422.0,
-   "e": 437.8333333333333,
-   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
-   "time": "2026-11-18 01:00 UTC",
-   "character": "nezuko",
-   "song": "lonown_avangard_phonk",
-   "voice": "en-US-AndrewNeural",
-   "writer": "groq:openai/gpt-oss-120b",
-   "mode": "rhyme",
-   "title": "Nezuko quote that hits hard \ud83e\udd76 #shorts"
-  },
-  {
-   "ep": "jujutsu-kaisen:S3E01",
-   "s": 1233.7333333333333,
-   "e": 1249.3666666666666,
-   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
-   "time": "2026-11-19 02:00 UTC"
-  },
-  {
    "ep": "jujutsu-kaisen:S2E07",
    "s": 293.46666666666664,
    "e": 314.0,
@@ -10219,6 +10741,19 @@
    "e": 1019.0666666666667,
    "file": "Jujutsu_Kaisen_convo_trashxrl_deus_do_olimpo.mp4",
    "time": "2026-11-17 18:47 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 422.0,
+   "e": 437.8333333333333,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
+   "time": "2026-11-18 01:00 UTC",
+   "character": "nezuko",
+   "song": "lonown_avangard_phonk",
+   "voice": "en-US-AndrewNeural",
+   "writer": "groq:openai/gpt-oss-120b",
+   "mode": "rhyme",
+   "title": "Nezuko quote that hits hard \ud83e\udd76 #shorts"
   },
   {
    "ep": "jujutsu-kaisen:S2E03",
@@ -10249,6 +10784,13 @@
    "time": "2026-11-18 14:27 UTC"
   },
   {
+   "ep": "jujutsu-kaisen:S3E01",
+   "s": 1233.7333333333333,
+   "e": 1249.3666666666666,
+   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
+   "time": "2026-11-19 02:00 UTC"
+  },
+  {
    "ep": "jujutsu-kaisen:S2E07",
    "s": 331.4,
    "e": 348.3333333333333,
@@ -10277,6 +10819,13 @@
    "time": "2026-11-19 19:33 UTC"
   },
   {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "s": 587.3,
+   "e": 602.0,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
+   "time": "2026-11-20 03:05 UTC"
+  },
+  {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E06",
    "s": 753.1333333333333,
    "e": 772.6333333333333,
@@ -10289,6 +10838,13 @@
    "e": 740.7333333333333,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_andromeda_montagem_coma.mp4",
    "time": "2026-11-20 19:27 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E11",
+   "s": 165.4,
+   "e": 181.8,
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_andromeda_montagem_coma.mp4",
+   "time": "2026-11-21 03:14 UTC"
   }
  ],
  "styles": [
@@ -10309,18 +10865,6 @@
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E17",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
    "time": "2026-11-16 22:29 UTC"
-  },
-  {
-   "style": "narrated",
-   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
-   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
-   "time": "2026-11-18 01:00 UTC"
-  },
-  {
-   "style": "convo",
-   "ep": "jujutsu-kaisen:S3E01",
-   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
-   "time": "2026-11-19 02:00 UTC"
   },
   {
    "style": "convo",
@@ -10345,6 +10889,30 @@
    "ep": "jujutsu-kaisen:S2E02",
    "file": "Jujutsu_Kaisen_convo_trashxrl_deus_do_olimpo.mp4",
    "time": "2026-11-17 18:47 UTC"
+  },
+  {
+   "style": "narrated",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_narrated_lonown_avangard_phonk.mp4",
+   "time": "2026-11-18 01:00 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "jujutsu-kaisen:S3E01",
+   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
+   "time": "2026-11-19 02:00 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S2E02",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_glxxmstrider_dont_stop_slowed.mp4",
+   "time": "2026-11-20 03:05 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E11",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_andromeda_montagem_coma.mp4",
+   "time": "2026-11-21 03:14 UTC"
   }
  ],
  "narr_chars": {
