@@ -21,8 +21,8 @@ os.chdir(HERE); sys.path.insert(0, HERE)
 from drive_index import library
 
 W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by default (1080x1440)
-TOTAL = float(os.environ.get('TOTAL_SECONDS', 59))
-CMIN, CMAX = float(os.environ.get('CONV_MIN', 14)), float(os.environ.get('CONV_MAX', 27))   # short talk, long edit
+TOTAL = float(os.environ.get('TOTAL_SECONDS', 42))                   # sweet spot: ~16 s talk + ~26 s edit (was 59)
+CMIN, CMAX = float(os.environ.get('CONV_MIN', 11)), float(os.environ.get('CONV_MAX', 19))   # short talk, long edit
 HOOK = float(os.environ.get('CONVO_HOOK', 0))                      # no cold open: the talk starts the Short at 0 s (set 1.5 for the old phonk hook)
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
