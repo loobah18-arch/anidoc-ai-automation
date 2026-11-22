@@ -21,8 +21,8 @@ os.chdir(HERE); sys.path.insert(0, HERE)
 from drive_index import library
 
 W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by default (1080x1440)
-TOTAL = float(os.environ.get('TOTAL_SECONDS', 42))                   # sweet spot: ~16 s talk + ~26 s edit (was 59)
-CMIN, CMAX = float(os.environ.get('CONV_MIN', 13)), float(os.environ.get('CONV_MAX', 19))   # short talk, long edit
+TOTAL = float(os.environ.get('TOTAL_SECONDS', 42))                   # sweet spot: ~20 s talk with full context + ~22 s edit (was 59)
+CMIN, CMAX = float(os.environ.get('CONV_MIN', 16)), float(os.environ.get('CONV_MAX', 26))   # talk carries the whole story; edit can be short
 HOOK = float(os.environ.get('CONVO_HOOK', 0))                      # no cold open: the talk starts the Short at 0 s (set 1.5 for the old phonk hook)
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
@@ -425,8 +425,8 @@ def check(sel):
     if any(b <= a for a, b in zip(sel, sel[1:])):
         return 'lines not in order'
     rs = runs_of(sel)
-    if not 1 <= len(rs) <= 4:
-        return f'{len(rs)} stretches (1-4 allowed)'
+    if not 1 <= len(rs) <= 3:
+        return f'{len(rs)} stretches (1-3 allowed)'
     ps = pieces_of(sel); tot = sum(L for _, L in ps)
     if not CMIN <= tot <= CMAX:
         return f'{tot:.1f}s long ({CMIN:.0f}-{CMAX:.0f}s allowed)'
@@ -459,12 +459,15 @@ def groq_pick():
               "- hook (CONTEXT): the first line makes it instantly clear who is talking and what is at stake, AND grabs "
               "at once (a threat, a bold claim, a challenge, a question, an emotional cry). Never open on filler, a name call "
               "alone, or a line that needs earlier context\n"
+              "- STORY: someone who has never seen this anime must understand from these lines alone who is facing whom, "
+              "what is happening and why it matters. Include the setup lines that explain it; never skip a line the payoff "
+              "depends on. Prefer one unbroken stretch; cut lines out only when they are filler\n"
               "- build (LEAN): lines that make the viewer lean in: tension rises, one side looks sure to win, a shocking "
               "claim, proof of power, or a pain point. Prefer consecutive lines so the scene flows\n"
               "- payoff (SNAPBACK): the last line flips the direction the build leaned toward: a counter, a reveal, a "
               "defiant answer, an unexpected twist (but / no / you're wrong / I won't). It is a complete, strong statement "
               "that ends with . ! or ? and is followed by a pause. If no line truly flips it, take the strongest closing line\n"
-              "Rules: line numbers in increasing order; the chosen lines form at most 4 separate stretches of consecutive "
+              "Rules: line numbers in increasing order; the chosen lines form at most 3 separate stretches of consecutive "
               f"numbers; the summed durations of the chosen lines are {CMIN:.0f}-{CMAX:.0f} s.\n"
               'Answer with JSON only: {"hook": <number>, "build": [<numbers>], "payoff": <number>, "reason": "<short>"}')
     prompt += ("\nAdd up the durations in brackets before answering; most picks need about "
@@ -488,6 +491,13 @@ def groq_pick():
             fix.pop(1)
         if check(fix) is None:
             print(f'groq pick trimmed to fit ({why}): {fix}', flush=True)
+            return fix, None
+        fix = list(sel)                                               # too short: add the lines just before it (more context)
+        while fix[0] > 0 and sum(L for _, L in pieces_of(fix)) < CMIN \
+                and sum(L for _, L in pieces_of([fix[0] - 1] + fix)) <= CMAX:
+            fix.insert(0, fix[0] - 1)
+        if check(fix) is None:
+            print(f'groq pick extended back for context ({why}): {fix}', flush=True)
             return fix, None
         prompt += f"\n\nYour previous answer {json.dumps(js)} was rejected: {why}. Answer again, following every rule."
     return sel, why
@@ -514,7 +524,7 @@ def heuristic_pick():
             a_, b_ = SEGS[h]['s'], SEGS[p]['e']
             act = per_s[int(a_):int(b_) + 1].mean() / mref
             dens = sum(SEGS[k]['e'] - SEGS[k]['s'] for k in sel) / sum(L for _, L in pieces_of(sel))
-            sc = 1.0 * dens + 1.0 * min(act, 1.3) + 1.5 * pick_frac(a_, b_) + 0.3 * len(HOOKY.findall(SEGS[h]['t'])) + 0.4 * min(2, len(SNAP.findall(SEGS[p]['t']))) - 0.15 * (len(runs_of(sel)) - 1)
+            sc = 1.0 * dens + 1.0 * min(act, 1.3) + 1.5 * pick_frac(a_, b_) + 0.3 * len(HOOKY.findall(SEGS[h]['t'])) + 0.4 * min(2, len(SNAP.findall(SEGS[p]['t']))) - 0.5 * (len(runs_of(sel)) - 1)   # cuts lose context: prefer one unbroken stretch
             if best_ is None or sc > best_[0]:
                 best_ = (sc, sel)
     return best_[1] if best_ else None
