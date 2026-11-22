@@ -7,7 +7,7 @@
   "lonown_avangard_phonk": 3,
   "trashxrl_deus_do_olimpo": 3,
   "montagem_zora": 3,
-  "rayelo_ultraslowed": 2,
+  "rayelo_ultraslowed": 3,
   "rubikdice_montagem_pegadora_slowed": 2,
   "ncts_next_phonk": 3,
   "nxxkz_loucura_letal_funk_slowed": 3,
@@ -21,7 +21,7 @@
  },
  "episodes": {
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E08": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E08": 2,
   "jujutsu-kaisen:S1E17": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E17": 2,
   "jujutsu-kaisen:S2E02": 2,
@@ -30,8 +30,8 @@
   "jujutsu-kaisen:S3E08": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E07": 6,
-  "demon-slayer-kimetsu-no-yaiba:S4E07": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E07": 2,
+  "demon-slayer-kimetsu-no-yaiba:S4E09": 2,
   "jujutsu-kaisen:S1E14": 1,
   "jujutsu-kaisen:S2E01": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E24": 1,
@@ -63,7 +63,7 @@
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
   "demon-slayer-kimetsu-no-yaiba:S3E10": 2,
   "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E05": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E05": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E26": 1,
   "jujutsu-kaisen:S1E24": 1,
   "jujutsu-kaisen:S1E07": 11,
@@ -83,7 +83,8 @@
   "demon-slayer-kimetsu-no-yaiba:S5E07": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E02": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
-  "jujutsu-kaisen:S2E03": 2
+  "jujutsu-kaisen:S2E03": 2,
+  "demon-slayer-kimetsu-no-yaiba:S4E04": 1
  },
  "shots": [
   {
@@ -9393,6 +9394,158 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E07",
    "s": 272.858
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1214.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 292.308
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 1003.683
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 861.683
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 995.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 400.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1017.017
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1034.117
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1121.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 993.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1221.433
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 1006.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 361.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 998.809
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 580.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 160.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 786.933
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1124.683
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 192.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 362.683
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 804.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1119.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 1155.575
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E05",
+   "s": 582.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 598.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1223.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1252.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1263.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1281.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E08",
+   "s": 1303.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 281.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 636.808
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 996.433
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 805.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1254.758
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 1060.366
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E09",
+   "s": 1142.075
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
+   "s": 329.707
   }
  ],
  "runs": [
@@ -9971,6 +10124,20 @@
     "demon-slayer-kimetsu-no-yaiba:S2E05",
     "demon-slayer-kimetsu-no-yaiba:S2E06",
     "demon-slayer-kimetsu-no-yaiba:S2E07"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-22 04:41 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "rayelo_ultraslowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S4E04",
+    "demon-slayer-kimetsu-no-yaiba:S4E05",
+    "demon-slayer-kimetsu-no-yaiba:S4E07",
+    "demon-slayer-kimetsu-no-yaiba:S4E08",
+    "demon-slayer-kimetsu-no-yaiba:S4E09"
    ],
    "file": "_amv_part.mp4"
   }
@@ -10731,11 +10898,41 @@
     1296.0,
     1375.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E25": [
+   [
+    50.0,
+    93.0
+   ],
+   [
+    1280.0,
+    1375.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E05": [
+   [
+    1279.0,
+    1313.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E04": [
+   [
+    21.0,
+    56.0
+   ],
+   [
+    78.0,
+    158.0
+   ],
+   [
+    1287.0,
+    1385.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 26,
-  "demon-slayer-kimetsu-no-yaiba": 22
+  "demon-slayer-kimetsu-no-yaiba": 23
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -11217,6 +11414,15 @@
    "e": 1091.0333333333333,
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_atlxs_passo_bem_solto_slowed.mp4",
    "time": "2026-11-22 02:31 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1068.0666666666666,
+   "e": 1089.8333333333333,
+   "topic": "muichiro",
+   "question": "Who would stop Enmu first: Muichiro or Kyojuro?",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_rayelo_ultraslowed.mp4",
+   "time": "2026-11-22 04:42 UTC"
   }
  ],
  "styles": [
