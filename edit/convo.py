@@ -1034,6 +1034,16 @@ try:
             IDENT['target_share'] = round(_tv / max(1, _fr), 3)
     print(f'identify votes for the talk {c0:.1f}-{c1:.1f}s: {IDENT.get("votes")} of {IDENT.get("frames")} frames '
           f'-> {IDENT.get("name") or "unsure"}' + (f' ({PICK_NAME} share {IDENT.get("target_share")})' if PICK_NAME else ''), flush=True)
+    if PICK_NAME and IDENT.get('name') != PICK_NAME and IDENT.get('target_share', 0) < 0.25 \
+            and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
+        # a Sukuna pick got Toji vs Dagon (Sukuna 18%): the talk itself must show the pick, or say their name
+        _said = ' '.join(w['w'] for w in cw).lower()
+        if not any(p_ and len(p_) >= 3 and re.search(r'\b' + re.escape(p_.lower()) + r'\b', _said) for p_ in PICK_NAME.split()):
+            _left = [e for e in eps if e != conv_ep and e not in EP_EXCLUDE]
+            if _left and len(EP_EXCLUDE) < 3:
+                print(f'the talk shows {IDENT.get("name")}, not {PICK_NAME} ({IDENT.get("target_share", 0):.0%}): trying another episode', flush=True)
+                os.environ['CONVO_EP_EXCLUDE'] = ','.join(EP_EXCLUDE + [conv_ep]); os.environ.pop('CONVO_SKIP', None)
+                os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
     if not topic_name and IDENT.get('name') and not _not_in_episode(IDENT['name']):
         topic_name = IDENT['name']
         topic_slug = char_slug(topic_name, series_key)
