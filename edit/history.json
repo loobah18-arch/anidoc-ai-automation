@@ -1,6 +1,6 @@
 {
  "songs": {
-  "andromeda_no_fear_phonk": 2,
+  "andromeda_no_fear_phonk": 3,
   "glxxmstrider_dont_stop_slowed": 3,
   "andromeda_montagem_coma": 3,
   "mvsterious_slava_funk": 3,
@@ -59,10 +59,10 @@
   "jujutsu-kaisen:S3E01": 1,
   "jujutsu-kaisen:S2E16": 1,
   "jujutsu-kaisen:S1E13": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
+  "demon-slayer-kimetsu-no-yaiba:S3E07": 3,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
-  "demon-slayer-kimetsu-no-yaiba:S3E10": 2,
-  "demon-slayer-kimetsu-no-yaiba:S3E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E10": 3,
+  "demon-slayer-kimetsu-no-yaiba:S3E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S4E05": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E26": 1,
   "jujutsu-kaisen:S1E24": 1,
@@ -82,9 +82,10 @@
   "demon-slayer-kimetsu-no-yaiba:S4E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E07": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E02": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E03": 1,
+  "demon-slayer-kimetsu-no-yaiba:S5E03": 2,
   "jujutsu-kaisen:S2E03": 2,
-  "demon-slayer-kimetsu-no-yaiba:S4E04": 1
+  "demon-slayer-kimetsu-no-yaiba:S4E04": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E08": 1
  },
  "shots": [
   {
@@ -9546,6 +9547,162 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S4E07",
    "s": 329.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 892.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 474.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 1045.642
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 958.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 1201.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 395.017
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 1222.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 1256.7
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 520.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1026.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1099.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1047.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1230.183
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1217.434
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1241.934
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 1203.683
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 1263.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 797.559
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 829.809
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1105.642
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1056.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1088.183
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E09",
+   "s": 1210.283
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E08",
+   "s": 1236.059
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 217.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 507.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 762.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 925.533
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 966.992
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 128.242
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 140.658
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 411.634
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 469.033
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 832.158
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 1037.241
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E07",
+   "s": 855.533
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 1074.658
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S5E03",
+   "s": 1092.283
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E10",
+   "s": 1045.366
   }
  ],
  "runs": [
@@ -10138,6 +10295,20 @@
     "demon-slayer-kimetsu-no-yaiba:S4E07",
     "demon-slayer-kimetsu-no-yaiba:S4E08",
     "demon-slayer-kimetsu-no-yaiba:S4E09"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-22 06:07 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "andromeda_no_fear_phonk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S3E07",
+    "demon-slayer-kimetsu-no-yaiba:S3E08",
+    "demon-slayer-kimetsu-no-yaiba:S3E09",
+    "demon-slayer-kimetsu-no-yaiba:S3E10",
+    "demon-slayer-kimetsu-no-yaiba:S5E03"
    ],
    "file": "_amv_part.mp4"
   }
@@ -10928,11 +11099,17 @@
     1287.0,
     1385.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S3E01": [
+   [
+    2432.0,
+    2502.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 26,
-  "demon-slayer-kimetsu-no-yaiba": 23
+  "demon-slayer-kimetsu-no-yaiba": 24
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -11423,6 +11600,15 @@
    "question": "Who would stop Enmu first: Muichiro or Kyojuro?",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_rayelo_ultraslowed.mp4",
    "time": "2026-11-22 04:42 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E01",
+   "s": 2222.9666666666667,
+   "e": 2240.9666666666667,
+   "topic": "tengen",
+   "question": "Who would win: Tengen or Tanjiro?",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_andromeda_no_fear_phonk.mp4",
+   "time": "2026-11-22 06:08 UTC"
   }
  ],
  "styles": [
