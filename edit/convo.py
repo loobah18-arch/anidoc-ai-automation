@@ -1021,11 +1021,28 @@ def _clean_q(q):
     return q if q.endswith('?') else q.rstrip('.!') + '?'
 
 
+def _ep_score_of(nm):
+    try:
+        rc = json.load(open('research_cache.json')).get(series_key, {}).get('characters', {})
+        return max([r.get('score', 0) for r in rc.get(nm, {}).get('ranked', []) if r.get('ep') == conv_ep] or [0])
+    except Exception:
+        return 0
+
+
 def _on_screen():
-    """Characters actually in the talk: the Short's character plus anyone identify() saw in 15%+ of the frames."""
-    names = [topic_name] if topic_name else []
+    """Who the question may name. identify() is noisy (it saw Enmu and Rengoku in Swordsmith Village), so a name counts only
+    when it is said in the talk, or identify() saw it in 30%+ of the frames, or 15%+ AND research puts it in this episode."""
+    talk_l = ' '.join(SEGS[k]['t'] for k in SEL).lower()
+    heard = []
+    for nm, als in _known_names().items():
+        if any(len(a_) >= 3 and re.search(r'\b' + re.escape(a_.lower()) + r'\b', talk_l) for a_ in als if a_):
+            heard.append(nm)
     _v, _fr = IDENT.get('votes') or {}, max(1, IDENT.get('frames') or 1)
-    names += [nm for nm, c in _v.items() if c / _fr >= 0.15 and nm not in names]
+    seen = [nm for nm, c in _v.items() if c / _fr >= 0.30 or (c / _fr >= 0.15 and _ep_score_of(nm) >= 2.0)]
+    names = []
+    for nm in ([topic_name] if topic_name and (topic_name in heard or topic_name in seen or not (heard or seen)) else []) + heard + seen:
+        if nm and nm not in names:
+            names.append(nm)
     return names[:3]
 
 
@@ -1037,6 +1054,12 @@ def _known_names():
     try:
         for nm in json.load(open('research_cache.json')).get(series_key, {}).get('characters', {}):
             out.setdefault(nm, [nm])
+    except Exception:
+        pass
+    try:
+        import research
+        for nm, al in (research.character_names(series_key) or {}).items():
+            out.setdefault(nm, [nm]); out[nm] += list(al)
     except Exception:
         pass
     for nm in (IDENT.get('votes') or {}):
