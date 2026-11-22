@@ -729,7 +729,20 @@ for li, ln in enumerate(lines):
     toks = [t for t in toks if t]
     if not toks:
         continue
-    split = len(toks) if len(toks) <= 3 or sum(map(len, toks)) <= 14 else (len(toks) + 1) // 2
+    # rows by width, not word count: at 98 px a caps row fits ~16 characters across the 1080 frame
+    # ("HE KNOWS UROKODAKI?" ran off both edges). Two rows at most; a row still too wide shrinks the font.
+    ROWC = int(os.environ.get('CAP_ROW_CHARS', 16))
+    _w = lambda r: sum(len(t) for t in r) + max(0, len(r) - 1)
+    if _w(toks) <= ROWC or len(toks) == 1:
+        rows_ = [toks]
+    else:
+        rows_ = min(([toks[:i], toks[i:]] for i in range(1, len(toks))), key=lambda rr: max(_w(rr[0]), _w(rr[1])))
+    widest = max(_w(r) for r in rows_)
+    fs_tag = f'\\fs{max(56, int(98 * ROWC / widest))}' if widest > ROWC else ''
+    ends = set()
+    n_ = 0
+    for r in rows_[:-1]:
+        n_ += len(r); ends.add(n_ - 1)
     for k in range(len(toks)):                                        # word-by-word: spoken white, the rest dim
         a = to_out(ln[min(k, len(ln) - 1)]['s']) + HOOK
         b = (to_out(ln[k + 1]['s']) + HOOK) if k + 1 < len(toks) and k + 1 < len(ln) else t_end
@@ -738,14 +751,14 @@ for li, ln in enumerate(lines):
         parts = []
         for m, t in enumerate(toks):
             parts.append(('{\\1c&H00FFFFFF&}' if m <= k else '{\\1c' + DIM + '}') + t)
-            if m == split - 1 and m != len(toks) - 1:
+            if m in ends:
                 parts.append('\\N')
             elif m != len(toks) - 1:
                 parts.append(' ')
         txt = ''.join(parts).replace(' \\N', '\\N')
         pop = '{\\fscx106\\fscy106\\t(0,90,\\fscx100\\fscy100)}' if k == 0 else ''
-        glow = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord18\\blur16\\3c{ass_col(col)}\\3a&H20&\\shad0\\1a&HFF&}}'
-        main = f'{{\\pos({W // 2},{int(H * 0.53)})\\bord4\\blur3\\3c{ass_col(col)}\\shad3}}'
+        glow = f'{{\\pos({W // 2},{int(H * 0.53)}){fs_tag}\\bord18\\blur16\\3c{ass_col(col)}\\3a&H20&\\shad0\\1a&HFF&}}'
+        main = f'{{\\pos({W // 2},{int(H * 0.53)}){fs_tag}\\bord4\\blur3\\3c{ass_col(col)}\\shad3}}'
         ass.append(f'Dialogue: 0,{ts(a)},{ts(b)},Cap,,0,0,0,,{glow}{pop}{txt}')
         ass.append(f'Dialogue: 1,{ts(a)},{ts(b)},Cap,,0,0,0,,{main}{pop}{txt}')
 open('work/convo/captions.ass', 'w').write('\n'.join(ass) + '\n')
@@ -934,6 +947,26 @@ if PICK in chars:
 #    (name / look / stills, z-scored against frames every 25 s of the same episode). Always run and logged, so a
 #    character pick shows whether the talk really features them.
 IDENT = {}
+
+
+def _not_in_episode(nm):
+    """True when research knows this character's episodes and this one is not among them, and nobody says the name in
+    the talk: identify() picked Rengoku for Sabito in S1E03, so the edit became Rengoku's fights"""
+    try:
+        d_ = json.load(open('research_cache.json')).get(series_key, {}).get('characters', {}).get(nm)
+    except Exception:
+        return False
+    if not isinstance(d_, dict) or not d_.get('ranked'):
+        return False
+    if any(r.get('ep') == conv_ep and r.get('score', 0) > 0 for r in d_['ranked']):
+        return False
+    said = ' '.join(w['w'] for w in cw).lower()
+    if any(p_ and len(p_) >= 3 and re.search(r'\b' + re.escape(p_.lower()) + r'\b', said) for p_ in nm.split()):
+        return False
+    print(f'identify() says {nm}, but research does not have them in {conv_ep} and nobody says the name: not trusted', flush=True)
+    return True
+
+
 try:
     import charvis
     _parts = [charvis.identify(src, a_, a_ + L_, series_key, lo, hi, skip=_SKIP_SONG, expected=(PICK_NAME,) if PICK_NAME else (),
@@ -959,7 +992,7 @@ try:
             IDENT['target_share'] = round(_tv / max(1, _fr), 3)
     print(f'identify votes for the talk {c0:.1f}-{c1:.1f}s: {IDENT.get("votes")} of {IDENT.get("frames")} frames '
           f'-> {IDENT.get("name") or "unsure"}' + (f' ({PICK_NAME} share {IDENT.get("target_share")})' if PICK_NAME else ''), flush=True)
-    if not topic_name and IDENT.get('name'):
+    if not topic_name and IDENT.get('name') and not _not_in_episode(IDENT['name']):
         topic_name = IDENT['name']
         topic_slug = char_slug(topic_name, series_key)
         print('conversation character from identify():', topic_name, flush=True)
@@ -1079,7 +1112,7 @@ def _on_screen():
         if any(len(a_) >= 3 and re.search(r'\b' + re.escape(a_.lower()) + r'\b', talk_l) for a_ in als if a_):
             heard.append(nm)
     _v, _fr = IDENT.get('votes') or {}, max(1, IDENT.get('frames') or 1)
-    seen = [nm for nm, c in _v.items() if c / _fr >= 0.30 or (c / _fr >= 0.15 and _ep_score_of(nm) >= 2.0)]
+    seen = [nm for nm, c in _v.items() if (c / _fr >= 0.30 and not _not_in_episode(nm)) or (c / _fr >= 0.15 and _ep_score_of(nm) >= 2.0)]
     names = []
     for nm in ([topic_name] if topic_name and (topic_name in heard or topic_name in seen or not (heard or seen or TOPIC_GUESS)) else []) + heard + seen:
         if nm and nm not in names:
