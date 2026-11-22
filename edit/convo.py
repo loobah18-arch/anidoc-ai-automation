@@ -22,7 +22,7 @@ from drive_index import library
 
 W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by default (1080x1440)
 TOTAL = float(os.environ.get('TOTAL_SECONDS', 42))                   # sweet spot: ~16 s talk + ~26 s edit (was 59)
-CMIN, CMAX = float(os.environ.get('CONV_MIN', 11)), float(os.environ.get('CONV_MAX', 19))   # short talk, long edit
+CMIN, CMAX = float(os.environ.get('CONV_MIN', 13)), float(os.environ.get('CONV_MAX', 19))   # short talk, long edit
 HOOK = float(os.environ.get('CONVO_HOOK', 0))                      # no cold open: the talk starts the Short at 0 s (set 1.5 for the old phonk hook)
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
@@ -1011,6 +1011,45 @@ def _clean_q(q):
     return q if q.endswith('?') else q.rstrip('.!') + '?'
 
 
+def _on_screen():
+    """Characters actually in the talk: the Short's character plus anyone identify() saw in 15%+ of the frames."""
+    names = [topic_name] if topic_name else []
+    _v, _fr = IDENT.get('votes') or {}, max(1, IDENT.get('frames') or 1)
+    names += [nm for nm, c in _v.items() if c / _fr >= 0.15 and nm not in names]
+    return names[:3]
+
+
+def _known_names():
+    """Every name/alias of the series cast, so a question naming someone off screen can be caught."""
+    out = {}
+    for nm, d in (series_lore or {}).items():
+        out[nm] = [nm] + list(d.get('names', []))
+    try:
+        for nm in json.load(open('research_cache.json')).get(series_key, {}).get('characters', {}):
+            out.setdefault(nm, [nm])
+    except Exception:
+        pass
+    for nm in (IDENT.get('votes') or {}):
+        out.setdefault(nm, [nm])
+    return out
+
+
+def _off_screen_name(q, here):
+    ql = q.lower()
+    here_l = {h.lower() for h in here}
+    here_words = {w for h in here for w in h.lower().split()}
+    for nm, als in _known_names().items():
+        if nm.lower() in here_l:
+            continue
+        for a in als + nm.split():
+            a = (a or '').lower().strip()
+            if len(a) < 3 or a in here_words:
+                continue
+            if re.search(r'\b' + re.escape(a) + r'\b', ql):
+                return nm
+    return None
+
+
 def make_question():
     if not QUESTION_ON:
         return None
@@ -1018,28 +1057,42 @@ def make_question():
         return _clean_q(os.environ['QUESTION_TEXT'])
     first = (topic_name or '').split()[0] if topic_name else ''
     talk = ' '.join(SEGS[k]['t'] for k in SEL)
+    here = _on_screen()
+    print('on screen for the question:', here, flush=True)
+    who_txt = ', '.join(here) if here else (topic_name or 'unknown')
     try:
         groq = _load_groq()
-        out, mdl = groq(
-            f"Anime: {EPISODES[conv_ep]['series'].replace('-', ' ')}. Main character of this Short: {topic_name or 'unknown'}.\n"
-            f"What they say in the clip (auto-translated): {talk}\n\n"
-            "Write ONE short question (4 to 8 words) shown as big text at the top of the video while they talk. "
-            "It must make a viewer stop scrolling and want to argue in the comments. Best kinds: power debates "
-            "('Is Rengoku stronger than Giyu?', 'Who wins: Gojo or Sukuna?'), a hard 'why' ('Why didn't Akaza finish him?'), "
-            "or a bold opinion to defend ('Was Tanjiro wrong here?'). Avoid soft feelings questions. Use the names fans "
-            "use (surname for Hashira like Rengoku, Giyu, Tengen). Do not spoil the ending, no emojis, no hashtags, "
-            "no quotes. Reply with the question only.",
-            temperature=0.9, system='You write scroll-stopping on-screen questions for anime YouTube Shorts.')
-        q = _clean_q(out.strip().splitlines()[0] if out.strip() else '')
-        if q:
+        for attempt in range(2):
+            out, mdl = groq(
+                f"Anime: {EPISODES[conv_ep]['series'].replace('-', ' ')}. Characters ON SCREEN in this clip: {who_txt}.\n"
+                f"What they say in the clip (auto-translated): {talk}\n\n"
+                "Write ONE short question (4 to 8 words) shown as big text at the top of the video while they talk. "
+                "It must make a viewer stop scrolling and want to argue in the comments. "
+                "ONLY name characters from the on-screen list above; never bring in anyone else from the series. "
+                "Best kinds: a power debate between two on-screen characters ('Who wins: A or B?'), a hard 'why' about "
+                "what happens here ('Why didn't A finish it?'), or a bold opinion to defend ('Was A wrong here?'). "
+                "If only one character is listed, use a why or opinion question, not a versus. Avoid soft feelings "
+                "questions. Use the names fans use. Do not spoil the ending, no emojis, no hashtags, no quotes. "
+                "Reply with the question only.",
+                temperature=0.9 if attempt == 0 else 0.5,
+                system='You write scroll-stopping on-screen questions for anime YouTube Shorts.')
+            q = _clean_q(out.strip().splitlines()[0] if out.strip() else '')
+            if not q:
+                print('question from groq unusable:', out[:120], flush=True)
+                continue
+            bad = _off_screen_name(q, here)
+            if bad:
+                print(f'question rejected, names {bad} who is not on screen: {q}', flush=True)
+                continue
             print(f'question ({mdl}): {q}', flush=True)
             return q
-        print('question from groq unusable:', out[:120], flush=True)
     except Exception as ex:
         print('question groq skipped:', ex, flush=True)
     who = first or 'he'
-    pool = [f'Can anyone beat {who} here?', f'Did {who} just go too far?', f'Is {who} the strongest here?',
-            f'Would you survive {who}?', f'Who wins this fight?', f'Was {who} right here?']
+    pool = [f'Did {who} just go too far?', f'Was {who} right here?', f'Would you survive {who}?',
+            f'Is {who} stronger than you think?', 'Who wins this fight?']
+    if len(here) >= 2:
+        pool.append(f"Who wins: {here[0].split()[0]} or {here[1].split()[0]}?")
     return rng.choice(pool)
 
 
