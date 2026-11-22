@@ -74,6 +74,22 @@ for c in hist.get('convos', []):
     used_eps[c['ep']] = used_eps.get(c['ep'], 0) + 2                  # conversation episodes rest longer
 if PICK in chars:
     cand = [e for e in chars[PICK] if e in EPISODES]
+    # the talk must come from an episode the pick really fights in: chars.json put Sukuna in JJK S2E14 (Toji / Mei Mei vs
+    # Dagon), and two Sukuna Shorts got that talk. Research's fight scores (>= 5) narrow it when they exist
+    try:
+        _rcp = json.load(open('research_cache.json'))
+        _good = {}
+        for _sv in _rcp.values():
+            for _nm, _d in ((_sv.get('characters') or {}).items() if isinstance(_sv, dict) else []):
+                if isinstance(_d, dict) and _nm.split() and PICK in (_nm.lower().split()[0], _nm.lower().split()[-1]):
+                    for r in _d.get('ranked', []):
+                        if r.get('ep') in EPISODES and r.get('score', 0) >= 5:
+                            _good[r['ep']] = max(_good.get(r['ep'], 0), r['score'])
+        if len(_good) >= 3:
+            print(f'talk episodes for {PICK} from research fight scores: {sorted(_good, key=lambda e: -_good[e])}', flush=True)
+            cand = sorted(_good, key=lambda e: -_good[e])
+    except Exception as ex:
+        print('research narrowing skipped:', ex, flush=True)
 else:
     series = match[0] if match else (EPISODES[new_eps[0]]['series'] if new_eps else least_used(series_all, hist.get('series', {}), 1)[0])
     cand = [k for k, v in EPISODES.items() if v['series'] == series]
