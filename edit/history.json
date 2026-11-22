@@ -13,7 +13,7 @@
   "nxxkz_loucura_letal_funk_slowed": 3,
   "montagem_vozes_profundas": 3,
   "cotneus_stereo_love_funk": 3,
-  "zxvren_montagem_delirio_slowed": 3,
+  "zxvren_montagem_delirio_slowed": 4,
   "poker_face": 4,
   "atlxs_passo_bem_solto_slowed": 3,
   "ashreveal_manasha_phonk": 3,
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 3,
+  "jujutsu-kaisen:S1E02": 4,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 1,
+  "jujutsu-kaisen:S1E04": 2,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 1,
+  "jujutsu-kaisen:S2E16": 2,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 3,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -91,7 +91,9 @@
   "demon-slayer-kimetsu-no-yaiba:S1E18": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E03": 1,
   "jujutsu-kaisen:S3E03": 1,
-  "jujutsu-kaisen:S3E04": 1
+  "jujutsu-kaisen:S3E04": 1,
+  "jujutsu-kaisen:S1E05": 1,
+  "jujutsu-kaisen:S2E17": 1
  },
  "shots": [
   {
@@ -10269,6 +10271,154 @@
   {
    "ep": "jujutsu-kaisen:S3E04",
    "s": 1131.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 249.958
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 555.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 963.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 989.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1129.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1245.683
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1262.084
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 777.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 926.542
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 962.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1024.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1079.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1227.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1243.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 82.375
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 279.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 380.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1102.891
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 364.0
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 620.641
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 625.958
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 889.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 902.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1041.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 853.584
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 382.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 383.625
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 476.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 622.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 649.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 722.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 761.266
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 917.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 995.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1037.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 893.75
   }
  ],
  "runs": [
@@ -10926,6 +11076,20 @@
     "jujutsu-kaisen:S3E03",
     "jujutsu-kaisen:S3E04",
     "jujutsu-kaisen:S3E05"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-22 08:54 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "zxvren_montagem_delirio_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
    ],
    "file": "_amv_part.mp4"
   }
@@ -11794,10 +11958,64 @@
     1334.0,
     1424.0
    ]
+  ],
+  "jujutsu-kaisen:S1E06": [
+   [
+    23.0,
+    127.0
+   ],
+   [
+    1295.0,
+    1402.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E15": [
+   [
+    -2.0,
+    54.0
+   ],
+   [
+    268.0,
+    365.0
+   ],
+   [
+    1341.0,
+    1424.0
+   ]
+  ],
+  "jujutsu-kaisen:S1E15": [
+   [
+    141.0,
+    241.0
+   ],
+   [
+    1241.0,
+    1342.0
+   ]
+  ],
+  "jujutsu-kaisen:S1E05": [
+   [
+    139.2,
+    232.4
+   ],
+   [
+    718.1,
+    733.6
+   ],
+   [
+    1254.1,
+    1370.1
+   ]
+  ],
+  "jujutsu-kaisen:S2E17": [
+   [
+    1381.1,
+    1429.4
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 27,
+  "jujutsu-kaisen": 28,
   "demon-slayer-kimetsu-no-yaiba": 27
  },
  "known": [
@@ -12334,6 +12552,15 @@
    "question": "Can anyone stop this?",
    "file": "Jujutsu_Kaisen_convo_andromeda_no_fear_phonk.mp4",
    "time": "2026-11-22 08:21 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E15",
+   "s": 570.0,
+   "e": 587.4333333333333,
+   "topic": "sukuna",
+   "question": "Who wins: Sukuna or Jogo?",
+   "file": "Jujutsu_Kaisen_convo_zxvren_montagem_delirio_slowed.mp4",
+   "time": "2026-11-22 08:54 UTC"
   }
  ],
  "styles": [
