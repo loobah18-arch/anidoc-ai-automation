@@ -230,7 +230,7 @@ mref = np.percentile(per_s[lo:hi], 90) + 1e-6
 # scan the whole episode for speech, then take the stretch where they talk the most WHILE fighting
 from faster_whisper import WhisperModel
 import soundfile as _sf
-sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(lo), '-t', str(hi - lo), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/full.wav'])
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(lo), '-t', str(hi - lo), '-i', src, '-vn', '-af', 'aresample=async=1:first_pts=0', '-ac', '1', '-ar', '16000', 'work/convo/full.wav'])
 _scan = WhisperModel('small', device='cpu', compute_type='int8')
 _ss, _ = _scan.transcribe(_sf.read('work/convo/full.wav', dtype='float32')[0], beam_size=1, vad_filter=True)
 speech = np.zeros(int(dur) + 1)
@@ -311,7 +311,7 @@ if PICK_NAME and _cands and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
 fight = bt
 win0, win1 = max(lo, bt - 12), min(hi, bt + int(os.environ.get('CONVO_WIN_AFTER', 72)))   # wide enough for the payoff to finish
 print('conversation from', conv_ep, f'| talking fight at {bt}s (score {bs:.2f}), transcribing {win0}-{win1}s', flush=True)
-sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(win0), '-t', str(win1 - win0), '-i', src, '-vn', '-ac', '1', '-ar', '16000', 'work/convo/win.wav'])
+sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', str(win0), '-t', str(win1 - win0), '-i', src, '-vn', '-af', 'aresample=async=1:first_pts=0', '-ac', '1', '-ar', '16000', 'work/convo/win.wav'])
 
 from faster_whisper import WhisperModel
 model = WhisperModel(os.environ.get('WHISPER', 'small'), device='cpu', compute_type='int8')
@@ -620,6 +620,33 @@ if CONV < CMIN * 0.6:                                                 # too thin
     print(f'conversation only {CONV:.1f}s, trying the next fight moment', flush=True)
     os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
+
+
+def dead_air(y_, sr_, a_, b_, min_len=0.8):
+    """runs of true digital silence (a broken audio stretch in the source; real anime audio is never exactly 0)"""
+    i0, i1 = max(0, int(a_ * sr_)), min(len(y_), int(b_ * sr_))
+    hop = int(0.05 * sr_); runs, run0 = [], None
+    for i in range(i0, i1, hop):
+        quiet = float(np.abs(y_[i:i + hop]).max()) < 2e-4 if i + hop <= len(y_) else True
+        if quiet and run0 is None:
+            run0 = i
+        elif not quiet and run0 is not None:
+            if (i - run0) / sr_ >= min_len:
+                runs.append((run0 / sr_, i / sr_))
+            run0 = None
+    if run0 is not None and (i1 - run0) / sr_ >= min_len:
+        runs.append((run0 / sr_, i1 / sr_))
+    return runs
+
+
+_dead = sum([dead_air(audio16, 16000, a - win0, a - win0 + L) for a, L in PIECES], [])
+if _dead:
+    print(f'talk audio has dead air {[(round(x + win0, 1), round(y + win0, 1)) for x, y in _dead]} '
+          f'(broken audio in the source): trying the next fight moment', flush=True)
+    if len(SKIP) >= 4:
+        raise SystemExit('every conversation candidate has broken audio')
+    os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 print(f'conversation ({how}) {len(PIECES)} piece(s) ' + ', '.join(f'{a:.2f}-{a + L:.2f}s' for a, L in PIECES) +
       f' = {CONV:.2f}s, {len(cw)} words; span {c0:.2f}-{c1:.2f}s', flush=True)
 
@@ -839,7 +866,7 @@ sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i
 XF = 0.06
 for n_, (a, L) in enumerate(PIECES):
     ext = L + (XF if n_ < len(PIECES) - 1 else 0.0)
-    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{a:.3f}', '-t', f'{ext:.3f}', '-i', src, '-vn', '-ac', '2', '-ar', '44100',
+    sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{a:.3f}', '-t', f'{ext:.3f}', '-i', src, '-vn', '-af', 'aresample=async=1:first_pts=0', '-ac', '2', '-ar', '44100',
         f'work/convo/talk_{n_}.wav'])
 if len(PIECES) == 1:
     os.replace('work/convo/talk_0.wav', 'work/convo/talk.wav')
@@ -852,6 +879,15 @@ else:
     sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', *ins, '-filter_complex', ';'.join(g_), '-map', '[out]', '-t', f'{CONV:.3f}',
         'work/convo/talk.wav'])
 print(f'talk audio: {len(PIECES)} piece(s) stitched, {duration("work/convo/talk.wav"):.3f}s (picture {CONV:.3f}s)', flush=True)
+_ty, _tsr = _sf.read('work/convo/talk.wav', dtype='float32')
+_ty = _ty.mean(axis=1) if _ty.ndim > 1 else _ty
+_tdead = dead_air(_ty, _tsr, 0, CONV)
+if _tdead or len(_ty) / _tsr < CONV - 0.3:
+    print(f'stitched talk audio broken (dead air {_tdead}, {len(_ty) / _tsr:.2f}s of {CONV:.2f}s): trying the next fight moment', flush=True)
+    if len(SKIP) >= 4:
+        raise SystemExit('every conversation candidate has broken audio')
+    os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 subprocess.run([sys.executable, '-m', 'demucs', '--two-stems=vocals', '-n', 'htdemucs', '-o', 'work/convo/sep', 'work/convo/talk.wav'], check=True)
 VOICE = 'work/convo/sep/htdemucs/talk/vocals.wav'
 print('voices separated from the anime music', flush=True)
