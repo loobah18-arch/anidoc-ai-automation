@@ -830,6 +830,188 @@
     "anchors": 5,
     "detected": "2026-11-21"
    }
+  },
+  "yuji": {
+   "jujutsu-kaisen:S1E12": {
+    "windows": [
+     [
+      210.2,
+      280.5
+     ],
+     [
+      292.8,
+      405.9
+     ],
+     [
+      551.5,
+      575.5
+     ],
+     [
+      603.0,
+      659.0
+     ],
+     [
+      969.9,
+      1120.7
+     ],
+     [
+      1122.9,
+      1170.2
+     ],
+     [
+      1236.9,
+      1273.1
+     ]
+    ],
+    "source": "auto",
+    "character": "Yuji Itadori",
+    "anchors": 29,
+    "detected": "2026-11-21"
+   },
+   "jujutsu-kaisen:S1E24": {
+    "windows": [
+     [
+      70.0,
+      99.5
+     ],
+     [
+      475.2,
+      524.1
+     ],
+     [
+      532.1,
+      570.2
+     ],
+     [
+      580.6,
+      700.7
+     ],
+     [
+      751.4,
+      859.1
+     ],
+     [
+      1092.2,
+      1140.4
+     ],
+     [
+      1216.0,
+      1279.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Yuji Itadori",
+    "anchors": 28,
+    "detected": "2026-11-21"
+   },
+   "jujutsu-kaisen:S2E11": {
+    "windows": [
+     [
+      152.5,
+      168.9
+     ],
+     [
+      201.4,
+      225.9
+     ],
+     [
+      246.5,
+      272.4
+     ],
+     [
+      399.2,
+      453.0
+     ],
+     [
+      503.0,
+      542.8
+     ],
+     [
+      898.2,
+      949.1
+     ],
+     [
+      998.8,
+      1043.7
+     ],
+     [
+      1121.0,
+      1188.4
+     ],
+     [
+      1192.2,
+      1219.5
+     ],
+     [
+      1250.0,
+      1303.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Yuji Itadori",
+    "anchors": 48,
+    "detected": "2026-11-21"
+   },
+   "jujutsu-kaisen:S2E20": {
+    "windows": [
+     [
+      67.5,
+      109.2
+     ],
+     [
+      508.5,
+      570.5
+     ],
+     [
+      640.0,
+      660.9
+     ],
+     [
+      705.8,
+      816.5
+     ],
+     [
+      824.4,
+      866.2
+     ],
+     [
+      1053.2,
+      1124.3
+     ],
+     [
+      1146.5,
+      1287.2
+     ]
+    ],
+    "source": "auto",
+    "character": "Yuji Itadori",
+    "anchors": 32,
+    "detected": "2026-11-21"
+   },
+   "jujutsu-kaisen:S3E01": {
+    "windows": [
+     [
+      87.1,
+      200.2
+     ],
+     [
+      386.0,
+      417.5
+     ],
+     [
+      1082.2,
+      1167.3
+     ],
+     [
+      1175.0,
+      1294.7
+     ]
+    ],
+    "source": "auto",
+    "character": "Yuji Itadori",
+    "anchors": 17,
+    "detected": "2026-11-21"
+   }
   }
  },
  "_doc_auto": "_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked windows, cached so later runs reuse them. Hand-checked entries stay at the top level."

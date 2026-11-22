@@ -21,8 +21,8 @@ os.chdir(HERE); sys.path.insert(0, HERE)
 from drive_index import library
 
 W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by default (1080x1440)
-TOTAL = float(os.environ.get('TOTAL_SECONDS', 59))
-CMIN, CMAX = float(os.environ.get('CONV_MIN', 14)), float(os.environ.get('CONV_MAX', 27))   # short talk, long edit
+TOTAL = float(os.environ.get('TOTAL_SECONDS', 42))                   # sweet spot: ~16 s talk + ~26 s edit (was 59)
+CMIN, CMAX = float(os.environ.get('CONV_MIN', 13)), float(os.environ.get('CONV_MAX', 19))   # short talk, long edit
 HOOK = float(os.environ.get('CONVO_HOOK', 0))                      # no cold open: the talk starts the Short at 0 s (set 1.5 for the old phonk hook)
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
 SEED = int(os.environ.get('SEED', time.time())); rng = random.Random(SEED)
@@ -76,6 +76,27 @@ if PICK in chars:
 else:
     series = match[0] if match else (EPISODES[new_eps[0]]['series'] if new_eps else least_used(series_all, hist.get('series', {}), 1)[0])
     cand = [k for k, v in EPISODES.items() if v['series'] == series]
+# characters of the last 4 Shorts rest: their episodes count as heavily used, and episodes a re-run rejected are skipped
+RECENT_TOPICS = [c.get('topic') for c in hist.get('convos', [])[-4:] if c.get('topic')]
+AVOID = [e for e in os.environ.get('CONVO_AVOID_EPS', '').split(',') if e]
+if PICK == 'auto':
+    try:
+        _rc0 = json.load(open('research_cache.json'))
+    except Exception:
+        _rc0 = {}
+    for _t in set(RECENT_TOPICS):
+        _eps_t = set(chars.get(_t, []))
+        for _sv in _rc0.values():
+            for _nm, _d in (_sv.get('characters') or {}).items():
+                if _nm.lower().split()[-1] == _t or _nm.lower().split()[0] == _t:
+                    _eps_t |= {r.get('ep') for r in _d.get('ranked', []) if r.get('score', 0) >= 2}
+        for _e in _eps_t:
+            if _e:
+                used_eps[_e] = used_eps.get(_e, 0) + 4
+    if RECENT_TOPICS:
+        print('resting characters of the last Shorts:', RECENT_TOPICS, flush=True)
+    if len([e for e in cand if e not in AVOID]) >= 3:
+        cand = [e for e in cand if e not in AVOID]
 fresh = [e for e in new_eps if e in cand][:3]
 eps = fresh + least_used([e for e in cand if e not in fresh], used_eps, 3 - len(fresh))
 SF, SW, SH_ = 4, 64, 36
@@ -433,10 +454,16 @@ def groq_pick():
     lines_ = '\n'.join(f"{g['k']}. [{g['s'] - win0:.1f}-{g['e'] - win0:.1f}s, {g['e'] - g['s']:.1f}s] {g['t']}" for g in SEGS)
     prompt = (f"Numbered subtitle lines (English translation) from an anime scene of {EPISODES[conv_ep]['series'].replace('-', ' ')}"
               + (f", focused on {PICK_NAME}" if PICK_NAME else '') + ":\n" + lines_ + "\n\n"
-              f"Cut a {CMIN:.0f}-{CMAX:.0f} second talk clip for a YouTube Short as HOOK -> BUILD -> PAYOFF:\n"
-              "- hook: the first line, it must grab attention at once (a question, a threat, a bold claim, an emotional cry)\n"
-              "- build: the lines in between that develop it (prefer consecutive lines so the scene flows)\n"
-              "- payoff: the last line, a complete, strong closing statement that ends with . ! or ? and is followed by a pause\n"
+              f"Cut a {CMIN:.0f}-{CMAX:.0f} second talk clip for a YouTube Short using the TRIPLE HOOK "
+              "(context -> lean -> contrarian snapback):\n"
+              "- hook (CONTEXT): the first line makes it instantly clear who is talking and what is at stake, AND grabs "
+              "at once (a threat, a bold claim, a challenge, a question, an emotional cry). Never open on filler, a name call "
+              "alone, or a line that needs earlier context\n"
+              "- build (LEAN): lines that make the viewer lean in: tension rises, one side looks sure to win, a shocking "
+              "claim, proof of power, or a pain point. Prefer consecutive lines so the scene flows\n"
+              "- payoff (SNAPBACK): the last line flips the direction the build leaned toward: a counter, a reveal, a "
+              "defiant answer, an unexpected twist (but / no / you're wrong / I won't). It is a complete, strong statement "
+              "that ends with . ! or ? and is followed by a pause. If no line truly flips it, take the strongest closing line\n"
               "Rules: line numbers in increasing order; the chosen lines form at most 4 separate stretches of consecutive "
               f"numbers; the summed durations of the chosen lines are {CMIN:.0f}-{CMAX:.0f} s.\n"
               'Answer with JSON only: {"hook": <number>, "build": [<numbers>], "payoff": <number>, "reason": "<short>"}')
@@ -467,6 +494,7 @@ def groq_pick():
 
 
 HOOKY = re.compile(r"\?|!|\byou\b|\byour\b|\bi'll\b|\bi will\b|\bcan't\b|\bcannot\b", re.I)
+SNAP = re.compile(r"\bbut\b|\bno\b|\bnot\b|\bnever\b|\bwrong\b|\bactually\b|\binstead\b|\bwon't\b|\bstill\b|\byet\b", re.I)   # contrarian snapback words
 
 
 def heuristic_pick():
@@ -486,7 +514,7 @@ def heuristic_pick():
             a_, b_ = SEGS[h]['s'], SEGS[p]['e']
             act = per_s[int(a_):int(b_) + 1].mean() / mref
             dens = sum(SEGS[k]['e'] - SEGS[k]['s'] for k in sel) / sum(L for _, L in pieces_of(sel))
-            sc = 1.0 * dens + 1.0 * min(act, 1.3) + 1.5 * pick_frac(a_, b_) + 0.3 * len(HOOKY.findall(SEGS[h]['t'])) - 0.15 * (len(runs_of(sel)) - 1)
+            sc = 1.0 * dens + 1.0 * min(act, 1.3) + 1.5 * pick_frac(a_, b_) + 0.3 * len(HOOKY.findall(SEGS[h]['t'])) + 0.4 * min(2, len(SNAP.findall(SEGS[p]['t']))) - 0.15 * (len(runs_of(sel)) - 1)
             if best_ is None or sc > best_[0]:
                 best_ = (sc, sel)
     return best_[1] if best_ else None
@@ -916,11 +944,17 @@ if not topic_name:
         _rc = json.load(open('research_cache.json')).get(series_key, {}).get('characters', {})
         mains = [nm for nm, d in _rc.items() if (d.get('role') or '').lower() == 'main']
         _v = IDENT.get('votes') or {}
-        voted = [nm for nm in mains if _v.get(nm)]
+        _fr = max(1, IDENT.get('frames') or sum(_v.values()) or 1)
+        _recent = [c.get('topic') for c in hist.get('convos', [])[-4:] if c.get('topic')]   # last 4 Shorts' characters rest
+        _ep_score = lambda nm: max([r.get('score', 0) for r in _rc[nm].get('ranked', []) if r.get('ep') == conv_ep] or [0])
+        # a weak identify() vote only counts when it is a real share of the frames AND research says the character is in
+        # this episode (fixes "Rengoku wins with 9/22 frames in S1E11", an episode he is not in)
+        voted = [nm for nm in mains if _v.get(nm, 0) / _fr >= 0.20 and _ep_score(nm) >= 2.0
+                 and char_slug(nm, series_key) not in _recent]
         if voted:
             topic_name = max(voted, key=lambda nm: _v[nm])
         else:
-            here = [(max([r.get('score', 0) for r in _rc[nm].get('ranked', []) if r.get('ep') == conv_ep] or [0]), nm) for nm in mains]
+            here = [(_ep_score(nm), nm) for nm in mains if char_slug(nm, series_key) not in _recent]
             here = [x for x in here if x[0] > 0]
             if here:
                 topic_name = max(here)[1]
@@ -957,11 +991,118 @@ if not topic_name:
         print('charvis conversation identification skipped:', ex, flush=True)
 
 print(f'conversation character identified: {topic_name} ({topic_slug})', flush=True)
+if PICK == 'auto' and topic_slug and topic_slug in RECENT_TOPICS and len(AVOID) < 3 \
+        and os.environ.get('REPEAT_GUARD', '1') != '0':                # same character as a recent Short: another episode
+    print(f'{topic_slug} was in one of the last {len(RECENT_TOPICS)} Shorts, re-picking without {conv_ep}', flush=True)
+    os.environ['CONVO_AVOID_EPS'] = ','.join(AVOID + [conv_ep])
+    os.environ.pop('CONVO_SKIP', None)
+    os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
+
+# ------------------------------------------------------------------ 5b. the question shown at the top during the talk only
+QUESTION_ON = os.environ.get('QUESTION', '1') != '0'
+
+
+def _clean_q(q):
+    q = re.sub(r'[\r\n"\u201c\u201d*#{}\\]+', ' ', q or '').strip()
+    q = re.sub(r'\s+', ' ', q)
+    q = re.sub(r'^(question|q)\s*[:\-]\s*', '', q, flags=re.I)
+    if not q or len(q.split()) > 9 or len(q) > 60:
+        return None
+    return q if q.endswith('?') else q.rstrip('.!') + '?'
+
+
+def _on_screen():
+    """Characters actually in the talk: the Short's character plus anyone identify() saw in 15%+ of the frames."""
+    names = [topic_name] if topic_name else []
+    _v, _fr = IDENT.get('votes') or {}, max(1, IDENT.get('frames') or 1)
+    names += [nm for nm, c in _v.items() if c / _fr >= 0.15 and nm not in names]
+    return names[:3]
+
+
+def _known_names():
+    """Every name/alias of the series cast, so a question naming someone off screen can be caught."""
+    out = {}
+    for nm, d in (series_lore or {}).items():
+        out[nm] = [nm] + list(d.get('names', []))
+    try:
+        for nm in json.load(open('research_cache.json')).get(series_key, {}).get('characters', {}):
+            out.setdefault(nm, [nm])
+    except Exception:
+        pass
+    for nm in (IDENT.get('votes') or {}):
+        out.setdefault(nm, [nm])
+    return out
+
+
+def _off_screen_name(q, here):
+    ql = q.lower()
+    here_l = {h.lower() for h in here}
+    here_words = {w for h in here for w in h.lower().split()}
+    for nm, als in _known_names().items():
+        if nm.lower() in here_l:
+            continue
+        for a in als + nm.split():
+            a = (a or '').lower().strip()
+            if len(a) < 3 or a in here_words:
+                continue
+            if re.search(r'\b' + re.escape(a) + r'\b', ql):
+                return nm
+    return None
+
+
+def make_question():
+    if not QUESTION_ON:
+        return None
+    if os.environ.get('QUESTION_TEXT', '').strip():
+        return _clean_q(os.environ['QUESTION_TEXT'])
+    first = (topic_name or '').split()[0] if topic_name else ''
+    talk = ' '.join(SEGS[k]['t'] for k in SEL)
+    here = _on_screen()
+    print('on screen for the question:', here, flush=True)
+    who_txt = ', '.join(here) if here else (topic_name or 'unknown')
+    try:
+        groq = _load_groq()
+        for attempt in range(2):
+            out, mdl = groq(
+                f"Anime: {EPISODES[conv_ep]['series'].replace('-', ' ')}. Characters ON SCREEN in this clip: {who_txt}.\n"
+                f"What they say in the clip (auto-translated): {talk}\n\n"
+                "Write ONE short question (4 to 8 words) shown as big text at the top of the video while they talk. "
+                "It must make a viewer stop scrolling and want to argue in the comments. "
+                "ONLY name characters from the on-screen list above; never bring in anyone else from the series. "
+                "Best kinds: a power debate between two on-screen characters ('Who wins: A or B?'), a hard 'why' about "
+                "what happens here ('Why didn't A finish it?'), or a bold opinion to defend ('Was A wrong here?'). "
+                "If only one character is listed, use a why or opinion question, not a versus. Avoid soft feelings "
+                "questions. Use the names fans use. Do not spoil the ending, no emojis, no hashtags, no quotes. "
+                "Reply with the question only.",
+                temperature=0.9 if attempt == 0 else 0.5,
+                system='You write scroll-stopping on-screen questions for anime YouTube Shorts.')
+            q = _clean_q(out.strip().splitlines()[0] if out.strip() else '')
+            if not q:
+                print('question from groq unusable:', out[:120], flush=True)
+                continue
+            bad = _off_screen_name(q, here)
+            if bad:
+                print(f'question rejected, names {bad} who is not on screen: {q}', flush=True)
+                continue
+            print(f'question ({mdl}): {q}', flush=True)
+            return q
+    except Exception as ex:
+        print('question groq skipped:', ex, flush=True)
+    who = first or 'he'
+    pool = [f'Did {who} just go too far?', f'Was {who} right here?', f'Would you survive {who}?',
+            f'Is {who} stronger than you think?', 'Who wins this fight?']
+    if len(here) >= 2:
+        pool.append(f"Who wins: {here[0].split()[0]} or {here[1].split()[0]}?")
+    return rng.choice(pool)
+
+
+QUESTION_TXT = make_question()
+print('top question:', QUESTION_TXT, flush=True)
 
 # Update convo.json with identified character
 try:
     cinfo = json.load(open('work/convo/convo.json'))
-    cinfo.update(character=topic_slug, character_name=topic_name)
+    cinfo.update(character=topic_slug, character_name=topic_name, question=QUESTION_TXT)
     json.dump(cinfo, open('work/convo/convo.json', 'w'), indent=1)
 except Exception:
     pass
@@ -1069,6 +1210,20 @@ fc = (
 # captions were timed from the start of the short (hook included); the conversation clip starts at 0
 txt = open('work/convo/captions.ass').read()
 txt = re.sub(r'(\d+:\d\d:\d\d\.\d\d)', lambda m: ts(max(0, sum(float(x) * f for x, f in zip(m.group(1).split(':'), (3600, 60, 1))) - HOOK)), txt)
+if QUESTION_TXT:                                                     # top question: talk part only, never on the edit
+    _qw = QUESTION_TXT.upper().split(); _qrows, _cur = [], ''
+    for w_ in _qw:
+        if _cur and len(_cur) + 1 + len(w_) > int(os.environ.get('QUESTION_WRAP', 18)):
+            _qrows.append(_cur); _cur = w_
+        else:
+            _cur = (_cur + ' ' + w_).strip()
+    _qrows.append(_cur)
+    _qfs = int(os.environ.get('QUESTION_SIZE', 72))
+    _qy = int(H * float(os.environ.get('QUESTION_Y', 0.06)))
+    _q = '\\N'.join(_qrows)
+    txt = txt.rstrip('\n') + '\n' + (
+        f"Dialogue: 2,{ts(0)},{ts(CONV)},Cap,,0,0,0,,{{\\an8\\pos({W // 2},{_qy})\\fs{_qfs}\\bord7\\3c&H00000000&\\shad4"
+        f"\\4a&H60&\\1c&H00FFFFFF&\\fad(150,0)}}{_q}\n")
 open('work/convo/captions_shift.ass', 'w').write(txt)
 sh(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-i', amv, '-i', 'work/convo/video.mp4',
     '-i', VOICE,
@@ -1079,5 +1234,5 @@ os.remove(amv)
 print('wrote', f'out/{name}.mp4', flush=True)
 
 hist = json.load(open('history.json'))
-hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())))
+hist.setdefault('convos', []).append(dict(ep=conv_ep, s=c0, e=c1, topic=topic_slug, question=QUESTION_TXT, file=f'{name}.mp4', time=time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime())))
 json.dump(hist, open('history.json', 'w'), indent=1)
