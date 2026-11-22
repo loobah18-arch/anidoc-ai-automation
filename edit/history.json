@@ -8,7 +8,7 @@
   "trashxrl_deus_do_olimpo": 4,
   "montagem_zora": 3,
   "rayelo_ultraslowed": 4,
-  "rubikdice_montagem_pegadora_slowed": 3,
+  "rubikdice_montagem_pegadora_slowed": 4,
   "ncts_next_phonk": 3,
   "nxxkz_loucura_letal_funk_slowed": 3,
   "montagem_vozes_profundas": 3,
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 4,
+  "jujutsu-kaisen:S1E02": 5,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 2,
+  "jujutsu-kaisen:S1E04": 3,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 2,
+  "jujutsu-kaisen:S2E16": 3,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 3,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -92,8 +92,8 @@
   "demon-slayer-kimetsu-no-yaiba:S2E03": 1,
   "jujutsu-kaisen:S3E03": 1,
   "jujutsu-kaisen:S3E04": 1,
-  "jujutsu-kaisen:S1E05": 1,
-  "jujutsu-kaisen:S2E17": 1,
+  "jujutsu-kaisen:S1E05": 2,
+  "jujutsu-kaisen:S2E17": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E21": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E22": 1
  },
@@ -10621,6 +10621,170 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
    "s": 132.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 249.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 649.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 858.284
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 873.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 963.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 989.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1129.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1245.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1262.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 751.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 777.366
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 926.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 962.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1006.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1024.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1079.659
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1227.242
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1243.367
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 82.408
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 279.116
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 380.158
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1102.908
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 364.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 620.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 625.991
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 889.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 902.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1041.284
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 761.283
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 382.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 383.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 476.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 622.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 646.659
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 555.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 722.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 924.825
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 995.284
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1037.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 893.766
   }
  ],
  "runs": [
@@ -11304,6 +11468,20 @@
     "demon-slayer-kimetsu-no-yaiba:S1E21",
     "demon-slayer-kimetsu-no-yaiba:S1E22",
     "demon-slayer-kimetsu-no-yaiba:S1E23"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-22 19:37 UTC",
+   "pick": "sukuna",
+   "series": "jujutsu-kaisen",
+   "song": "rubikdice_montagem_pegadora_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
    ],
    "file": "_amv_part.mp4"
   }
@@ -12236,10 +12414,16 @@
     1269.0,
     1361.0
    ]
+  ],
+  "jujutsu-kaisen:S2E14": [
+   [
+    1348.0,
+    1431.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 28,
+  "jujutsu-kaisen": 29,
   "demon-slayer-kimetsu-no-yaiba": 28
  },
  "known": [
@@ -12794,6 +12978,15 @@
    "question": "Who survives this?",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_trashxrl_deus_do_olimpo.mp4",
    "time": "2026-11-22 19:04 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E14",
+   "s": 1061.6,
+   "e": 1078.3,
+   "topic": "sukuna",
+   "question": "Why does Sukuna call himself weak?",
+   "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
+   "time": "2026-11-22 19:38 UTC"
   }
  ],
  "styles": [
