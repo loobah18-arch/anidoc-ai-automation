@@ -5,7 +5,7 @@
   "andromeda_montagem_coma": 3,
   "mvsterious_slava_funk": 3,
   "lonown_avangard_phonk": 3,
-  "trashxrl_deus_do_olimpo": 3,
+  "trashxrl_deus_do_olimpo": 4,
   "montagem_zora": 3,
   "rayelo_ultraslowed": 4,
   "rubikdice_montagem_pegadora_slowed": 3,
@@ -43,7 +43,7 @@
   "jujutsu-kaisen:S2E05": 2,
   "demon-slayer-kimetsu-no-yaiba:S4E11": 2,
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E23": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E23": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
@@ -93,7 +93,9 @@
   "jujutsu-kaisen:S3E03": 1,
   "jujutsu-kaisen:S3E04": 1,
   "jujutsu-kaisen:S1E05": 1,
-  "jujutsu-kaisen:S2E17": 1
+  "jujutsu-kaisen:S2E17": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E21": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E22": 1
  },
  "shots": [
   {
@@ -10419,6 +10421,206 @@
   {
    "ep": "jujutsu-kaisen:S1E02",
    "s": 893.75
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 647.933
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 624.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 124.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 519.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 548.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 846.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 941.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 1078.325
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 1258.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 637.809
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 342.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 416.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 520.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 575.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 616.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 1156.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 380.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 722.433
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 626.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 75.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 623.642
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 1268.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 642.2
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 649.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 1242.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 690.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 773.934
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 844.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 1070.642
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 618.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 1160.184
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 1209.808
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 497.433
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 655.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 1255.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 150.017
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 189.325
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 565.058
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 621.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 484.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 1211.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 516.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 394.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 481.892
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 546.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 195.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 616.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 622.058
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E23",
+   "s": 774.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E21",
+   "s": 132.767
   }
  ],
  "runs": [
@@ -11090,6 +11292,18 @@
     "jujutsu-kaisen:S1E05",
     "jujutsu-kaisen:S2E16",
     "jujutsu-kaisen:S2E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-22 19:03 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "trashxrl_deus_do_olimpo",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E21",
+    "demon-slayer-kimetsu-no-yaiba:S1E22",
+    "demon-slayer-kimetsu-no-yaiba:S1E23"
    ],
    "file": "_amv_part.mp4"
   }
@@ -12012,11 +12226,21 @@
     1381.1,
     1429.4
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E22": [
+   [
+    98.0,
+    162.0
+   ],
+   [
+    1269.0,
+    1361.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 28,
-  "demon-slayer-kimetsu-no-yaiba": 27
+  "demon-slayer-kimetsu-no-yaiba": 28
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -12561,6 +12785,15 @@
    "question": "Who wins: Sukuna or Jogo?",
    "file": "Jujutsu_Kaisen_convo_zxvren_montagem_delirio_slowed.mp4",
    "time": "2026-11-22 08:54 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E22",
+   "s": 202.4,
+   "e": 220.9,
+   "topic": "rengoku",
+   "question": "Who survives this?",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_trashxrl_deus_do_olimpo.mp4",
+   "time": "2026-11-22 19:04 UTC"
   }
  ],
  "styles": [
