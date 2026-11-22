@@ -885,6 +885,7 @@ def char_slug(nm, series):
 
 topic_name = None
 topic_slug = None
+TOPIC_GUESS = False                                                   # True when the character is only a guess (no pick, no clear frames, not said)
 
 # 1. If explicit PICK matches a character slug
 if PICK in chars:
@@ -968,6 +969,7 @@ if not topic_name:
             here = [x for x in here if x[0] > 0]
             if here:
                 topic_name = max(here)[1]
+                TOPIC_GUESS = True                                     # just the main with the best score for this episode
         if topic_name:
             topic_slug = char_slug(topic_name, series_key)
             print('conversation character from the researched main cast:', topic_name, flush=True)
@@ -996,12 +998,13 @@ if not topic_name:
                 if scores[top_char] >= 0.20:
                     topic_name = top_char
                     topic_slug = char_slug(topic_name, series_key)
+                    TOPIC_GUESS = True
                     print('conversation character from the 4-frame reference match:', topic_name, flush=True)
     except Exception as ex:
         print('charvis conversation identification skipped:', ex, flush=True)
 
 print(f'conversation character identified: {topic_name} ({topic_slug})', flush=True)
-if PICK == 'auto' and topic_slug and topic_slug in RECENT_TOPICS and len(AVOID) < 3 \
+if PICK == 'auto' and topic_slug and not TOPIC_GUESS and topic_slug in RECENT_TOPICS and len(AVOID) < 3 \
         and os.environ.get('REPEAT_GUARD', '1') != '0':                # same character as a recent Short: another episode
     print(f'{topic_slug} was in one of the last {len(RECENT_TOPICS)} Shorts, re-picking without {conv_ep}', flush=True)
     os.environ['CONVO_AVOID_EPS'] = ','.join(AVOID + [conv_ep])
@@ -1040,7 +1043,7 @@ def _on_screen():
     _v, _fr = IDENT.get('votes') or {}, max(1, IDENT.get('frames') or 1)
     seen = [nm for nm, c in _v.items() if c / _fr >= 0.30 or (c / _fr >= 0.15 and _ep_score_of(nm) >= 2.0)]
     names = []
-    for nm in ([topic_name] if topic_name and (topic_name in heard or topic_name in seen or not (heard or seen)) else []) + heard + seen:
+    for nm in ([topic_name] if topic_name and (topic_name in heard or topic_name in seen or not (heard or seen or TOPIC_GUESS)) else []) + heard + seen:
         if nm and nm not in names:
             names.append(nm)
     return names[:3]
@@ -1088,9 +1091,9 @@ def make_question():
         return None
     if os.environ.get('QUESTION_TEXT', '').strip():
         return _clean_q(os.environ['QUESTION_TEXT'])
-    first = (topic_name or '').split()[0] if topic_name else ''
-    talk = ' '.join(SEGS[k]['t'] for k in SEL)
     here = _on_screen()
+    first = here[0].split()[0] if here else ''
+    talk = ' '.join(SEGS[k]['t'] for k in SEL)
     print('on screen for the question:', here, flush=True)
     who_txt = ', '.join(here) if here else (topic_name or 'unknown')
     try:
@@ -1122,6 +1125,8 @@ def make_question():
     except Exception as ex:
         print('question groq skipped:', ex, flush=True)
     who = first or 'he'
+    if not first:
+        return rng.choice(['Who wins this fight?', 'Who survives this?', 'Can anyone stop this?'])
     pool = [f'Did {who} just go too far?', f'Was {who} right here?', f'Would you survive {who}?',
             f'Is {who} stronger than you think?', 'Who wins this fight?']
     if len(here) >= 2:
@@ -1177,6 +1182,19 @@ if _sc:
         amv_eps = list(dict.fromkeys([conv_ep] + fight_eps))[:MAX_FIGHT]
 else:
     amv_eps = list(dict.fromkeys([conv_ep] + fight_eps))[:MAX_FIGHT] if fight_eps else [conv_ep]
+if TOPIC_GUESS and os.environ.get('EDIT_FROM_TALK', '1') != '0':
+    # the character is only a guess (the Urogi talk was labelled Muichiro, so the edit showed his fights): build the edit
+    # from the talk's own fight instead - its episode and the ones right around it - with no character filter
+    _m = re.match(r'(.*S\d+E)(\d+)$', conv_ep)
+    _near = [conv_ep]
+    if _m:
+        _n = int(_m.group(2))
+        for d_ in (1, -1, 2, -2):
+            _c = f'{_m.group(1)}{_n + d_:0{len(_m.group(2))}d}'
+            if _c in EPISODES:
+                _near.append(_c)
+    amv_eps = _near[:3]
+    print(f'character "{topic_name}" is only a guess: the edit comes from the talk\'s own fight {amv_eps}', flush=True)
 print('fight episodes for the edit:', amv_eps, flush=True)
 for ep_code in amv_eps:
     try:
@@ -1193,8 +1211,8 @@ env = dict(os.environ,
            AMV_STYLE='drop',                                        # the edit opens ON the drop (beat 17), one cut per beat
            MIN_SONG_START=f'{CONV + 0.6:.2f}',                      # room before the drop for the song bed under the talk
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
-           CHAR_NAME=topic_name or '',
-           CHAR_SLUG=topic_slug or '',
+           CHAR_NAME='' if TOPIC_GUESS else (topic_name or ''),
+           CHAR_SLUG='' if TOPIC_GUESS else (topic_slug or ''),
            CHAR_SERIES=series_title,
            CHAR_ACT_MIN='0.0',
            CHAR_REL_MIN='0.04',
