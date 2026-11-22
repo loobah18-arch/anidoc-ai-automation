@@ -1,6 +1,6 @@
 {
  "songs": {
-  "andromeda_no_fear_phonk": 3,
+  "andromeda_no_fear_phonk": 4,
   "glxxmstrider_dont_stop_slowed": 3,
   "andromeda_montagem_coma": 3,
   "mvsterious_slava_funk": 3,
@@ -70,7 +70,7 @@
   "demon-slayer-kimetsu-no-yaiba:S4E02": 1,
   "jujutsu-kaisen:S2E10": 1,
   "jujutsu-kaisen:S3E09": 2,
-  "jujutsu-kaisen:S3E05": 1,
+  "jujutsu-kaisen:S3E05": 2,
   "jujutsu-kaisen:S3E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E03": 1,
   "jujutsu-kaisen:S2E04": 9,
@@ -89,7 +89,9 @@
   "demon-slayer-kimetsu-no-yaiba:S1E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E07": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E18": 1,
-  "demon-slayer-kimetsu-no-yaiba:S2E03": 1
+  "demon-slayer-kimetsu-no-yaiba:S2E03": 1,
+  "jujutsu-kaisen:S3E03": 1,
+  "jujutsu-kaisen:S3E04": 1
  },
  "shots": [
   {
@@ -10147,6 +10149,126 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S2E04",
    "s": 1082.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1190.683
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 981.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 879.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 896.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 912.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1154.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 935.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1267.866
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 947.434
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 965.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1326.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 976.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 883.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1021.683
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1107.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 925.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1177.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 941.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1278.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1296.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1316.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 972.309
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1343.241
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 339.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 872.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 637.809
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 396.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E05",
+   "s": 887.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 785.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1131.475
   }
  ],
  "runs": [
@@ -10792,6 +10914,18 @@
     "demon-slayer-kimetsu-no-yaiba:S2E02",
     "demon-slayer-kimetsu-no-yaiba:S2E03",
     "demon-slayer-kimetsu-no-yaiba:S2E04"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-22 08:20 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "andromeda_no_fear_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S3E03",
+    "jujutsu-kaisen:S3E04",
+    "jujutsu-kaisen:S3E05"
    ],
    "file": "_amv_part.mp4"
   }
@@ -11630,10 +11764,40 @@
     1296.0,
     1371.0
    ]
+  ],
+  "jujutsu-kaisen:S1E22": [
+   [
+    28.0,
+    125.0
+   ],
+   [
+    1242.0,
+    1342.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E04": [
+   [
+    -4.0,
+    94.0
+   ],
+   [
+    1583.0,
+    1674.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E03": [
+   [
+    -4.0,
+    94.0
+   ],
+   [
+    1334.0,
+    1424.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 26,
+  "jujutsu-kaisen": 27,
   "demon-slayer-kimetsu-no-yaiba": 27
  },
  "known": [
@@ -12161,6 +12325,15 @@
    "question": "Who wins this fight?",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_poker_face.mp4",
    "time": "2026-11-22 07:29 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E04",
+   "s": 1027.8666666666666,
+   "e": 1073.3999999999999,
+   "topic": "naoya",
+   "question": "Can anyone stop this?",
+   "file": "Jujutsu_Kaisen_convo_andromeda_no_fear_phonk.mp4",
+   "time": "2026-11-22 08:21 UTC"
   }
  ],
  "styles": [
