@@ -7,17 +7,17 @@
     "requires_spacing_sleep": false,
     "spacing_sleep_seconds": 0,
     "active_layer": "All Layers Cleared",
-    "recommendation": "Active video velocity (26 views/hr, peak: 57/hr) is below 2,500 views/hr threshold. Cleared to upload next video.",
+    "recommendation": "Active video velocity (6 views/hr, peak: 57/hr) is below 2,500 views/hr threshold. Cleared to upload next video.",
     "layer0": {
       "layer": 0,
       "decision": "SPACING_CLEARED",
       "can_upload": true,
       "requires_spacing_sleep": false,
       "spacing_sleep_seconds": 0,
-      "elapsed_hours": 24.14,
+      "elapsed_hours": 24.0,
       "min_spacing_hours": 24.0,
       "remaining_hours": 0.0,
-      "recommendation": "\u2705 24-Hour Spacing Cleared: Active video has been up for 24.1h (>= 24h). Evaluating performance under Layer 1 & Layer 2."
+      "recommendation": "\u2705 24-Hour Spacing Cleared: Active video has been up for 24.0h (>= 24h). Evaluating performance under Layer 1 & Layer 2."
     },
     "layer1": {
       "layer": 1,
@@ -25,20 +25,20 @@
       "can_upload": true,
       "requires_timer": false,
       "timer_seconds": 3600,
-      "total_views": 633,
-      "elapsed_hours": 24.14,
-      "recommendation": "Video is past the initial 24h window (24.1h elapsed). Layer 1 passed; evaluating under Layer 2."
+      "total_views": 749,
+      "elapsed_hours": 24.0,
+      "recommendation": "Video is past the initial 24h window (24.0h elapsed). Layer 1 passed; evaluating under Layer 2."
     },
     "layer2": {
       "decision": "UPLOAD_CLEARED",
       "can_upload": true,
-      "consecutive_hours_below": 12,
+      "consecutive_hours_below": 14,
       "required_hours": 24,
       "threshold": 2500,
-      "current_hourly_rate": 26,
+      "current_hourly_rate": 6,
       "peak_hourly_rate": 57,
-      "total_candles": 12,
-      "recommendation": "Active video velocity (26 views/hr, peak: 57/hr) is below 2,500 views/hr threshold. Cleared to upload next video."
+      "total_candles": 14,
+      "recommendation": "Active video velocity (6 views/hr, peak: 57/hr) is below 2,500 views/hr threshold. Cleared to upload next video."
     }
   },
   "hourly_candles": [
@@ -53,14 +53,16 @@
     34,
     57,
     8,
-    26
+    26,
+    31,
+    6
   ],
   "last_snapshot": {
-    "video_id": "4PZ0L5f8vmE",
+    "video_id": "Odfx2nbLa_8",
     "title": "Kyojuro goes all out \ud83e\udd76 #shorts",
-    "total_views": 633,
-    "timestamp": "2026-11-21T03:14:18.295228+00:00",
-    "hourly_velocity": 26,
-    "elapsed_hours": 24.14
+    "total_views": 749,
+    "timestamp": "2026-11-22T03:14:50.480297+00:00",
+    "hourly_velocity": 6,
+    "elapsed_hours": 24.0
   }
 }
