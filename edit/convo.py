@@ -985,12 +985,14 @@ def _not_in_episode(nm):
         return False
     if not isinstance(d_, dict) or not d_.get('ranked'):
         return False
-    if any(r.get('ep') == conv_ep and r.get('score', 0) > 0 for r in d_['ranked']):
+    # a fight of theirs must be IN this episode (score >= 8): identify() voted Sukuna 57% on Dagon's beach talk in
+    # JJK S2E15, where research only gave Sukuna 5.5 (he fights Jogo in S2E16), so the edit became Sukuna's fights
+    if any(r.get('ep') == conv_ep and r.get('score', 0) >= float(os.environ.get('CONV_TRUST_SCORE', 8)) for r in d_['ranked']):
         return False
     said = ' '.join(w['w'] for w in cw).lower()
     if any(p_ and len(p_) >= 3 and re.search(r'\b' + re.escape(p_.lower()) + r'\b', said) for p_ in nm.split()):
         return False
-    print(f'identify() says {nm}, but research does not have them in {conv_ep} and nobody says the name: not trusted', flush=True)
+    print(f'identify() says {nm}, but research has no fight of theirs in {conv_ep} and nobody says the name: not trusted', flush=True)
     return True
 
 
