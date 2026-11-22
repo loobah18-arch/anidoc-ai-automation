@@ -381,6 +381,22 @@ def pick_frac(a, b):                                                  # share of
 # translated word times are spread evenly inside a segment, so the only honest cut points are segment edges. The talk is
 # 1-4 stretches of whole segments: a HOOK line that grabs, BUILD lines, and a PAYOFF line that finishes the thought.
 SEGS = [g for g in SEGS if not SONG[max(0, int(g['s'] - 0.35)):int(g['e'] + 0.8) + 1].any()]
+# whisper hallucinations: a line repeated word for word (it loops a line over music: "No good! My teeth won't go through!"
+# came back as a 13 s segment over the opening), or a long segment with almost no words in it
+_seen_t, _keep = set(), []
+for g in SEGS:
+    _norm = re.sub(r'[^a-z0-9 ]', '', g['t'].lower()).strip()
+    _dur = g['e'] - g['s']
+    _nw = len(g['t'].split())
+    if _norm and _norm in _seen_t:
+        print(f"dropping repeated line {g['s']:.1f}-{g['e']:.1f}s: {g['t']}", flush=True)
+        continue
+    if _dur > 4.0 and _nw / _dur < 1.0:
+        print(f"dropping sparse line {g['s']:.1f}-{g['e']:.1f}s ({_nw} words in {_dur:.1f}s): {g['t']}", flush=True)
+        continue
+    _seen_t.add(_norm)
+    _keep.append(g)
+SEGS = _keep
 for k_, g in enumerate(SEGS):
     g['k'] = k_
 SEND = lambda t_: re.sub(r'["\'\u201d\u2019)\]\s]+$', '', t_ or '')[-1:] in '.!?'
