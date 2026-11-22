@@ -87,8 +87,10 @@ if PICK == 'auto':
     for _t in set(RECENT_TOPICS):
         _eps_t = set(chars.get(_t, []))
         for _sv in _rc0.values():
+            if not isinstance(_sv, dict):                             # the cache also holds plain keys (a version, a date)
+                continue
             for _nm, _d in (_sv.get('characters') or {}).items():
-                if _nm.lower().split()[-1] == _t or _nm.lower().split()[0] == _t:
+                if isinstance(_d, dict) and _nm.split() and (_nm.lower().split()[-1] == _t or _nm.lower().split()[0] == _t):
                     _eps_t |= {r.get('ep') for r in _d.get('ranked', []) if r.get('score', 0) >= 2}
         for _e in _eps_t:
             if _e:
