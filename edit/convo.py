@@ -22,6 +22,7 @@ from drive_index import library
 
 W, H, FPS = 1080, int(os.environ.get("OUT_H", 1440)), 30          # 3:4 by default (1080x1440)
 TOTAL = float(os.environ.get('TOTAL_SECONDS', 42))                   # sweet spot: ~20 s talk with full context + ~22 s edit (was 59)
+MAXGAP = float(os.environ.get('CONV_MAXGAP', 6))                   # most screen time a cut inside the talk may skip
 CMIN, CMAX = float(os.environ.get('CONV_MIN', 16)), float(os.environ.get('CONV_MAX', 26))   # talk carries the whole story; edit can be short
 HOOK = float(os.environ.get('CONVO_HOOK', 0))                      # no cold open: the talk starts the Short at 0 s (set 1.5 for the old phonk hook)
 PICK = (os.environ.get('PICK') or 'auto').strip().lower()
@@ -446,6 +447,9 @@ def check(sel):
     if not 1 <= len(rs) <= 3:
         return f'{len(rs)} stretches (1-3 allowed)'
     ps = pieces_of(sel); tot = sum(L for _, L in ps)
+    for (a0, L0), (a1, _) in zip(ps, ps[1:]):                        # one scene: a cut may skip a few lines, never jump scenes
+        if a1 - (a0 + L0) > MAXGAP:
+            return f'{a1 - (a0 + L0):.1f}s skipped between stretches (one scene only, at most {MAXGAP:.0f}s skipped)'
     if not CMIN <= tot <= CMAX:
         return f'{tot:.1f}s long ({CMIN:.0f}-{CMAX:.0f}s allowed)'
     if any(SONG[max(0, int(a)):int(a + L) + 1].any() for a, L in ps):
@@ -486,7 +490,8 @@ def groq_pick():
               "defiant answer, an unexpected twist (but / no / you're wrong / I won't). It is a complete, strong statement "
               "that ends with . ! or ? and is followed by a pause. If no line truly flips it, take the strongest closing line\n"
               "Rules: line numbers in increasing order; the chosen lines form at most 3 separate stretches of consecutive "
-              f"numbers; the summed durations of the chosen lines are {CMIN:.0f}-{CMAX:.0f} s.\n"
+              f"numbers, all from ONE scene: never jump to an unrelated scene, and never skip more than {MAXGAP:.0f} s between "
+              f"stretches; the summed durations of the chosen lines are {CMIN:.0f}-{CMAX:.0f} s.\n"
               'Answer with JSON only: {"hook": <number>, "build": [<numbers>], "payoff": <number>, "reason": "<short>"}')
     prompt += ("\nAdd up the durations in brackets before answering; most picks need about "
                f"{max(2, int(len(SEGS) * (CMIN + CMAX) / 2 / max(1.0, sum(g['e'] - g['s'] + 0.4 for g in SEGS))))} lines.")
