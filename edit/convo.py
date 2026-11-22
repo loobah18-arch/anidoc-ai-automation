@@ -259,6 +259,17 @@ for sg in _ss:
         speech[int(lo + sg.start):int(lo + sg.end) + 1] = 1
 speech[SONG[:len(speech)]] = 0
 SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
+
+
+def next_episode(why):
+    """this episode has no usable talk: try another episode (at most 3) instead of failing the whole run"""
+    if len(AVOID) < 3:
+        print(f'{why} in {conv_ep}: trying another episode', flush=True)
+        os.environ['CONVO_AVOID_EPS'] = ','.join(AVOID + [conv_ep])
+        os.environ.pop('CONVO_SKIP', None)
+        os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
+    raise SystemExit(why)
+
 prevc = [(c['s'], c['e']) for c in hist.get('convos', []) if c['ep'] == conv_ep]
 bs, bt = -1, fight
 _cands = []
@@ -273,6 +284,8 @@ for t in range(lo, hi - 40, 2):
     _cands.append((sc, t))
     if sc > bs:
         bs, bt = sc, t
+if not _cands and SKIP:                                               # every talk moment here was tried (it kept retrying 950s)
+    next_episode('no talk moment left')
 LORE_ALL = json.load(open('lore.json')) if os.path.exists('lore.json') else {}
 _SKIP_SONG = lambda t_: bool(SONG[min(len(SONG) - 1, max(0, int(t_)))])
 PICK_NAME = None                                                      # a character pick: their full name in lore.json
@@ -353,7 +366,7 @@ for sg in segs:
 words = [w for w in words if not SONG[min(len(SONG) - 1, int(w['s']))] and not SONG[min(len(SONG) - 1, int(w['e']))]]
 if len(words) < 12:
     if len(SKIP) >= 4:
-        raise SystemExit('not enough dialogue in the fight')
+        next_episode('not enough dialogue in the fight')
     print('too little dialogue there, trying the next fight moment', flush=True)
     os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
@@ -638,12 +651,12 @@ if SONG[max(0, int(c0)):int(c1) + 1].any() and any(SONG[max(0, int(a)):int(a + L
     os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
 _wps = len(cw) / max(0.1, CONV)
-if CONV > CMAX + 2 or _wps < 1.0:                                     # a fallback that is mostly music/fight noise is no talk
+if CONV > CMAX + 2 or _wps < 0.7:                                     # a fallback that is mostly music/fight noise is no talk
     print(f'talk rejected: {CONV:.1f}s with {len(cw)} words ({_wps:.2f}/s)', flush=True)
     CONV = 0.0
 if CONV < CMIN * 0.6:                                                 # too thin to be a conversation: next fight moment
     if len(SKIP) >= 4:
-        raise SystemExit('no real conversation found in the fights')
+        next_episode('no real conversation found in the fights')
     print(f'conversation only {CONV:.1f}s, trying the next fight moment', flush=True)
     os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
