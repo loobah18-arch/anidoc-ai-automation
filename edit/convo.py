@@ -500,7 +500,9 @@ def groq_pick():
         try:
             out, mdl = groq(prompt, temperature=0.2, system='You are a precise video editor of anime Shorts. You answer with JSON only.')
             js = json.loads(re.search(r'\{.*\}', out, re.S).group(0))
-            sel = [int(js['hook'])] + [int(x) for x in (js.get('build') or [])] + [int(js['payoff'])]
+            if js.get('hook') is None or js.get('payoff') is None:
+                raise ValueError(f'no hook/payoff line in {js}')
+            sel = [int(js['hook'])] + [int(x) for x in (js.get('build') or []) if x is not None] + [int(js['payoff'])]
             sel = list(dict.fromkeys(sel))
             print(f'groq ({mdl}) pick {attempt + 1}: {js}', flush=True)
         except Exception as ex:
@@ -635,6 +637,10 @@ if SONG[max(0, int(c0)):int(c1) + 1].any() and any(SONG[max(0, int(a)):int(a + L
     print(f'conversation {c0:.1f}-{c1:.1f}s touches an opening/ending, trying the next fight moment', flush=True)
     os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
     os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
+_wps = len(cw) / max(0.1, CONV)
+if CONV > CMAX + 2 or _wps < 1.0:                                     # a fallback that is mostly music/fight noise is no talk
+    print(f'talk rejected: {CONV:.1f}s with {len(cw)} words ({_wps:.2f}/s)', flush=True)
+    CONV = 0.0
 if CONV < CMIN * 0.6:                                                 # too thin to be a conversation: next fight moment
     if len(SKIP) >= 4:
         raise SystemExit('no real conversation found in the fights')
