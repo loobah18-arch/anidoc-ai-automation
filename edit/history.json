@@ -1,6 +1,6 @@
 {
  "songs": {
-  "andromeda_no_fear_phonk": 2,
+  "andromeda_no_fear_phonk": 3,
   "glxxmstrider_dont_stop_slowed": 3,
   "andromeda_montagem_coma": 3,
   "mvsterious_slava_funk": 3,
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 3,
+  "jujutsu-kaisen:S1E02": 4,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 1,
+  "jujutsu-kaisen:S1E04": 2,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 1,
+  "jujutsu-kaisen:S2E16": 2,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -88,7 +88,9 @@
   "demon-slayer-kimetsu-no-yaiba:S3E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E04": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E05": 1
+  "demon-slayer-kimetsu-no-yaiba:S5E05": 1,
+  "jujutsu-kaisen:S1E05": 1,
+  "jujutsu-kaisen:S2E17": 1
  },
  "shots": [
   {
@@ -9766,6 +9768,110 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S5E05",
    "s": 130.617
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1102.928
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 888.492
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 924.658
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 298.012
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 753.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 409.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 853.637
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 466.825
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 503.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 646.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 701.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 722.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 301.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 838.2
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1020.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 412.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 873.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 895.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 889.095
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 887.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 916.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 916.873
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 842.022
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1037.97
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 302.29
   }
  ],
  "runs": [
@@ -10370,6 +10476,20 @@
     "demon-slayer-kimetsu-no-yaiba:S5E03",
     "demon-slayer-kimetsu-no-yaiba:S5E04",
     "demon-slayer-kimetsu-no-yaiba:S5E05"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-23 10:58 UTC",
+   "pick": "sukuna",
+   "series": "jujutsu-kaisen",
+   "song": "andromeda_no_fear_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
    ],
    "file": "_amv_part.mp4"
   }
@@ -11156,10 +11276,26 @@
     1286.1,
     1400.3
    ]
+  ],
+  "jujutsu-kaisen:S2E17": [
+   [
+    1339.0,
+    1436.0
+   ]
+  ],
+  "jujutsu-kaisen:S1E05": [
+   [
+    141.0,
+    236.0
+   ],
+   [
+    1272.0,
+    1372.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 26,
+  "jujutsu-kaisen": 27,
   "demon-slayer-kimetsu-no-yaiba": 24
  },
  "known": [
@@ -11660,6 +11796,15 @@
    "question": "Who survives this?",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_rubikdice_montagem_pegadora_slowed.mp4",
    "time": "2026-11-23 09:37 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 858.9666666666667,
+   "e": 880.7333333333333,
+   "topic": "sukuna",
+   "question": "Who\u2019s stronger: Sukuna or Ryomen Sukuna?",
+   "file": "Jujutsu_Kaisen_convo_andromeda_no_fear_phonk.mp4",
+   "time": "2026-11-23 10:59 UTC"
   }
  ],
  "styles": [
