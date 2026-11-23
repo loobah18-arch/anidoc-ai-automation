@@ -1550,217 +1550,57 @@
     "anchors": 11,
     "detected": "2026-11-22"
    }
-  },
-  "sukuna": {
-   "jujutsu-kaisen:S1E02": {
-    "windows": [
-     [
-      75.9,
-      209.5
-     ],
-     [
-      245.0,
-      305.0
-     ],
-     [
-      537.3,
-      595.0
-     ],
-     [
-      785.9,
-      876.5
-     ],
-     [
-      878.6,
-      897.3
-     ],
-     [
-      950.5,
-      1024.6
-     ],
-     [
-      1051.5,
-      1152.0
-     ],
-     [
-      1233.9,
-      1269.9
-     ]
-    ],
-    "source": "auto",
-    "character": "Ryomen Sukuna",
-    "anchors": 54,
-    "detected": "2026-11-22"
-   },
-   "jujutsu-kaisen:S1E04": {
-    "windows": [
-     [
-      488.0,
-      558.1
-     ],
-     [
-      562.5,
-      611.5
-     ],
-     [
-      631.3,
-      663.5
-     ],
-     [
-      676.9,
-      716.8
-     ],
-     [
-      722.1,
-      833.3
-     ],
-     [
-      888.7,
-      973.0
-     ],
-     [
-      984.7,
-      1041.6
-     ],
-     [
-      1066.7,
-      1094.7
-     ],
-     [
-      1154.4,
-      1185.5
-     ],
-     [
-      1217.6,
-      1261.9
-     ]
-    ],
-    "source": "auto",
-    "character": "Ryomen Sukuna",
-    "anchors": 40,
-    "detected": "2026-11-22"
-   },
-   "jujutsu-kaisen:S1E05": {
-    "windows": [
-     [
-      69.0,
-      102.5
-     ],
-     [
-      263.0,
-      296.0
-     ],
-     [
-      326.4,
-      449.2
-     ],
-     [
-      736.5,
-      889.5
-     ]
-    ],
-    "source": "auto",
-    "character": "Ryomen Sukuna",
-    "anchors": 14,
-    "detected": "2026-11-22"
-   },
-   "jujutsu-kaisen:S2E16": {
-    "windows": [
-     [
-      130.8,
-      166.7
-     ],
-     [
-      354.4,
-      399.0
-     ],
-     [
-      608.0,
-      627.0
-     ],
-     [
-      812.9,
-      858.0
-     ],
-     [
-      867.4,
-      919.8
-     ],
-     [
-      928.8,
-      1054.4
-     ],
-     [
-      1090.9,
-      1106.8
-     ],
-     [
-      1121.0,
-      1187.0
-     ]
-    ],
-    "source": "auto",
-    "character": "Ryomen Sukuna",
-    "anchors": 56,
-    "detected": "2026-11-22"
-   },
-   "jujutsu-kaisen:S2E17": {
-    "windows": [
-     [
-      253.1,
-      310.5
-     ],
-     [
-      354.4,
-      390.0
-     ],
-     [
-      447.1,
-      481.6
-     ],
-     [
-      488.8,
-      552.4
-     ],
-     [
-      588.3,
-      654.0
-     ],
-     [
-      675.2,
-      690.0
-     ],
-     [
-      719.5,
-      782.8
-     ],
-     [
-      819.2,
-      904.7
-     ],
-     [
-      908.7,
-      937.6
-     ],
-     [
-      974.2,
-      1024.7
-     ],
-     [
-      1030.8,
-      1103.5
-     ],
-     [
-      1128.6,
-      1152.7
-     ]
-    ],
-    "source": "auto",
-    "character": "Ryomen Sukuna",
-    "anchors": 56,
-    "detected": "2026-11-22"
-   }
   }
  },
- "_doc_auto": "_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked windows, cached so later runs reuse them. Hand-checked entries stay at the top level."
+ "_doc_auto": "_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked windows, cached so later runs reuse them. Hand-checked entries stay at the top level.",
+ "sukuna": {
+  "jujutsu-kaisen:S2E16": [
+   [
+    865.0,
+    915.0
+   ],
+   [
+    1000.0,
+    1150.0
+   ],
+   [
+    1295.0,
+    1310.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E17": [
+   [
+    335.0,
+    375.0
+   ],
+   [
+    395.0,
+    415.0
+   ],
+   [
+    425.0,
+    470.0
+   ],
+   [
+    590.0,
+    630.0
+   ],
+   [
+    680.0,
+    690.0
+   ],
+   [
+    840.0,
+    915.0
+   ],
+   [
+    1000.0,
+    1090.0
+   ],
+   [
+    1170.0,
+    1180.0
+   ]
+  ]
+ }
 }
