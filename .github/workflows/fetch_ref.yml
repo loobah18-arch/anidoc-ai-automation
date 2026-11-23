@@ -1,9 +1,10 @@
 name: Fetch reference Short
 on:
-  push:
-    branches: [convo-edit]
-    paths: ['.github/workflows/fetch_ref.yml']
   workflow_dispatch:
+    inputs:
+      ids:
+        description: 'space separated YouTube Short ids'
+        required: true
 jobs:
   fetch:
     runs-on: ubuntu-latest
@@ -12,10 +13,12 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           pip install -U yt-dlp
           mkdir ref
-          for c in default tv_simply ios android mweb; do
-            yt-dlp --extractor-args "youtube:player_client=$c" -f "bv*[height<=1920]+ba/b" --merge-output-format mp4 -o ref/ref.mp4 "https://www.youtube.com/shorts/XeqGgslY3h0" && break
+          for id in ${{ github.event.inputs.ids }}; do
+            for c in default tv_simply ios android mweb web_safari; do
+              yt-dlp --extractor-args "youtube:player_client=$c" -f "bv*[height<=1920]+ba/b" --merge-output-format mp4 -o ref/$id.mp4 "https://www.youtube.com/shorts/$id" && break
+            done
+            ffprobe -v error -show_entries stream=width,height,r_frame_rate:format=duration -of csv=p=0 ref/$id.mp4 > ref/$id.probe.txt || true
+            ffmpeg -v error -i ref/$id.mp4 -filter:v "select='gt(scene,0.25)',showinfo" -f null - 2> ref/$id.scenes.txt || true
           done
-          ffprobe -v error -show_entries stream=width,height:format=duration -of csv=p=0 ref/ref.mp4
-          ffmpeg -v error -i ref/ref.mp4 -vf "fps=1,scale=360:-2" ref/f_%03d.jpg
       - uses: actions/upload-artifact@v4
         with: {name: ref, path: ref/}

@@ -118,6 +118,9 @@ def build_shot_fx(
     if "shake" in fx:
         chain.append("rgbashift=rh=-6:bh=6:enable='lt(t\\,0.12)'")
 
+    if "freeze" in fx:                                    # reference look: the last shot freezes on its final pose
+        hold = min(0.6, d * 0.4)
+        chain.append(f"trim=end_frame={max(1, round((d - hold) * FPS))}")
     chain.append("tpad=stop_mode=clone:stop_duration=1")
     chain.append(f"trim=end_frame={n_frames or max(1, round(d * FPS))}")
     chain.append("setpts=PTS-STARTPTS")
@@ -179,6 +182,40 @@ def build_battle_iq_grade() -> str:
         "[gb0][gbl]blend=all_mode=screen:all_opacity=0.28,"
         "vignette=PI/4.2,format=yuv420p"
     )
+
+
+def build_ref_grade(warm: bool = False, close: bool = False) -> str:
+    """Look of the reference Shorts (Yoriichi 'Muzan's Nightmare', Gojo 'Jalebi Baby'):
+    crushed blacks, a teal-blue grade that flips to warm amber/red after the midpoint,
+    soft glow/halation on highlights, light chromatic aberration, vignette, fine grain."""
+    bal = ("colorbalance=rs=0.05:gs=-0.01:bs=-0.07:rm=0.07:gm=0.01:bm=-0.07:rh=0.08:gh=0.02:bh=-0.08" if warm else
+           "colorbalance=rs=-0.07:gs=0.0:bs=0.09:rm=-0.05:gm=0.01:bm=0.06:rh=-0.02:gh=0.02:bh=0.05")
+    ca = "rgbashift=rh=-4:bh=4," if close else "rgbashift=rh=-2:bh=2,"
+    return (
+        "eq=contrast=1.16:saturation=1.12:gamma=0.95:brightness=-0.025," + bal + "," + ca +
+        "split[rg0][rg1];[rg1]gblur=sigma=22,eq=brightness=-0.10:contrast=1.35[rgl];"
+        "[rg0][rgl]blend=all_mode=screen:all_opacity=0.30,"
+        "vignette=PI/4.5,noise=alls=5:allf=t,format=yuv420p"
+    )
+
+
+def ref_transition_pattern(n_shots: int, drop_index: int, flip_index: int) -> List[str]:
+    """Reference transitions: zoom-blur and directional motion-blur whips between
+    most shots, a flash on the drop and on the colour flip, plain punch-ins between."""
+    kinds = []
+    for b in range(1, n_shots):
+        k = b - drop_index
+        if b < drop_index:
+            kinds.append("cut")
+        elif b == drop_index or b == flip_index:
+            kinds.append("flash")
+        elif k % 3 == 1:
+            kinds.append("zoom")
+        elif k % 3 == 2:
+            kinds.append("whip")
+        else:
+            kinds.append("punch")
+    return kinds
 
 
 def shot_frame_counts(durations: List[float], fps: int = FPS) -> List[int]:

@@ -18,7 +18,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from pro_fx import build_shot_fx, pair_transitions, default_transition_pattern
+from pro_fx import build_shot_fx, pair_transitions, default_transition_pattern, build_ref_grade, ref_transition_pattern
 from drive_index import library
 
 W, H, FPS = int(os.environ.get('W', 1080)), int(os.environ.get('H', 1080)), 30   # 1:1 square
@@ -36,6 +36,10 @@ OUT_NAME = os.environ.get('OUT_NAME', '')
 # AMV_STYLE=drop (set by convo.py): the edit starts ON the drop (beat 17), one cut per beat, only the topic
 # character's combat / awakening shots with impact >= the 85th percentile, Gojo v2 FX on every cut.
 DROP_STYLE = os.environ.get('AMV_STYLE', '') == 'drop'
+# AMV_LOOK=ref (default on this branch): the edit part copies the reference Shorts (Yoriichi FEzJYFlO7H4,
+# Gojo QalX73pxT6s): ~1 cut a second with a faster burst in the middle, zoom-blur / motion-blur whips, slow-mo
+# holds, push-in drift, teal grade flipping to warm at the midpoint, glow, light RGB split, grain, freeze ending.
+REF_LOOK = DROP_STYLE and os.environ.get('AMV_LOOK', 'ref') == 'ref'
 # shots the drop edit really needs: ~0.8 cuts per beat at ~140 BPM (bar-grouped cuts), not a fixed 60
 DROP_NEED = int(os.environ.get('DROP_MIN_SHOTS', 60))                # main's count: many distinct scenes
 IMPACT_PCT = float(os.environ.get('IMPACT_PCT', 85))
@@ -903,6 +907,24 @@ if DROP_STYLE:                                                        # fast sec
         tmpl = [(a_, b_) for a_, b_ in zip(cuts_, cuts_[1:] + [tmpl[-1][1]])]
         print(f'drop style: {len(tmpl)} cuts on bars and strong hits over {max_beats - max(START_BEAT, DROP_BEAT)} beats '
               f'({sum(b_ - a_ == 2 for a_, b_ in tmpl)} two-beat holds)', flush=True)
+if REF_LOOK and len(tmpl) > 8:                                        # reference pace: 2-beat cuts (~1 s), a 1-beat burst in the
+    _env = librosa.onset.onset_strength(y=y, sr=sr)                   # middle third and on strong hits, a 4-beat final hold
+    _ts = librosa.times_like(_env, sr=sr)
+    _bt = lambda j: song_start + (j - START_BEAT) * P
+    _st = {j: float(_env[max(0, np.searchsorted(_ts, _bt(j)) - 2):np.searchsorted(_ts, _bt(j)) + 3].max(initial=0))
+           for j in range(tmpl[0][0], tmpl[-1][1])}
+    _med = float(np.median(list(_st.values())))
+    j0, jend = tmpl[0][0], tmpl[-1][1]
+    _len = jend - j0
+    b_lo, b_hi = j0 + int(_len * 0.40), j0 + int(_len * 0.62)
+    cuts_, j = [], j0
+    while j < jend - 4:
+        step = 1 if (b_lo <= j < b_hi or (j > j0 + 2 and _st.get(j, 0) >= _med * 1.35)) else 2
+        cuts_.append(j); j += step
+    cuts_.append(j)
+    tmpl = [(a_, b_) for a_, b_ in zip(cuts_, cuts_[1:] + [jend])]
+    print(f'ref look: {len(tmpl)} cuts over {_len} beats ({sum(b_ - a_ == 1 for a_, b_ in tmpl)} burst cuts, '
+          f'{_len * P / max(1, len(tmpl)):.2f} s per cut)', flush=True)
 n = len(tmpl)
 second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 pre = [i for i, (a, b) in enumerate(tmpl) if a < DROP_BEAT]
@@ -1081,7 +1103,8 @@ impact_cut = np.percentile([s['impact'] for s in pool], 85)
 # ---------------------------------------------------------------- 7. render
 fr = lambda j: round((j - START_BEAT) * P * FPS)
 drop_i = next(i for i, (a, b) in enumerate(tmpl) if a == DROP_BEAT)
-kinds = default_transition_pattern(n, drop_i)
+flip_i = drop_i + max(1, (n - drop_i) // 2) if n - drop_i > 3 else None      # ref look: teal -> warm colour flip
+kinds = (ref_transition_pattern(n, drop_i, flip_i) if REF_LOOK else default_transition_pattern(n, drop_i))
 if second_drop:
     kinds[second_drop - 1] = 'flash'
 fxl = pair_transitions(n, kinds)
@@ -1091,13 +1114,23 @@ if DROP_STYLE:                                                        # the drop
             fxl[drop_i].append(f_)
     heavy_cut = float(np.percentile([assign[i].get('peak', 0) for i in range(n)], 65))   # heavy hits: top third by peak motion
     slow_cut = float(np.percentile([assign[i]['impact'] for i in range(n)], 60))         # 2-beat holds on strong shots: slow-mo
+    ref_heavy = float(np.percentile([assign[i].get('peak', 0) for i in range(n)], 80))
+    ref_slow = float(np.percentile([assign[i]['impact'] for i in range(n)], 40))
 os.makedirs('segfx', exist_ok=True)
 jobs, plan = [], []
 for k_, (a, b) in enumerate(tmpl):
     s = assign[k_]
     nf = fr(b) - fr(a); dur = nf / FPS
     fx = list(fxl[k_])
-    if DROP_STYLE:                                                    # pulse on every beat, shake + RGB split on the heavy hits
+    if REF_LOOK:                                                      # reference: slow push-in on every shot, slow-mo on strong
+        fx.append('drift')                                            # holds, shake only on the drop and the heaviest hits
+        if k_ == drop_i or s.get('peak', 0) >= ref_heavy:
+            fx.append('shake')
+        if b - a >= 2 and s['impact'] >= ref_slow and k_ != n - 1:
+            fx.append('slowmo')
+        if k_ == n - 1:
+            fx.append('freeze')
+    elif DROP_STYLE:                                                  # pulse on every beat, shake + RGB split on the heavy hits
         fx.append('pulse')
         if k_ == drop_i or s.get('peak', 0) >= heavy_cut:
             fx.append('shake')
@@ -1119,9 +1152,13 @@ for k_, (a, b) in enumerate(tmpl):
     else:
         st = s['s']; spd = max(0.5, L / dur)
     vf = build_shot_fx(dur, W, H, fx, beat=P, speed=spd)
-    vf += ',eq=contrast=1.12:saturation=1.18:gamma=0.97,vignette=PI/5'
+    if REF_LOOK:
+        vf += ',' + build_ref_grade(warm=flip_i is not None and k_ >= flip_i, close='slowmo' in fx)
+    else:
+        vf += ',eq=contrast=1.12:saturation=1.18:gamma=0.97,vignette=PI/5'
     if k_ == n - 1:
-        fd = min(0.6, dur * 0.5); vf += f',fade=out:st={max(0.0, dur - fd):.2f}:d={fd:.2f}'
+        fd = min(0.6, dur * 0.5) if not REF_LOOK else min(0.35, dur * 0.25)       # ref: short dip to black, loops cleanly
+        vf += f',fade=out:st={max(0.0, dur - fd):.2f}:d={fd:.2f}'
     plan.append(dict(beats=[a, b], ep=s['ep'], start=round(st, 3), fx=fx, speed=round(spd, 3)))
     jobs.append(['ffmpeg', '-nostdin', '-v', 'error', '-y', '-ss', f'{st:.3f}', '-i', SRC(s['ep']), '-an',
                  '-vf', vf, '-frames:v', str(nf), '-r', str(FPS), '-fps_mode', 'cfr',
