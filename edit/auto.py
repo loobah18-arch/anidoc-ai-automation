@@ -401,9 +401,13 @@ def _curated_windows():
     return {_k(e): [tuple(w) for w in v] for e, v in fw.get(slug, {}).items()} if slug else {}
 
 
+def _auto_slug():                                                     # no character (topic guess): any-fight windows
+    return os.environ.get('CHAR_SLUG', '').strip().lower() or ('' if CHAR_NAME else '_fight')
+
+
 def _cached_auto_windows():
     """fight windows detected automatically by earlier runs (fight_windows.json -> _auto -> slug -> episode)"""
-    slug = os.environ.get('CHAR_SLUG', '').strip().lower()
+    slug = _auto_slug()
     try:
         fw = json.load(open('fight_windows.json')).get('_auto', {}).get(slug, {}) if slug else {}
         return {_k(e): [tuple(w) for w in d['windows']] for e, d in fw.items()
@@ -414,7 +418,7 @@ def _cached_auto_windows():
 
 def _save_auto_windows(det, anchors, source='auto'):
     """remember detected windows so later runs reuse them; hand-checked entries are never touched"""
-    slug = os.environ.get('CHAR_SLUG', '').strip().lower()
+    slug = _auto_slug()
     if not slug or not det:
         return
     try:
@@ -529,12 +533,14 @@ def _ask_vision(code, a, b, times):
     except Exception:
         pass
     series = os.environ.get('CHAR_SERIES', '') or code.split(':')[0].replace('-', ' ')
+    who = CHAR_NAME or 'the fighters'
     prompt = (f'Contact sheet of {len(times)} numbered frames (left to right, top to bottom) from the anime {series}, '
-              f'{a:.0f}-{b:.0f} s of one episode. Character: {CHAR_NAME}' + (f' ({look})' if look else '') + '.\n'
-              'Answer with JSON only: {"fight": true or false, "tiles": [numbers of the frames where ' + CHAR_NAME +
+              f'{a:.0f}-{b:.0f} s of one episode. Character: {who}' + (f' ({look})' if look else '') + '.\n'
+              'Answer with JSON only: {"fight": true or false, "tiles": [numbers of the frames where ' + who +
               ' is clearly visible]}. "fight" is true only when these frames are an action / combat scene (attacks, '
-              'techniques, clashes, powering up), not talking, comedy, crowds, flashbacks of daily life or title cards. '
-              'Only list a tile when you are confident it is ' + CHAR_NAME + ', not another character.')
+              'techniques, clashes, powering up), not talking, comedy, crowds, flashbacks of daily life or title cards. ' +
+              ('Only list a tile when you are confident it is ' + CHAR_NAME + ', not another character.' if CHAR_NAME else
+               'List the tiles that show fighting.'))
     body = dict(model=_vision_model(), temperature=0.0, max_tokens=200,
                 messages=[dict(role='user', content=[dict(type='text', text=prompt),
                                                      dict(type='image_url', image_url=dict(url='data:image/jpeg;base64,' + _sheet(code, times)))])])
@@ -596,8 +602,8 @@ def _vision_windows(full_pool, eps):
         checked.add(ep)
         fight, tiles = r
         print(f'vision {ep} {a:.0f}-{b:.0f}s: fight={fight} {CHAR_NAME} tiles={tiles}', flush=True)
-        if fight and len(tiles) >= MIN_TILES:
-            ts = [times[t - 1] for t in tiles]
+        if fight and (len(tiles) >= MIN_TILES or not CHAR_NAME):
+            ts = [times[t - 1] for t in tiles] if CHAR_NAME and tiles else [a, b]
             lo, hi = max(a, min(ts) - (b - a) / 8), min(b, max(ts) + (b - a) / 8)   # trim to where the character is
             win.setdefault(ep, []).append((lo - 1.0, hi + 1.0))
         time.sleep(float(os.environ.get('FIGHT_VISION_SLEEP', 2.5)))
@@ -781,6 +787,29 @@ if CHAR_NAME and DROP_STYLE:
         print('character filter failed, impact-gated motion picks only:', ex, flush=True)
     if purity_pct != IMPACT_PCT:
         print(f'WARNING drop style: impact gate relaxed to p{purity_pct:.0f} to find enough {CHAR_NAME} shots', flush=True)
+elif DROP_STYLE and VISION_ON:                                        # no character (topic guess): fights only, still
+    try:                                                              # (run 45147032793: noodle-eating / screaming gags got in)
+        _eps = list(dict.fromkeys(s_['ep'] for s_ in full_pool))
+        _cw = _cached_auto_windows()
+        _todo = [e for e in _eps if e not in _cw]
+        _vw = _vision_windows(full_pool, _todo) if _todo else {}
+        if _vw:
+            _save_auto_windows(_vw, [], source='vision')
+        _vw.update({e: _cw[e] for e in _eps if e in _cw})
+        _in = lambda s_: any(a_ <= s_['s'] and s_['e'] <= b_ for a_, b_ in _vw.get(s_['ep'], []))
+        _fp = [s_ for s_ in pool if _in(s_)]
+        if len(_fp) < DROP_NEED:                                      # thin: every shot inside the fights above the median
+            _inw = [s_ for s_ in full_pool if _in(s_)]
+            if _inw:
+                _g = float(np.percentile([s_['impact'] for s_ in _inw], 50))
+                _fp = [s_ for s_ in _inw if s_['impact'] >= _g]
+        if len(_fp) >= 12:
+            print(f'drop style: vision fight windows keep {len(_fp)} shots (no character filter)', flush=True)
+            pool = _fp
+        else:
+            print(f'drop style: vision fight windows too thin ({len(_fp)}); impact-gated picks', flush=True)
+    except Exception as ex:
+        print('vision fight filter failed:', ex, flush=True)
 elif CHAR_NAME:
     try:
         pool = _char_filter(pool)
