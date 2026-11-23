@@ -1,6 +1,6 @@
 {
  "songs": {
-  "andromeda_no_fear_phonk": 2,
+  "andromeda_no_fear_phonk": 3,
   "glxxmstrider_dont_stop_slowed": 3,
   "andromeda_montagem_coma": 3,
   "mvsterious_slava_funk": 3,
@@ -28,7 +28,7 @@
   "demon-slayer-kimetsu-no-yaiba:S2E01": 4,
   "jujutsu-kaisen:S1E23": 1,
   "jujutsu-kaisen:S3E08": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E10": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E10": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E07": 7,
   "demon-slayer-kimetsu-no-yaiba:S4E07": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E09": 1,
@@ -44,7 +44,7 @@
   "demon-slayer-kimetsu-no-yaiba:S4E11": 2,
   "demon-slayer-kimetsu-no-yaiba:S4E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E23": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
   "jujutsu-kaisen:S1E02": 3,
@@ -88,7 +88,10 @@
   "demon-slayer-kimetsu-no-yaiba:S3E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S4E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E04": 1,
-  "demon-slayer-kimetsu-no-yaiba:S5E05": 1
+  "demon-slayer-kimetsu-no-yaiba:S5E05": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E04": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E07": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E18": 1
  },
  "shots": [
   {
@@ -9766,6 +9769,138 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S5E05",
    "s": 130.617
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 139.433
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 198.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 1258.434
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 182.058
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 207.517
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 446.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 516.1
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 817.95
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 710.934
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 1088.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 32.059
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 543.392
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 910.85
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 944.808
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E07",
+   "s": 1000.142
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 303.558
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 825.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 713.934
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 871.6
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 936.225
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 961.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 1138.725
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 1147.991
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E09",
+   "s": 1153.767
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 194.475
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 29.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 624.267
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 874.35
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 1183.309
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E10",
+   "s": 1253.637
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E04",
+   "s": 1178.803
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E18",
+   "s": 1038.553
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E18",
+   "s": 338.54
   }
  ],
  "runs": [
@@ -10370,6 +10505,20 @@
     "demon-slayer-kimetsu-no-yaiba:S5E03",
     "demon-slayer-kimetsu-no-yaiba:S5E04",
     "demon-slayer-kimetsu-no-yaiba:S5E05"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-23 19:27 UTC",
+   "pick": "tanjiro",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "andromeda_no_fear_phonk",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E04",
+    "demon-slayer-kimetsu-no-yaiba:S1E07",
+    "demon-slayer-kimetsu-no-yaiba:S1E09",
+    "demon-slayer-kimetsu-no-yaiba:S1E10",
+    "demon-slayer-kimetsu-no-yaiba:S1E18"
    ],
    "file": "_amv_part.mp4"
   }
@@ -11156,11 +11305,31 @@
     1286.1,
     1400.3
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E18": [
+   [
+    60.0,
+    92.0
+   ],
+   [
+    1280.0,
+    1375.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E07": [
+   [
+    44.0,
+    142.0
+   ],
+   [
+    1269.0,
+    1360.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 26,
-  "demon-slayer-kimetsu-no-yaiba": 24
+  "demon-slayer-kimetsu-no-yaiba": 25
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -11660,6 +11829,15 @@
    "question": "Who survives this?",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_rubikdice_montagem_pegadora_slowed.mp4",
    "time": "2026-11-23 09:37 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E02",
+   "s": 865.8666666666667,
+   "e": 890.5333333333333,
+   "topic": "tanjiro",
+   "question": "Why does Tanjiro trust Nezuko's signal?",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_andromeda_no_fear_phonk.mp4",
+   "time": "2026-11-23 19:27 UTC"
   }
  ],
  "styles": [

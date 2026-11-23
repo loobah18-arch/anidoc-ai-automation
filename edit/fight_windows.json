@@ -1431,11 +1431,15 @@
     ],
     "source": "auto",
     "character": "Tanjiro Kamado",
-    "anchors": 36,
-    "detected": "2026-11-22"
+    "anchors": 37,
+    "detected": "2026-11-23"
    },
    "demon-slayer-kimetsu-no-yaiba:S1E07": {
     "windows": [
+     [
+      210.0,
+      224.5
+     ],
      [
       495.1,
       552.7
@@ -1463,8 +1467,8 @@
     ],
     "source": "auto",
     "character": "Tanjiro Kamado",
-    "anchors": 33,
-    "detected": "2026-11-22"
+    "anchors": 36,
+    "detected": "2026-11-23"
    },
    "demon-slayer-kimetsu-no-yaiba:S1E09": {
     "windows": [
@@ -1496,7 +1500,7 @@
     "source": "auto",
     "character": "Tanjiro Kamado",
     "anchors": 28,
-    "detected": "2026-11-22"
+    "detected": "2026-11-23"
    },
    "demon-slayer-kimetsu-no-yaiba:S1E10": {
     "windows": [
@@ -1532,10 +1536,14 @@
     "source": "auto",
     "character": "Tanjiro Kamado",
     "anchors": 35,
-    "detected": "2026-11-22"
+    "detected": "2026-11-23"
    },
    "demon-slayer-kimetsu-no-yaiba:S1E18": {
     "windows": [
+     [
+      176.0,
+      226.6
+     ],
      [
       326.4,
       356.7
@@ -1547,8 +1555,8 @@
     ],
     "source": "auto",
     "character": "Tanjiro Kamado",
-    "anchors": 11,
-    "detected": "2026-11-22"
+    "anchors": 14,
+    "detected": "2026-11-23"
    }
   },
   "akaza": {
