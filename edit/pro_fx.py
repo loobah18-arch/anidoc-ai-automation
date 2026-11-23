@@ -195,7 +195,7 @@ def build_ref_grade(warm: bool = False, close: bool = False) -> str:
         "eq=contrast=1.10:saturation=1.12:gamma=1.04:brightness=0.01," + bal + "," + ca +
         "split[rg0][rg1];[rg1]gblur=sigma=22,eq=brightness=-0.10:contrast=1.35[rgl];"
         "[rg0][rgl]blend=all_mode=screen:all_opacity=0.30,"
-        "vignette=PI/5.5,noise=alls=5:allf=t,format=yuv420p"
+        "vignette=PI/5.5,noise=alls=5:allf=t,setsar=1,format=yuv420p"
     )
 
 
