@@ -36,6 +36,8 @@ OUT_NAME = os.environ.get('OUT_NAME', '')
 # AMV_STYLE=drop (set by convo.py): the edit starts ON the drop (beat 17), one cut per beat, only the topic
 # character's combat / awakening shots with impact >= the 85th percentile, Gojo v2 FX on every cut.
 DROP_STYLE = os.environ.get('AMV_STYLE', '') == 'drop'
+# shots the drop edit really needs: ~0.8 cuts per beat at ~140 BPM (bar-grouped cuts), not a fixed 60
+DROP_NEED = int(os.environ.get('DROP_MIN_SHOTS', 60))                # main's count: many distinct scenes
 IMPACT_PCT = float(os.environ.get('IMPACT_PCT', 85))
 SCAN_W, SCAN_H, SCAN_FPS = 64, 36, 12
 rng = random.Random(SEED)
@@ -576,7 +578,7 @@ def _drop_char_pool(full_pool):
         ladder = [(max(AUTO_REL, 0.02), 0.03), (AUTO_REL, 0.02), (AUTO_REL, 0.0), (AUTO_REL, -9.0)]
     floor = int(os.environ.get('DROP_PURE_FLOOR', 24))               # below this even the loosest checked step is too thin
     g50, g75 = gate_of(50.0), gate_of(75.0)
-    need_ = int(os.environ.get('DROP_MIN_SHOTS', 60))
+    need_ = DROP_NEED
     levels = []
     for rmin, mmin in ladder:
         pure = [s for s in cands if base(s) and s['rel'] >= rmin and s['riv'] >= mmin and s['look'] >= LOOK_MIN
@@ -596,7 +598,7 @@ def _drop_char_pool(full_pool):
     rmin, mmin, pure, at50, _ = pick_
     print(f'drop style: identity step rel>={rmin} & {mmin:+.2f} over rivals chosen ({at50} shots at p50)', flush=True)
     print(f'drop style: rivals {rivals}; {len(pure)} {CHAR_NAME} shots inside the fight windows', flush=True)
-    need = int(os.environ.get('DROP_MIN_SHOTS', 60))
+    need = DROP_NEED
     last = None
     for pct in (IMPACT_PCT, 75.0, 65.0, 50.0, 40.0, 30.0):
         if pct < 50.0 and (len(keep) >= target or not curated):                        # below p50 only while the stricter identity leaves it thin
@@ -636,7 +638,7 @@ if DROP_STYLE:                                                        # talking 
         import cv2
         _casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
         mot_hi = float(np.percentile([s['motion'] for s in pool], 60)) if pool else 0
-        kept = []
+        kept, _q = [], []
         for s in pool:
             raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f"{(s['s'] + s['e']) / 2:.2f}", '-i', SRC(s['ep']),
                             '-frames:v', '1', '-vf', 'scale=480:270,format=gray', '-f', 'rawvideo', '-'])
@@ -645,7 +647,13 @@ if DROP_STYLE:                                                        # talking 
             big = max((w * h for x, y, w, h in faces), default=0) / (480 * 270)
             if big > 0.07 and s['motion'] < mot_hi:
                 continue
+            _q.append((s, float(img.mean()), float(cv2.Laplacian(img, cv2.CV_64F).var())))
+        _sh20 = float(np.percentile([q[2] for q in _q], 20)) if _q else 0.0
+        for s, lum, shp in _q:                                         # too dark or too soft to read on a phone
+            if lum < 38 or (shp < _sh20 and lum < 70):
+                continue
             kept.append(s)
+        print(f'drop style: dark / soft frames dropped {len(_q) - len(kept)}', flush=True)
         print(f'drop style: talking-head check dropped {len(pool) - len(kept)} of {len(pool)}', flush=True)
         if len(kept) >= 6:
             pool = kept
@@ -698,6 +706,20 @@ max_beats = START_BEAT + int(MAX_SECONDS / P)                         # keep eve
 tmpl = [(a, min(b, max_beats)) for a, b in tmpl if START_BEAT <= a < max_beats]
 if DROP_STYLE:                                                        # fast section: one cut on every beat from the drop
     tmpl = [(j, j + 1) for j in range(max(START_BEAT, DROP_BEAT), max_beats)]
+    if os.environ.get('DROP_GROUP', '0') == '1' and len(tmpl) > 8:   # one cut per beat felt flat: cut on every bar start and on
+        _env = librosa.onset.onset_strength(y=y, sr=sr)               # the strong hits, hold the weak beats (never > 2 beats)
+        _ts = librosa.times_like(_env, sr=sr)
+        _bt = lambda j: song_start + (j - START_BEAT) * P
+        _st = {j: float(_env[max(0, np.searchsorted(_ts, _bt(j)) - 2):np.searchsorted(_ts, _bt(j)) + 3].max(initial=0))
+               for j, _ in tmpl}
+        _med = float(np.median(list(_st.values())))
+        cuts_, last_ = [], None
+        for j, _ in tmpl:
+            if last_ is None or (j - DROP_BEAT) % 4 == 0 or _st[j] >= _med * 1.1 or j - last_ >= 2:
+                cuts_.append(j); last_ = j
+        tmpl = [(a_, b_) for a_, b_ in zip(cuts_, cuts_[1:] + [tmpl[-1][1]])]
+        print(f'drop style: {len(tmpl)} cuts on bars and strong hits over {max_beats - max(START_BEAT, DROP_BEAT)} beats '
+              f'({sum(b_ - a_ == 2 for a_, b_ in tmpl)} two-beat holds)', flush=True)
 n = len(tmpl)
 second_drop = next((i for i, (a, b) in enumerate(tmpl) if a == 113), None)
 pre = [i for i, (a, b) in enumerate(tmpl) if a < DROP_BEAT]
@@ -885,6 +907,7 @@ if DROP_STYLE:                                                        # the drop
         if f_ not in fxl[drop_i]:
             fxl[drop_i].append(f_)
     heavy_cut = float(np.percentile([assign[i].get('peak', 0) for i in range(n)], 65))   # heavy hits: top third by peak motion
+    slow_cut = float(np.percentile([assign[i]['impact'] for i in range(n)], 60))         # 2-beat holds on strong shots: slow-mo
 os.makedirs('segfx', exist_ok=True)
 jobs, plan = [], []
 for k_, (a, b) in enumerate(tmpl):
@@ -895,6 +918,10 @@ for k_, (a, b) in enumerate(tmpl):
         fx.append('pulse')
         if k_ == drop_i or s.get('peak', 0) >= heavy_cut:
             fx.append('shake')
+        if k_ != drop_i and (a - DROP_BEAT) % 8 == 0 and 'flash' not in fx:   # a flash on every other bar marks the phrase
+            fx.append('flash')
+        if b - a >= 2 and s['impact'] >= slow_cut and k_ != n - 1:
+            fx.append('slowmo')
     elif a < DROP_BEAT or 109 <= a < 113:
         fx.append('drift')
     elif b - a >= 2:
@@ -902,7 +929,9 @@ for k_, (a, b) in enumerate(tmpl):
     if not DROP_STYLE and s['impact'] >= impact_cut and a >= DROP_BEAT:
         fx.append('shake')
     L = s['e'] - s['s']; spd = 1.0
-    if L >= dur:
+    if 'slowmo' in fx and L >= dur * 0.6:                             # 0.6x: the hit lands, then the next cut snaps back
+        spd = 0.6; st = s['s'] + (L - dur * 0.6) / 2
+    elif L >= dur:
         st = s['s'] + (L - dur) / 2
     else:
         st = s['s']; spd = max(0.5, L / dur)

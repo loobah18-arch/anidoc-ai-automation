@@ -10,6 +10,10 @@ on:
         description: 'auto (newest/least-used anime in Drive), an anime name (e.g. demon slayer), or a character (gojo, sukuna, yuji, toji, megumi)'
         required: false
         default: 'auto'
+      episode:
+        description: 'optional: pin the talk to this episode (e.g. S2E16)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -36,6 +40,7 @@ jobs:
       - name: Make the Short
         env:
           PICK: ${{ github.event.inputs.pick || 'auto' }}
+          CONVO_EP: ${{ github.event.inputs.episode }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
         run: python3 edit/convo.py
