@@ -1070,6 +1070,10 @@ try:
                 print(f'the talk shows {IDENT.get("name")}, not {PICK_NAME} ({IDENT.get("target_share", 0):.0%}): trying another episode', flush=True)
                 os.environ['CONVO_EP_EXCLUDE'] = ','.join(EP_EXCLUDE + [conv_ep]); os.environ.pop('CONVO_SKIP', None)
                 os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
+            if PIN and len(SKIP) < 4:                                   # pinned episode (run 45132798514 got Jogo): next talk moment there
+                print(f'the talk shows {IDENT.get("name")}, not {PICK_NAME}: trying the next talk moment in {conv_ep}', flush=True)
+                os.environ['CONVO_SKIP'] = ','.join(map(str, SKIP + [bt]))
+                os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
     if not topic_name and IDENT.get('name') and not _not_in_episode(IDENT['name']):
         topic_name = IDENT['name']
         topic_slug = char_slug(topic_name, series_key)
