@@ -17,7 +17,7 @@
   "poker_face": 4,
   "atlxs_passo_bem_solto_slowed": 3,
   "ashreveal_manasha_phonk": 4,
-  "dygo_funk_infernal": 3
+  "dygo_funk_infernal": 4
  },
  "episodes": {
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 9,
+  "jujutsu-kaisen:S1E02": 10,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 7,
+  "jujutsu-kaisen:S1E04": 8,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 7,
+  "jujutsu-kaisen:S2E16": 8,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 3,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -92,8 +92,8 @@
   "demon-slayer-kimetsu-no-yaiba:S2E03": 1,
   "jujutsu-kaisen:S3E03": 1,
   "jujutsu-kaisen:S3E04": 1,
-  "jujutsu-kaisen:S1E05": 6,
-  "jujutsu-kaisen:S2E17": 6,
+  "jujutsu-kaisen:S1E05": 7,
+  "jujutsu-kaisen:S2E17": 7,
   "demon-slayer-kimetsu-no-yaiba:S1E21": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E22": 1
  },
@@ -11389,6 +11389,114 @@
   {
    "ep": "jujutsu-kaisen:S1E02",
    "s": 893.566
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1060.428
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1020.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 887.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1026.592
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1031.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1038.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1020.72
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 412.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1032.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 406.408
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 596.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 853.647
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 873.428
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1023.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 888.492
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 895.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1037.97
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1057.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 409.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 851.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 870.707
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1019.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 890.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1019.04
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1025.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1102.741
   }
  ],
  "runs": [
@@ -12136,6 +12244,20 @@
    "pick": "sukuna",
    "series": "jujutsu-kaisen",
    "song": "nxxkz_loucura_letal_funk_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-23 06:37 UTC",
+   "pick": "sukuna",
+   "series": "jujutsu-kaisen",
+   "song": "dygo_funk_infernal",
    "episodes": [
     "jujutsu-kaisen:S1E02",
     "jujutsu-kaisen:S1E04",
@@ -13083,7 +13205,7 @@
   ]
  },
  "series": {
-  "jujutsu-kaisen": 33,
+  "jujutsu-kaisen": 34,
   "demon-slayer-kimetsu-no-yaiba": 28
  },
  "known": [
@@ -13683,6 +13805,15 @@
    "question": "Who truly dominates: Sukuna or Gojo?",
    "file": "Jujutsu_Kaisen_convo_nxxkz_loucura_letal_funk_slowed.mp4",
    "time": "2026-11-23 06:00 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1068.0,
+   "e": 1084.4666666666667,
+   "topic": "sukuna",
+   "question": "Who wins: Sukuna or Gojo?",
+   "file": "Jujutsu_Kaisen_convo_dygo_funk_infernal.mp4",
+   "time": "2026-11-23 06:38 UTC"
   }
  ],
  "styles": [
