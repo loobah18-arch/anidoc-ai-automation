@@ -190,12 +190,12 @@ def build_ref_grade(warm: bool = False, close: bool = False) -> str:
     soft glow/halation on highlights, light chromatic aberration, vignette, fine grain."""
     bal = ("colorbalance=rs=0.05:gs=-0.01:bs=-0.07:rm=0.07:gm=0.01:bm=-0.07:rh=0.08:gh=0.02:bh=-0.08" if warm else
            "colorbalance=rs=-0.07:gs=0.0:bs=0.09:rm=-0.05:gm=0.01:bm=0.06:rh=-0.02:gh=0.02:bh=0.05")
-    ca = "rgbashift=rh=-4:bh=4," if close else "rgbashift=rh=-2:bh=2,"
+    ca = "rgbashift=rh=-4:bh=4:edge=smear,crop=iw-8:ih:4:0,scale=iw+8:ih," if close else ""   # no coloured edge line
     return (
-        "eq=contrast=1.16:saturation=1.12:gamma=0.95:brightness=-0.025," + bal + "," + ca +
+        "eq=contrast=1.10:saturation=1.12:gamma=1.04:brightness=0.01," + bal + "," + ca +
         "split[rg0][rg1];[rg1]gblur=sigma=22,eq=brightness=-0.10:contrast=1.35[rgl];"
         "[rg0][rgl]blend=all_mode=screen:all_opacity=0.30,"
-        "vignette=PI/4.5,noise=alls=5:allf=t,format=yuv420p"
+        "vignette=PI/5.5,noise=alls=5:allf=t,format=yuv420p"
     )
 
 

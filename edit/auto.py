@@ -1117,6 +1117,25 @@ if DROP_STYLE:                                                        # the drop
     ref_heavy = float(np.percentile([assign[i].get('peak', 0) for i in range(n)], 80))
     ref_slow = float(np.percentile([assign[i]['impact'] for i in range(n)], 40))
 os.makedirs('segfx', exist_ok=True)
+_dark_cache = {}
+
+
+def _dark(s_):
+    """mean luma of 3 frames across the shot (start, middle, end) under 30 of 255, or 2 of them under 22"""
+    key = (s_['ep'], s_['s'])
+    if key not in _dark_cache:
+        ls = []
+        for t_ in (s_['s'] + 0.1, (s_['s'] + s_['e']) / 2, s_['e'] - 0.1):
+            try:
+                raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t_:.2f}', '-i', SRC(s_['ep']),
+                                '-frames:v', '1', '-vf', 'scale=96:54,format=gray', '-f', 'rawvideo', '-'])
+                ls.append(float(np.frombuffer(raw, np.uint8).mean()))
+            except Exception:
+                pass
+        _dark_cache[key] = bool(ls) and (np.mean(ls) < 30 or sum(l_ < 22 for l_ in ls) >= 2)
+    return _dark_cache[key]
+
+
 jobs, plan = [], []
 for k_, (a, b) in enumerate(tmpl):
     s = assign[k_]
@@ -1144,6 +1163,15 @@ for k_, (a, b) in enumerate(tmpl):
         fx.append('pulse')
     if not DROP_STYLE and s['impact'] >= impact_cut and a >= DROP_BEAT:
         fx.append('shake')
+    if REF_LOOK:                                                      # the grade makes dark shots black on a phone (run
+        if _dark(s) :                                                 # that will play, swap for the next unused bright shot
+            _used = {(v['ep'], v['s']) for v in assign.values()}
+            for c_ in sorted(pool, key=lambda c_: -c_['impact']):
+                if (c_['ep'], c_['s']) in _used or c_['e'] - c_['s'] < dur * 0.5 or _dark(c_):
+                    continue
+                print(f'ref look: cut {k_} {s["ep"]}@{s["s"]:.1f} too dark, swapped for {c_["ep"]}@{c_["s"]:.1f}', flush=True)
+                s = assign[k_] = c_
+                break
     L = s['e'] - s['s']; spd = 1.0
     if 'slowmo' in fx and L >= dur * 0.6:                             # 0.6x: the hit lands, then the next cut snaps back
         spd = 0.6; st = s['s'] + (L - dur * 0.6) / 2

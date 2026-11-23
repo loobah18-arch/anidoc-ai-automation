@@ -1248,6 +1248,9 @@ def make_question():
     if os.environ.get('QUESTION_TEXT', '').strip():
         return _clean_q(os.environ['QUESTION_TEXT'])
     here = _on_screen()
+    _ws = lambda n_: set(re.findall(r'\w+', n_.lower()))
+    here = [n_ for n_ in here if not any(o_ != n_ and _ws(n_) < _ws(o_) for o_ in here)]   # 'Sukuna' and 'Ryomen Sukuna'
+    here = list(dict.fromkeys(here))                                  # are one person (run 45153670807 asked 'Sukuna or Ryomen Sukuna?')
     first = here[0].split()[0] if here else ''
     talk = ' '.join(SEGS[k]['t'] for k in SEL)
     print('on screen for the question:', here, flush=True)
