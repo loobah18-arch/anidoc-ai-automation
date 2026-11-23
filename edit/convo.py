@@ -116,6 +116,9 @@ if PICK == 'auto':
         print('resting characters of the last Shorts:', RECENT_TOPICS, flush=True)
     if len([e for e in cand if e not in AVOID]) >= 3:
         cand = [e for e in cand if e not in AVOID]
+_TRIED = AVOID + [e for e in os.environ.get('CONVO_EP_EXCLUDE', '').split(',') if e]   # episodes a retry already ruled out:
+if any(e not in _TRIED for e in cand):                                # leave them out for picks too, so the next 3 are new ones
+    cand = [e for e in cand if e not in _TRIED]                       # (tanjiro run 45148880061 cycled S1E14/S1E18/S1E04 and failed)
 fresh = [e for e in new_eps if e in cand][:3]
 eps = fresh + least_used([e for e in cand if e not in fresh], used_eps, 3 - len(fresh))
 PIN = os.environ.get('CONVO_EP', '').strip()                        # pinned talk episode, e.g. S2E16 or jujutsu-kaisen:S2E16
