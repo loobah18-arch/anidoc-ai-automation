@@ -37,7 +37,7 @@ OUT_NAME = os.environ.get('OUT_NAME', '')
 # character's combat / awakening shots with impact >= the 85th percentile, Gojo v2 FX on every cut.
 DROP_STYLE = os.environ.get('AMV_STYLE', '') == 'drop'
 # shots the drop edit really needs: ~0.8 cuts per beat at ~140 BPM (bar-grouped cuts), not a fixed 60
-DROP_NEED = int(os.environ.get('DROP_MIN_SHOTS', max(24, int(MAX_SECONDS / 0.43 * 0.8) + 4)))
+DROP_NEED = int(os.environ.get('DROP_MIN_SHOTS', 60))                # main's count: many distinct scenes
 IMPACT_PCT = float(os.environ.get('IMPACT_PCT', 85))
 SCAN_W, SCAN_H, SCAN_FPS = 64, 36, 12
 rng = random.Random(SEED)
@@ -608,7 +608,7 @@ def _drop_char_pool(full_pool):
         keep = [s for s in pure if s['impact'] >= gate]
         print(f'drop style: p{pct:.0f} gate {gate:.3f}: {len(keep)} pure {CHAR_NAME} combat shots', flush=True)
         last = pct
-        if len(keep) >= need or (pct <= 65.0 and len(keep) >= 24):   # 2-beat holds beat weak shots: never below p65 for count
+        if len(keep) >= need:
             break
     purity_pct = pct
     if len(keep) < 6:
@@ -706,7 +706,7 @@ max_beats = START_BEAT + int(MAX_SECONDS / P)                         # keep eve
 tmpl = [(a, min(b, max_beats)) for a, b in tmpl if START_BEAT <= a < max_beats]
 if DROP_STYLE:                                                        # fast section: one cut on every beat from the drop
     tmpl = [(j, j + 1) for j in range(max(START_BEAT, DROP_BEAT), max_beats)]
-    if os.environ.get('DROP_GROUP', '1') == '1' and len(tmpl) > 8:   # one cut per beat felt flat: cut on every bar start and on
+    if os.environ.get('DROP_GROUP', '0') == '1' and len(tmpl) > 8:   # one cut per beat felt flat: cut on every bar start and on
         _env = librosa.onset.onset_strength(y=y, sr=sr)               # the strong hits, hold the weak beats (never > 2 beats)
         _ts = librosa.times_like(_env, sr=sr)
         _bt = lambda j: song_start + (j - START_BEAT) * P
