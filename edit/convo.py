@@ -118,6 +118,14 @@ if PICK == 'auto':
         cand = [e for e in cand if e not in AVOID]
 fresh = [e for e in new_eps if e in cand][:3]
 eps = fresh + least_used([e for e in cand if e not in fresh], used_eps, 3 - len(fresh))
+PIN = os.environ.get('CONVO_EP', '').strip()                        # pinned talk episode, e.g. S2E16 or jujutsu-kaisen:S2E16
+if PIN:
+    _pm = [e for e in EPISODES if e == PIN or (e.endswith(':' + PIN) and e.split(':')[0] == (eps[0].split(':')[0] if eps else e.split(':')[0]))]
+    if not _pm:
+        raise SystemExit(f'CONVO_EP {PIN} is not an episode in the index')
+    PIN = _pm[0]
+    eps = [PIN] + [e for e in eps if e != PIN][:2]
+    print('talk episode pinned:', PIN, flush=True)
 SF, SW, SH_ = 4, 64, 36
 def motion(src):
     raw = sh(['ffmpeg', '-nostdin', '-v', 'error', '-i', src, '-vf', f'fps={SF},scale={SW}:{SH_}', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], binary=True)
@@ -226,7 +234,7 @@ SONGS = {}
 EP_EXCLUDE = [e for e in os.environ.get('CONVO_EP_EXCLUDE', '').split(',') if e]   # talk episodes that did not show the pick
 for ep in eps:
     d_, ps = motions[ep]
-    if ep in EP_EXCLUDE and any(e not in EP_EXCLUDE for e in eps):
+    if (PIN and ep != PIN) or (not PIN and ep in EP_EXCLUDE and any(e not in EP_EXCLUDE for e in eps)):
         SONGS[ep] = song_mask(ep, d_)
         continue
     SONGS[ep] = song_mask(ep, d_)
@@ -279,6 +287,8 @@ SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
 
 def next_episode(why):
     """this episode has no usable talk: try another episode (at most 3) instead of failing the whole run"""
+    if PIN:
+        raise SystemExit(f'{why} in the pinned episode {conv_ep}')
     if len(AVOID) < 3:
         print(f'{why} in {conv_ep}: trying another episode', flush=True)
         os.environ['CONVO_AVOID_EPS'] = ','.join(AVOID + [conv_ep])
@@ -331,7 +341,7 @@ if PICK_NAME and _cands and os.environ.get('CONVO_IDENT_PICK', '1') == '1':
                 break
         else:
             left = [e for e in eps if e != conv_ep and e not in EP_EXCLUDE]
-            if left and len(EP_EXCLUDE) < 2:                          # try the talk in another of the picked episodes
+            if left and not PIN and len(EP_EXCLUDE) < 2:                          # try the talk in another of the picked episodes
                 print(f'no talk candidate in {conv_ep} is clearly {PICK_NAME}; trying the next episode {left}', flush=True)
                 os.environ['CONVO_EP_EXCLUDE'] = ','.join(EP_EXCLUDE + [conv_ep]); os.environ.pop('CONVO_SKIP', None)
                 os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
@@ -1056,7 +1066,7 @@ try:
         _said = ' '.join(w['w'] for w in cw).lower()
         if not any(p_ and len(p_) >= 3 and re.search(r'\b' + re.escape(p_.lower()) + r'\b', _said) for p_ in PICK_NAME.split()):
             _left = [e for e in eps if e != conv_ep and e not in EP_EXCLUDE]
-            if _left and len(EP_EXCLUDE) < 3:
+            if _left and not PIN and len(EP_EXCLUDE) < 3:
                 print(f'the talk shows {IDENT.get("name")}, not {PICK_NAME} ({IDENT.get("target_share", 0):.0%}): trying another episode', flush=True)
                 os.environ['CONVO_EP_EXCLUDE'] = ','.join(EP_EXCLUDE + [conv_ep]); os.environ.pop('CONVO_SKIP', None)
                 os.execv(sys.executable, [sys.executable, os.path.abspath(__file__)])
