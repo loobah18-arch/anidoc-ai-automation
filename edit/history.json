@@ -16,7 +16,7 @@
   "zxvren_montagem_delirio_slowed": 4,
   "poker_face": 4,
   "atlxs_passo_bem_solto_slowed": 3,
-  "ashreveal_manasha_phonk": 3,
+  "ashreveal_manasha_phonk": 4,
   "dygo_funk_infernal": 3
  },
  "episodes": {
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 7,
+  "jujutsu-kaisen:S1E02": 8,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 5,
+  "jujutsu-kaisen:S1E04": 6,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 5,
+  "jujutsu-kaisen:S2E16": 6,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 3,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -92,8 +92,8 @@
   "demon-slayer-kimetsu-no-yaiba:S2E03": 1,
   "jujutsu-kaisen:S3E03": 1,
   "jujutsu-kaisen:S3E04": 1,
-  "jujutsu-kaisen:S1E05": 4,
-  "jujutsu-kaisen:S2E17": 4,
+  "jujutsu-kaisen:S1E05": 5,
+  "jujutsu-kaisen:S2E17": 5,
   "demon-slayer-kimetsu-no-yaiba:S1E21": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E22": 1
  },
@@ -11105,6 +11105,154 @@
   {
    "ep": "jujutsu-kaisen:S1E02",
    "s": 893.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 250.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 555.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 963.308
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 989.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1129.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1245.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 1262.184
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 752.033
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 777.433
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 926.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 962.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1006.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1024.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1079.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1227.308
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E04",
+   "s": 1243.433
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 82.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 279.183
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 380.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1102.975
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 364.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 620.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 626.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 889.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 902.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1041.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 995.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E05",
+   "s": 383.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 383.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 476.892
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 622.267
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 649.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 722.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 761.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1038.017
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E02",
+   "s": 893.866
   }
  ],
  "runs": [
@@ -11824,6 +11972,20 @@
    "pick": "sukuna",
    "series": "jujutsu-kaisen",
    "song": "ncts_next_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-23 05:26 UTC",
+   "pick": "sukuna",
+   "series": "jujutsu-kaisen",
+   "song": "ashreveal_manasha_phonk",
    "episodes": [
     "jujutsu-kaisen:S1E02",
     "jujutsu-kaisen:S1E04",
@@ -12771,7 +12933,7 @@
   ]
  },
  "series": {
-  "jujutsu-kaisen": 31,
+  "jujutsu-kaisen": 32,
   "demon-slayer-kimetsu-no-yaiba": 28
  },
  "known": [
@@ -13353,6 +13515,15 @@
    "question": "Why does Sukuna defend humanity's lies?",
    "file": "Jujutsu_Kaisen_convo_ncts_next_phonk.mp4",
    "time": "2026-11-22 20:22 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1068.3666666666666,
+   "e": 1092.9666666666665,
+   "topic": "sukuna",
+   "question": "Who would win: Sukuna or Gojo?",
+   "file": "Jujutsu_Kaisen_convo_ashreveal_manasha_phonk.mp4",
+   "time": "2026-11-23 05:27 UTC"
   }
  ],
  "styles": [
