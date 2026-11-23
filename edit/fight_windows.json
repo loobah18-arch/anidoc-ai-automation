@@ -1012,6 +1012,180 @@
     "anchors": 17,
     "detected": "2026-11-21"
    }
+  },
+  "akaza": {
+   "demon-slayer-kimetsu-no-yaiba:S1E03": {
+    "windows": [
+     [
+      36.4,
+      142.4
+     ],
+     [
+      381.9,
+      415.1
+     ],
+     [
+      675.7,
+      732.6
+     ],
+     [
+      734.7,
+      866.5
+     ],
+     [
+      923.9,
+      983.4
+     ],
+     [
+      1118.0,
+      1161.0
+     ],
+     [
+      1163.0,
+      1182.9
+     ]
+    ],
+    "source": "auto",
+    "character": "Akaza",
+    "anchors": 34,
+    "detected": "2026-11-23"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S2E06": {
+    "windows": [
+     [
+      31.6,
+      246.4
+     ],
+     [
+      850.8,
+      890.0
+     ],
+     [
+      892.9,
+      1045.4
+     ],
+     [
+      1076.9,
+      1216.3
+     ]
+    ],
+    "source": "auto",
+    "character": "Akaza",
+    "anchors": 45,
+    "detected": "2026-11-23"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S2E07": {
+    "windows": [
+     [
+      168.5,
+      205.5
+     ],
+     [
+      210.8,
+      294.8
+     ],
+     [
+      471.6,
+      499.6
+     ],
+     [
+      512.1,
+      590.3
+     ],
+     [
+      612.9,
+      686.9
+     ],
+     [
+      1091.0,
+      1265.8
+     ]
+    ],
+    "source": "auto",
+    "character": "Akaza",
+    "anchors": 15,
+    "detected": "2026-11-23"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S3E01": {
+    "windows": [
+     [
+      44.5,
+      103.0
+     ],
+     [
+      661.9,
+      892.5
+     ],
+     [
+      955.8,
+      1027.6
+     ],
+     [
+      1030.0,
+      1075.5
+     ],
+     [
+      1079.5,
+      1173.3
+     ],
+     [
+      2197.3,
+      2436.0
+     ],
+     [
+      2506.0,
+      2526.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Akaza",
+    "anchors": 44,
+    "detected": "2026-11-23"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S4E01": {
+    "windows": [
+     [
+      157.0,
+      225.5
+     ],
+     [
+      289.1,
+      322.3
+     ],
+     [
+      356.7,
+      446.4
+     ],
+     [
+      659.4,
+      688.7
+     ],
+     [
+      760.9,
+      851.9
+     ],
+     [
+      878.2,
+      925.3
+     ],
+     [
+      933.0,
+      949.8
+     ],
+     [
+      1860.7,
+      2059.4
+     ],
+     [
+      2657.4,
+      2673.0
+     ]
+    ],
+    "source": "auto",
+    "character": "Akaza",
+    "anchors": 31,
+    "detected": "2026-11-23"
+   }
   }
  },
  "_doc_auto": "_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked windows, cached so later runs reuse them. Hand-checked entries stay at the top level."
