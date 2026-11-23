@@ -15,7 +15,7 @@
   "cotneus_stereo_love_funk": 3,
   "zxvren_montagem_delirio_slowed": 4,
   "poker_face": 4,
-  "atlxs_passo_bem_solto_slowed": 3,
+  "atlxs_passo_bem_solto_slowed": 4,
   "ashreveal_manasha_phonk": 4,
   "dygo_funk_infernal": 4
  },
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 2,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 2,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 11,
+  "jujutsu-kaisen:S1E02": 12,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 9,
+  "jujutsu-kaisen:S1E04": 10,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 9,
+  "jujutsu-kaisen:S2E16": 10,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 3,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -92,8 +92,8 @@
   "demon-slayer-kimetsu-no-yaiba:S2E03": 1,
   "jujutsu-kaisen:S3E03": 1,
   "jujutsu-kaisen:S3E04": 1,
-  "jujutsu-kaisen:S1E05": 8,
-  "jujutsu-kaisen:S2E17": 8,
+  "jujutsu-kaisen:S1E05": 9,
+  "jujutsu-kaisen:S2E17": 9,
   "demon-slayer-kimetsu-no-yaiba:S1E21": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E22": 1
  },
@@ -11629,6 +11629,126 @@
   {
    "ep": "jujutsu-kaisen:S2E17",
    "s": 302.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1102.958
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 896.192
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 924.875
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1020.75
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 646.692
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1031.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1039.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 701.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 298.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 753.333
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 409.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 853.667
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 467.042
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 503.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1024.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 722.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 301.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 838.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1037.983
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 412.334
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 873.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 887.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 889.108
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 917.167
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 917.083
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1020.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 841.992
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1137.441
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 302.29
   }
  ],
  "runs": [
@@ -12404,6 +12524,20 @@
    "pick": "sukuna",
    "series": "jujutsu-kaisen",
    "song": "montagem_zora",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-23 08:27 UTC",
+   "pick": "sukuna",
+   "series": "jujutsu-kaisen",
+   "song": "atlxs_passo_bem_solto_slowed",
    "episodes": [
     "jujutsu-kaisen:S1E02",
     "jujutsu-kaisen:S1E04",
@@ -13351,7 +13485,7 @@
   ]
  },
  "series": {
-  "jujutsu-kaisen": 35,
+  "jujutsu-kaisen": 36,
   "demon-slayer-kimetsu-no-yaiba": 28
  },
  "known": [
@@ -13969,6 +14103,15 @@
    "question": "Why does Jogo mock cursed users?",
    "file": "Jujutsu_Kaisen_convo_montagem_zora.mp4",
    "time": "2026-11-23 08:04 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1059.7333333333333,
+   "e": 1084.4666666666667,
+   "topic": "sukuna",
+   "question": "Who would win: Sukuna or Gojo?",
+   "file": "Jujutsu_Kaisen_convo_atlxs_passo_bem_solto_slowed.mp4",
+   "time": "2026-11-23 08:27 UTC"
   }
  ],
  "styles": [
