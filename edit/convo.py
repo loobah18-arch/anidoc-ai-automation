@@ -234,7 +234,7 @@ SONGS = {}
 EP_EXCLUDE = [e for e in os.environ.get('CONVO_EP_EXCLUDE', '').split(',') if e]   # talk episodes that did not show the pick
 for ep in eps:
     d_, ps = motions[ep]
-    if (PIN and ep != PIN) or (not PIN and ep in EP_EXCLUDE and any(e not in EP_EXCLUDE for e in eps)):
+    if (PIN and ep != PIN) or (not PIN and ep in EP_EXCLUDE + AVOID and any(e not in EP_EXCLUDE + AVOID for e in eps)):   # rengoku run 45141125056 looped on S2E05
         SONGS[ep] = song_mask(ep, d_)
         continue
     SONGS[ep] = song_mask(ep, d_)
