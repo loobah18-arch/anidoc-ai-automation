@@ -406,12 +406,13 @@ def _cached_auto_windows():
     slug = os.environ.get('CHAR_SLUG', '').strip().lower()
     try:
         fw = json.load(open('fight_windows.json')).get('_auto', {}).get(slug, {}) if slug else {}
-        return {_k(e): [tuple(w) for w in d['windows']] for e, d in fw.items() if d.get('windows')}
+        return {_k(e): [tuple(w) for w in d['windows']] for e, d in fw.items()
+                if (d.get('source') == 'vision' or not VISION_ON) and (d.get('windows') or d.get('source') == 'vision')}
     except Exception:
         return {}
 
 
-def _save_auto_windows(det, anchors):
+def _save_auto_windows(det, anchors, source='auto'):
     """remember detected windows so later runs reuse them; hand-checked entries are never touched"""
     slug = os.environ.get('CHAR_SLUG', '').strip().lower()
     if not slug or not det:
@@ -420,7 +421,7 @@ def _save_auto_windows(det, anchors):
         fw = json.load(open('fight_windows.json'))
         auto = fw.setdefault('_auto', {}).setdefault(slug, {})
         for e, w in det.items():
-            auto[e] = dict(windows=[[round(a, 1), round(b, 1)] for a, b in w], source='auto', character=CHAR_NAME,
+            auto[e] = dict(windows=[[round(a, 1), round(b, 1)] for a, b in w], source=source, character=CHAR_NAME,
                            anchors=sum(1 for s in anchors if s['ep'] == e), detected=time.strftime('%Y-%m-%d', time.gmtime()))
         fw['_doc_auto'] = ('_auto: fight windows found automatically (_auto_fight_windows) for characters without hand-checked '
                            'windows, cached so later runs reuse them. Hand-checked entries stay at the top level.')
@@ -472,6 +473,148 @@ NONCOMBAT_MAX = -0.003                                                # charvis 
                                                                       #  Joker cosplayer .007, opening shots .01; fight shots <= -0.02)
 
 
+# ---------------------------------------------------------------- 4c. vision-checked fight windows (no hand-checking)
+# A new anime / character gets the same kind of windows a person would pick from frame sheets: hot stretches of the
+# episode are cut into <= 60 s chunks, 8 frames of each are tiled into one numbered sheet, and a Groq vision model says
+# whether it is a fight and which tiles show the character. Confirmed chunks become the windows (source 'vision'),
+# cached in fight_windows.json -> _auto so later runs reuse them. (Sukuna run 45118648741: CLIP-anchor windows were mostly
+# other characters; hand-checked windows fixed it, this does the same check automatically.)
+VISION_ON = os.environ.get('FIGHT_VISION', '1') == '1' and bool(os.environ.get('GROQ_API_KEY', '').strip())
+_VISION_MODEL = []
+
+
+def _vision_model():
+    if _VISION_MODEL:
+        return _VISION_MODEL[0]
+    import urllib.request
+    key = os.environ['GROQ_API_KEY'].strip(); mdl = os.environ.get('FIGHT_VISION_MODEL', '').strip()
+    if not mdl:
+        try:
+            r = urllib.request.Request('https://api.groq.com/openai/v1/models',
+                                       headers={'Authorization': f'Bearer {key}', 'User-Agent': 'anidoc/1.0'})
+            ids = [m['id'] for m in json.load(urllib.request.urlopen(r, timeout=30))['data']]
+            pref = ['llama-4-scout', 'llama-4-maverick', 'vision', '-vl', 'vl-']
+            ok = sorted([m for m in ids if any(p_ in m for p_ in pref)], key=lambda m: next(i for i, p_ in enumerate(pref) if p_ in m))
+            mdl = ok[0] if ok else ''
+            print('vision models:', ok, flush=True)
+        except Exception as ex:
+            print('vision model list failed:', ex, flush=True)
+            mdl = 'meta-llama/llama-4-scout-17b-16e-instruct'
+    _VISION_MODEL.append(mdl)
+    return mdl
+
+
+def _sheet(code, times):
+    import base64, cv2
+    cap = cv2.VideoCapture(SRC(code)); tiles = []
+    for i, t in enumerate(times):
+        cap.set(cv2.CAP_PROP_POS_MSEC, t * 1000.0); ok, fr = cap.read()
+        fr = cv2.resize(fr, (320, 180)) if ok else np.zeros((180, 320, 3), np.uint8)
+        cv2.rectangle(fr, (0, 0), (34, 30), (0, 0, 0), -1)
+        cv2.putText(fr, str(i + 1), (4, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        tiles.append(fr)
+    cap.release()
+    while len(tiles) % 4:
+        tiles.append(np.zeros((180, 320, 3), np.uint8))
+    img = np.vstack([np.hstack(tiles[r:r + 4]) for r in range(0, len(tiles), 4)])
+    return base64.b64encode(cv2.imencode('.jpg', img, [cv2.IMWRITE_JPEG_QUALITY, 80])[1].tobytes()).decode()
+
+
+def _ask_vision(code, a, b, times):
+    import urllib.request
+    look = ''
+    try:
+        import charvis
+        look = charvis.lore_series(os.environ.get('CHAR_SERIES', '')).get(CHAR_NAME, {}).get('look', '')
+    except Exception:
+        pass
+    series = os.environ.get('CHAR_SERIES', '') or code.split(':')[0].replace('-', ' ')
+    prompt = (f'Contact sheet of {len(times)} numbered frames (left to right, top to bottom) from the anime {series}, '
+              f'{a:.0f}-{b:.0f} s of one episode. Character: {CHAR_NAME}' + (f' ({look})' if look else '') + '.\n'
+              'Answer with JSON only: {"fight": true or false, "tiles": [numbers of the frames where ' + CHAR_NAME +
+              ' is clearly visible]}. "fight" is true only when these frames are an action / combat scene (attacks, '
+              'techniques, clashes, powering up), not talking, comedy, crowds, flashbacks of daily life or title cards. '
+              'Only list a tile when you are confident it is ' + CHAR_NAME + ', not another character.')
+    body = dict(model=_vision_model(), temperature=0.0, max_tokens=200,
+                messages=[dict(role='user', content=[dict(type='text', text=prompt),
+                                                     dict(type='image_url', image_url=dict(url='data:image/jpeg;base64,' + _sheet(code, times)))])])
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST', data=json.dumps(body).encode(),
+                                         headers={'Authorization': 'Bearer ' + os.environ['GROQ_API_KEY'].strip(),
+                                                  'Content-Type': 'application/json', 'User-Agent': 'anidoc/1.0'})
+            out = json.load(urllib.request.urlopen(req, timeout=60))['choices'][0]['message']['content']
+            js = json.loads(re.search(r'\{.*\}', out, re.S).group(0))
+            return bool(js.get('fight')), [int(t) for t in js.get('tiles') or [] if str(t).isdigit() and 1 <= int(t) <= len(times)]
+        except Exception as ex:
+            err = getattr(ex, 'code', None)
+            print(f'vision check {code} {a:.0f}-{b:.0f} failed ({attempt + 1}):', ex, flush=True)
+            time.sleep(8 if err == 429 else 2)
+    return None
+
+
+def _vision_windows(full_pool, eps):
+    """vision-checked fight windows for the episodes in eps; {} when the vision model is unusable"""
+    HOT_PCT = float(os.environ.get('FIGHT_HOT_PCT', 35)); GAP = float(os.environ.get('FIGHT_GAP', 6.0))
+    CHUNK = float(os.environ.get('FIGHT_CHUNK', 60.0)); MAX_CALLS = int(os.environ.get('FIGHT_VISION_CALLS', 48))
+    MIN_TILES = int(os.environ.get('FIGHT_VISION_TILES', 2))
+    chunks = []
+    for ep in eps:
+        sh_ = sorted((s for s in full_pool if s['ep'] == ep), key=lambda s: s['s'])
+        if len(sh_) < 8:
+            continue
+        gate = float(np.percentile([s['impact'] for s in sh_], HOT_PCT)); segs, cur = [], None
+        for s in sh_:
+            if s['impact'] < gate:
+                continue
+            if cur and s['s'] - cur[1] <= GAP:
+                cur[1] = s['e']; cur[2] += 1
+            else:
+                cur = [s['s'], s['e'], 1]; segs.append(cur)
+        for a, b, k in segs:
+            if b - a < 10.0 or k < 4:
+                continue
+            n = max(1, int(np.ceil((b - a) / CHUNK)))
+            for i in range(n):
+                ca, cb = a + (b - a) * i / n, a + (b - a) * (i + 1) / n
+                hot = float(np.mean([s['impact'] for s in sh_ if ca <= s['s'] < cb] or [0]))
+                chunks.append((ep, ca, cb, hot))
+    eps_order = {e: i for i, e in enumerate(eps)}
+    chunks.sort(key=lambda c: (eps_order[c[0]], -c[3]))                 # earlier (stronger) episodes first, hottest chunks first
+    win, calls, fails, checked = {}, 0, 0, set()
+    for ep, a, b, _ in chunks:
+        if calls >= MAX_CALLS:
+            break
+        times = [a + (b - a) * (i + 0.5) / 8 for i in range(8)]
+        r = _ask_vision(ep, a, b, times); calls += 1
+        if r is None:
+            fails += 1
+            if fails >= 3 and not win:
+                print('vision check unusable: falling back to CLIP-anchor windows', flush=True)
+                return {}
+            continue
+        checked.add(ep)
+        fight, tiles = r
+        print(f'vision {ep} {a:.0f}-{b:.0f}s: fight={fight} {CHAR_NAME} tiles={tiles}', flush=True)
+        if fight and len(tiles) >= MIN_TILES:
+            ts = [times[t - 1] for t in tiles]
+            lo, hi = max(a, min(ts) - (b - a) / 8), min(b, max(ts) + (b - a) / 8)   # trim to where the character is
+            win.setdefault(ep, []).append((lo - 1.0, hi + 1.0))
+        time.sleep(float(os.environ.get('FIGHT_VISION_SLEEP', 2.5)))
+    for ep in win:
+        m = []
+        for a, b in sorted(win[ep]):
+            if m and a <= m[-1][1] + 3:
+                m[-1] = (m[-1][0], max(m[-1][1], b))
+            else:
+                m.append((a, b))
+        win[ep] = m
+    for ep in checked:
+        win.setdefault(ep, [])                                         # checked, no fight of theirs: remember that too
+    print(f'vision fight windows ({calls} checks):', {e: [(round(a), round(b)) for a, b in v] for e, v in win.items()}, flush=True)
+    return win
+
+
 def _drop_char_pool(full_pool):
     """Character purity for the drop edit, for any anime and any character. Shots come ONLY from the character's
     fights: hand-checked windows (fight_windows.json) when the character has them, else fight stretches detected
@@ -494,6 +637,17 @@ def _drop_char_pool(full_pool):
         raise RuntimeError('charvis unavailable')
     imp = [s['impact'] for s in full_pool]
     curated = {e: w for e, w in _curated_windows().items() if any(s['ep'] == e for s in full_pool)}
+    if not curated and VISION_ON and CHAR_NAME:                       # no hand-checked windows: the vision check picks them
+        pool_eps = list(dict.fromkeys(s['ep'] for s in full_pool))
+        cached = _cached_auto_windows()
+        todo = [e for e in pool_eps if e not in cached]
+        vw = _vision_windows(full_pool, todo) if todo else {}
+        if vw:
+            _save_auto_windows(vw, [], source='vision')
+        vw.update({e: cached[e] for e in pool_eps if e in cached})
+        curated = {e: w for e, w in vw.items() if w}
+        if curated:
+            print('drop style: vision-checked fight windows used like hand-checked ones', flush=True)
     in_win = lambda s, win: any(a <= s['s'] and s['e'] <= b for a, b in win.get(s['ep'], []))
     lo_imp = float(np.percentile(imp, 55))
     cands = [s for s in full_pool if (in_win(s, curated) if curated else s['impact'] >= lo_imp)]
