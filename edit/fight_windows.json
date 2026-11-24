@@ -381,12 +381,8 @@
       852.7
      ],
      [
-      858.5,
-      886.3
-     ],
-     [
       902.0,
-      1016.5
+      1022.7
      ],
      [
       1034.5,
@@ -395,8 +391,8 @@
     ],
     "source": "auto",
     "character": "Nezuko Kamado",
-    "anchors": 15,
-    "detected": "2026-11-19"
+    "anchors": 17,
+    "detected": "2026-11-24"
    },
    "demon-slayer-kimetsu-no-yaiba:S3E07": {
     "windows": [
@@ -405,22 +401,38 @@
       236.0
      ],
      [
-      571.4,
-      692.5
+      346.1,
+      376.0
      ],
      [
-      696.4,
-      747.9
+      398.6,
+      427.6
+     ],
+     [
+      440.0,
+      500.1
+     ],
+     [
+      571.4,
+      609.3
+     ],
+     [
+      611.6,
+      692.5
      ],
      [
       808.8,
       912.0
+     ],
+     [
+      941.6,
+      1049.7
      ]
     ],
     "source": "auto",
     "character": "Nezuko Kamado",
-    "anchors": 20,
-    "detected": "2026-11-19"
+    "anchors": 34,
+    "detected": "2026-11-24"
    },
    "demon-slayer-kimetsu-no-yaiba:S4E06": {
     "windows": [
@@ -453,19 +465,19 @@
    "demon-slayer-kimetsu-no-yaiba:S4E11": {
     "windows": [
      [
-      184.0,
-      276.1
+      398.0,
+      487.0
      ],
      [
       898.4,
-      1119.4
+      1103.7
      ],
      [
-      1121.8,
+      1123.6,
       1169.7
      ],
      [
-      1178.6,
+      1201.5,
       1347.6
      ],
      [
@@ -474,21 +486,73 @@
      ],
      [
       1604.3,
-      1641.4
+      1647.2
      ],
      [
       1676.8,
       1702.4
-     ],
-     [
-      1704.5,
-      1746.7
      ]
     ],
     "source": "auto",
     "character": "Nezuko Kamado",
-    "anchors": 55,
-    "detected": "2026-11-19"
+    "anchors": 74,
+    "detected": "2026-11-24"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S1E01": {
+    "windows": [
+     [
+      24.4,
+      119.7
+     ],
+     [
+      146.6,
+      190.5
+     ],
+     [
+      610.5,
+      762.1
+     ],
+     [
+      818.0,
+      913.0
+     ],
+     [
+      958.0,
+      1028.5
+     ],
+     [
+      1072.1,
+      1158.3
+     ],
+     [
+      1164.1,
+      1206.1
+     ]
+    ],
+    "source": "auto",
+    "character": "Nezuko Kamado",
+    "anchors": 34,
+    "detected": "2026-11-24"
+   },
+   "demon-slayer-kimetsu-no-yaiba:S1E02": {
+    "windows": [
+     [
+      101.6,
+      137.0
+     ],
+     [
+      441.5,
+      522.7
+     ],
+     [
+      697.0,
+      718.4
+     ]
+    ],
+    "source": "auto",
+    "character": "Nezuko Kamado",
+    "anchors": 12,
+    "detected": "2026-11-24"
    }
   },
   "zenitsu": {
