@@ -18,7 +18,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from pro_fx import build_shot_fx, pair_transitions, default_transition_pattern, build_ref_grade, ref_transition_pattern
+from pro_fx import build_shot_fx, pair_transitions, default_transition_pattern, build_ref_grade, ref_transition_pattern, build_cine_fx, build_cine_grade, build_cine_post
 from drive_index import library
 
 W, H, FPS = int(os.environ.get('W', 1080)), int(os.environ.get('H', 1080)), 30   # 1:1 square
@@ -39,7 +39,17 @@ DROP_STYLE = os.environ.get('AMV_STYLE', '') == 'drop'
 # AMV_LOOK=ref (default on this branch): the edit part copies the reference Shorts (Yoriichi FEzJYFlO7H4,
 # Gojo QalX73pxT6s): ~1 cut a second with a faster burst in the middle, zoom-blur / motion-blur whips, slow-mo
 # holds, push-in drift, teal grade flipping to warm at the midpoint, glow, light RGB split, grain, freeze ending.
-REF_LOOK = DROP_STYLE and os.environ.get('AMV_LOOK', 'ref') == 'ref'
+# AMV_LOOK=cine (default now): the TumpyGFX 'Middle of the Night' AMV (CMF3qeu7fHY): a calm letterboxed build of
+# 2 slow push-in close-ups before the drop with a blur-in open and a cut to black, then ~1 cut a second with a
+# 1-beat burst, one slow letterboxed 'breath' with rain where the grade flips, cold -> orange/teal -> amber grade,
+# dutch tilts, echo trails on fast hits, glow, heavier vignette, grain, freeze ending. AMV_LOOK=ref keeps the old.
+AMV_LOOK = os.environ.get('AMV_LOOK', 'cine')
+REF_LOOK = DROP_STYLE and AMV_LOOK in ('ref', 'cine')
+CINE = DROP_STYLE and AMV_LOOK == 'cine'
+CINE_PRE = int(os.environ.get('CINE_PRE_BEATS', 8))                  # beats of calm build before the drop
+if CINE and os.environ.get('START_BEAT') == '17':
+    START_BEAT = DROP_BEAT - CINE_PRE
+CINE_BREATH = None
 # shots the drop edit really needs: ~0.8 cuts per beat at ~140 BPM (bar-grouped cuts), not a fixed 60
 DROP_NEED = int(os.environ.get('DROP_MIN_SHOTS', 60))                # main's count: many distinct scenes
 IMPACT_PCT = float(os.environ.get('IMPACT_PCT', 85))
@@ -907,7 +917,29 @@ if DROP_STYLE:                                                        # fast sec
         tmpl = [(a_, b_) for a_, b_ in zip(cuts_, cuts_[1:] + [tmpl[-1][1]])]
         print(f'drop style: {len(tmpl)} cuts on bars and strong hits over {max_beats - max(START_BEAT, DROP_BEAT)} beats '
               f'({sum(b_ - a_ == 2 for a_, b_ in tmpl)} two-beat holds)', flush=True)
-if REF_LOOK and len(tmpl) > 8:                                        # reference pace: 2-beat cuts (~1 s), a 1-beat burst in the
+if CINE and len(tmpl) > 8:                                            # cine pace: 2 x 4-beat calm holds before the drop,
+    _env = librosa.onset.onset_strength(y=y, sr=sr)                   # 2-beat cuts, 1-beat on strong hits and in a burst
+    _ts = librosa.times_like(_env, sr=sr)                             # (58-78%), one 4-beat breath at ~45%, 4-beat finisher
+    _bt = lambda j: song_start + (j - START_BEAT) * P
+    jend = max_beats
+    _st = {j: float(_env[max(0, np.searchsorted(_ts, _bt(j)) - 2):np.searchsorted(_ts, _bt(j)) + 3].max(initial=0))
+           for j in range(DROP_BEAT, jend)}
+    _med = float(np.median(list(_st.values())))
+    cuts_ = list(range(START_BEAT, DROP_BEAT, max(1, (DROP_BEAT - START_BEAT) // 2)))[:2]
+    _len = jend - DROP_BEAT
+    br_at, b_lo, b_hi = DROP_BEAT + int(_len * 0.45), DROP_BEAT + int(_len * 0.58), DROP_BEAT + int(_len * 0.78)
+    j = DROP_BEAT
+    while j < jend - 4:
+        cuts_.append(j)
+        if CINE_BREATH is None and j >= br_at and j + 4 < jend - 4:
+            CINE_BREATH = len(cuts_) - 1; j += 4; continue
+        j += 1 if (b_lo <= j < b_hi or (j > DROP_BEAT + 2 and _st.get(j, 0) >= _med * 1.4)) else 2
+    cuts_.append(j)
+    tmpl = [(a_, b_) for a_, b_ in zip(cuts_, cuts_[1:] + [jend])]
+    print(f'cine look: {len(tmpl)} cuts over {jend - START_BEAT} beats ({DROP_BEAT - START_BEAT} calm build beats, '
+          f'{sum(b_ - a_ == 1 for a_, b_ in tmpl)} burst cuts, breath at cut {CINE_BREATH}, '
+          f'{(jend - DROP_BEAT) * P / max(1, len(tmpl) - 2):.2f} s per drop cut)', flush=True)
+elif REF_LOOK and len(tmpl) > 8:                                        # reference pace: 2-beat cuts (~1 s), a 1-beat burst in the
     _env = librosa.onset.onset_strength(y=y, sr=sr)                   # middle third and on strong hits, a 4-beat final hold
     _ts = librosa.times_like(_env, sr=sr)
     _bt = lambda j: song_start + (j - START_BEAT) * P
@@ -958,6 +990,8 @@ try:
 except Exception as ex:
     print('face check skipped', ex, flush=True)
 take(pre + build2, 'calm', 0.8)                                      # build-ups: steady, readable shots
+if CINE_BREATH is not None:
+    take([CINE_BREATH], 'calm', 0.8)                                   # the breath: a steady, readable close-up
 FIN = None
 if DROP_STYLE and n > 2 and pool:                                     # the finisher: the character's single highest-impact shot,
     FIN = max((s for s in pool if id(s) not in taken), key=lambda s: s['impact'], default=None)   # kept for the last cut only
@@ -1104,6 +1138,8 @@ impact_cut = np.percentile([s['impact'] for s in pool], 85)
 fr = lambda j: round((j - START_BEAT) * P * FPS)
 drop_i = next(i for i, (a, b) in enumerate(tmpl) if a == DROP_BEAT)
 flip_i = drop_i + max(1, (n - drop_i) // 2) if n - drop_i > 3 else None      # ref look: teal -> warm colour flip
+if CINE_BREATH is not None:
+    flip_i = CINE_BREATH
 kinds = (ref_transition_pattern(n, drop_i, flip_i) if REF_LOOK else default_transition_pattern(n, drop_i))
 if second_drop:
     kinds[second_drop - 1] = 'flash'
@@ -1149,6 +1185,19 @@ for k_, (a, b) in enumerate(tmpl):
             fx.append('slowmo')
         if k_ == n - 1:
             fx.append('freeze')
+        if CINE:
+            if k_ < drop_i or k_ == CINE_BREATH or k_ == n - 1:          # calm holds: letterbox, slow-mo, blur-in open
+                fx += ['letterbox', 'blurin']
+                if 'slowmo' not in fx and k_ != n - 1:
+                    fx.append('slowmo')
+            if k_ == drop_i - 1:
+                fx.append('blackout')                                 # cut to black just before the drop
+            if k_ == CINE_BREATH:
+                fx.append('rain')
+            if k_ > drop_i and k_ != CINE_BREATH and k_ < n - 1 and (k_ - drop_i) % 5 == 2:
+                fx.append('tilt')
+            if k_ > drop_i and k_ < n - 1 and (b - a == 1 or s.get('peak', 0) >= ref_heavy) and 'slowmo' not in fx:
+                fx.append('echo')
     elif DROP_STYLE:                                                  # pulse on every beat, shake + RGB split on the heavy hits
         fx.append('pulse')
         if k_ == drop_i or s.get('peak', 0) >= heavy_cut:
@@ -1180,7 +1229,11 @@ for k_, (a, b) in enumerate(tmpl):
     else:
         st = s['s']; spd = max(0.5, L / dur)
     vf = build_shot_fx(dur, W, H, fx, beat=P, speed=spd)
-    if REF_LOOK:
+    if CINE:
+        _sec = 'cold' if k_ < drop_i else ('warm' if flip_i is not None and k_ >= flip_i else 'teal')
+        vf += ',' + build_cine_fx(fx, dur, W, H, k_) + ',' + build_cine_grade(_sec, close='slowmo' in fx)
+        vf += ',' + build_cine_post(fx, dur, W, H)
+    elif REF_LOOK:
         vf += ',' + build_ref_grade(warm=flip_i is not None and k_ >= flip_i, close='slowmo' in fx)
     else:
         vf += ',eq=contrast=1.12:saturation=1.18:gamma=0.97,vignette=PI/5'

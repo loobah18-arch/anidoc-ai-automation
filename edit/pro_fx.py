@@ -199,6 +199,60 @@ def build_ref_grade(warm: bool = False, close: bool = False) -> str:
     )
 
 
+def build_cine_fx(fx, d: float, w: int, h: int, idx: int = 0) -> str:
+    """Cine look (TumpyGFX 'Middle of the Night' AMV) per-shot extras applied before the grade:
+    blur-in open, echo trails on fast hits, procedural rain, dutch tilt."""
+    fx = set(fx or [])
+    ch = []
+    if "echo" in fx:
+        ch.append("tmix=frames=4:weights='4 2 1 0.5'")
+    if "blurin" in fx:
+        ch.append("gblur=sigma=26:enable='lt(t\\,0.07)',gblur=sigma=11:enable='between(t\\,0.07\\,0.15)',"
+                  "gblur=sigma=4:enable='between(t\\,0.15\\,0.23)'")
+    if "rain" in fx:                                      # sparse noise -> long slanted streaks, screened on luma only
+        ch.append(f"split[cr0][cr1];[cr1]lutyuv=y=128:u=128:v=128,noise=alls=100:allf=t,"
+                  f"lutyuv=y='if(gt(val\\,236)\\,255\\,0)':u=128:v=128,dblur=angle=100:radius=40,"
+                  f"lutyuv=y='clip((val-5)*7\\,0\\,255)':u=128:v=128,crop={w}:{int(h * 0.9)}:0:{h - int(h * 0.9)},"
+                  f"scale={w}:{h}[crl];[cr0][crl]blend=c0_mode=screen:c0_opacity=0.42:c1_mode=normal:c1_opacity=1:"
+                  f"c2_mode=normal:c2_opacity=1")
+    if "tilt" in fx:
+        a = 0.075 if idx % 2 else -0.075
+        ch.append(f"rotate={a}:fillcolor=black,scale={int(w * 1.12) // 2 * 2}:-2,crop={w}:{h},setsar=1")
+    return ",".join(ch) if ch else "null"
+
+
+def build_cine_grade(section: str = "teal", close: bool = False) -> str:
+    """Section grades: 'cold' desaturated blue for the calm build, 'teal' orange-teal split-tone for the drop,
+    'warm' amber after the breath; glow on highlights, heavier vignette, fine grain."""
+    if section == "cold":
+        eq, bal = ("eq=contrast=1.08:saturation=0.82:gamma=1.03",
+                   "colorbalance=rs=-0.08:gs=-0.01:bs=0.10:rm=-0.05:bm=0.07:rh=-0.03:bh=0.05")
+    elif section == "warm":
+        eq, bal = ("eq=contrast=1.10:saturation=1.10:gamma=1.04:brightness=0.01",
+                   "colorbalance=rs=0.07:gs=0.0:bs=-0.08:rm=0.08:gm=0.02:bm=-0.08:rh=0.09:gh=0.03:bh=-0.09")
+    else:
+        eq, bal = ("eq=contrast=1.12:saturation=1.16:gamma=1.04:brightness=0.01",
+                   "colorbalance=rs=-0.08:gs=0.01:bs=0.10:rm=0.02:bm=-0.02:rh=0.09:gh=0.02:bh=-0.09")
+    ca = "rgbashift=rh=-4:bh=4:edge=smear,crop=iw-8:ih:4:0,scale=iw+8:ih," if close else ""
+    return (eq + "," + bal + "," + ca +
+            "split[cg0][cg1];[cg1]gblur=sigma=22,eq=brightness=-0.10:contrast=1.35[cgl];"
+            "[cg0][cgl]blend=all_mode=screen:all_opacity=0.32,"
+            "vignette=PI/4.6,noise=alls=6:allf=t,setsar=1,format=yuv420p")
+
+
+def build_cine_post(fx, d: float, w: int, h: int) -> str:
+    """After the grade: letterbox bars on calm holds, a cut to black before the drop."""
+    fx = set(fx or [])
+    ch = []
+    if "letterbox" in fx:
+        bh = int(h * 0.10)
+        ch.append(f"drawbox=x=0:y=0:w=iw:h={bh}:color=black:t=fill,drawbox=x=0:y=ih-{bh}:w=iw:h={bh}:color=black:t=fill")
+    if "blackout" in fx:
+        fd = min(0.16, d * 0.2)
+        ch.append(f"fade=t=out:st={max(0.0, d - fd):.3f}:d={fd:.3f}")
+    return ",".join(ch) if ch else "null"
+
+
 def ref_transition_pattern(n_shots: int, drop_index: int, flip_index: int) -> List[str]:
     """Reference transitions: zoom-blur and directional motion-blur whips between
     most shots, a flash on the drop and on the colour flip, plain punch-ins between."""
