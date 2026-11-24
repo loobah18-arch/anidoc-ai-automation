@@ -9,7 +9,7 @@
   "montagem_zora": 3,
   "rayelo_ultraslowed": 3,
   "rubikdice_montagem_pegadora_slowed": 4,
-  "ncts_next_phonk": 3,
+  "ncts_next_phonk": 4,
   "nxxkz_loucura_letal_funk_slowed": 3,
   "montagem_vozes_profundas": 3,
   "cotneus_stereo_love_funk": 3,
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 5,
+  "jujutsu-kaisen:S1E02": 6,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 3,
+  "jujutsu-kaisen:S1E04": 4,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 3,
+  "jujutsu-kaisen:S2E16": 4,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -89,8 +89,8 @@
   "demon-slayer-kimetsu-no-yaiba:S4E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E05": 1,
-  "jujutsu-kaisen:S1E05": 2,
-  "jujutsu-kaisen:S2E17": 2
+  "jujutsu-kaisen:S1E05": 3,
+  "jujutsu-kaisen:S2E17": 3
  },
  "shots": [
   {
@@ -9944,6 +9944,78 @@
   {
    "ep": "jujutsu-kaisen:S2E17",
    "s": 302.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 924.565
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 841.742
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1102.928
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 889.095
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 298.012
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 301.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 409.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1037.97
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 503.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 853.367
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 722.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 838.184
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 896.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 873.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1020.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 412.117
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 302.29
   }
  ],
  "runs": [
@@ -10570,6 +10642,20 @@
    "pick": "sukuna",
    "series": "jujutsu-kaisen",
    "song": "rubikdice_montagem_pegadora_slowed",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-24 03:44 UTC",
+   "pick": "sukuna",
+   "series": "jujutsu-kaisen",
+   "song": "ncts_next_phonk",
    "episodes": [
     "jujutsu-kaisen:S1E02",
     "jujutsu-kaisen:S1E04",
@@ -11391,7 +11477,7 @@
   ]
  },
  "series": {
-  "jujutsu-kaisen": 28,
+  "jujutsu-kaisen": 29,
   "demon-slayer-kimetsu-no-yaiba": 24
  },
  "known": [
@@ -11910,6 +11996,15 @@
    "question": "Who wins: Sukuna or Gojo?",
    "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
    "time": "2026-11-23 20:02 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1059.8333333333333,
+   "e": 1085.0333333333333,
+   "topic": "sukuna",
+   "question": "Why did Gojo skip his domain?",
+   "file": "Jujutsu_Kaisen_convo_ncts_next_phonk.mp4",
+   "time": "2026-11-24 03:45 UTC"
   }
  ],
  "styles": [
