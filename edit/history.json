@@ -17,7 +17,7 @@
   "poker_face": 4,
   "atlxs_passo_bem_solto_slowed": 3,
   "ashreveal_manasha_phonk": 3,
-  "dygo_funk_infernal": 3
+  "dygo_funk_infernal": 4
  },
  "episodes": {
   "demon-slayer-kimetsu-no-yaiba:S1E19": 1,
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 8,
+  "jujutsu-kaisen:S1E02": 9,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 6,
+  "jujutsu-kaisen:S1E04": 7,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 6,
+  "jujutsu-kaisen:S2E16": 7,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -89,8 +89,8 @@
   "demon-slayer-kimetsu-no-yaiba:S4E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E05": 1,
-  "jujutsu-kaisen:S1E05": 5,
-  "jujutsu-kaisen:S2E17": 5
+  "jujutsu-kaisen:S1E05": 6,
+  "jujutsu-kaisen:S2E17": 6
  },
  "shots": [
   {
@@ -10176,6 +10176,114 @@
   {
    "ep": "jujutsu-kaisen:S2E17",
    "s": 302.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 924.565
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 895.909
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1020.72
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1137.678
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 917.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1026.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 298.058
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 701.158
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 412.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 842.012
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 406.425
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 467.059
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 503.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 853.357
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 646.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 301.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 722.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 753.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 838.184
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 409.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 873.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 887.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 916.95
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1020.72
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1037.97
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 302.29
   }
  ],
  "runs": [
@@ -10844,6 +10952,20 @@
    "pick": "sukuna",
    "series": "jujutsu-kaisen",
    "song": "poker_face",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-25 07:43 UTC",
+   "pick": "sukuna",
+   "series": "jujutsu-kaisen",
+   "song": "dygo_funk_infernal",
    "episodes": [
     "jujutsu-kaisen:S1E02",
     "jujutsu-kaisen:S1E04",
@@ -11665,7 +11787,7 @@
   ]
  },
  "series": {
-  "jujutsu-kaisen": 31,
+  "jujutsu-kaisen": 32,
   "demon-slayer-kimetsu-no-yaiba": 24
  },
  "known": [
@@ -12211,6 +12333,15 @@
    "question": "Why did Jogo freeze everyone?",
    "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
    "time": "2026-11-25 07:01 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 802.5,
+   "e": 821.8333333333334,
+   "topic": "sukuna",
+   "question": "Why did Sukuna spare that one?",
+   "file": "Jujutsu_Kaisen_convo_dygo_funk_infernal.mp4",
+   "time": "2026-11-25 07:44 UTC"
   }
  ],
  "styles": [
