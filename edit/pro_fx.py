@@ -228,16 +228,16 @@ def build_cine_grade(section: str = "teal", close: bool = False) -> str:
         eq, bal = ("eq=contrast=1.08:saturation=0.82:gamma=1.03",
                    "colorbalance=rs=-0.08:gs=-0.01:bs=0.10:rm=-0.05:bm=0.07:rh=-0.03:bh=0.05")
     elif section == "warm":
-        eq, bal = ("eq=contrast=1.10:saturation=1.10:gamma=1.04:brightness=0.01",
+        eq, bal = ("eq=contrast=1.13:saturation=1.12:gamma=1.05",
                    "colorbalance=rs=0.07:gs=0.0:bs=-0.08:rm=0.08:gm=0.02:bm=-0.08:rh=0.09:gh=0.03:bh=-0.09")
     else:
-        eq, bal = ("eq=contrast=1.12:saturation=1.16:gamma=1.04:brightness=0.01",
+        eq, bal = ("eq=contrast=1.14:saturation=1.18:gamma=1.05",
                    "colorbalance=rs=-0.08:gs=0.01:bs=0.10:rm=0.02:bm=-0.02:rh=0.09:gh=0.02:bh=-0.09")
     ca = "rgbashift=rh=-4:bh=4:edge=smear,crop=iw-8:ih:4:0,scale=iw+8:ih," if close else ""
     return (eq + "," + bal + "," + ca +
-            "split[cg0][cg1];[cg1]gblur=sigma=22,eq=brightness=-0.10:contrast=1.35[cgl];"
-            "[cg0][cgl]blend=all_mode=screen:all_opacity=0.32,"
-            "vignette=PI/4.6,noise=alls=6:allf=t,setsar=1,format=yuv420p")
+            "split[cg0][cg1];[cg1]gblur=sigma=22,eq=brightness=-0.16:contrast=1.45[cgl];"
+            "[cg0][cgl]blend=all_mode=screen:all_opacity=0.22,"
+            "vignette=PI/5.4,noise=alls=6:allf=t,setsar=1,format=yuv420p")
 
 
 def build_cine_post(fx, d: float, w: int, h: int) -> str:

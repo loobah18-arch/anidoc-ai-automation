@@ -1197,7 +1197,13 @@ def _on_screen():
         if any(len(a_) >= 3 and re.search(r'\b' + re.escape(a_.lower()) + r'\b', talk_l) for a_ in als if a_):
             heard.append(nm)
     _v, _fr = IDENT.get('votes') or {}, max(1, IDENT.get('frames') or 1)
-    seen = [nm for nm, c in _v.items() if (c / _fr >= 0.30 and not _not_in_episode(nm)) or (c / _fr >= 0.15 and _ep_score_of(nm) >= 2.0)]
+    seen = [nm for nm, c in _v.items() if (c / _fr >= 0.30 and not _not_in_episode(nm)) or (c / _fr >= 0.15 and _ep_score_of(nm) >= 2.0)
+            or c / _fr >= 0.40]                                       # Jogo was 50% of the talk but research had no score for him
+    _sh = lambda nm: max([c / _fr for v_, c in _v.items() if v_ == nm or set(v_.lower().split()) & set(nm.lower().split())] or [0])
+    _off = [nm for nm in heard if _sh(nm) < 0.10]                     # only talked about, never shown: run 45318048205 asked
+    if _off:                                                          # 'Why did Gojo skip his domain?' with no Gojo on screen
+        print('heard but not on screen, kept out of the question:', _off, flush=True)
+    heard = [nm for nm in heard if nm not in _off]
     names = []
     for nm in ([topic_name] if topic_name and (topic_name in heard or topic_name in seen or not (heard or seen or TOPIC_GUESS)) else []) + heard + seen:
         if nm and nm not in names:

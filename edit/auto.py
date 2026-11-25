@@ -979,7 +979,7 @@ def take(idx_list, key, min_len):
 try:
     import cv2
     casc = cv2.CascadeClassifier('lbpcascade_animeface.xml')
-    for s in ([] if DROP_STYLE else sorted(pool, key=lambda s: -s['calm'])[:90]):
+    for s in (sorted(pool, key=lambda s: -s['calm'])[:60] if CINE else [] if DROP_STYLE else sorted(pool, key=lambda s: -s['calm'])[:90]):
         t = (s['s'] + s['e']) / 2
         raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t:.2f}', '-i', SRC(s['ep']), '-frames:v', '1',
                         '-vf', 'scale=480:270,format=gray', '-f', 'rawvideo', '-'])
@@ -1157,18 +1157,24 @@ _dark_cache = {}
 
 
 def _dark(s_):
-    """mean luma of 3 frames across the shot (start, middle, end) under 30 of 255, or 2 of them under 22"""
+    """unusable shot: mean luma of 3 frames (start, middle, end) under 38 of 255 or 2 of them under 26, or (cine look)
+    2 of 3 frames with almost no edges - smoke, blur, a plain wall (run 45318048205 had 5 such unreadable cuts)"""
     key = (s_['ep'], s_['s'])
     if key not in _dark_cache:
-        ls = []
+        ls, flat = [], 0
         for t_ in (s_['s'] + 0.1, (s_['s'] + s_['e']) / 2, s_['e'] - 0.1):
             try:
                 raw = sh_bytes(['ffmpeg', '-nostdin', '-v', 'error', '-ss', f'{t_:.2f}', '-i', SRC(s_['ep']),
-                                '-frames:v', '1', '-vf', 'scale=96:54,format=gray', '-f', 'rawvideo', '-'])
-                ls.append(float(np.frombuffer(raw, np.uint8).mean()))
+                                '-frames:v', '1', '-vf', 'scale=160:90,gblur=sigma=0.8,format=gray', '-f', 'rawvideo', '-'])
+                g_ = np.frombuffer(raw, np.uint8).reshape(90, 160).astype(float)
+                ls.append(float(g_.mean()))
+                ed = ((np.abs(np.diff(g_, axis=1))[:-1] + np.abs(np.diff(g_, axis=0))[:, :-1]) > 30).mean()
+                flat += ed < float(os.environ.get('CINE_MIN_EDGES', 0.035))
             except Exception:
                 pass
-        _dark_cache[key] = bool(ls) and (np.mean(ls) < 38 or sum(l_ < 26 for l_ in ls) >= 2)
+        _dark_cache[key] = bool(ls) and (np.mean(ls) < 38 or sum(l_ < 26 for l_ in ls) >= 2 or (CINE and flat >= 2))
+        if CINE and flat >= 2:
+            print(f"cine look: {s_['ep']}@{s_['s']:.1f} unreadable (few edges)", flush=True)
     return _dark_cache[key]
 
 
