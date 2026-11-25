@@ -987,6 +987,8 @@ try:
         faces = casc.detectMultiScale(img, 1.1, 4, minSize=(40, 40))
         big = max((w * h for x, y, w, h in faces), default=0) / (480 * 270)
         s['calm'] += 2.5 if big > 0.04 else (1.2 if big > 0 else -0.5)
+        if CINE and big == 0:                                          # cine build opens on a face, never a train wreck
+            s['calm'] -= 6
 except Exception as ex:
     print('face check skipped', ex, flush=True)
 take(pre + build2, 'calm', 0.8)                                      # build-ups: steady, readable shots
@@ -1169,10 +1171,10 @@ def _dark(s_):
                 g_ = np.frombuffer(raw, np.uint8).reshape(90, 160).astype(float)
                 ls.append(float(g_.mean()))
                 ed = ((np.abs(np.diff(g_, axis=1))[:-1] + np.abs(np.diff(g_, axis=0))[:, :-1]) > 30).mean()
-                flat += ed < float(os.environ.get('CINE_MIN_EDGES', 0.035))
+                flat += ed < float(os.environ.get('CINE_MIN_EDGES', 0.05))
             except Exception:
                 pass
-        _dark_cache[key] = bool(ls) and (np.mean(ls) < 38 or sum(l_ < 26 for l_ in ls) >= 2 or (CINE and flat >= 2))
+        _dark_cache[key] = bool(ls) and (np.mean(ls) < (46 if CINE else 38) or sum(l_ < (32 if CINE else 26) for l_ in ls) >= 2 or (CINE and flat >= 2))
         if CINE and flat >= 2:
             print(f"cine look: {s_['ep']}@{s_['s']:.1f} unreadable (few edges)", flush=True)
     return _dark_cache[key]
@@ -1202,7 +1204,7 @@ for k_, (a, b) in enumerate(tmpl):
                 fx.append('rain')
             if k_ > drop_i and k_ != CINE_BREATH and k_ < n - 1 and (k_ - drop_i) % 5 == 2:
                 fx.append('tilt')
-            if k_ > drop_i and k_ < n - 1 and b - a == 1 and 'slowmo' not in fx:
+            if k_ > drop_i and k_ < n - 1 and b - a == 1 and 'slowmo' not in fx and s.get('peak', 0) >= ref_heavy and k_ % 3 == 0:
                 fx.append('echo')
     elif DROP_STYLE:                                                  # pulse on every beat, shake + RGB split on the heavy hits
         fx.append('pulse')
