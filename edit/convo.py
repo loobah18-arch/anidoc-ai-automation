@@ -1360,6 +1360,28 @@ if TOPIC_GUESS and os.environ.get('EDIT_FROM_TALK', '1') != '0':
                 _near.append(_c)
     amv_eps = _near[:3]
     print(f'character "{topic_name}" is only a guess: the edit comes from the talk\'s own fight {amv_eps}', flush=True)
+# SAME FIGHT (default; EDIT_SAME_FIGHT=0 turns it off): the edit shows the fight the talk belongs to, never the
+# character's other fights. Run 45565123569: the talk was Sukuna and Jogo, the edit mixed in Mahoraga, a train wreck
+# and Yuki from S2E17. The edit comes only from the talk's episode, inside the fight window that holds the talk
+# (hand-checked or vision-checked windows), widened only as far as needed for enough shots; no character filter, so
+# both fighters show. Works for any anime: with no known window it grows around the talk itself.
+SAME_FIGHT = os.environ.get('EDIT_SAME_FIGHT', '1') != '0'
+fight_a, fight_b = c0, c1
+if SAME_FIGHT:
+    try:
+        _fwj = json.load(open('fight_windows.json'))
+        _srcs = [_fwj.get(topic_slug or '', {})] + [{e_: (d_.get('windows') or []) for e_, d_ in v_.items()}
+                                                   for k_, v_ in (_fwj.get('_auto') or {}).items()
+                                                   if k_ in (topic_slug, '_fight') and isinstance(v_, dict)]
+        _wins = [tuple(w_) for src_ in _srcs for e_, ws_ in src_.items()
+                 if (e_ if ':' in e_ else f'jujutsu-kaisen:{e_}') == conv_ep for w_ in ws_]
+        _near = [w_ for w_ in _wins if w_[0] - 30 <= c1 and w_[1] + 30 >= c0]
+        if _near:
+            fight_a, fight_b = min([c0] + [w_[0] for w_ in _near]), max([c1] + [w_[1] for w_ in _near])
+    except Exception as ex:
+        print('fight window lookup skipped:', ex, flush=True)
+    amv_eps = [conv_ep]
+    print(f'same fight: the edit comes from {conv_ep} {fight_a:.0f}-{fight_b:.0f}s (the talk is {c0:.0f}-{c1:.0f}s)', flush=True)
 print('fight episodes for the edit:', amv_eps, flush=True)
 for ep_code in amv_eps:
     try:
@@ -1371,13 +1393,14 @@ for ep_code in amv_eps:
 amv_len = max(14.0, TOTAL - HOOK - CONV)
 env = dict(os.environ,
            FORCE_EPS=','.join(amv_eps),
-           INCLUDE='',
+           INCLUDE=f'{conv_ep}|{fight_a:.1f}|{fight_b:.1f}' if SAME_FIGHT else '',
+           INCLUDE_NEED=os.environ.get('SAME_FIGHT_SHOTS', '70'), INCLUDE_MAXPAD=os.environ.get('SAME_FIGHT_MAXPAD', '300'),
            START_BEAT='17', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            AMV_STYLE='drop',                                        # the edit opens ON the drop (beat 17), one cut per beat
            MIN_SONG_START=f'{CONV + 0.6:.2f}',                      # room before the drop for the song bed under the talk
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
-           CHAR_NAME='' if TOPIC_GUESS else (topic_name or ''),
-           CHAR_SLUG='' if TOPIC_GUESS else (topic_slug or ''),
+           CHAR_NAME='' if (TOPIC_GUESS or SAME_FIGHT) else (topic_name or ''),   # same fight: both fighters
+           CHAR_SLUG='' if (TOPIC_GUESS or SAME_FIGHT) else (topic_slug or ''),
            CHAR_SERIES=series_title,
            CHAR_ACT_MIN='0.0',
            CHAR_REL_MIN='0.04',

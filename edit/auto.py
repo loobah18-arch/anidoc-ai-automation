@@ -269,9 +269,9 @@ allshots = [s for s in allshots if not any(s['ep'] == ep and s['e'] > float(a) -
 ep_all = list(allshots)
 if INCLUDE:                                                           # widen around the scene only as far as needed
     iep, ia, ib = INCLUDE.rsplit('|', 2); ia, ib = float(ia), float(ib)
-    for pad in range(0, 421, 30):
+    for pad in range(0, int(os.environ.get('INCLUDE_MAXPAD', 420)) + 1, 30):
         scene = [s for s in allshots if s['ep'] == iep and s['s'] >= ia - pad and s['e'] <= ib + pad]
-        if len(scene) >= 45:
+        if len(scene) >= int(os.environ.get('INCLUDE_NEED', 45)):
             break
     print('scene shots', len(scene), 'within', pad, 's of', INCLUDE, flush=True)
     allshots = scene
@@ -337,7 +337,7 @@ for s in pool:
         s['impact'] -= 0.25
 full_pool = list(pool)
 if DROP_STYLE:                                                        # action only: every shot in the top 15% by impact
-    gate = float(np.percentile([s['impact'] for s in pool], IMPACT_PCT))
+    gate = float(np.percentile([s['impact'] for s in pool], min(IMPACT_PCT, 35.0) if INCLUDE else IMPACT_PCT))   # one fight: a small pool
     pool = [s for s in pool if s['impact'] >= gate]
     print(f'drop style: impact gate p{IMPACT_PCT:.0f} = {gate:.3f}, {len(pool)} of {len(full_pool)} shots pass', flush=True)
 
