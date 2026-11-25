@@ -205,7 +205,7 @@ def build_cine_fx(fx, d: float, w: int, h: int, idx: int = 0) -> str:
     fx = set(fx or [])
     ch = []
     if "echo" in fx:
-        ch.append("tmix=frames=4:weights='4 2 1 0.5'")
+        ch.append("tmix=frames=3:weights='4 1.5 0.5'")
     if "blurin" in fx:
         ch.append("gblur=sigma=26:enable='lt(t\\,0.07)',gblur=sigma=11:enable='between(t\\,0.07\\,0.15)',"
                   "gblur=sigma=4:enable='between(t\\,0.15\\,0.23)'")

@@ -1168,7 +1168,7 @@ def _dark(s_):
                 ls.append(float(np.frombuffer(raw, np.uint8).mean()))
             except Exception:
                 pass
-        _dark_cache[key] = bool(ls) and (np.mean(ls) < 30 or sum(l_ < 22 for l_ in ls) >= 2)
+        _dark_cache[key] = bool(ls) and (np.mean(ls) < 38 or sum(l_ < 26 for l_ in ls) >= 2)
     return _dark_cache[key]
 
 
@@ -1196,7 +1196,7 @@ for k_, (a, b) in enumerate(tmpl):
                 fx.append('rain')
             if k_ > drop_i and k_ != CINE_BREATH and k_ < n - 1 and (k_ - drop_i) % 5 == 2:
                 fx.append('tilt')
-            if k_ > drop_i and k_ < n - 1 and (b - a == 1 or s.get('peak', 0) >= ref_heavy) and 'slowmo' not in fx:
+            if k_ > drop_i and k_ < n - 1 and b - a == 1 and 'slowmo' not in fx:
                 fx.append('echo')
     elif DROP_STYLE:                                                  # pulse on every beat, shake + RGB split on the heavy hits
         fx.append('pulse')
