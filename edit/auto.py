@@ -1223,7 +1223,7 @@ for k_, (a, b) in enumerate(tmpl):
     if REF_LOOK:                                                      # the grade makes dark shots black on a phone (run
         if _dark(s) :                                                 # that will play, swap for the next unused bright shot
             _used = {(v['ep'], v['s']) for v in assign.values()}
-            for c_ in sorted(pool, key=lambda c_: -c_['impact']):
+            for c_ in sorted(pool, key=lambda c_: -(c_['calm'] if CINE and a < DROP_BEAT else c_['impact'])):   # build: a face shot, not the train wreck
                 if (c_['ep'], c_['s']) in _used or c_['e'] - c_['s'] < dur * 0.5 or _dark(c_):
                     continue
                 print(f'ref look: cut {k_} {s["ep"]}@{s["s"]:.1f} too dark, swapped for {c_["ep"]}@{c_["s"]:.1f}', flush=True)
