@@ -14,7 +14,7 @@
   "montagem_vozes_profundas": 3,
   "cotneus_stereo_love_funk": 3,
   "zxvren_montagem_delirio_slowed": 3,
-  "poker_face": 3,
+  "poker_face": 4,
   "atlxs_passo_bem_solto_slowed": 3,
   "ashreveal_manasha_phonk": 3,
   "dygo_funk_infernal": 3
@@ -47,17 +47,17 @@
   "demon-slayer-kimetsu-no-yaiba:S1E09": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E13": 1,
-  "jujutsu-kaisen:S1E02": 7,
+  "jujutsu-kaisen:S1E02": 8,
   "jujutsu-kaisen:S1E16": 1,
   "jujutsu-kaisen:S1E20": 4,
-  "jujutsu-kaisen:S1E04": 5,
+  "jujutsu-kaisen:S1E04": 6,
   "jujutsu-kaisen:S1E10": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E01": 1,
   "jujutsu-kaisen:S1E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E06": 1,
   "demon-slayer-kimetsu-no-yaiba:S2E06": 7,
   "jujutsu-kaisen:S3E01": 1,
-  "jujutsu-kaisen:S2E16": 5,
+  "jujutsu-kaisen:S2E16": 6,
   "jujutsu-kaisen:S1E13": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E07": 2,
   "demon-slayer-kimetsu-no-yaiba:S5E08": 2,
@@ -89,8 +89,8 @@
   "demon-slayer-kimetsu-no-yaiba:S4E01": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E04": 1,
   "demon-slayer-kimetsu-no-yaiba:S5E05": 1,
-  "jujutsu-kaisen:S1E05": 4,
-  "jujutsu-kaisen:S2E17": 4
+  "jujutsu-kaisen:S1E05": 5,
+  "jujutsu-kaisen:S2E17": 5
  },
  "shots": [
   {
@@ -10096,6 +10096,86 @@
   {
    "ep": "jujutsu-kaisen:S2E17",
    "s": 302.29
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 924.515
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 841.672
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 887.075
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 528.274
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1043.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 298.025
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 301.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 409.207
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1020.733
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 464.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1293.941
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 722.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1137.348
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 838.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 896.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 873.458
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 917.15
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 412.084
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 1037.94
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E17",
+   "s": 302.29
   }
  ],
  "runs": [
@@ -10750,6 +10830,20 @@
    "pick": "sukuna",
    "series": "jujutsu-kaisen",
    "song": "trashxrl_deus_do_olimpo",
+   "episodes": [
+    "jujutsu-kaisen:S1E02",
+    "jujutsu-kaisen:S1E04",
+    "jujutsu-kaisen:S1E05",
+    "jujutsu-kaisen:S2E16",
+    "jujutsu-kaisen:S2E17"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-25 07:00 UTC",
+   "pick": "sukuna",
+   "series": "jujutsu-kaisen",
+   "song": "poker_face",
    "episodes": [
     "jujutsu-kaisen:S1E02",
     "jujutsu-kaisen:S1E04",
@@ -11571,7 +11665,7 @@
   ]
  },
  "series": {
-  "jujutsu-kaisen": 30,
+  "jujutsu-kaisen": 31,
   "demon-slayer-kimetsu-no-yaiba": 24
  },
  "known": [
@@ -12108,6 +12202,15 @@
    "question": "Why should Sukuna fear Jogo\u2019s domain?",
    "file": "Jujutsu_Kaisen_convo_trashxrl_deus_do_olimpo.mp4",
    "time": "2026-11-25 06:22 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E16",
+   "s": 1006.1333333333333,
+   "e": 1032.3999999999999,
+   "topic": "sukuna",
+   "question": "Why did Jogo freeze everyone?",
+   "file": "Jujutsu_Kaisen_convo_poker_face.mp4",
+   "time": "2026-11-25 07:01 UTC"
   }
  ],
  "styles": [
