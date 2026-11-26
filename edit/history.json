@@ -7,7 +7,7 @@
   "lonown_avangard_phonk": 4,
   "trashxrl_deus_do_olimpo": 3,
   "montagem_zora": 4,
-  "rayelo_ultraslowed": 3,
+  "rayelo_ultraslowed": 4,
   "rubikdice_montagem_pegadora_slowed": 3,
   "ncts_next_phonk": 4,
   "nxxkz_loucura_letal_funk_slowed": 3,
@@ -97,7 +97,8 @@
   "demon-slayer-kimetsu-no-yaiba:S3E03": 1,
   "jujutsu-kaisen:S1E06": 1,
   "jujutsu-kaisen:S2E12": 1,
-  "demon-slayer-kimetsu-no-yaiba:S1E25": 1
+  "demon-slayer-kimetsu-no-yaiba:S1E25": 1,
+  "demon-slayer-kimetsu-no-yaiba:S3E06": 1
  },
  "shots": [
   {
@@ -10527,6 +10528,70 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
    "s": 852.842
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 913.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 865.592
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 878.132
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 899.747
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 905.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 914.675
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 947.508
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 951.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 952.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 954.258
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 959.413
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 876.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 894.707
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 865.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 946.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 912.491
   }
  ],
  "runs": [
@@ -11201,6 +11266,16 @@
    "song": "montagem_zora",
    "episodes": [
     "demon-slayer-kimetsu-no-yaiba:S1E25"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-26 09:37 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "rayelo_ultraslowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S3E06"
    ],
    "file": "_amv_part.mp4"
   }
@@ -12109,7 +12184,7 @@
  },
  "series": {
   "jujutsu-kaisen": 28,
-  "demon-slayer-kimetsu-no-yaiba": 28
+  "demon-slayer-kimetsu-no-yaiba": 29
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -12663,6 +12738,15 @@
    "question": "Who survives this?",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_montagem_zora.mp4",
    "time": "2026-11-26 08:56 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "s": 921.1333333333333,
+   "e": 941.0666666666666,
+   "topic": "daki",
+   "question": "Who survives this?",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_rayelo_ultraslowed.mp4",
+   "time": "2026-11-26 09:37 UTC"
   }
  ],
  "styles": [
@@ -12761,6 +12845,12 @@
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E03",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_andromeda_no_fear_phonk.mp4",
    "time": "2026-11-25 14:15 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S3E06",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_rayelo_ultraslowed.mp4",
+   "time": "2026-11-26 09:37 UTC"
   }
  ],
  "narr_chars": {
