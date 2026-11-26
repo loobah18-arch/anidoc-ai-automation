@@ -277,8 +277,13 @@ def remediate_metadata_for_retry(title: str, description: str, tags: list, attem
     disclaimer = "\n\n📌 Transformative Fair Use: Original commentary, sound design, and narrative pacing."
     new_desc = f"{description.strip()}{disclaimer}"
 
-    sanitized_tags = [t for t in tags if t.lower() not in ("full", "episode", "leaked", "raw")]
+    sanitized_tags = [t for t in tags if t.lower() not in ("full", "episode", "leaked", "raw", "demonslayer", "demonslayerkimetsunoyaiba", "jujutsukaisen", "jjk")]
     sanitized_tags.extend(["scenebreakdown", "animeedit", "phonk"])
+    for pat in [r"demon\s*slayer[:\s]*kimetsu\s*no\s*yaiba", r"demon\s*slayer", r"kimetsu\s*no\s*yaiba", r"jujutsu\s*kaisen", r"\bjjk\b"]:
+        clean_title = re.sub(pat, "", clean_title, flags=re.IGNORECASE)
+    clean_title = re.sub(r"[ \t]+", " ", clean_title).strip()
+    if not clean_title:
+        clean_title = "Anime Scene"
     return new_title, new_desc, list(dict.fromkeys(sanitized_tags))[:15]
 
 

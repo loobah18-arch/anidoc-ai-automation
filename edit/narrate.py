@@ -702,19 +702,57 @@ os.makedirs(out_dir, exist_ok=True)
 video_file = os.path.join(out_dir, f'{name}.mp4')
 series_key = conv_ep.split(':')[0]
 series_title = series_key.replace('-', ' ').title()
-tag_series = series_key.replace('-', '')
 rng_m = random.Random()
-first = CHAR.split()[0] if CHAR else series_title
+
+
+def strip_anime_names(text: str) -> str:
+    patterns = [
+        r"demon\s*slayer[:\s]*kimetsu\s*no\s*yaiba",
+        r"demon\s*slayer",
+        r"kimetsu\s*no\s*yaiba",
+        r"jujutsu\s*kaisen",
+        r"\bjjk\b",
+        r"#demonslayer\w*",
+        r"#jujutsukaisen\w*",
+        r"#jjk\b",
+    ]
+    if series_key:
+        clean = re.escape(series_key.replace('-', ' ').strip())
+        joined = re.escape(series_key.replace('-', '').strip())
+        patterns.extend([rf"\b{clean}\b", rf"\b{joined}\b", rf"#{joined}\b"])
+    cleaned = text
+    for pat in patterns:
+        cleaned = re.sub(pat, "", cleaned, flags=re.IGNORECASE)
+    return re.sub(r"[ \t]+", " ", cleaned).strip()
+
+
+first = CHAR.split()[0] if (CHAR and CHAR.lower() not in series_title.lower()) else None
 if MODE == 'character' and CHAR and CHAR in LORE:
-    meta_title = rng_m.choice([f'Who is {CHAR}? 🤯', f'{CHAR} explained in 20 seconds 🔥', f"{first}'s power is unreal 😳"])
+    t_opts = [f'Who is {CHAR}? 🤯', f'{CHAR} explained in 20 seconds 🔥']
+    if first:
+        t_opts.append(f"{first}'s power is unreal 😳")
+    meta_title = rng_m.choice(t_opts)
     meta_desc = f"{CHAR}'s power, explained.\n\n{LORE[CHAR].get('power', '')}"
 else:
-    meta_title = rng_m.choice([f'{first} hits different 🥶', f'This {series_title} edit goes hard 🔥', f'{first} quote that hits hard 🥶'])
-    meta_desc = ' '.join(' '.join(w['w'] for w in ln) for ln in lines) if lines else f"{series_title} anime edit"
+    t_opts = ['This edit goes hard 🔥', 'This fight hits different 🥶', 'This quote hits hard 🥶']
+    if first:
+        t_opts.append(f'{first} hits different 🥶')
+    meta_title = rng_m.choice(t_opts)
+    meta_desc = ' '.join(' '.join(w['w'] for w in ln) for ln in lines) if lines else 'Anime scene breakdown'
 
+meta_title = strip_anime_names(meta_title)
+if not meta_title or meta_title.lower() == '#shorts':
+    meta_title = 'This edit hits different 🥶'
 meta_title = meta_title[:90] + ' #shorts'
-tags = ['shorts', 'anime', 'animeedit', tag_series, 'phonk', 'amv']
-meta_desc = f"{meta_desc}\n\n#{tag_series} #animeedit #anime #phonk #shorts"
+
+tags = ['shorts', 'anime', 'animeedit', 'phonk', 'amv']
+if CHAR:
+    c_clean = re.sub(r'\W+', '', CHAR.lower())
+    if c_clean and c_clean not in ('demonslayer', 'demonslayerkimetsunoyaiba', 'jujutsukaisen', 'jjk', series_key.replace('-', '')):
+        tags.append(c_clean)
+
+meta_desc = strip_anime_names(meta_desc)
+meta_desc = f"{meta_desc}\n\n#animeedit #anime #phonk #shorts"
 meta = dict(file=video_file, style='narrated', ep=conv_ep, title=meta_title, description=meta_desc, tags=tags,
             character=TOPIC, character_name=TOPIC_NAME, song=plan['song'], voice=os.environ.get('VOICE', 'en-US-AndrewNeural'), writer=WRITER)
 json.dump(meta, open(os.path.join(out_dir, 'meta.json'), 'w'), indent=1, ensure_ascii=False)

@@ -1,0 +1,24 @@
+name: Delete YouTube Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_id:
+        description: 'YouTube Video ID to delete'
+        required: true
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install --break-system-packages google-api-python-client google-auth requests
+      - name: Delete video
+        env:
+          VIDEO_ID: ${{ github.event.inputs.video_id }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID || secrets.CLIENT_ID }}
+          YOUTUBE_ACCESS_TOKEN: ${{ secrets.YOUTUBE_ACCESS_TOKEN }}
+        run: python3 scripts/delete_youtube_video.py "$VIDEO_ID"
