@@ -9,7 +9,7 @@
   "montagem_zora": 3,
   "rayelo_ultraslowed": 3,
   "rubikdice_montagem_pegadora_slowed": 3,
-  "ncts_next_phonk": 3,
+  "ncts_next_phonk": 4,
   "nxxkz_loucura_letal_funk_slowed": 3,
   "montagem_vozes_profundas": 3,
   "cotneus_stereo_love_funk": 3,
@@ -94,7 +94,8 @@
   "demon-slayer-kimetsu-no-yaiba:S1E18": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E02": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E02": 1,
-  "demon-slayer-kimetsu-no-yaiba:S3E03": 1
+  "demon-slayer-kimetsu-no-yaiba:S3E03": 1,
+  "jujutsu-kaisen:S1E06": 1
  },
  "shots": [
   {
@@ -10220,6 +10221,150 @@
   {
    "ep": "demon-slayer-kimetsu-no-yaiba:S3E02",
    "s": 455.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 630.475
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 753.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 429.558
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 524.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 601.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 450.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 558.308
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 664.79
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 466.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 613.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 491.6
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 625.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 508.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 432.767
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 547.308
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 697.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 553.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 554.85
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 556.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 453.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 731.433
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 561.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 436.575
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 604.1
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 606.808
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 609.392
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 473.35
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 500.684
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 626.725
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 459.142
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 551.225
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 708.642
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 559.933
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 746.7
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 402.134
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 602.123
   }
  ],
  "runs": [
@@ -10864,6 +11009,16 @@
     "demon-slayer-kimetsu-no-yaiba:S3E02",
     "demon-slayer-kimetsu-no-yaiba:S3E03",
     "demon-slayer-kimetsu-no-yaiba:S3E04"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-26 07:21 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "ncts_next_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S1E06"
    ],
    "file": "_amv_part.mp4"
   }
@@ -11702,10 +11857,36 @@
     1282.0,
     1330.0
    ]
+  ],
+  "jujutsu-kaisen:S1E05": [
+   [
+    140.0,
+    236.0
+   ],
+   [
+    1272.0,
+    1372.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E20": [
+   [
+    310.0,
+    407.0
+   ]
+  ],
+  "jujutsu-kaisen:S1E06": [
+   [
+    23.0,
+    127.0
+   ],
+   [
+    1295.0,
+    1402.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 26,
+  "jujutsu-kaisen": 27,
   "demon-slayer-kimetsu-no-yaiba": 27
  },
  "known": [
@@ -12233,6 +12414,15 @@
    "question": "Who survives this?",
    "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_andromeda_no_fear_phonk.mp4",
    "time": "2026-11-25 14:15 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S1E06",
+   "s": 574.4666666666667,
+   "e": 598.2333333333333,
+   "topic": "jogo",
+   "question": "Why is Jogo so calm?",
+   "file": "Jujutsu_Kaisen_convo_ncts_next_phonk.mp4",
+   "time": "2026-11-26 07:22 UTC"
   }
  ],
  "styles": [
