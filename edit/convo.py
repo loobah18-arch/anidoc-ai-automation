@@ -1401,7 +1401,7 @@ amv_len = max(14.0, TOTAL - HOOK - CONV)
 env = dict(os.environ,
            FORCE_EPS=','.join(amv_eps),
            INCLUDE=f'{conv_ep}|{fight_a:.1f}|{fight_b:.1f}' if SAME_FIGHT else '',
-           INCLUDE_NEED=os.environ.get('SAME_FIGHT_SHOTS', '70'), INCLUDE_MAXPAD=os.environ.get('SAME_FIGHT_MAXPAD', '300'),
+           INCLUDE_NEED=os.environ.get('SAME_FIGHT_SHOTS', '36'), INCLUDE_MAXPAD=os.environ.get('SAME_FIGHT_MAXPAD', '60'),   # run 45773246175: 180 s of padding pulled in Gojo, Panda, Maki scenes
            START_BEAT='17', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            AMV_STYLE='drop',                                        # the edit opens ON the drop (beat 17), one cut per beat
            MIN_SONG_START=f'{CONV + 0.6:.2f}',                      # room before the drop for the song bed under the talk
