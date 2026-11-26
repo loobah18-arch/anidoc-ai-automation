@@ -4,7 +4,7 @@
   "glxxmstrider_dont_stop_slowed": 3,
   "andromeda_montagem_coma": 3,
   "mvsterious_slava_funk": 3,
-  "lonown_avangard_phonk": 3,
+  "lonown_avangard_phonk": 4,
   "trashxrl_deus_do_olimpo": 3,
   "montagem_zora": 3,
   "rayelo_ultraslowed": 3,
@@ -95,7 +95,8 @@
   "demon-slayer-kimetsu-no-yaiba:S1E02": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E02": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E03": 1,
-  "jujutsu-kaisen:S1E06": 1
+  "jujutsu-kaisen:S1E06": 1,
+  "jujutsu-kaisen:S2E12": 1
  },
  "shots": [
   {
@@ -10365,6 +10366,86 @@
   {
    "ep": "jujutsu-kaisen:S1E06",
    "s": 602.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 743.583
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 710.358
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 712.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 713.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 714.525
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 841.25
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 719.833
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 727.941
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 730.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 731.898
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 733.023
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 734.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 736.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 738.023
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 813.125
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 716.066
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 842.208
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 830.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 838.983
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 704.417
   }
  ],
  "runs": [
@@ -11019,6 +11100,16 @@
    "song": "ncts_next_phonk",
    "episodes": [
     "jujutsu-kaisen:S1E06"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-26 07:36 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "lonown_avangard_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S2E12"
    ],
    "file": "_amv_part.mp4"
   }
@@ -11883,10 +11974,40 @@
     1295.0,
     1402.0
    ]
+  ],
+  "jujutsu-kaisen:S1E22": [
+   [
+    30.0,
+    122.0
+   ],
+   [
+    1242.0,
+    1342.0
+   ]
+  ],
+  "jujutsu-kaisen:S1E19": [
+   [
+    483.0,
+    575.0
+   ],
+   [
+    1241.0,
+    1342.0
+   ]
+  ],
+  "jujutsu-kaisen:S2E12": [
+   [
+    47.0,
+    148.0
+   ],
+   [
+    1334.0,
+    1431.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 27,
+  "jujutsu-kaisen": 28,
   "demon-slayer-kimetsu-no-yaiba": 27
  },
  "known": [
@@ -12423,6 +12544,15 @@
    "question": "Why is Jogo so calm?",
    "file": "Jujutsu_Kaisen_convo_ncts_next_phonk.mp4",
    "time": "2026-11-26 07:22 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S2E12",
+   "s": 759.4,
+   "e": 788.8333333333334,
+   "topic": "nobara",
+   "question": "Why is Nobara so overpowered?",
+   "file": "Jujutsu_Kaisen_convo_lonown_avangard_phonk.mp4",
+   "time": "2026-11-26 07:36 UTC"
   }
  ],
  "styles": [
