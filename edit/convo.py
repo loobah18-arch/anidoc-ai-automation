@@ -281,8 +281,12 @@ for k_ in range(len(sung) - 2):                                       # three su
 if sung:
     print(f'singing / lyric segments in {conv_ep}: {len(sung)}', flush=True)
 print(f'{conv_ep} song seconds excluded from the talk: {int(SONG.sum())}', flush=True)
+def _nwords(t_):                                                       # words, with CJK text (no spaces) counted ~2 chars a word
+    t_ = t_ or ''
+    cjk = len(re.findall(r'[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]', t_))
+    return len(re.sub(r'[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]', ' ', t_).split()) + cjk // 2
 for sg in _ss:
-    if len((sg.text or '').split()) >= 3 and sg.avg_logprob > -1.0 and sg.no_speech_prob < 0.6:
+    if _nwords(sg.text) >= 3 and sg.avg_logprob > -1.0 and sg.no_speech_prob < 0.6:
         speech[int(lo + sg.start):int(lo + sg.end) + 1] = 1
 speech[SONG[:len(speech)]] = 0
 SKIP = [float(x) for x in os.environ.get('CONVO_SKIP', '').split(',') if x]
@@ -315,6 +319,16 @@ for t in range(lo, hi - 40, 2):
         bs, bt = sc, t
 if not _cands and SKIP:                                               # every talk moment here was tried (it kept retrying 950s)
     next_episode('no talk moment left')
+# WEAK TALK GUARD: run 45629584475 had no talk candidate at all (score -1.00) and used the fight peak anyway. No candidate,
+# or only weak ones (little talk, little action), moves on to another episode instead of making a weak Short.
+TALK_MIN = float(os.environ.get('CONVO_MIN_SCORE', 0.95))
+if not _cands:
+    next_episode('no moment with real talk during a fight')
+_strong = [c_ for c_ in _cands if c_[0] >= TALK_MIN]
+print(f'talk candidates: {len(_cands)}, {len(_strong)} at score >= {TALK_MIN} (best {bs:.2f})', flush=True)
+if not _strong:
+    next_episode(f'only weak talk moments (best score {bs:.2f} < {TALK_MIN})')
+_cands = _strong
 LORE_ALL = json.load(open('lore.json')) if os.path.exists('lore.json') else {}
 _SKIP_SONG = lambda t_: bool(SONG[min(len(SONG) - 1, max(0, int(t_)))])
 PICK_NAME = None                                                      # a character pick: their full name in lore.json
@@ -1299,7 +1313,8 @@ print('top question:', QUESTION_TXT, flush=True)
 # Update convo.json with identified character
 try:
     cinfo = json.load(open('work/convo/convo.json'))
-    cinfo.update(character=topic_slug, character_name=topic_name, question=QUESTION_TXT)
+    cinfo.update(character=topic_slug, character_name=topic_name, question=QUESTION_TXT,
+                 topic_guess=bool(TOPIC_GUESS), title_name=(None if TOPIC_GUESS else topic_name))   # a guess never goes in the title
     json.dump(cinfo, open('work/convo/convo.json', 'w'), indent=1)
 except Exception:
     pass
@@ -1354,6 +1369,26 @@ if TOPIC_GUESS and os.environ.get('EDIT_FROM_TALK', '1') != '0':
                 _near.append(_c)
     amv_eps = _near[:3]
     print(f'character "{topic_name}" is only a guess: the edit comes from the talk\'s own fight {amv_eps}', flush=True)
+# SAME FIGHT (default; EDIT_SAME_FIGHT=0 turns it off): the edit shows the fight the talk belongs to, never the
+# character's other fights or neighbouring episodes (run 45629584475 mixed S3E02/03/04). Any anime: the talk's episode,
+# inside a known fight window holding the talk, else grown around the talk only as far as needed; no character filter.
+SAME_FIGHT = os.environ.get('EDIT_SAME_FIGHT', '1') != '0'
+fight_a, fight_b = c0, c1
+if SAME_FIGHT:
+    try:
+        _fwj = json.load(open('fight_windows.json'))
+        _srcs = [_fwj.get(topic_slug or '', {})] + [{e_: (d_.get('windows') or []) for e_, d_ in v_.items() if isinstance(d_, dict)}
+                                                   for k_, v_ in (_fwj.get('_auto') or {}).items()
+                                                   if k_ in (topic_slug, '_fight') and isinstance(v_, dict)]
+        _wins = [tuple(w_) for src_ in _srcs for e_, ws_ in src_.items() if isinstance(ws_, list)
+                 if (e_ if ':' in e_ else f'jujutsu-kaisen:{e_}') == conv_ep for w_ in ws_]
+        _near = [w_ for w_ in _wins if w_[0] - 30 <= c1 and w_[1] + 30 >= c0]
+        if _near:
+            fight_a, fight_b = min([c0] + [w_[0] for w_ in _near]), max([c1] + [w_[1] for w_ in _near])
+    except Exception as ex:
+        print('fight window lookup skipped:', ex, flush=True)
+    amv_eps = [conv_ep]
+    print(f'same fight: the edit comes from {conv_ep} {fight_a:.0f}-{fight_b:.0f}s (the talk is {c0:.0f}-{c1:.0f}s)', flush=True)
 print('fight episodes for the edit:', amv_eps, flush=True)
 for ep_code in amv_eps:
     try:
@@ -1365,13 +1400,14 @@ for ep_code in amv_eps:
 amv_len = max(14.0, TOTAL - HOOK - CONV)
 env = dict(os.environ,
            FORCE_EPS=','.join(amv_eps),
-           INCLUDE='',
+           INCLUDE=f'{conv_ep}|{fight_a:.1f}|{fight_b:.1f}' if SAME_FIGHT else '',
+           INCLUDE_NEED=os.environ.get('SAME_FIGHT_SHOTS', '70'), INCLUDE_MAXPAD=os.environ.get('SAME_FIGHT_MAXPAD', '300'),
            START_BEAT='17', MAX_SECONDS=f'{amv_len:.2f}', W=str(W), H=str(H),
            AMV_STYLE='drop',                                        # the edit opens ON the drop (beat 17), one cut per beat
            MIN_SONG_START=f'{CONV + 0.6:.2f}',                      # room before the drop for the song bed under the talk
            EXCLUDE=f'{conv_ep}|{c0}|{c1}', OUT_NAME='_amv_part', PICK=PICK,
-           CHAR_NAME='' if TOPIC_GUESS else (topic_name or ''),
-           CHAR_SLUG='' if TOPIC_GUESS else (topic_slug or ''),
+           CHAR_NAME='' if (TOPIC_GUESS or SAME_FIGHT) else (topic_name or ''),
+           CHAR_SLUG='' if (TOPIC_GUESS or SAME_FIGHT) else (topic_slug or ''),
            CHAR_SERIES=series_title,
            CHAR_ACT_MIN='0.0',
            CHAR_REL_MIN='0.04',

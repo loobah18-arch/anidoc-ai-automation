@@ -40,8 +40,8 @@ if style == 'narrated':
         title = rng.choice([f'{first} hits different 🥶', f'This {series} edit goes hard 🔥', f'{first} quote that hits hard 🥶'])
         desc = ' '.join(lines)
 else:
-    char = info.get('character_name') or info.get('character')
-    first = char.split()[0] if char else series
+    char = info.get('title_name') if 'title_name' in info else (info.get('character_name') or info.get('character'))
+    first = char.split()[0] if char else series                      # a guessed character never names the title
     title = rng.choice([f'{first} battle IQ is unreal 🔥', f'{first} fight goes crazy 😳', f'{first} goes all out 🥶'])
     desc = '\n'.join(lines[:6])
 title = title[:90] + ' #shorts'

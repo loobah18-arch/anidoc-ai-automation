@@ -255,9 +255,9 @@ allshots = [s for s in allshots if not any(s['ep'] == ep and s['e'] > float(a) -
 ep_all = list(allshots)
 if INCLUDE:                                                           # widen around the scene only as far as needed
     iep, ia, ib = INCLUDE.rsplit('|', 2); ia, ib = float(ia), float(ib)
-    for pad in range(0, 421, 30):
+    for pad in range(0, int(os.environ.get('INCLUDE_MAXPAD', 420)) + 1, 30):
         scene = [s for s in allshots if s['ep'] == iep and s['s'] >= ia - pad and s['e'] <= ib + pad]
-        if len(scene) >= 45:
+        if len(scene) >= int(os.environ.get('INCLUDE_NEED', 45)):
             break
     print('scene shots', len(scene), 'within', pad, 's of', INCLUDE, flush=True)
     allshots = scene
@@ -323,7 +323,7 @@ for s in pool:
         s['impact'] -= 0.25
 full_pool = list(pool)
 if DROP_STYLE:                                                        # action only: every shot in the top 15% by impact
-    gate = float(np.percentile([s['impact'] for s in pool], IMPACT_PCT))
+    gate = float(np.percentile([s['impact'] for s in pool], min(IMPACT_PCT, 50.0) if INCLUDE else IMPACT_PCT))   # one fight: a smaller pool
     pool = [s for s in pool if s['impact'] >= gate]
     print(f'drop style: impact gate p{IMPACT_PCT:.0f} = {gate:.3f}, {len(pool)} of {len(full_pool)} shots pass', flush=True)
 
@@ -561,6 +561,9 @@ def _ask_vision(code, a, b, times):
 
 def _vision_windows(full_pool, eps):
     """vision-checked fight windows for the episodes in eps; {} when the vision model is unusable"""
+    if not _vision_model():
+        print('vision fight check skipped: no vision model on this Groq key', flush=True)
+        return {}
     HOT_PCT = float(os.environ.get('FIGHT_HOT_PCT', 35)); GAP = float(os.environ.get('FIGHT_GAP', 6.0))
     CHUNK = float(os.environ.get('FIGHT_CHUNK', 60.0)); MAX_CALLS = int(os.environ.get('FIGHT_VISION_CALLS', 48))
     MIN_TILES = int(os.environ.get('FIGHT_VISION_TILES', 2))
