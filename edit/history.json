@@ -6,7 +6,7 @@
   "mvsterious_slava_funk": 3,
   "lonown_avangard_phonk": 4,
   "trashxrl_deus_do_olimpo": 3,
-  "montagem_zora": 3,
+  "montagem_zora": 4,
   "rayelo_ultraslowed": 3,
   "rubikdice_montagem_pegadora_slowed": 3,
   "ncts_next_phonk": 4,
@@ -96,7 +96,8 @@
   "demon-slayer-kimetsu-no-yaiba:S3E02": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E03": 1,
   "jujutsu-kaisen:S1E06": 1,
-  "jujutsu-kaisen:S2E12": 1
+  "jujutsu-kaisen:S2E12": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E25": 1
  },
  "shots": [
   {
@@ -10446,6 +10447,86 @@
   {
    "ep": "jujutsu-kaisen:S2E12",
    "s": 704.417
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 809.566
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 804.05
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 817.457
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 822.342
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 824.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 829.55
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 838.43
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 844.097
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 846.009
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 851.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 855.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 856.795
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 892.05
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 915.3
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 833.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 845.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 828.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 801.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 821.29
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 852.842
   }
  ],
  "runs": [
@@ -11110,6 +11191,16 @@
    "song": "lonown_avangard_phonk",
    "episodes": [
     "jujutsu-kaisen:S2E12"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-26 08:55 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "montagem_zora",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E25"
    ],
    "file": "_amv_part.mp4"
   }
@@ -12004,11 +12095,21 @@
     1334.0,
     1431.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E25": [
+   [
+    50.0,
+    93.0
+   ],
+   [
+    1280.0,
+    1375.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 28,
-  "demon-slayer-kimetsu-no-yaiba": 27
+  "demon-slayer-kimetsu-no-yaiba": 28
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -12553,6 +12654,15 @@
    "question": "Why is Nobara so overpowered?",
    "file": "Jujutsu_Kaisen_convo_lonown_avangard_phonk.mp4",
    "time": "2026-11-26 07:36 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E25",
+   "s": 861.0666666666667,
+   "e": 882.2,
+   "topic": "zenitsu",
+   "question": "Who survives this?",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_montagem_zora.mp4",
+   "time": "2026-11-26 08:56 UTC"
   }
  ],
  "styles": [
