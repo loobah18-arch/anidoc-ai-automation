@@ -16,7 +16,7 @@
   "zxvren_montagem_delirio_slowed": 3,
   "poker_face": 4,
   "atlxs_passo_bem_solto_slowed": 3,
-  "ashreveal_manasha_phonk": 3,
+  "ashreveal_manasha_phonk": 4,
   "dygo_funk_infernal": 3
  },
  "episodes": {
@@ -99,7 +99,8 @@
   "jujutsu-kaisen:S2E12": 1,
   "demon-slayer-kimetsu-no-yaiba:S1E25": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E06": 1,
-  "jujutsu-kaisen:S2E22": 1
+  "jujutsu-kaisen:S2E22": 1,
+  "jujutsu-kaisen:S3E11": 1
  },
  "shots": [
   {
@@ -10649,6 +10650,78 @@
   {
    "ep": "jujutsu-kaisen:S2E22",
    "s": 1176.234
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1138.789
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1009.467
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1021.925
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1058.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1095.533
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1099.595
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1100.825
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1108.595
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1113.741
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1120.262
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1137.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1017.54
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1116.123
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1008.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1092.957
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1112.373
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1105.457
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1043.8
   }
  ],
  "runs": [
@@ -11343,6 +11416,16 @@
    "song": "rubikdice_montagem_pegadora_slowed",
    "episodes": [
     "jujutsu-kaisen:S2E22"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-27 04:58 UTC",
+   "pick": "auto",
+   "series": "jujutsu-kaisen",
+   "song": "ashreveal_manasha_phonk",
+   "episodes": [
+    "jujutsu-kaisen:S3E11"
    ],
    "file": "_amv_part.mp4"
   }
@@ -12277,10 +12360,40 @@
     1333.0,
     1424.0
    ]
+  ],
+  "jujutsu-kaisen:S1E12": [
+   [
+    101.0,
+    210.0
+   ],
+   [
+    1272.0,
+    1367.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E03": [
+   [
+    16.0,
+    94.0
+   ],
+   [
+    1356.0,
+    1424.0
+   ]
+  ],
+  "jujutsu-kaisen:S3E11": [
+   [
+    286.0,
+    364.0
+   ],
+   [
+    1319.0,
+    1409.0
+   ]
   ]
  },
  "series": {
-  "jujutsu-kaisen": 29,
+  "jujutsu-kaisen": 30,
   "demon-slayer-kimetsu-no-yaiba": 29
  },
  "known": [
@@ -12853,6 +12966,15 @@
    "question": "Why does Choso risk his life?",
    "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
    "time": "2026-11-27 04:41 UTC"
+  },
+  {
+   "ep": "jujutsu-kaisen:S3E11",
+   "s": 1063.4666666666667,
+   "e": 1087.6333333333334,
+   "topic": "megumi",
+   "question": "Who wins this fight?",
+   "file": "Jujutsu_Kaisen_convo_ashreveal_manasha_phonk.mp4",
+   "time": "2026-11-27 04:59 UTC"
   }
  ],
  "styles": [
@@ -12963,6 +13085,12 @@
    "ep": "jujutsu-kaisen:S2E22",
    "file": "Jujutsu_Kaisen_convo_rubikdice_montagem_pegadora_slowed.mp4",
    "time": "2026-11-27 04:41 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "jujutsu-kaisen:S3E11",
+   "file": "Jujutsu_Kaisen_convo_ashreveal_manasha_phonk.mp4",
+   "time": "2026-11-27 04:59 UTC"
   }
  ],
  "narr_chars": {
