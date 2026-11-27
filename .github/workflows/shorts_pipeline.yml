@@ -20,9 +20,15 @@ on:
         description: 'upload to YouTube (protection layers still apply)'
         required: false
         default: 'false'
+      from_timer:
+        description: 'Internal: dispatched by exact_due_timer (keeps 24h preflight active)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: shorts-pipeline
@@ -34,13 +40,47 @@ jobs:
     timeout-minutes: 160
     outputs:
       proceed: ${{ steps.gate.outputs.proceed }}
+      remaining_seconds: ${{ steps.gate.outputs.remaining_seconds }}
+      due_at: ${{ steps.gate.outputs.due_at }}
     steps:
       - uses: actions/checkout@v4
       - id: gate
         name: Layer 0 pre-flight (24 h spacing, skip render if too soon)
         env:
-          PREFLIGHT_BYPASS: ${{ github.event_name != 'schedule' && 'true' || '' }}
+          PREFLIGHT_BYPASS: ${{ github.event_name != 'schedule' && !inputs.from_timer && 'true' || '' }}
         run: python3 preflight_gate.py
+
+  exact_due_timer:
+    name: Trigger Pipeline Exactly When 24h Is Up
+    needs: preflight_gate
+    if: needs.preflight_gate.outputs.proceed == 'false' && needs.preflight_gate.outputs.remaining_seconds != '' && fromJSON(needs.preflight_gate.outputs.remaining_seconds) > 0
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      actions: write
+    concurrency:
+      group: anidoc-exact-due-timer
+      cancel-in-progress: true
+    steps:
+      - name: Sleep until due (${{ needs.preflight_gate.outputs.due_at }})
+        run: |
+          REM=${{ needs.preflight_gate.outputs.remaining_seconds }}
+          WAIT=$(( REM + 60 ))
+          MAX_SLEEP=20400
+          if [ "$WAIT" -gt "$MAX_SLEEP" ]; then
+            echo "Remaining wait (${WAIT}s) exceeds 5.6h runner cap. Sleeping ${MAX_SLEEP}s then chaining..."
+            sleep "$MAX_SLEEP"
+          else
+            echo "Sleeping ${WAIT}s until ${{ needs.preflight_gate.outputs.due_at }} (+60s margin)..."
+            [ "$WAIT" -gt 0 ] && sleep "$WAIT" || true
+          fi
+      - name: Dispatch the pipeline now
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run shorts_pipeline.yml \
+            --repo "${{ github.repository }}" --ref "${{ github.ref_name }}" \
+            -f style=convo -f pick=auto -f upload=true -f from_timer=true
 
   render:
     needs: preflight_gate
@@ -57,22 +97,38 @@ jobs:
           pip3 install --break-system-packages --index-url https://download.pytorch.org/whl/cpu torch==2.7.1 torchaudio==2.7.1 torchvision==0.22.1
           pip3 install --break-system-packages demucs open_clip_torch pillow
       - uses: actions/checkout@v4
+      - name: Restore character reference pictures + CLIP weights
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            edit/work/refs
+            /github/home/.cache/huggingface
+          key: charvis-refs-v1-${{ github.run_id }}
+          restore-keys: |
+            charvis-refs-v1-
       - name: Make the Short (conversation AMV edit only)
         env:
           STYLE: ${{ github.event.inputs.style || 'convo' }}
           PICK: ${{ github.event.inputs.pick || 'auto' }}
           DRIVE_FOLDER: 1e5_IF3GRHNr315hP5zK_qlyfsKXm3Ox4
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          FIGHT_VISION: '0'
         run: python3 edit/pipeline.py
+      - name: Quality gate (duration, repeats, captions, loudness, character)
+        id: gate
+        run: python3 edit/gate.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: anime-short-${{ github.run_number }}
           path: |
             out/*.mp4
             out/meta.json
+            out/gate.json
           retention-days: 30
       - name: Upload with protection layers (0 spacing, 1 momentum, 2 velocity, block retry)
-        if: github.event_name == 'schedule' || github.event.inputs.upload == 'true'
+        if: (github.event_name == 'schedule' || github.event.inputs.upload == 'true') && steps.gate.outputs.gate == 'pass'
         env:
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET || secrets.CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN || secrets.REFRESH_TOKEN }}

@@ -246,15 +246,34 @@ class CandleGate:
         self.history_file.parent.mkdir(parents=True, exist_ok=True)
         self.history_file.write_text(json.dumps(history, indent=2), encoding="utf-8")
 
+    def _fallback_local_spacing(self, published_at_str: Optional[str], reason: str) -> Dict[str, Any]:
+        """Enforce Layer 0 spacing from local history when live YouTube stats are unavailable."""
+        if not published_at_str:
+            return {"can_upload": True, "reason": reason}
+        try:
+            published_at = datetime.fromisoformat(str(published_at_str).replace("Z", "+00:00"))
+            if published_at.tzinfo is None:
+                published_at = published_at.replace(tzinfo=timezone.utc)
+            elapsed_hours = max((datetime.now(timezone.utc) - published_at).total_seconds() / 3600.0, 0.0)
+            spacing_eval = self.evaluate_upload_spacing(elapsed_hours)
+            candle_eval = {
+                **spacing_eval,
+                "active_layer": "Layer 0 (Local History Fallback)",
+                "layer0": spacing_eval,
+            }
+            return {"candle_evaluation": candle_eval, "reason": reason}
+        except Exception:
+            return {"can_upload": True, "reason": reason}
+
     def evaluate_live_channel(self, youtube_client=None) -> Dict[str, Any]:
         """Queries live YouTube API for recent video velocity and enforces layers 0, 1, and 2."""
         if youtube_client is None:
             return self.load_state()
 
+        published_at_str = None
         try:
             vid_id = None
             title = "Previous Anime Edit"
-            published_at_str = None
 
             if self.history_file.exists():
                 try:
@@ -262,7 +281,7 @@ class CandleGate:
                     if records and isinstance(records, list):
                         for rec in reversed(records):
                             raw_id = rec.get("video_id")
-                            if raw_id and not str(raw_id).startswith("dry_run"):
+                            if raw_id and not str(raw_id).startswith("dry_run") and rec.get("status", "uploaded") == "uploaded":
                                 vid_id = raw_id
                                 title = rec.get("title", title)
                                 published_at_str = rec.get("timestamp")
@@ -292,7 +311,7 @@ class CandleGate:
             vid_stats = youtube_client.videos().list(id=vid_id, part="statistics,snippet").execute()
             v_items = vid_stats.get("items", [])
             if not v_items:
-                return {"can_upload": True, "reason": f"Could not fetch stats for video {vid_id}"}
+                return self._fallback_local_spacing(published_at_str, f"Could not fetch stats for video {vid_id}; using local Layer 0")
 
             snippet = v_items[0].get("snippet", {})
             title = snippet.get("title", title)
@@ -402,4 +421,4 @@ class CandleGate:
             self.save_state(updated_state)
             return updated_state
         except Exception as e:
-            return {"can_upload": True, "reason": f"Live channel check failed: {e}; clearing upload"}
+            return self._fallback_local_spacing(published_at_str, f"Live channel check failed: {e}; using local Layer 0")

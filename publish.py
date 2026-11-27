@@ -21,6 +21,7 @@ def strip_anime_names(text: str) -> str:
     cleaned = text
     for pat in patterns:
         cleaned = re.sub(pat, "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"#(?=\s|$)", "", cleaned)
     return re.sub(r"[ \t]+", " ", cleaned).strip()
 
 

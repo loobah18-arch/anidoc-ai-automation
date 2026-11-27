@@ -341,7 +341,10 @@ def _groq(prompt, temperature=0.8, system='You write short narration and rhyming
     pref = ['llama-3.3-70b', 'llama-4', 'gpt-oss-120b', 'qwen', 'kimi', 'gpt-oss', 'llama', 'gemma', 'mistral']
     ranked = sorted([m for m in avail if not re.search(r'whisper|guard|tts|embed|vision|compound', m)],
                     key=lambda m: next((i for i, p in enumerate(pref) if p in m), 99))
-    for mdl in dict.fromkeys([os.environ.get('GROQ_MODEL') or 'llama-3.3-70b-versatile'] + ranked[:3] + ['llama-3.1-8b-instant']):
+    candidates = ([os.environ['GROQ_MODEL']] if os.environ.get('GROQ_MODEL') else []) + ranked[:3]
+    if not candidates:
+        candidates = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
+    for mdl in dict.fromkeys(candidates):
         try:
             req = urllib.request.Request('https://api.groq.com/openai/v1/chat/completions', method='POST',
                 data=json.dumps(dict(model=mdl, temperature=temperature, max_tokens=2000, **({'reasoning_effort': 'low'} if 'gpt-oss' in mdl or 'qwen3' in mdl else {}),
@@ -723,6 +726,7 @@ def strip_anime_names(text: str) -> str:
     cleaned = text
     for pat in patterns:
         cleaned = re.sub(pat, "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"#(?=\s|$)", "", cleaned)
     return re.sub(r"[ \t]+", " ", cleaned).strip()
 
 

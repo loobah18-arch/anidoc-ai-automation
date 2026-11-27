@@ -114,10 +114,10 @@ def get_valid_access_token() -> Optional[str]:
 def check_youtube_video_status(
     youtube: Any,
     video_id: str,
-    timeout_sec: float = 12.0,
-    poll_interval_sec: float = 3.0,
+    timeout_sec: float = 120.0,
+    poll_interval_sec: float = 10.0,
 ) -> Tuple[bool, Optional[str], Dict[str, Any]]:
-    """Polls YouTube Data API to verify if an uploaded video is blocked or rejected.
+    """Polls YouTube Data API until processing finishes to verify if an uploaded video is blocked or rejected.
 
     Returns:
         (is_blocked, rejection_reason, raw_status_dict)
@@ -149,7 +149,10 @@ def check_youtube_video_status(
                 print(f"[YouTube] 🛑 API indicates block on video {video_id}: {e}")
                 return True, "api_error_blocked", {"error": str(e)}
             print(f"[YouTube] ⚠️ YouTube status check query warning for {video_id}: {e}")
-            break
+            if time.time() - start_time >= timeout_sec:
+                break
+            time.sleep(poll_interval_sec)
+            continue
 
         if not isinstance(resp, dict):
             return False, None, {}
@@ -201,12 +204,13 @@ def check_youtube_video_status(
             return True, "region_restricted_empty_allowed", last_status
 
         elapsed = time.time() - start_time
-        if upload_status in ("uploaded", "processed") and processing_status in ("succeeded", "processing"):
-            if elapsed >= timeout_sec or timeout_sec <= 0:
-                print(f"[YouTube] ✅ Video {video_id} clean after check (uploadStatus={upload_status}, processingStatus={processing_status}).")
-                return False, None, last_status
+        # Only declare clean once YouTube actually finishes processing (Content ID runs during/after processing)
+        if processing_status == "succeeded" or upload_status == "processed":
+            print(f"[YouTube] ✅ Video {video_id} clean after processing (uploadStatus={upload_status}, processingStatus={processing_status}).")
+            return False, None, last_status
 
-        if elapsed >= timeout_sec:
+        if elapsed >= timeout_sec or timeout_sec <= 0:
+            print(f"[YouTube] ⚠️ Video {video_id} still {processing_status or upload_status} after {elapsed:.0f}s check timeout; no block detected yet.")
             break
 
         time.sleep(poll_interval_sec)
@@ -318,7 +322,7 @@ def upload_video_with_block_retry(
     tags: list,
     privacy_status: str = "public",
     max_retries: int = 2,
-    verify_timeout_sec: float = 12.0,
+    verify_timeout_sec: float = 120.0,
     dry_run: bool = False,
     youtube_client: Any = None,
     media_upload_cls: Any = None,
@@ -364,7 +368,7 @@ def upload_video_with_block_retry(
     gate = candle_gate or CandleGate()
     if gate_check and not force_upload and not dry_run and youtube:
         gate_res = gate.evaluate_live_channel(youtube)
-        candle_eval = gate_res.get("candle_evaluation", {})
+        candle_eval = gate_res.get("candle_evaluation") or (gate_res if "can_upload" in gate_res else {})
         if candle_eval.get("requires_spacing_sleep", False):
             wait_sec = candle_eval.get("spacing_sleep_seconds", 0)
             print(f"[YouTube] ⏱️ 24h upload spacing is within inline window ({wait_sec // 60}m remaining). Sleeping inline...")
@@ -372,7 +376,7 @@ def upload_video_with_block_retry(
             time.sleep(wait_sec)
             # Re-evaluate after the wait: Layer 1/2 may have flipped while sleeping.
             gate_res = gate.evaluate_live_channel(youtube)
-            candle_eval = gate_res.get("candle_evaluation", {})
+            candle_eval = gate_res.get("candle_evaluation") or (gate_res if "can_upload" in gate_res else {})
             if candle_eval and not candle_eval.get("can_upload", True):
                 rec = candle_eval.get("recommendation", "Upload deferred by Candle Gate after spacing wait.")
                 print(f"[YouTube] 🛑 {rec}")
@@ -516,7 +520,7 @@ def upload_video_to_youtube(
     tags: list,
     privacy_status: str = "public",
     max_retries: int = 2,
-    verify_timeout_sec: float = 12.0,
+    verify_timeout_sec: float = 120.0,
     dry_run: bool = False,
     youtube_client: Any = None,
     media_upload_cls: Any = None,
