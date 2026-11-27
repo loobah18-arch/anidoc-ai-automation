@@ -812,9 +812,9 @@ for li, ln in enumerate(lines):
     toks = [t for t in toks if t]
     if not toks:
         continue
-    # rows by width, not word count: at 98 px a caps row fits ~16 characters across the 1080 frame
-    # ("HE KNOWS UROKODAKI?" ran off both edges). Two rows at most; a row still too wide shrinks the font.
-    ROWC = int(os.environ.get('CAP_ROW_CHARS', 16))
+    # rows by width, not word count: at 98 px a caps row fits ~13 characters across the 1080 safe frame
+    # (16 chars ran into YouTube safe margins). Two rows at most; a row still too wide shrinks the font.
+    ROWC = int(os.environ.get('CAP_ROW_CHARS', 13))
     _w = lambda r: sum(len(t) for t in r) + max(0, len(r) - 1)
     if _w(toks) <= ROWC or len(toks) == 1:
         rows_ = [toks]

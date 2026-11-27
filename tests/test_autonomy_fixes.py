@@ -10,9 +10,11 @@ import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "edit"))
 
 import preflight_gate
 import publish
+from edit.gate import c_captions
 from publishers.candle_gate import CandleGate
 from publishers.youtube_publisher import check_youtube_video_status
 
@@ -128,6 +130,45 @@ class TestAutonomyFixes(unittest.TestCase):
             self.assertFalse(decision["proceed"])
             self.assertEqual(decision["remaining_seconds"], int(5.75 * 3600))
             self.assertEqual(decision["due_at"], "2026-11-27T09:45:00Z")
+
+    def test_c_captions_detects_overflow_and_respects_fs_scale(self):
+        sample_ass_overflow = """[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,Montserrat-ExtraBold,98,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,3,0,1,0,3,5,60,60,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:01.00,0:00:03.00,Cap,,0,0,0,,{\\pos(540,1017)\\bord4\\blur3\\3c&H00D946EF&\\shad3}FOR MY YOUNGER\\NBROTHER STANDING
+"""
+        sample_ass_scaled = """[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,Montserrat-ExtraBold,98,&H00FFFFFF,&H00FFFFFF,&H00FFFFFF,&H96000000,0,0,0,0,100,100,3,0,1,0,3,5,60,60,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 1,0:00:01.00,0:00:03.00,Cap,,0,0,0,,{\\pos(540,1017)\\fs70\\bord4\\blur3\\3c&H00D946EF&\\shad3}FOR MY YOUNGER\\NBROTHER STANDING
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            p_fail = Path(tmp) / "fail.ass"
+            p_pass = Path(tmp) / "pass.ass"
+            p_fail.write_text(sample_ass_overflow, encoding="utf-8")
+            p_pass.write_text(sample_ass_scaled, encoding="utf-8")
+
+            res_fail = c_captions(str(p_fail))
+            res_pass = c_captions(str(p_pass))
+
+            self.assertEqual(res_fail["status"], "fail")
+            self.assertEqual(res_pass["status"], "pass")
 
 
 if __name__ == "__main__":

@@ -134,11 +134,11 @@ def c_loudness():
     return out
 
 
-def c_captions():
-    path = 'work/convo/captions.ass'
+def c_captions(path='work/convo/captions.ass'):
     if not os.path.exists(path):
         return dict(status='skipped', why='no captions')
-    txt = open(path).read()
+    with open(path, encoding='utf-8') as f:
+        txt = f.read()
     W = int(re.search(r'PlayResX:\s*(\d+)', txt).group(1)); H = int(re.search(r'PlayResY:\s*(\d+)', txt).group(1))
     st = re.search(r'^Style:\s*Cap,([^,]+),(\d+(?:\.\d+)?),(?:[^,]*,){10}(-?\d+(?:\.\d+)?),', txt, re.M)
     font_name, size, spacing = st.group(1), float(st.group(2)), float(st.group(3))
@@ -160,6 +160,9 @@ def c_captions():
         x, y = (float(pos.group(1)), float(pos.group(2))) if pos else (W / 2, H / 2)
         sc = [float(v) for v in re.findall(r'\\fscx(\d+(?:\.\d+)?)', body)] or [100.0]
         scale = sc[-1] / 100.0                                        # the settled size (the 106% pop lasts 90 ms)
+        fs = [float(v) for v in re.findall(r'\\fs(\d+(?:\.\d+)?)', body)]
+        if fs:
+            scale *= fs[-1] / size
         bord = float((re.findall(r'\\bord(\d+(?:\.\d+)?)', body) or [0])[-1])
         rows = [re.sub(r'\{[^}]*\}', '', r) for r in body.split('\\N')]
         w = max(width(r) for r in rows) * scale + 2 * bord
@@ -208,25 +211,30 @@ def c_credits():
                 why='' if not bad else f'{len(bad)} cuts come from an opening/ending/recap, e.g. {bad[0]}')
 
 
-run('video', c_video)
-run('repeats', c_repeats)
-run('credits', c_credits)
-run('captions', c_captions)
-run('loudness', c_loudness)
-if os.environ.get('GATE_CHARACTER', '1') != '0':
-    run('character', c_character)
-ok = not reasons
-res = dict(result='pass' if ok else 'fail', reasons=reasons, checks=checks, writer=meta.get('writer') or convo.get('writer'),
-           character=meta.get('character_name'), song=meta.get('song'))
-os.makedirs(OUT, exist_ok=True)
-json.dump(res, open(os.path.join(OUT, 'gate.json'), 'w'), indent=1)
-print('GATE', res['result'].upper(), '|', '; '.join(reasons) or 'all checks passed or skipped', flush=True)
-if os.environ.get('GITHUB_OUTPUT'):
-    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-        f.write(f"gate={res['result']}\n")
-if os.environ.get('GITHUB_STEP_SUMMARY'):
-    with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
-        f.write(f"### Quality gate: {res['result'].upper()}\nwriter: {res['writer']} | character: {res['character']} | song: {res['song']}\n\n")
-        for k, v in checks.items():
-            f.write(f"- **{k}**: {v.get('status')} {v.get('why', '')}\n")
-sys.exit(0)
+def main():
+    run('video', c_video)
+    run('repeats', c_repeats)
+    run('credits', c_credits)
+    run('captions', c_captions)
+    run('loudness', c_loudness)
+    if os.environ.get('GATE_CHARACTER', '1') != '0':
+        run('character', c_character)
+    ok = not reasons
+    res = dict(result='pass' if ok else 'fail', reasons=reasons, checks=checks, writer=meta.get('writer') or convo.get('writer'),
+               character=meta.get('character_name'), song=meta.get('song'))
+    os.makedirs(OUT, exist_ok=True)
+    json.dump(res, open(os.path.join(OUT, 'gate.json'), 'w'), indent=1)
+    print('GATE', res['result'].upper(), '|', '; '.join(reasons) or 'all checks passed or skipped', flush=True)
+    if os.environ.get('GITHUB_OUTPUT'):
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write(f"gate={res['result']}\n")
+    if os.environ.get('GITHUB_STEP_SUMMARY'):
+        with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+            f.write(f"### Quality gate: {res['result'].upper()}\nwriter: {res['writer']} | character: {res['character']} | song: {res['song']}\n\n")
+            for k, v in checks.items():
+                f.write(f"- **{k}**: {v.get('status')} {v.get('why', '')}\n")
+    return res
+
+
+if __name__ == '__main__':
+    main()
