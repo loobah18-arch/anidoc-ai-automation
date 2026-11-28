@@ -11,7 +11,7 @@
   "rubikdice_montagem_pegadora_slowed": 4,
   "ncts_next_phonk": 4,
   "nxxkz_loucura_letal_funk_slowed": 3,
-  "montagem_vozes_profundas": 3,
+  "montagem_vozes_profundas": 4,
   "cotneus_stereo_love_funk": 3,
   "zxvren_montagem_delirio_slowed": 3,
   "poker_face": 4,
@@ -100,7 +100,8 @@
   "demon-slayer-kimetsu-no-yaiba:S1E25": 1,
   "demon-slayer-kimetsu-no-yaiba:S3E06": 1,
   "jujutsu-kaisen:S2E22": 1,
-  "jujutsu-kaisen:S3E11": 1
+  "jujutsu-kaisen:S3E11": 1,
+  "demon-slayer-kimetsu-no-yaiba:S4E04": 1
  },
  "shots": [
   {
@@ -10722,6 +10723,62 @@
   {
    "ep": "jujutsu-kaisen:S3E11",
    "s": 1043.8
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1148.035
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1112.754
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1122.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1123.95
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1134.975
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1211.533
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1220.683
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1143.623
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1109.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1123.54
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1211.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1214.04
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1133.79
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1140.225
   }
  ],
  "runs": [
@@ -11426,6 +11483,16 @@
    "song": "ashreveal_manasha_phonk",
    "episodes": [
     "jujutsu-kaisen:S3E11"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-28 04:55 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "montagem_vozes_profundas",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S4E04"
    ],
    "file": "_amv_part.mp4"
   }
@@ -12390,11 +12457,35 @@
     1319.0,
     1409.0
    ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S1E22": [
+   [
+    98.0,
+    162.0
+   ],
+   [
+    1269.0,
+    1361.0
+   ]
+  ],
+  "demon-slayer-kimetsu-no-yaiba:S4E04": [
+   [
+    21.0,
+    56.0
+   ],
+   [
+    78.0,
+    158.0
+   ],
+   [
+    1287.0,
+    1385.0
+   ]
   ]
  },
  "series": {
   "jujutsu-kaisen": 30,
-  "demon-slayer-kimetsu-no-yaiba": 29
+  "demon-slayer-kimetsu-no-yaiba": 30
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -12975,6 +13066,15 @@
    "question": "Who wins this fight?",
    "file": "Jujutsu_Kaisen_convo_ashreveal_manasha_phonk.mp4",
    "time": "2026-11-27 04:59 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "s": 1157.3333333333333,
+   "e": 1175.1999999999998,
+   "topic": "nezuko",
+   "question": "Why is Nezuko so excited now?",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_montagem_vozes_profundas.mp4",
+   "time": "2026-11-28 04:55 UTC"
   }
  ],
  "styles": [
@@ -13091,6 +13191,12 @@
    "ep": "jujutsu-kaisen:S3E11",
    "file": "Jujutsu_Kaisen_convo_ashreveal_manasha_phonk.mp4",
    "time": "2026-11-27 04:59 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S4E04",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_montagem_vozes_profundas.mp4",
+   "time": "2026-11-28 04:55 UTC"
   }
  ],
  "narr_chars": {
