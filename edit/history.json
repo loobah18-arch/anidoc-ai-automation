@@ -15,7 +15,7 @@
   "cotneus_stereo_love_funk": 3,
   "zxvren_montagem_delirio_slowed": 3,
   "poker_face": 4,
-  "atlxs_passo_bem_solto_slowed": 3,
+  "atlxs_passo_bem_solto_slowed": 4,
   "ashreveal_manasha_phonk": 4,
   "dygo_funk_infernal": 3
  },
@@ -101,7 +101,8 @@
   "demon-slayer-kimetsu-no-yaiba:S3E06": 1,
   "jujutsu-kaisen:S2E22": 1,
   "jujutsu-kaisen:S3E11": 1,
-  "demon-slayer-kimetsu-no-yaiba:S4E04": 1
+  "demon-slayer-kimetsu-no-yaiba:S4E04": 1,
+  "demon-slayer-kimetsu-no-yaiba:S1E14": 1
  },
  "shots": [
   {
@@ -10855,6 +10856,82 @@
   {
    "ep": "jujutsu-kaisen:S2E04",
    "s": 940.816
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 257.208
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 221.775
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 334.525
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 348.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 237.957
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 242.207
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 243.45
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 247.567
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 299.524
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 317.916
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 324.733
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 328.625
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 223.857
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 351.023
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 253.123
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 236.233
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 312.373
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 332.873
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 244.9
   }
  ],
  "runs": [
@@ -11579,6 +11656,16 @@
    "song": "andromeda_montagem_coma",
    "episodes": [
     "jujutsu-kaisen:S2E04"
+   ],
+   "file": "_amv_part.mp4"
+  },
+  {
+   "time": "2026-11-28 07:12 UTC",
+   "pick": "auto",
+   "series": "demon-slayer-kimetsu-no-yaiba",
+   "song": "atlxs_passo_bem_solto_slowed",
+   "episodes": [
+    "demon-slayer-kimetsu-no-yaiba:S1E14"
    ],
    "file": "_amv_part.mp4"
   }
@@ -12571,7 +12658,7 @@
  },
  "series": {
   "jujutsu-kaisen": 31,
-  "demon-slayer-kimetsu-no-yaiba": 30
+  "demon-slayer-kimetsu-no-yaiba": 31
  },
  "known": [
   "demon-slayer-kimetsu-no-yaiba:S1E01",
@@ -13170,6 +13257,15 @@
    "question": "Why is Gojo\u2019s Infinity flawed?",
    "file": "Jujutsu_Kaisen_convo_andromeda_montagem_coma.mp4",
    "time": "2026-11-28 07:01 UTC"
+  },
+  {
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "s": 272.5,
+   "e": 295.3666666666667,
+   "topic": "inosuke",
+   "question": "Who\u2019s stronger: Inosuke or Tanjiro?",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_atlxs_passo_bem_solto_slowed.mp4",
+   "time": "2026-11-28 07:12 UTC"
   }
  ],
  "styles": [
@@ -13298,6 +13394,12 @@
    "ep": "jujutsu-kaisen:S2E04",
    "file": "Jujutsu_Kaisen_convo_andromeda_montagem_coma.mp4",
    "time": "2026-11-28 07:01 UTC"
+  },
+  {
+   "style": "convo",
+   "ep": "demon-slayer-kimetsu-no-yaiba:S1E14",
+   "file": "Demon_Slayer_Kimetsu_No_Yaiba_convo_atlxs_passo_bem_solto_slowed.mp4",
+   "time": "2026-11-28 07:12 UTC"
   }
  ],
  "narr_chars": {
